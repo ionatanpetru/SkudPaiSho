@@ -194,7 +194,7 @@ var GINSENG_1_POINT_0 = "Ginseng1_0";
 gameOptionDescriptions[GINSENG_1_POINT_0] = "Ginseng 1.0";
 
 var DIAGONAL_BISON_ABILITY_TESTING = "DiaBisonTesting";
-gameOptionDescriptions[DIAGONAL_BISON_ABILITY_TESTING] = "Bison gives Diagonal movement";
+gameOptionDescriptions[DIAGONAL_BISON_ABILITY_TESTING] = "Bison gives Diagonal movement (testing)";
 
 /* Key Pai Sho */
 var NO_EFFECT_TILES = "NoEffectTiles";

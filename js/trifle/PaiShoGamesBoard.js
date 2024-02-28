@@ -1651,6 +1651,7 @@ PaiShoGames.Board.prototype.getMovementExtendedDistance = function(boardPointSta
 };
 
 PaiShoGames.Board.prototype.getManipulatedMovementInfo = function(boardPointStart, movementInfo) {
+	movementInfo = { ...movementInfo };	// Copy object
 	var manipulateMovementAbilities = this.abilityManager.getAbilitiesTargetingTile(Trifle.AbilityName.manipulateExistingMovement, boardPointStart.tile);
 	manipulateMovementAbilities.forEach(manipulateAbility => {
 		if (manipulateAbility.abilityInfo.newMovementType) {
