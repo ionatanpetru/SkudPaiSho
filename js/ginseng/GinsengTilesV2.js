@@ -365,26 +365,46 @@ Ginseng.TileInfo.defineGinsengTilesV2 = function() {
 				}
 			],
 			abilities: [
-				{
-					type: Trifle.AbilityName.extendMovement,
-					extendMovementType: Trifle.MovementType.standard,
-					extendDistance: 1,
-					triggers: [
-						{
-							triggerType: Trifle.AbilityTriggerType.whileTargetTileIsSurrounding,
-							targetTeams: [Trifle.TileTeam.friendly],
-							activationRequirements: [
-								{
-									type: Trifle.ActivationRequirement.tileIsOnPointOfType,
-									targetTileTypes: [Trifle.TileCategory.thisTile],
-									targetPointTypes: [RED]
-								}
-							]
-						}
-					],
-					targetTypes: [Trifle.TargetType.triggerTargetTiles],
-					targetTeams: [Trifle.TileTeam.friendly]
-				}
+				gameOptionEnabled(DIAGONAL_BISON_ABILITY_TESTING)
+					? {
+						type: Trifle.AbilityName.manipulateExistingMovement,
+						newMovementType: Trifle.MovementType.diagonal,
+						triggers: [
+							{
+								triggerType: Trifle.AbilityTriggerType.whileTargetTileIsSurrounding,
+								targetTeams: [Trifle.TileTeam.friendly],
+								activationRequirements: [
+									{
+										type: Trifle.ActivationRequirement.tileIsOnPointOfType,
+										targetTileTypes: [Trifle.TileCategory.thisTile],
+										targetPointTypes: [RED]
+									}
+								]
+							}
+						],
+						targetTypes: [Trifle.TargetType.triggerTargetTiles],
+						targetTeams: [Trifle.TileTeam.friendly]
+					}
+					: {
+						type: Trifle.AbilityName.extendMovement,
+						extendMovementType: Trifle.MovementType.standard,
+						extendDistance: 1,
+						triggers: [
+							{
+								triggerType: Trifle.AbilityTriggerType.whileTargetTileIsSurrounding,
+								targetTeams: [Trifle.TileTeam.friendly],
+								activationRequirements: [
+									{
+										type: Trifle.ActivationRequirement.tileIsOnPointOfType,
+										targetTileTypes: [Trifle.TileCategory.thisTile],
+										targetPointTypes: [RED]
+									}
+								]
+							}
+						],
+						targetTypes: [Trifle.TargetType.triggerTargetTiles],
+						targetTeams: [Trifle.TileTeam.friendly]
+					}
 			],
 			textLines: [
 				"<strong>Movement Phase</strong>",

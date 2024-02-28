@@ -580,8 +580,10 @@ PaiShoGames.Board.prototype.getAdjacentDiagonalPointsPotentialPossibleMoves = fu
 	var rowDifference = originPoint.row - pointAlongTheWay.row;
 	var colDifference = originPoint.col - pointAlongTheWay.col;
 
+	var ignorePreserveDirection = !mustPreserveDirection || pointAlongTheWay === originPoint;
+
 	if (
-			(!mustPreserveDirection || (mustPreserveDirection && rowDifference >= 0 && colDifference >= 0))
+			(ignorePreserveDirection || (mustPreserveDirection && rowDifference > 0 && colDifference > 0))
 			&& (pointAlongTheWay.row > 0 && pointAlongTheWay.col > 0)
 		) {
 		var adjacentPoint = this.cells[pointAlongTheWay.row - 1][pointAlongTheWay.col - 1];
@@ -590,7 +592,7 @@ PaiShoGames.Board.prototype.getAdjacentDiagonalPointsPotentialPossibleMoves = fu
 		}
 	}
 	if (
-			(!mustPreserveDirection || (mustPreserveDirection && rowDifference <= 0 && colDifference <= 0))
+			(ignorePreserveDirection || (mustPreserveDirection && rowDifference < 0 && colDifference < 0))
 			&& (pointAlongTheWay.row < paiShoBoardMaxRowOrCol && pointAlongTheWay.col < paiShoBoardMaxRowOrCol)
 		) {
 		var adjacentPoint = this.cells[pointAlongTheWay.row + 1][pointAlongTheWay.col + 1];
@@ -599,7 +601,7 @@ PaiShoGames.Board.prototype.getAdjacentDiagonalPointsPotentialPossibleMoves = fu
 		}
 	}
 	if (
-			(!mustPreserveDirection || (mustPreserveDirection && colDifference >= 0 && rowDifference <= 0))
+			(ignorePreserveDirection || (mustPreserveDirection && colDifference > 0 && rowDifference < 0))
 			&& (pointAlongTheWay.col > 0 && pointAlongTheWay.row < paiShoBoardMaxRowOrCol)
 		) {
 		var adjacentPoint = this.cells[pointAlongTheWay.row + 1][pointAlongTheWay.col - 1];
@@ -608,7 +610,7 @@ PaiShoGames.Board.prototype.getAdjacentDiagonalPointsPotentialPossibleMoves = fu
 		}
 	}
 	if (
-			(!mustPreserveDirection || (mustPreserveDirection && colDifference <= 0 && rowDifference >= 0))
+			(ignorePreserveDirection || (mustPreserveDirection && colDifference < 0 && rowDifference > 0))
 			&& (pointAlongTheWay.col < paiShoBoardMaxRowOrCol && pointAlongTheWay.row > 0)
 		) {
 		var adjacentPoint = this.cells[pointAlongTheWay.row - 1][pointAlongTheWay.col + 1];
@@ -1541,6 +1543,7 @@ PaiShoGames.Board.prototype.setPossibleMovePoints = function(boardPointStart) {
 			var self = this;
 			if (tileInfo.movements) {
 				tileInfo.movements.forEach(function(movementInfo) {
+					movementInfo = self.getManipulatedMovementInfo(boardPointStart, movementInfo);
 					self.setPossibleMovesForMovement(movementInfo, boardPointStart);
 				});
 			}
@@ -1647,6 +1650,22 @@ PaiShoGames.Board.prototype.getMovementExtendedDistance = function(boardPointSta
 	return extendDistance;
 };
 
+PaiShoGames.Board.prototype.getManipulatedMovementInfo = function(boardPointStart, movementInfo) {
+	var manipulateMovementAbilities = this.abilityManager.getAbilitiesTargetingTile(Trifle.AbilityName.manipulateExistingMovement, boardPointStart.tile);
+	manipulateMovementAbilities.forEach(manipulateAbility => {
+		if (manipulateAbility.abilityInfo.newMovementType) {
+			var newMovementType = manipulateAbility.abilityInfo.newMovementType;
+			if (
+				(newMovementType === Trifle.MovementType.diagonal && movementInfo.type === Trifle.MovementType.standard)
+				|| (newMovementType === Trifle.MovementType.standard && movementInfo.type === Trifle.MovementType.diagonal)
+			) {
+				movementInfo.type = Trifle.MovementType.orthAndDiag;
+			}
+		}
+	});
+	return movementInfo;
+};
+
 PaiShoGames.Board.prototype.setPossibleMovesForMovement = function(movementInfo, boardPointStart) {
 	this.movementPointChecks = 0;
 	var movementDistance = movementInfo.distance + this.getMovementExtendedDistance(boardPointStart, movementInfo);
@@ -1696,7 +1715,6 @@ PaiShoGames.Board.diagonalMovementFunction = function(board, originPoint, boardP
 	return board.getAdjacentDiagonalPointsPotentialPossibleMoves(boardPointAlongTheWay, originPoint, mustPreserveDirection, movementInfo);
 };
 PaiShoGames.Board.orthAndDiagMovementFunction = function(board, originPoint, boardPointAlongTheWay, movementInfo, moveStepNumber) {
-	/* TODO: Test preserve direction */
 	var mustPreserveDirection = Trifle.TileInfo.movementMustPreserveDirection(movementInfo);
 	return board.getAdjacentPointsPotentialPossibleMoves(boardPointAlongTheWay, originPoint, mustPreserveDirection, movementInfo)
 			.concat(board.getAdjacentDiagonalPointsPotentialPossibleMoves(boardPointAlongTheWay, originPoint, mustPreserveDirection, movementInfo));
