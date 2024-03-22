@@ -2,7 +2,19 @@
 
 // --------------------------------------------- // 
 
-function VagabondNotationMove(text) {
+import { BRAND_NEW } from '../PaiShoMain';
+import {
+  DEPLOY,
+  DRAW_ACCEPT,
+  DRAW_OFFER,
+  GUEST,
+  HOST,
+  MOVE,
+  NotationPoint,
+} from '../CommonNotationObjects';
+import { debug } from '../GameData';
+
+export function VagabondNotationMove(text) {
 	this.fullMoveText = text;
 	this.analyzeMove();
 }
@@ -81,7 +93,7 @@ VagabondNotationMove.prototype.equals = function(otherMove) {
 
 // --------------------------------------- //
 
-function VagabondNotationBuilder() {
+export function VagabondNotationBuilder() {
 	// this.moveNum;	// Let's try making this magic
 	// this.player;		// Magic
 	this.moveType;
@@ -118,7 +130,7 @@ VagabondNotationBuilder.prototype.getNotationMove = function(moveNum, player) {
 
 
 
-function VagabondGameNotation() {
+export function VagabondGameNotation() {
 	this.notationText = "";
 	this.moves = [];
 }

@@ -1,5 +1,9 @@
 // Tile
 
+import { GUEST, HOST } from '../CommonNotationObjects';
+import { PaiShoGames, Trifle } from './TrifleController';
+import { debug } from '../GameData';
+
 Trifle.tileId = 1;
 
 Trifle.Tile = function(code, ownerCode) {

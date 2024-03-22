@@ -1,5 +1,13 @@
+import {
+  GameType,
+  buildDropdownDiv,
+  currentGameData,
+  gameController,
+  usernameEquals
+} from '../PaiShoMain';
+import { dateIsBetween } from "../GameData";
 
-function AdevarOptions() {
+export function AdevarOptions() {
 	// Adevar options
 	if (dateIsBetween("10/01/2023", "11/04/2023")) {
 		AdevarOptions.enableSpoopyTiles();

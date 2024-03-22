@@ -1,6 +1,17 @@
 /* Vagabond AI Help */
 
-function VagabondAiHelp() {
+import {
+  DEPLOY,
+  GUEST,
+  MOVE,
+  NotationPoint,
+  RowAndColumn,
+} from '../../CommonNotationObjects';
+import { NON_PLAYABLE, POSSIBLE_MOVE } from '../../skud-pai-sho/SkudPaiShoBoardPoint';
+import { VagabondNotationBuilder } from '../VagabondGameNotation';
+import { WAITING_FOR_ENDPOINT } from '../../PaiShoMain';
+
+export function VagabondAiHelp() {
 	this.moveNum = 0;
 }
 
@@ -40,7 +51,7 @@ VagabondAiHelp.prototype.getPossibleDeploymentMoves = function(game, player) {
 					isDuplicate = true;
 				}
 			}
-			if (!isDuplicate) {
+			if (!isDuplicate && move && move.fullMoveText) {
 				moves.push(move);
 			}
 		}
@@ -100,13 +111,24 @@ VagabondAiHelp.prototype.getTilePile = function(game, player) {
 
 VagabondAiHelp.prototype.getPossibleMovePoints = function(game) {
 	var points = [];
-	for (var row = 0; row < game.board.cells.length; row++) {
-		for (var col = 0; col < game.board.cells[row].length; col++) {
-			if (game.board.cells[row][col].isType(POSSIBLE_MOVE)) {
-				points.push(game.board.cells[row][col]);
+	// for (var row = 0; row < game.board.cells.length; row++) {
+	// 	for (var col = 0; col < game.board.cells[row].length; col++) {
+	// 		if (game.board.cells[row][col].isType(POSSIBLE_MOVE)) {
+	// 			points.push(game.board.cells[row][col]);
+	// 		}
+	// 	}
+	// }
+
+	game.board.cells.forEach(function(row) {
+		row.forEach(function(boardPoint) {
+			if (!boardPoint.isType(NON_PLAYABLE)) {
+				if (boardPoint.isType(POSSIBLE_MOVE)) {
+					points.push(boardPoint);
+				}
 			}
-		}
-	}
+		});
+	});
+
 	return points;
 };
 

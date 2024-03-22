@@ -1,6 +1,57 @@
 /* Skud Pai Sho Board */
 
-function SkudPaiShoBoard() {
+import {
+  ACCENT_TILE,
+  BAMBOO,
+  BASIC_FLOWER,
+  BOAT,
+  KNOTWEED,
+  LION_TURTLE,
+  ORCHID,
+  POND,
+  ROCK,
+  WHEEL,
+  WHITE_LOTUS,
+  boatOnlyMoves,
+  debug,
+  lotusNoCapture,
+  newKnotweedRules,
+  newOrchidVulnerableRule,
+  newWheelRule,
+  rocksUnwheelable,
+  simpleRocks,
+  simpleSpecialFlowerRule,
+  simplest,
+  superRocks,
+} from '../GameData';
+import { AdevarTileType } from '../adevar/AdevarTile';
+import {
+  DIAGONAL_MOVEMENT,
+  EVERYTHING_CAPTURE,
+  IGNORE_CLASHING,
+  gameOptionEnabled,
+} from '../GameOptions';
+import {
+  GATE,
+  NON_PLAYABLE,
+  POSSIBLE_MOVE,
+  SkudPaiShoBoardPoint,
+} from './SkudPaiShoBoardPoint';
+import {
+  GUEST,
+  HOST,
+  NotationPoint,
+  RowAndColumn,
+} from '../CommonNotationObjects';
+import {
+  SkudPaiShoHarmony,
+  SkudPaiShoHarmonyManager
+} from './SkudPaiShoHarmony';
+import { SkudPaiShoTile } from './SkudPaiShoTile';
+import { paiShoBoardMaxRowOrCol } from '../pai-sho-common/PaiShoBoardHelp';
+import { showBadMoveModal } from '../PaiShoMain';
+
+export function SkudPaiShoBoard() {
 	this.size = new RowAndColumn(17, 17);
 	this.cells = this.brandNew();
 

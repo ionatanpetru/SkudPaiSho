@@ -1,6 +1,6 @@
 // Board Point
 
-function CoopSolitaireBoardPoint() {
+export function CoopSolitaireBoardPoint() {
 	this.types = [];
 	this.row = -1;
 	this.col = -1;

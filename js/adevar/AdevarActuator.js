@@ -1,6 +1,35 @@
 // Actuator
 
-function AdevarActuator(gameContainer, isMobile, enableAnimations) {
+import { ADEVAR_GUEST_ROTATE, ADEVAR_ROTATE } from '../GameOptions';
+import { AdevarController } from './AdevarController';
+import { AdevarOptions } from './AdevarOptions';
+import { AdevarTileType } from './AdevarTile';
+import { DEPLOY, GUEST, HOST, MOVE } from '../CommonNotationObjects';
+import { ElementStyleTransform } from '../util/ElementStyleTransform';
+import {
+  MARKED,
+  NON_PLAYABLE,
+  POSSIBLE_MOVE,
+} from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import {
+  RmbDown,
+  RmbUp,
+  clearMessage,
+  getUsername,
+  pieceAnimationLength,
+  piecePlaceAnimation,
+  showTileMessage,
+  unplayedTileClicked,
+} from '../PaiShoMain';
+import {
+  createBoardArrow,
+  createBoardPointDiv,
+  getTilesForPlayer,
+  isSamePoint,
+  setupPaiShoBoard,
+} from '../ActuatorHelp';
+
+export function AdevarActuator(gameContainer, isMobile, enableAnimations) {
 	this.gameContainer = gameContainer;
 	this.mobile = isMobile;
 
@@ -199,11 +228,20 @@ AdevarActuator.prototype.addTile = function(tile, tileContainer, isCaptured) {
 
 	if (!isCaptured) {
 		if (this.mobile) {
-			theDiv.setAttribute("onclick", "unplayedTileClicked(this); showTileMessage(this);");
+			// theDiv.setAttribute("onclick", "unplayedTileClicked(this); showTileMessage(this);");
+			theDiv.addEventListener('click', () => {
+				unplayedTileClicked(theDiv);
+				showTileMessage(theDiv);
+			});
 		} else {
-			theDiv.setAttribute("onclick", "unplayedTileClicked(this);");
-			theDiv.setAttribute("onmouseover", "showTileMessage(this);");
-			theDiv.setAttribute("onmouseout", "clearMessage();");
+			// theDiv.setAttribute("onclick", "unplayedTileClicked(this);");
+			theDiv.addEventListener('click', () => unplayedTileClicked(theDiv));
+			
+			// theDiv.setAttribute("onmouseover", "showTileMessage(this);");
+			theDiv.addEventListener('mouseover', () => showTileMessage(theDiv));
+			
+			// theDiv.setAttribute("onmouseout", "clearMessage();");
+			theDiv.addEventListener('mouseout', clearMessage);
 		}
 	}
 
@@ -243,7 +281,7 @@ AdevarActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate) {
 		} else {
 			theDiv.setAttribute("onclick", "pointClicked(this);");
 			theDiv.setAttribute("onmouseover", "showPointMessage(this);");
-			theDiv.setAttribute("onmouseout", "clearMessage();");
+			theDiv.addEventListener('mouseout', clearMessage);
 			theDiv.addEventListener('mousedown', e => {
 				 // Right Mouse Button
 				if (e.button == 2) {

@@ -1,5 +1,5 @@
 
-function BloomsGameManager(actuator, ignoreActuate, isCopy) {
+export function BloomsGameManager(actuator, ignoreActuate, isCopy) {
 	this.isCopy = isCopy;
 	this.actuator = actuator;
 

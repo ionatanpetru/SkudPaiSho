@@ -2,28 +2,36 @@
 
 // --------------------------------------------- // 
 
-Trifle.NotationBuilderStatus = {
+import { BRAND_NEW, gameController } from '../PaiShoMain';
+import { DEPLOY, MOVE, SETUP, TEAM_SELECTION } from '../CommonNotationObjects';
+import { debug } from '../GameData';
+import {
+  getOpponentName,
+  getPlayerCodeFromName,
+} from '../pai-sho-common/PaiShoPlayerHelp';
+
+export const TrifleNotationBuilderStatus = {
 	PROMPTING_FOR_TARGET: "PROMPTING_FOR_TARGET"
 };
 
 /* Because it's just json, the NotationMove object here might not be used */
-Trifle.NotationMove = function(text, promptTargetData) {
+export function TrifleNotationMove(text, promptTargetData) {
 	this.fullMoveText = text;
 	this.analyzeMove();
 	this.promptTargetData = promptTargetData;
 }
 
-Trifle.NotationMove.prototype.analyzeMove = function() {
+TrifleNotationMove.prototype.analyzeMove = function() {
 	this.valid = true;
 
 	this.moveData = JSON.parse(this.fullMoveText);
 };
 
-Trifle.NotationMove.prototype.isValidNotation = function() {
+TrifleNotationMove.prototype.isValidNotation = function() {
 	return this.valid;
 };
 
-Trifle.NotationMove.prototype.equals = function(otherMove) {
+TrifleNotationMove.prototype.equals = function(otherMove) {
 	return this.fullMoveText === otherMove.fullMoveText;
 };
 
@@ -31,7 +39,7 @@ Trifle.NotationMove.prototype.equals = function(otherMove) {
 
 // --------------------------------------- //
 
-Trifle.NotationBuilder = function() {
+export function TrifleNotationBuilder() {
 	// this.moveNum;	// Let's try making this magic
 	// this.player;		// Magic
 	this.moveType;
@@ -47,7 +55,7 @@ Trifle.NotationBuilder = function() {
 	this.status = BRAND_NEW;
 }
 
-Trifle.NotationBuilder.prototype.getNotationMove = function(moveNum, player) {
+TrifleNotationBuilder.prototype.getNotationMove = function(moveNum, player) {
 	var move = {
 		moveNum: moveNum,
 		player: player,
@@ -66,6 +74,7 @@ Trifle.NotationBuilder.prototype.getNotationMove = function(moveNum, player) {
 		move.endPoint = this.endPoint.pointText;
 	}
 
+	// if (this.promptTargetData && Object.keys(this.promptTargetData).length > 0) {
 	if (this.promptTargetData) {
 		move.promptTargetData = this.promptTargetData;
 	}
@@ -74,6 +83,7 @@ Trifle.NotationBuilder.prototype.getNotationMove = function(moveNum, player) {
 		move.offerDraw = true;
 	}
 
+	// TODO notation cleanup
 	if (this.endPointMovementPath) {
 		var movementPathNotationPoints = [];
 		this.endPointMovementPath.forEach(boardPoint => {
@@ -94,30 +104,30 @@ Trifle.NotationBuilder.prototype.getNotationMove = function(moveNum, player) {
 
 
 
-Trifle.GameNotation = function(firstPlayer) {
+export function TrifleGameNotation(firstPlayer) {
 	this.notationText = "";
 	this.moves = [];
 	this.firstPlayer = firstPlayer;
 	this.secondPlayer = getOpponentName(firstPlayer);
 }
 
-Trifle.GameNotation.prototype.setNotationText = function(text) {
+TrifleGameNotation.prototype.setNotationText = function(text) {
 	this.notationText = text;
 	this.loadMoves();
 };
 
-Trifle.GameNotation.prototype.addMove = function(move) {
+TrifleGameNotation.prototype.addMove = function(move) {
 	this.moves.push(move);
 };
 
-Trifle.GameNotation.prototype.removeLastMove = function() {
+TrifleGameNotation.prototype.removeLastMove = function() {
 	var removedMove = this.moves.pop();
 	
 	debug("Removed Move:");
 	debug(removedMove);
 };
 
-/* Trifle.GameNotation.prototype.getPlayerMoveNum = function() {
+/* TrifleGameNotation.prototype.getPlayerMoveNum = function() {
 	var moveNum = 0;
 	var lastMove = this.moves[this.moves.length-1];
 
@@ -130,7 +140,7 @@ Trifle.GameNotation.prototype.removeLastMove = function() {
 	return moveNum;
 }; */	// Can get rid of this?
 
-Trifle.GameNotation.prototype.getNotationMoveFromBuilder = function(builder) {
+TrifleGameNotation.prototype.getNotationMoveFromBuilder = function(builder) {
 	var moveNum = 0;
 
 	var lastMove = this.moves[this.moves.length-1];
@@ -145,14 +155,20 @@ Trifle.GameNotation.prototype.getNotationMoveFromBuilder = function(builder) {
 	return builder.getNotationMove(moveNum, builder.currentPlayer);
 };
 
-Trifle.GameNotation.prototype.loadMoves = function() {
+TrifleGameNotation.prototype.loadMoves = function() {
 	this.moves = [];
 	if (this.notationText) {
 		this.moves = JSON.parse(this.notationText);
+
+		// this.moves.forEach(move => {
+		// 	if (!move.moveType) {
+		// 		move.moveType = MOVE;
+		// 	}
+		// });
 	}
 };
 
-Trifle.GameNotation.prototype.buildSimplifiedNotationString = function(move) {
+TrifleGameNotation.prototype.buildSimplifiedNotationString = function(move) {
 	if (gameController.buildNotationString) {
 		return gameController.buildNotationString(move);
 	}
@@ -163,7 +179,7 @@ Trifle.GameNotation.prototype.buildSimplifiedNotationString = function(move) {
 	return moveNum + playerCode + ".¯\\_(ツ)_/¯";
 };
 
-Trifle.GameNotation.prototype.getNotationHtml = function() {
+TrifleGameNotation.prototype.getNotationHtml = function() {
 	var notationHtml = "";
 
 	this.moves.forEach(function(move) {
@@ -173,12 +189,13 @@ Trifle.GameNotation.prototype.getNotationHtml = function() {
 	return notationHtml;
 };
 
-Trifle.GameNotation.prototype.notationTextForUrl = function() {
+TrifleGameNotation.prototype.notationTextForUrl = function() {
+	// TODO Could remove the 'moveType' field if it is equal to 'MOVE'
 	var str = JSON.stringify(this.moves);
 	return str;
 };
 
-Trifle.GameNotation.prototype.getNotationForEmail = function() {
+TrifleGameNotation.prototype.getNotationForEmail = function() {
 	var notationHtml = "";
 
 	this.moves.forEach((move) => {
@@ -188,15 +205,15 @@ Trifle.GameNotation.prototype.getNotationForEmail = function() {
 	return notationHtml;
 };
 
-Trifle.GameNotation.prototype.getLastMoveText = function() {
+TrifleGameNotation.prototype.getLastMoveText = function() {
 	return this.moves[this.moves.length - 1].fullMoveText;
 };
 
-Trifle.GameNotation.prototype.getLastMoveNumber = function() {
+TrifleGameNotation.prototype.getLastMoveNumber = function() {
 	return this.moves[this.moves.length - 1].moveNum;
 };
 
-Trifle.GameNotation.prototype.lastMoveHasDrawOffer = function() {
+TrifleGameNotation.prototype.lastMoveHasDrawOffer = function() {
 	return this.moves[this.moves.length - 1] 
 		&& this.moves[this.moves.length - 1].offerDraw;
 };

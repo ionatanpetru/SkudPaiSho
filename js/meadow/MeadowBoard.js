@@ -1,5 +1,5 @@
 
-function MeadowBoard() {
+export function MeadowBoard() {
 	this.edgeLength = 5;
 	if (gameOptionEnabled(FOUR_SIDED_BOARD)) {
 		this.edgeLength = 4;

@@ -1,6 +1,6 @@
 /* Skud Pai Sho specific UI interaction logic */
 
-function FirePaiShoController(gameContainer, isMobile) {
+export function FirePaiShoController(gameContainer, isMobile) {
 	this.actuator = new FirePaiShoActuator(gameContainer, isMobile, isAnimationsOn());
 	this.gameContainer = gameContainer;
 	this.resetGameManager();

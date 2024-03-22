@@ -1,9 +1,49 @@
 /* Undergrowth Pai Sho specific UI interaction logic */
 
-function Undergrowth() {};
+import {
+  BRAND_NEW,
+  GameType,
+  READY_FOR_BONUS,
+  WAITING_FOR_ENDPOINT,
+  callSubmitMove,
+  createGameIfThatIsOk,
+  currentMoveIndex,
+  finalizeMove,
+  getCurrentPlayer,
+  getGameOptionsMessageHtml,
+  getNeutralPointMessage,
+  getRedPointMessage,
+  getRedWhitePointMessage,
+  getResetMoveText,
+  getWhitePointMessage,
+  isAnimationsOn,
+  myTurn,
+  onlinePlayEnabled,
+  playingOnlineGame,
+  refreshMessage,
+  toHeading,
+} from '../PaiShoMain';
+import {
+  GATE,
+  NEUTRAL,
+  POSSIBLE_MOVE,
+} from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import { GUEST, HOST, NotationPoint, PLANTING } from '../CommonNotationObjects';
+import { RED, WHITE } from '../skud-pai-sho/SkudPaiShoTile';
+import { UNDERGROWTH_SIMPLE, gameOptionEnabled } from '../GameOptions';
+import { UndergrowthActuator } from './UndergrowthActuator';
+import { UndergrowthGameManager } from './UndergrowthGameManager';
+import {
+  UndergrowthGameNotation,
+  UndergrowthNotationBuilder,
+  UndergrowthNotationVars,
+} from './UndergrowthGameNotation';
+import { UndergrowthTile } from './UndergrowthTile';
+import { debug } from '../GameData';
+import { getOpponentName } from '../pai-sho-common/PaiShoPlayerHelp';
 
-Undergrowth.Controller = function(gameContainer, isMobile) {
-	this.actuator = new Undergrowth.Actuator(gameContainer, isMobile, isAnimationsOn());
+export function UndergrowthController(gameContainer, isMobile) {
+	this.actuator = new UndergrowthActuator(gameContainer, isMobile, isAnimationsOn());
 
 	this.resetGameNotation();	// First
 
@@ -13,41 +53,41 @@ Undergrowth.Controller = function(gameContainer, isMobile) {
 	this.isPaiShoGame = true;
 }
 
-Undergrowth.Controller.prototype.getGameTypeId = function() {
+UndergrowthController.prototype.getGameTypeId = function() {
 	return GameType.Undergrowth.id;
 };
 
-Undergrowth.Controller.prototype.resetGameManager = function() {
-	this.theGame = new Undergrowth.GameManager(this.actuator);
+UndergrowthController.prototype.resetGameManager = function() {
+	this.theGame = new UndergrowthGameManager(this.actuator);
 };
 
-Undergrowth.Controller.prototype.resetNotationBuilder = function() {
-	this.notationBuilder = new Undergrowth.NotationBuilder();
+UndergrowthController.prototype.resetNotationBuilder = function() {
+	this.notationBuilder = new UndergrowthNotationBuilder();
 };
 
-Undergrowth.Controller.prototype.resetGameNotation = function() {
+UndergrowthController.prototype.resetGameNotation = function() {
 	this.gameNotation = this.getNewGameNotation();
 };
 
-Undergrowth.Controller.prototype.getNewGameNotation = function() {
-	return new Undergrowth.GameNotation();
+UndergrowthController.prototype.getNewGameNotation = function() {
+	return new UndergrowthGameNotation();
 };
 
-Undergrowth.Controller.getHostTilesContainerDivs = function() {
+UndergrowthController.getHostTilesContainerDivs = function() {
 	var divs = '<div class="HR3"></div> <div class="HR4"></div> <div class="HR5"></div> <div class="HW3"></div> <div class="HW4"></div> <div class="HW5"></div> <br class="clear" /> <div class="HL"></div> <div class="HO"></div>';
 	return divs;
 }
 
-Undergrowth.Controller.getGuestTilesContainerDivs = function() {
+UndergrowthController.getGuestTilesContainerDivs = function() {
 	var divs = '<div class="GR3"></div> <div class="GR4"></div> <div class="GR5"></div> <div class="GW3"></div> <div class="GW4"></div> <div class="GW5"></div> <br class="clear" /> <div class="GL"></div> <div class="GO"></div>';
 	return divs;
 };
 
-Undergrowth.Controller.prototype.callActuate = function() {
+UndergrowthController.prototype.callActuate = function() {
 	this.theGame.actuate();
 };
 
-Undergrowth.Controller.prototype.resetMove = function() {
+UndergrowthController.prototype.resetMove = function() {
 	if (this.notationBuilder.status === BRAND_NEW) {
 		// Remove last move
 		this.gameNotation.removeLastMove();
@@ -56,7 +96,7 @@ Undergrowth.Controller.prototype.resetMove = function() {
 	}
 };
 
-Undergrowth.Controller.prototype.getDefaultHelpMessageText = function() {
+UndergrowthController.prototype.getDefaultHelpMessageText = function() {
 	return "<h4>Undergrowth Pai Sho</h4> <p>A placement game based on the Skud Pai Sho harmony system. Read the <a href='https://skudpaisho.com/site/games/undergrowth-pai-sho/' target='_blank'>rules page</a> to get started. Summary of the rules are below.</p>"
 	+ "<p>Two tiles are placed each turn, except the Host's first turn, where only one tile is placed.</p>"
 	+ "<p>First, Gates are filled. Then tiles are placed elsewhere on the board.</p>"
@@ -69,7 +109,7 @@ Undergrowth.Controller.prototype.getDefaultHelpMessageText = function() {
 	+ "<p>The Orchid harmonizes with all friendly Flower Tiles, but also forms Disharmony with everything at the same time.</p>";
 };
 
-Undergrowth.Controller.prototype.getAdditionalMessage = function() {
+UndergrowthController.prototype.getAdditionalMessage = function() {
 	var msg = "";
 	if (this.gameNotation.moves.length === 0) {
 		msg += getGameOptionsMessageHtml(GameType.Undergrowth.gameOptions);
@@ -83,8 +123,8 @@ Undergrowth.Controller.prototype.getAdditionalMessage = function() {
 		msg += "<strong>" + this.theGame.getScoreSummary() + "</strong>";
 	}
 
-	if (this.notationBuilder.status === Undergrowth.NotationBuilder.WAITING_FOR_SECOND_MOVE
-			|| this.notationBuilder.status === Undergrowth.NotationBuilder.WAITING_FOR_SECOND_ENDPOINT) {
+	if (this.notationBuilder.status === UndergrowthNotationBuilder.WAITING_FOR_SECOND_MOVE
+			|| this.notationBuilder.status === UndergrowthNotationBuilder.WAITING_FOR_SECOND_ENDPOINT) {
 		if (this.theGame.tileManager.playerIsOutOfTiles(getCurrentPlayer())) {
 			msg += "<br />Place second tile or <span class='clickableText' onclick='gameController.skipSecondTile();'>skip</span>";
 		} else {
@@ -103,19 +143,19 @@ Undergrowth.Controller.prototype.getAdditionalMessage = function() {
 	return msg;
 };
 
-Undergrowth.Controller.prototype.passTurn = function() {
+UndergrowthController.prototype.passTurn = function() {
 	if (this.gameNotation.moves.length > 2) {
 		this.notationBuilder.passTurn = true;
-		this.notationBuilder.moveType = Undergrowth.NotationVars.PASS_TURN;
+		this.notationBuilder.moveType = UndergrowthNotationVars.PASS_TURN;
 		this.completeMove();
 	}
 };
 
-Undergrowth.Controller.prototype.skipSecondTile = function() {
+UndergrowthController.prototype.skipSecondTile = function() {
 	this.completeMove();
 };
 
-Undergrowth.Controller.prototype.completeMove = function() {
+UndergrowthController.prototype.completeMove = function() {
 	var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
 	this.gameNotation.addMove(move);
 
@@ -131,7 +171,7 @@ Undergrowth.Controller.prototype.completeMove = function() {
 	}
 };
 
-Undergrowth.Controller.prototype.unplayedTileClicked = function(tileDiv) {
+UndergrowthController.prototype.unplayedTileClicked = function(tileDiv) {
 	this.theGame.markingManager.clearMarkings();
 	this.callActuate();
 
@@ -168,23 +208,23 @@ Undergrowth.Controller.prototype.unplayedTileClicked = function(tileDiv) {
 		this.notationBuilder.status = WAITING_FOR_ENDPOINT;
 
 		this.theGame.setAllLegalPointsOpen(getCurrentPlayer(), tile);
-	} else if (this.notationBuilder.status === Undergrowth.NotationBuilder.WAITING_FOR_SECOND_MOVE) {
+	} else if (this.notationBuilder.status === UndergrowthNotationBuilder.WAITING_FOR_SECOND_MOVE) {
 		tile.selectedFromPile = true;
 		this.notationBuilder.plantedFlowerType2 = tileCode;
-		this.notationBuilder.status = Undergrowth.NotationBuilder.WAITING_FOR_SECOND_ENDPOINT;
+		this.notationBuilder.status = UndergrowthNotationBuilder.WAITING_FOR_SECOND_ENDPOINT;
 
 		this.theGame.setAllLegalPointsOpen(getCurrentPlayer(), tile);
 	} else {
 		this.theGame.hidePossibleMovePoints();
 		if (this.notationBuilder.status === WAITING_FOR_ENDPOINT) {
-			this.notationBuilder = new Undergrowth.NotationBuilder();
-		} else if (this.notationBuilder.status === Undergrowth.NotationBuilder.WAITING_FOR_SECOND_ENDPOINT) {
-			this.notationBuilder.status = Undergrowth.NotationBuilder.WAITING_FOR_SECOND_MOVE;
+			this.notationBuilder = new UndergrowthNotationBuilder();
+		} else if (this.notationBuilder.status === UndergrowthNotationBuilder.WAITING_FOR_SECOND_ENDPOINT) {
+			this.notationBuilder.status = UndergrowthNotationBuilder.WAITING_FOR_SECOND_MOVE;
 		}
 	}
 };
 
-Undergrowth.Controller.prototype.RmbDown = function(htmlPoint) {
+UndergrowthController.prototype.RmbDown = function(htmlPoint) {
 	var npText = htmlPoint.getAttribute("name");
 
 	var notationPoint = new NotationPoint(npText);
@@ -192,7 +232,7 @@ Undergrowth.Controller.prototype.RmbDown = function(htmlPoint) {
 	this.mouseStartPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
 }
 
-Undergrowth.Controller.prototype.RmbUp = function(htmlPoint) {
+UndergrowthController.prototype.RmbUp = function(htmlPoint) {
 	var npText = htmlPoint.getAttribute("name");
 
 	var notationPoint = new NotationPoint(npText);
@@ -210,7 +250,7 @@ Undergrowth.Controller.prototype.RmbUp = function(htmlPoint) {
 	this.callActuate();
 }
 
-Undergrowth.Controller.prototype.pointClicked = function(htmlPoint) {
+UndergrowthController.prototype.pointClicked = function(htmlPoint) {
 	this.theGame.markingManager.clearMarkings();
 	this.callActuate();
 
@@ -241,7 +281,7 @@ Undergrowth.Controller.prototype.pointClicked = function(htmlPoint) {
 					finalizeMove();
 				}
 			} else {
-				this.notationBuilder.status = Undergrowth.NotationBuilder.WAITING_FOR_SECOND_MOVE;
+				this.notationBuilder.status = UndergrowthNotationBuilder.WAITING_FOR_SECOND_MOVE;
 				if (this.theGame.tileManager.playerIsOutOfTiles(getCurrentPlayer())) {
 					this.completeMove();
 				} else {
@@ -250,9 +290,9 @@ Undergrowth.Controller.prototype.pointClicked = function(htmlPoint) {
 			}
 		} else {
 			this.theGame.hidePossibleMovePoints();
-			this.notationBuilder = new Undergrowth.NotationBuilder();
+			this.notationBuilder = new UndergrowthNotationBuilder();
 		}
-	} else if (this.notationBuilder.status === Undergrowth.NotationBuilder.WAITING_FOR_SECOND_ENDPOINT) {
+	} else if (this.notationBuilder.status === UndergrowthNotationBuilder.WAITING_FOR_SECOND_ENDPOINT) {
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
 			this.theGame.hidePossibleMovePoints();
 			this.notationBuilder.endPoint2 = new NotationPoint(htmlPoint.getAttribute("name"));
@@ -260,16 +300,16 @@ Undergrowth.Controller.prototype.pointClicked = function(htmlPoint) {
 			this.completeMove();
 		} else {
 			this.theGame.hidePossibleMovePoints();
-			this.notationBuilder.status = Undergrowth.NotationBuilder.WAITING_FOR_SECOND_MOVE;
+			this.notationBuilder.status = UndergrowthNotationBuilder.WAITING_FOR_SECOND_MOVE;
 		}
 	}
 };
 
-Undergrowth.Controller.prototype.getTileMessage = function(tileDiv) {
+UndergrowthController.prototype.getTileMessage = function(tileDiv) {
 	var divName = tileDiv.getAttribute("name");	// Like: GW5 or HL
 	var tileId = parseInt(tileDiv.getAttribute("id"));
 
-	var tile = new Undergrowth.Tile(divName.substring(1), divName.charAt(0));
+	var tile = new UndergrowthTile(divName.substring(1), divName.charAt(0));
 
 	var message = [];
 
@@ -280,7 +320,7 @@ Undergrowth.Controller.prototype.getTileMessage = function(tileDiv) {
 	
 	var tileCode = divName.substring(1);
 
-	var heading = Undergrowth.Tile.getTileName(tileCode);
+	var heading = UndergrowthTile.getTileName(tileCode);
 
 	return {
 		heading: heading,
@@ -288,7 +328,7 @@ Undergrowth.Controller.prototype.getTileMessage = function(tileDiv) {
 	}
 }
 
-Undergrowth.Controller.prototype.getPointMessage = function(htmlPoint) {
+UndergrowthController.prototype.getPointMessage = function(htmlPoint) {
 	var npText = htmlPoint.getAttribute("name");
 
 	var notationPoint = new NotationPoint(npText);
@@ -318,19 +358,19 @@ Undergrowth.Controller.prototype.getPointMessage = function(htmlPoint) {
 	}
 }
 
-Undergrowth.Controller.prototype.playAiTurn = function(finalizeMove) {
+UndergrowthController.prototype.playAiTurn = function(finalizeMove) {
 	// 
 };
 
-Undergrowth.Controller.prototype.startAiGame = function(finalizeMove) {
+UndergrowthController.prototype.startAiGame = function(finalizeMove) {
 	// 
 };
 
-Undergrowth.Controller.prototype.getAiList = function() {
+UndergrowthController.prototype.getAiList = function() {
 	return [];
 }
 
-Undergrowth.Controller.prototype.getCurrentPlayer = function() {
+UndergrowthController.prototype.getCurrentPlayer = function() {
 	if (this.gameNotation.moves.length % 2 === 0) {
 		return HOST;
 	} else {
@@ -338,15 +378,15 @@ Undergrowth.Controller.prototype.getCurrentPlayer = function() {
 	}
 };
 
-Undergrowth.Controller.prototype.cleanup = function() {
+UndergrowthController.prototype.cleanup = function() {
 	// 
 };
 
-Undergrowth.Controller.prototype.isSolitaire = function() {
+UndergrowthController.prototype.isSolitaire = function() {
 	return false;
 };
 
-Undergrowth.Controller.prototype.setGameNotation = function(newGameNotation) {
+UndergrowthController.prototype.setGameNotation = function(newGameNotation) {
 	this.gameNotation.setNotationText(newGameNotation);
 };
 

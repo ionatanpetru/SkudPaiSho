@@ -1,6 +1,40 @@
 /* Capture Pai Sho specific UI interaction logic */
 
-var CapturePreferences = {
+import {
+  BRAND_NEW,
+  GameType,
+  WAITING_FOR_ENDPOINT,
+  buildPreferenceDropdownDiv,
+  callSubmitMove,
+  createGameIfThatIsOk,
+  currentMoveIndex,
+  finalizeMove,
+  gameController,
+  gameId,
+  getCurrentPlayer,
+  getLoginToken,
+  getUserGamePreference,
+  myTurn,
+  onlinePlayEnabled,
+  onlinePlayEngine,
+  playingOnlineGame,
+  rerunAll,
+  setUserGamePreference,
+  userIsLoggedIn,
+} from '../PaiShoMain';
+import { CaptureActuator } from './CaptureActuator';
+import { CaptureGameManager } from './CaptureGameManager';
+import {
+  CaptureGameNotation,
+  CaptureNotationBuilder,
+  CaptureNotationMove,
+} from './CaptureGameNotation';
+import { CaptureTile } from './CaptureTile';
+import { GUEST, HOST, MOVE, NotationPoint } from '../CommonNotationObjects';
+import { POSSIBLE_MOVE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import { debug, shuffleArray } from '../GameData';
+
+export var CapturePreferences = {
 	tileDesignKey: "TileDesigns",
 	tileDesignTypeValues: {
 		original: "Original",
@@ -10,7 +44,7 @@ var CapturePreferences = {
 	}
 };
 
-function CaptureController(gameContainer, isMobile) {
+export function CaptureController(gameContainer, isMobile) {
 	this.actuator = new CaptureActuator(gameContainer, isMobile);
 	
 	this.resetGameManager();

@@ -1,5 +1,34 @@
 // Trifle Actuator
 
+import { ElementStyleTransform } from '../util/ElementStyleTransform';
+import { GUEST, HOST } from '../CommonNotationObjects';
+import {
+  MARKED,
+  NON_PLAYABLE,
+  POSSIBLE_MOVE,
+} from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import { PaiShoGames, Trifle } from './TrifleController';
+import {
+  RmbDown,
+  RmbUp,
+  clearMessage,
+  pieceAnimationLength,
+  showTileMessage,
+  unplayedTileClicked,
+} from '../PaiShoMain';
+import {
+  cos45,
+  createBoardArrow,
+  createBoardPointDiv,
+  setupPaiShoBoard,
+  sin45,
+} from '../ActuatorHelp';
+import { debug } from '../GameData';
+import {
+  guestPlayerCode,
+  hostPlayerCode,
+} from '../pai-sho-common/PaiShoPlayerHelp';
+
 Trifle.Actuator = function(gameContainer, isMobile) {
 	this.gameContainer = gameContainer;
 	this.mobile = isMobile;
@@ -157,11 +186,14 @@ Trifle.Actuator.prototype.addTeamTile = function(tile, player, isForTeamSelectio
 	theDiv.setAttribute("id", tile.id);
 
 	if (this.mobile) {
-		theDiv.setAttribute("onclick", "unplayedTileClicked(this); showTileMessage(this);");
+		theDiv.addEventListener('click', () => {
+				unplayedTileClicked(this);
+				showTileMessage(this);
+			});
 	} else {
-		theDiv.setAttribute("onclick", "unplayedTileClicked(this);");
-		theDiv.setAttribute("onmouseover", "showTileMessage(this);");
-		theDiv.setAttribute("onmouseout", "clearMessage();");
+		theDiv.addEventListener('click', () => unplayedTileClicked(this));
+		theDiv.addEventListener('mouseover', () => showTileMessage(this));
+		theDiv.addEventListener('mouseout', clearMessage);
 	}
 
 	container.appendChild(theDiv);
@@ -194,7 +226,7 @@ Trifle.Actuator.prototype.addBoardPoint = function(boardPoint, board) {
 		} else {
 			theDiv.setAttribute("onclick", "pointClicked(this);");
 			theDiv.setAttribute("onmouseover", "showPointMessage(this);");
-			theDiv.setAttribute("onmouseout", "clearMessage();");
+			theDiv.addEventListener('mouseout', clearMessage);
 			theDiv.addEventListener('mousedown', e => {
 				 // Right Mouse Button
 				if (e.button == 2) {

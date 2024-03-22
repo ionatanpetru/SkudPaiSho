@@ -1,6 +1,28 @@
 // Actuator
 
-function CoopSolitaireActuator(gameContainer, isMobile) {
+import { CoopSolitaireController } from './CoopSolitaireController';
+import {
+  MARKED,
+  NON_PLAYABLE,
+  POSSIBLE_MOVE,
+} from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import {
+  RmbDown,
+  RmbUp,
+  clearMessage,
+  showTileMessage,
+  unplayedTileClicked,
+} from '../PaiShoMain';
+import { SolitaireTileManager } from '../solitaire/SolitaireTileManager';
+import {
+  createBoardArrow,
+  createBoardPointDiv,
+  getSkudTilesSrcPath,
+  setupPaiShoBoard,
+} from '../ActuatorHelp';
+import { debug } from '../GameData';
+
+export function CoopSolitaireActuator(gameContainer, isMobile) {
 	this.gameContainer = gameContainer;
 	this.mobile = isMobile;
 
@@ -101,11 +123,14 @@ CoopSolitaireActuator.prototype.addTile = function(tile, mainContainer) {
 	theDiv.setAttribute("id", tile.id);
 
 	if (this.mobile) {
-		theDiv.setAttribute("onclick", "unplayedTileClicked(this); showTileMessage(this);");
+		theDiv.addEventListener('click', () => {
+				unplayedTileClicked(theDiv);
+				showTileMessage(theDiv);
+			});
 	} else {
-		theDiv.setAttribute("onclick", "unplayedTileClicked(this);");
-		theDiv.setAttribute("onmouseover", "showTileMessage(this);");
-		theDiv.setAttribute("onmouseout", "clearMessage();");
+		theDiv.addEventListener('click', () => unplayedTileClicked(theDiv));
+		theDiv.addEventListener('mouseover', () => showTileMessage(theDiv));
+		theDiv.addEventListener('mouseout', clearMessage);
 	}
 
 	container.appendChild(theDiv);
@@ -138,7 +163,7 @@ CoopSolitaireActuator.prototype.addBoardPoint = function(boardPoint) {
 		} else {
 			theDiv.setAttribute("onclick", "pointClicked(this);");
 			theDiv.setAttribute("onmouseover", "showPointMessage(this);");
-			theDiv.setAttribute("onmouseout", "clearMessage();");
+			theDiv.addEventListener('mouseout', clearMessage);
 			theDiv.addEventListener('mousedown', e => {
 				 // Right Mouse Button
 				if (e.button == 2) {

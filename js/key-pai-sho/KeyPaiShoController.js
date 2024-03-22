@@ -1,6 +1,6 @@
 /* Key Pai Sho specific UI interaction logic */
 
-function KeyPaiSho() {}
+export function KeyPaiSho() {}
 
 KeyPaiSho.Controller = function(gameContainer, isMobile) {
 	/* Default game option until Effect Tiles are implemented */
@@ -22,7 +22,7 @@ KeyPaiSho.Controller = function(gameContainer, isMobile) {
 
 	this.isPaiShoGame = true;
 	this.supportsMoveLogMessages = true;
-}
+};
 
 /* KeyPaiSho.Controller.loadPreferences = function() {
 	var savedPreferences = JSON.parse(localStorage.getItem(SkudConstants.preferencesKey));

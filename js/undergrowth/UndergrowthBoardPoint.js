@@ -1,18 +1,33 @@
 // Board Point
 
-Undergrowth.BoardPoint = function() {
+import { ACCENT_TILE, BASIC_FLOWER, SPECIAL_FLOWER } from '../GameData';
+import {
+  GATE,
+  NEUTRAL,
+  NON_PLAYABLE,
+  gateDot,
+  thickDot,
+  thinDot,
+  whiteDot,
+} from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import { GUEST, HOST } from '../CommonNotationObjects';
+import { RED, WHITE } from '../skud-pai-sho/SkudPaiShoTile';
+import { UNDERGROWTH_SIMPLE, gameOptionEnabled } from '../GameOptions';
+import { Undergrowth } from './UndergrowthController';
+
+export function UndergrowthBoardPoint() {
 	this.types = [];
 	this.row = -1;
 	this.col = -1;
 }
 
-Undergrowth.BoardPoint.prototype.addType = function(type) {
+UndergrowthBoardPoint.prototype.addType = function(type) {
 	if (!this.types.includes(type)) {
 		this.types.push(type);
 	}
 };
 
-Undergrowth.BoardPoint.prototype.removeType = function(type) {
+UndergrowthBoardPoint.prototype.removeType = function(type) {
 	for (var i = 0; i < this.types.length; i++) {
 		if (this.types[i] === type) {
 			this.types.splice(i, 1);
@@ -20,7 +35,7 @@ Undergrowth.BoardPoint.prototype.removeType = function(type) {
 	}
 };
 
-Undergrowth.BoardPoint.prototype.getConsoleDisplay = function() {
+UndergrowthBoardPoint.prototype.getConsoleDisplay = function() {
 	if (this.tile) {
 		return this.tile.getConsoleDisplay();
 	} else {
@@ -57,26 +72,26 @@ Undergrowth.BoardPoint.prototype.getConsoleDisplay = function() {
 	}
 };
 
-Undergrowth.BoardPoint.prototype.putTile = function(tile) {
+UndergrowthBoardPoint.prototype.putTile = function(tile) {
 	this.tile = tile;
 };
 
-Undergrowth.BoardPoint.prototype.hasTile = function() {
+UndergrowthBoardPoint.prototype.hasTile = function() {
 	if (this.tile) {
 		return true;
 	}
 	return false;
 };
 
-Undergrowth.BoardPoint.prototype.isType = function(type) {
+UndergrowthBoardPoint.prototype.isType = function(type) {
 	return this.types.includes(type);
 };
 
-Undergrowth.BoardPoint.prototype.isOpenGate = function() {
+UndergrowthBoardPoint.prototype.isOpenGate = function() {
 	return !this.hasTile() && this.types.includes(GATE);
 };
 
-Undergrowth.BoardPoint.prototype.removeTile = function() {
+UndergrowthBoardPoint.prototype.removeTile = function() {
 	var theTile = this.tile;
 
 	this.tile = null;
@@ -84,19 +99,19 @@ Undergrowth.BoardPoint.prototype.removeTile = function() {
 	return theTile;
 };
 
-Undergrowth.BoardPoint.prototype.drainTile = function() {
+UndergrowthBoardPoint.prototype.drainTile = function() {
 	if (this.tile) {
 		this.tile.drain();
 	}
 };
 
-Undergrowth.BoardPoint.prototype.restoreTile = function() {
+UndergrowthBoardPoint.prototype.restoreTile = function() {
 	if (this.tile) {
 		this.tile.restore();
 	}
 };
 
-Undergrowth.BoardPoint.prototype.canHoldTile = function(tile, ignoreTileCheck) {
+UndergrowthBoardPoint.prototype.canHoldTile = function(tile, ignoreTileCheck) {
 	// Validate this point's ability to hold given tile
 
 	if (this.isType(NON_PLAYABLE)) {
@@ -133,13 +148,13 @@ Undergrowth.BoardPoint.prototype.canHoldTile = function(tile, ignoreTileCheck) {
 	return false;
 };
 
-Undergrowth.BoardPoint.prototype.isCompletelyWithinRedOrWhiteGarden = function() {
+UndergrowthBoardPoint.prototype.isCompletelyWithinRedOrWhiteGarden = function() {
 	return !this.isType(NEUTRAL) 
 			&& ((this.isType(RED) && !this.isType(WHITE)) 
 				|| (this.isType(WHITE) && !this.isType(RED)));
 };
 
-Undergrowth.BoardPoint.prototype.betweenPlayerHarmony = function(player) {
+UndergrowthBoardPoint.prototype.betweenPlayerHarmony = function(player) {
 	if (player === GUEST) {
 		return this.betweenHarmonyGuest;
 	} else if (player === HOST) {
@@ -148,8 +163,8 @@ Undergrowth.BoardPoint.prototype.betweenPlayerHarmony = function(player) {
 	return false;
 };
 
-Undergrowth.BoardPoint.prototype.getCopy = function() {
-	var copy = new Undergrowth.BoardPoint();
+UndergrowthBoardPoint.prototype.getCopy = function() {
+	var copy = new UndergrowthBoardPoint();
 
 	// this.types
 	for (var i = 0; i < this.types.length; i++) {
@@ -173,44 +188,44 @@ Undergrowth.BoardPoint.prototype.getCopy = function() {
 
 // Point makers
 
-Undergrowth.BoardPoint.neutral = function() {
-	var point = new Undergrowth.BoardPoint();
+UndergrowthBoardPoint.neutral = function() {
+	var point = new UndergrowthBoardPoint();
 	point.addType(NEUTRAL);
 
 	return point;
 };
 
-Undergrowth.BoardPoint.gate = function() {
-	var point = new Undergrowth.BoardPoint();
+UndergrowthBoardPoint.gate = function() {
+	var point = new UndergrowthBoardPoint();
 	point.addType(GATE);
 
 	return point;
 };
 
-Undergrowth.BoardPoint.red = function() {
-	var point = new Undergrowth.BoardPoint();
+UndergrowthBoardPoint.red = function() {
+	var point = new UndergrowthBoardPoint();
 	point.addType(RED);
 
 	return point;
 };
 
-Undergrowth.BoardPoint.white = function() {
-	var point = new Undergrowth.BoardPoint();
+UndergrowthBoardPoint.white = function() {
+	var point = new UndergrowthBoardPoint();
 	point.addType(WHITE);
 
 	return point;
 };
 
-Undergrowth.BoardPoint.redWhite = function() {
-	var point = new Undergrowth.BoardPoint();
+UndergrowthBoardPoint.redWhite = function() {
+	var point = new UndergrowthBoardPoint();
 	point.addType(RED);
 	point.addType(WHITE);
 
 	return point;
 };
 
-Undergrowth.BoardPoint.redWhiteNeutral = function() {
-	var point = new Undergrowth.BoardPoint();
+UndergrowthBoardPoint.redWhiteNeutral = function() {
+	var point = new UndergrowthBoardPoint();
 	point.addType(RED);
 	point.addType(WHITE);
 	point.addType(NEUTRAL);
@@ -218,16 +233,16 @@ Undergrowth.BoardPoint.redWhiteNeutral = function() {
 	return point;
 };
 
-Undergrowth.BoardPoint.redNeutral = function() {
-	var point = new Undergrowth.BoardPoint();
+UndergrowthBoardPoint.redNeutral = function() {
+	var point = new UndergrowthBoardPoint();
 	point.addType(RED);
 	point.addType(NEUTRAL);
 
 	return point;
 };
 
-Undergrowth.BoardPoint.whiteNeutral = function() {
-	var point = new Undergrowth.BoardPoint();
+UndergrowthBoardPoint.whiteNeutral = function() {
+	var point = new UndergrowthBoardPoint();
 	point.addType(WHITE);
 	point.addType(NEUTRAL);
 

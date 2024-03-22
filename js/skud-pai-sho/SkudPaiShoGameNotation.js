@@ -1,6 +1,17 @@
 /* Skud Pai Sho Notation */
 
-function SkudPaiShoNotationMove(text) {
+import {
+  ARRANGING,
+  GUEST,
+  HOST,
+  NotationPoint,
+  PLANTING,
+} from '../CommonNotationObjects';
+import { BRAND_NEW } from '../PaiShoMain';
+import { SkudPaiShoTile } from './SkudPaiShoTile';
+import { debug, sameStart, simpleCanonRules } from '../GameData';
+
+export function SkudPaiShoNotationMove(text) {
 	this.fullMoveText = text;
 	this.analyzeMove();
 }
@@ -113,7 +124,7 @@ SkudPaiShoNotationMove.prototype.equals = function(otherMove) {
 
 // --------------------------------------- //
 
-function SkudPaiShoNotationBuilder() {
+export function SkudPaiShoNotationBuilder() {
 	// this.moveNum;	// Let's try making this magic
 	// this.player;		// Magic
 	this.moveType;
@@ -170,7 +181,7 @@ SkudPaiShoNotationBuilder.prototype.getNotationMove = function(moveNum, player) 
 
 
 
-function SkudPaiShoGameNotation() {
+export function SkudPaiShoGameNotation() {
 	this.notationText = "";
 	this.moves = [];
 }
@@ -203,6 +214,8 @@ SkudPaiShoGameNotation.prototype.getPlayerMoveNum = function() {
 	var moveNum = 0;
 	var lastMove = this.moves[this.moves.length-1];
 
+	var player;
+	
 	if (lastMove) {
 		moveNum = lastMove.moveNum;
 		// At game beginning:

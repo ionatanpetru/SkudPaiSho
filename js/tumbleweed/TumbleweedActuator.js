@@ -1,6 +1,6 @@
 
 /* Create boardContainer, hostTilesContainer, and guestTilesContainer */
-function TumbleweedActuator(gameContainer, isMobile, hostTilesContainerDivs, guestTilesContainerDivs) {
+export function TumbleweedActuator(gameContainer, isMobile, hostTilesContainerDivs, guestTilesContainerDivs) {
 	this.gameContainer = gameContainer;
 	this.isMobile = isMobile;
 
@@ -131,7 +131,7 @@ TumbleweedActuator.prototype.addBoardPoint = function(rowDiv, boardPoint, lastMo
 			} else {
 				theDiv.setAttribute("onclick", "pointClicked(this);");
 				theDiv.setAttribute("onmouseover", "showPointMessage(this);");
-				theDiv.setAttribute("onmouseout", "clearMessage();");
+				theDiv.addEventListener('mouseout', clearMessage);
 			}
 			if (boardPoint.types.includes(POSSIBLE_MOVE)) {
 				theDiv.classList.add("possibleMove");

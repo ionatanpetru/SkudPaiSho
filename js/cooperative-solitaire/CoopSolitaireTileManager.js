@@ -1,6 +1,6 @@
 // Tile Manager
 
-function CoopSolitaireTileManager(forActuating) {
+export function CoopSolitaireTileManager(forActuating) {
 	this.playerCode = 'H'
 	
 	if (forActuating) {

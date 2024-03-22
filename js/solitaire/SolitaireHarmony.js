@@ -1,6 +1,9 @@
 // Solitaire Harmony
 
-function SolitaireHarmony(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn) {
+import { ACCENT_TILE, completeHarmony, debug } from '../GameData';
+import { GUEST, HOST, NotationPoint } from '../CommonNotationObjects';
+
+export function SolitaireHarmony(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn) {
 	this.tile1 = tile1;
 	this.tile1Pos = tile1RowAndColumn;
 	this.tile2 = tile2;
@@ -127,7 +130,7 @@ SolitaireHarmony.prototype.crossesCenter = function() {
 
 
 // HarmonyManager manages list of harmonies
-function SolitaireHarmonyManager() {
+export function SolitaireHarmonyManager() {
 	this.harmonies = [];
 	this.clashes = [];
 }
@@ -397,9 +400,9 @@ SolitaireHarmonyManager.prototype.getHarmonyChains = function() {
 		chain.push(hx);
 
 		var startTile = hx.tile2;
-		var startTilePos = hx.tile2Pos;
+		// var startTilePos = hx.tile2Pos;
 		var targetTile = hx.tile1;
-		var targetTilePos = hx.tile1Pos;
+		// var targetTilePos = hx.tile1Pos;
 
 		var ringFound = this.lookForRing(startTile, targetTile, chain);
 		

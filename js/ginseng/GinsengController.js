@@ -1,6 +1,6 @@
 /* Ginseng specific UI interaction logic */
 
-function Ginseng() {}
+export function Ginseng() {}
 
 Ginseng.Constants = {
 	preferencesKey: "GinsengPreferencesKey"
@@ -422,7 +422,7 @@ Ginseng.Controller.prototype.pointClicked = function(htmlPoint) {
 
 			if (!this.checkingOutOpponentTileOrNotMyTurn && !isInReplay) {
 				this.notationBuilder.endPoint = new NotationPoint(htmlPoint.getAttribute("name"));
-				this.notationBuilder.endPointMovementPath = currentMovePath;
+				this.notationBuilder.endPointMovementPath = currentMovePath;	// TODO notation cleanup ?
 				this.completeMove();
 			} else {
 				this.resetNotationBuilder();
@@ -654,6 +654,7 @@ Ginseng.Controller.prototype.buildNotationString = function(move) {
 				var keyObject = JSON.parse(key);
 				if (promptDataEntry.movedTilePoint && promptDataEntry.movedTileDestinationPoint) {
 					var movedTilePointRowAndCol = promptDataEntry.movedTilePoint.rowAndColumn;
+					// TODO promptDataEntry field work needed
 					var movedTileDestinationRowAndCol = promptDataEntry.movedTileDestinationPoint.rowAndColumn;
 					moveNotation += "+";
 					moveNotation += "(" + Ginseng.NotationAdjustmentFunction(movedTilePointRowAndCol.row, movedTilePointRowAndCol.col) + ")-";

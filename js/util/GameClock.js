@@ -1,5 +1,14 @@
+import { HOST } from '../CommonNotationObjects';
+import {
+  buildDropdownDiv,
+  gameController,
+  htmlDecode,
+  playingOnlineGame,
+  refreshMessage,
+} from '../PaiShoMain';
+import { debug } from '../GameData';
 
-function GameClock() {}
+export function GameClock() {}
 
 GameClock.Preferences = {
     enabled: "GameClockEnabled"
@@ -186,7 +195,7 @@ GameClock.timeControlsList = {
 
 GameClock.decodeGameClock = function(gameClockJsonString) {
     try {
-        gameClockObject = JSON.parse(htmlDecode(gameClockJsonString));
+        var gameClockObject = JSON.parse(htmlDecode(gameClockJsonString));
         return GameClock.buildGameClockInstance(gameClockObject);
     } catch (error) {
         debug("Error parsing time controls data");

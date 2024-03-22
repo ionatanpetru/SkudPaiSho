@@ -1,6 +1,12 @@
 // Tile Manager
 
-Undergrowth.TileManager = function(forActuating) {
+import { GUEST } from '../CommonNotationObjects';
+import { UNDERGROWTH_SIMPLE, gameOptionEnabled } from '../GameOptions';
+import { UndergrowthTile } from './UndergrowthTile';
+import { copyArray, debug } from '../GameData';
+import { guestPlayerCode } from '../pai-sho-common/PaiShoPlayerHelp';
+
+export function UndergrowthTileManager(forActuating) {
 	if (forActuating) {
 		this.hostTiles = this.loadOneOfEach('H');
 		this.guestTiles = this.loadOneOfEach('G');
@@ -10,63 +16,63 @@ Undergrowth.TileManager = function(forActuating) {
 	}
 }
 
-Undergrowth.TileManager.prototype.loadTileSet = function(ownerCode) {
+UndergrowthTileManager.prototype.loadTileSet = function(ownerCode) {
 	return this.loadPlayerTileSet(ownerCode, false, true);
 };
 
-Undergrowth.TileManager.prototype.loadOneOfEach = function(ownerCode) {
+UndergrowthTileManager.prototype.loadOneOfEach = function(ownerCode) {
 	var tiles = [];
 
 	var simplicity = gameOptionEnabled(UNDERGROWTH_SIMPLE);
 
-	tiles.push(new Undergrowth.Tile("R3", ownerCode, simplicity));
-	tiles.push(new Undergrowth.Tile("R4", ownerCode, simplicity));
-	tiles.push(new Undergrowth.Tile("R5", ownerCode, simplicity));
-	tiles.push(new Undergrowth.Tile("W3", ownerCode, simplicity));
-	tiles.push(new Undergrowth.Tile("W4", ownerCode, simplicity));
-	tiles.push(new Undergrowth.Tile("W5", ownerCode, simplicity));
+	tiles.push(new UndergrowthTile("R3", ownerCode, simplicity));
+	tiles.push(new UndergrowthTile("R4", ownerCode, simplicity));
+	tiles.push(new UndergrowthTile("R5", ownerCode, simplicity));
+	tiles.push(new UndergrowthTile("W3", ownerCode, simplicity));
+	tiles.push(new UndergrowthTile("W4", ownerCode, simplicity));
+	tiles.push(new UndergrowthTile("W5", ownerCode, simplicity));
 
-	tiles.push(new Undergrowth.Tile('L', ownerCode, simplicity));
-	tiles.push(new Undergrowth.Tile('O', ownerCode, simplicity));
+	tiles.push(new UndergrowthTile('L', ownerCode, simplicity));
+	tiles.push(new UndergrowthTile('O', ownerCode, simplicity));
 
 	return tiles;
 };
 
-Undergrowth.TileManager.prototype.loadPlayerTileSet = function(ownerCode) {
+UndergrowthTileManager.prototype.loadPlayerTileSet = function(ownerCode) {
 	var tiles = [];
 
 	var simplicity = gameOptionEnabled(UNDERGROWTH_SIMPLE);
 	// Basic flower tiles
 	for (var i = 0; i < 3; i++) {
-		tiles.push(new Undergrowth.Tile("R3", ownerCode, simplicity));
-		tiles.push(new Undergrowth.Tile("R4", ownerCode, simplicity));
-		tiles.push(new Undergrowth.Tile("R5", ownerCode, simplicity));
-		tiles.push(new Undergrowth.Tile("W3", ownerCode, simplicity));
-		tiles.push(new Undergrowth.Tile("W4", ownerCode, simplicity));
-		tiles.push(new Undergrowth.Tile("W5", ownerCode, simplicity));
+		tiles.push(new UndergrowthTile("R3", ownerCode, simplicity));
+		tiles.push(new UndergrowthTile("R4", ownerCode, simplicity));
+		tiles.push(new UndergrowthTile("R5", ownerCode, simplicity));
+		tiles.push(new UndergrowthTile("W3", ownerCode, simplicity));
+		tiles.push(new UndergrowthTile("W4", ownerCode, simplicity));
+		tiles.push(new UndergrowthTile("W5", ownerCode, simplicity));
 	}
 
 	// Special flower tiles
-	tiles.push(new Undergrowth.Tile('L', ownerCode, simplicity));
-	tiles.push(new Undergrowth.Tile('O', ownerCode, simplicity));
+	tiles.push(new UndergrowthTile('L', ownerCode, simplicity));
+	tiles.push(new UndergrowthTile('O', ownerCode, simplicity));
 
 	return tiles;
 };
 
-Undergrowth.TileManager.prototype.noMoreTilesLeft = function() {
+UndergrowthTileManager.prototype.noMoreTilesLeft = function() {
 	return this.hostTiles.length === 0 && this.guestTiles.length === 0;
 };
 
-Undergrowth.TileManager.prototype.aPlayerHasNoMoreTilesLeft = function() {
+UndergrowthTileManager.prototype.aPlayerHasNoMoreTilesLeft = function() {
 	return this.hostTiles.length === 0 || this.guestTiles.length === 0;
 };
 
-Undergrowth.TileManager.prototype.playerIsOutOfTiles = function(playerName) {
+UndergrowthTileManager.prototype.playerIsOutOfTiles = function(playerName) {
 	return this.getTilePile(playerName).length === 0;
 };
 
-Undergrowth.TileManager.prototype.getCopy = function() {
-	var copy = new Undergrowth.TileManager();
+UndergrowthTileManager.prototype.getCopy = function() {
+	var copy = new UndergrowthTileManager();
 
 	copy.hostTiles = copyArray(this.hostTiles);
 	copy.guestTiles = copyArray(this.guestTiles);
@@ -74,13 +80,13 @@ Undergrowth.TileManager.prototype.getCopy = function() {
 	return copy;
 };
 
-Undergrowth.TileManager.prototype.grabTile = function(playerName, tileCode) {
+UndergrowthTileManager.prototype.grabTile = function(playerName, tileCode) {
 	var tilePile = this.getTilePile(playerName);
 
 	var tile;
 	for (var i = 0; i < tilePile.length; i++) {
 		if (tilePile[i].code === tileCode) {
-			newTileArr = tilePile.splice(i, 1);
+			var newTileArr = tilePile.splice(i, 1);
 			tile = newTileArr[0];
 			break;
 		}
@@ -93,13 +99,13 @@ Undergrowth.TileManager.prototype.grabTile = function(playerName, tileCode) {
 	return tile;
 };
 
-Undergrowth.TileManager.prototype.putTileBack = function(tile) {
+UndergrowthTileManager.prototype.putTileBack = function(tile) {
 	var player = tile.ownerName;
 	var tilePile = this.getTilePile(player);
 	tilePile.push(tile);
 };
 
-Undergrowth.TileManager.prototype.removeSelectedTileFlags = function() {
+UndergrowthTileManager.prototype.removeSelectedTileFlags = function() {
 	this.hostTiles.forEach(function(tile) {
 		tile.selectedFromPile = false;
 	});
@@ -108,7 +114,7 @@ Undergrowth.TileManager.prototype.removeSelectedTileFlags = function() {
 	});
 };
 
-Undergrowth.TileManager.prototype.peekTile = function(playerCode, tileCode, tileId) {
+UndergrowthTileManager.prototype.peekTile = function(playerCode, tileCode, tileId) {
 	var tilePile = this.getTilePile(playerCode);
 
 	var tile;
@@ -134,7 +140,7 @@ Undergrowth.TileManager.prototype.peekTile = function(playerCode, tileCode, tile
 	return tile;
 };
 
-Undergrowth.TileManager.prototype.getTilePile = function(playerNameOrCode) {
+UndergrowthTileManager.prototype.getTilePile = function(playerNameOrCode) {
 	var tilePile = this.hostTiles;
 	if (playerNameOrCode === GUEST || playerNameOrCode === guestPlayerCode) {
 		tilePile = this.guestTiles;

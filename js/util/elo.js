@@ -1,6 +1,6 @@
 /* Code from or based on https://github.com/moroshko/elo.js */
 
-window.Elo = (function() {
+export var Elo = (function() {
     function getRatingDelta(myRating, opponentRating, myGameResult) {
         if ([0, 0.5, 1].indexOf(myGameResult) === -1) {
             return null;

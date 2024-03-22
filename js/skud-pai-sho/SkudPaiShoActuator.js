@@ -1,6 +1,32 @@
 // Actuator
 
-function SkudPaiShoActuator(gameContainer, isMobile, enableAnimations) {
+import { ACCENT_TILE, debug } from '../GameData';
+import { ARRANGING, PLANTING } from '../CommonNotationObjects';
+import { MARKED, NON_PLAYABLE, POSSIBLE_MOVE } from './SkudPaiShoBoardPoint';
+import { NO_HARMONY_VISUAL_AIDS, gameOptionEnabled } from '../GameOptions';
+import {
+  RmbDown,
+  RmbUp,
+  clearMessage,
+  getUserGamePreference,
+  pieceAnimationLength,
+  piecePlaceAnimation,
+  pointClicked,
+  showPointMessage,
+  showTileMessage,
+  unplayedTileClicked,
+} from '../PaiShoMain';
+import { SkudPaiShoController } from "./SkudPaiShoController";
+import { SkudPaiShoTileManager } from './SkudPaiShoTileManager';
+import {
+  createBoardArrow,
+  createBoardPointDiv,
+  getSkudTilesSrcPath,
+  isSamePoint,
+  setupPaiShoBoard
+} from '../ActuatorHelp';
+
+export function SkudPaiShoActuator(gameContainer, isMobile, enableAnimations) {
 	this.gameContainer = gameContainer;
 	this.mobile = isMobile;
 
@@ -126,11 +152,14 @@ SkudPaiShoActuator.prototype.addTile = function(tile, mainContainer) {
 	theDiv.setAttribute("id", tile.id);
 
 	if (this.mobile) {
-		theDiv.setAttribute("onclick", "unplayedTileClicked(this); showTileMessage(this);");
+		theDiv.addEventListener('click', () => {
+				unplayedTileClicked(theDiv);
+				showTileMessage(theDiv);
+			});
 	} else {
-		theDiv.setAttribute("onclick", "unplayedTileClicked(this);");
-		theDiv.setAttribute("onmouseover", "showTileMessage(this);");
-		theDiv.setAttribute("onmouseout", "clearMessage();");
+		theDiv.addEventListener('click', () => unplayedTileClicked(theDiv));
+		theDiv.addEventListener('mouseover', () => showTileMessage(theDiv));
+		theDiv.addEventListener('mouseout', clearMessage);
 	}
 
 	container.appendChild(theDiv);
@@ -183,11 +212,14 @@ SkudPaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 		}
 
 		if (this.mobile) {
-			theDiv.setAttribute("onclick", "pointClicked(this); showPointMessage(this);");
+			theDiv.addEventListener("click", () => {
+				pointClicked(theDiv);
+				showPointMessage(theDiv);
+			});
 		} else {
-			theDiv.setAttribute("onclick", "pointClicked(this);");
-			theDiv.setAttribute("onmouseover", "showPointMessage(this);");
-			theDiv.setAttribute("onmouseout", "clearMessage();");
+			theDiv.addEventListener('click', () => { pointClicked(theDiv)} );
+			theDiv.addEventListener("mouseover", () => { showPointMessage(theDiv) });
+			theDiv.addEventListener('mouseout', clearMessage);
 			theDiv.addEventListener('mousedown', e => {
 				 // Right Mouse Button
 				if (e.button == 2) {

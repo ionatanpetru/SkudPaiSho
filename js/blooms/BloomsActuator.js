@@ -1,6 +1,19 @@
-
 /* Create boardContainer, hostTilesContainer, and guestTilesContainer */
-function BloomsActuator(gameContainer, isMobile, hostTilesContainerDivs, guestTilesContainerDivs) {
+import { BloomsBoardPoint } from './BloomsBoardPoint';
+import {
+  EIGHT_SIDED_BOARD,
+  HEXHEX_10,
+  SIX_SIDED_BOARD,
+  gameOptionEnabled,
+} from '../GameOptions';
+import {
+  createDivWithClass,
+  createDivWithId,
+  removeChildren,
+} from '../ActuatorHelp';
+import { gameController } from '../PaiShoMain';
+
+export function BloomsActuator(gameContainer, isMobile, hostTilesContainerDivs, guestTilesContainerDivs) {
 	this.gameContainer = gameContainer;
 	this.isMobile = isMobile;
 

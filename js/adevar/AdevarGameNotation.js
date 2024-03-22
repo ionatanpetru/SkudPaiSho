@@ -2,11 +2,11 @@
 
 // --------------------------------------------- // 
 
-var AdevarMoveType = {
+export var AdevarMoveType = {
 	chooseHiddenTile: "cHT:"
 };
 
-function AdevarNotationMove(text) {
+export function AdevarNotationMove(text) {
 	this.fullMoveText = text;
 	this.analyzeMove();
 }
@@ -102,7 +102,7 @@ AdevarNotationMove.prototype.copyWithoutHiddenDetails = function() {
 
 // --------------------------------------- //
 
-function AdevarNotationBuilder() {
+export function AdevarNotationBuilder() {
 	this.moveType;
 
 	// DEPLOY
@@ -136,7 +136,7 @@ AdevarNotationBuilder.prototype.getNotationMove = function(moveNum, player) {
 
 
 
-function AdevarGameNotation() {
+export function AdevarGameNotation() {
 	this.notationText = "";
 	this.moves = [];
 }

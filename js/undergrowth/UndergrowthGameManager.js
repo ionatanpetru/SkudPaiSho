@@ -1,10 +1,21 @@
+import { GUEST, HOST, PLANTING } from '../CommonNotationObjects';
+import { PaiShoMarkingManager } from '../pai-sho-common/PaiShoMarkingManager';
+import { UndergrowthBoard } from './UndergrowthBoard';
+import { UndergrowthNotationVars } from './UndergrowthGameNotation';
+import { UndergrowthTileManager } from './UndergrowthTileManager';
+import {
+  debug,
+  lessBonus,
+  newGatesRule,
+  newSpecialFlowerRules,
+} from '../GameData';
 
-Undergrowth.GameManager = function(actuator, ignoreActuate, isCopy) {
+export function UndergrowthGameManager(actuator, ignoreActuate, isCopy) {
 	this.isCopy = isCopy;
 
 	this.actuator = actuator;
 
-	this.tileManager = new Undergrowth.TileManager();
+	this.tileManager = new UndergrowthTileManager();
 	this.markingManager = new PaiShoMarkingManager();
 
 	this.setup(ignoreActuate);
@@ -12,8 +23,8 @@ Undergrowth.GameManager = function(actuator, ignoreActuate, isCopy) {
 }
 
 // Set up the game
-Undergrowth.GameManager.prototype.setup = function (ignoreActuate) {
-	this.board = new Undergrowth.Board();
+UndergrowthGameManager.prototype.setup = function (ignoreActuate) {
+	this.board = new UndergrowthBoard();
 
 	this.passInSuccessionCount = 0;
 
@@ -24,7 +35,7 @@ Undergrowth.GameManager.prototype.setup = function (ignoreActuate) {
 };
 
 // Sends the updated board to the actuator
-Undergrowth.GameManager.prototype.actuate = function(move, moveAnimationBeginStep) {
+UndergrowthGameManager.prototype.actuate = function(move, moveAnimationBeginStep) {
 	if (this.isCopy) {
 		return;
 	}
@@ -32,13 +43,13 @@ Undergrowth.GameManager.prototype.actuate = function(move, moveAnimationBeginSte
 	this.actuator.actuate(this.board, this, this.markingManager, move, moveAnimationBeginStep);
 };
 
-Undergrowth.GameManager.prototype.runNotationMove = function(move, withActuate, moveAnimationBeginStep) {
+UndergrowthGameManager.prototype.runNotationMove = function(move, withActuate, moveAnimationBeginStep) {
 	debug("Running Move: " + move.fullMoveText);
 
 	var errorFound = false;
 	var bonusAllowed = false;
 
-	if (move.moveType === Undergrowth.NotationVars.PASS_TURN) {
+	if (move.moveType === UndergrowthNotationVars.PASS_TURN) {
 		this.passInSuccessionCount++;
 	} else if (move.moveType === PLANTING) {
 		// Just placing tile on board
@@ -57,7 +68,7 @@ Undergrowth.GameManager.prototype.runNotationMove = function(move, withActuate, 
 		}
 	}
 
-	if (move.moveType !== Undergrowth.NotationVars.PASS_TURN) {
+	if (move.moveType !== UndergrowthNotationVars.PASS_TURN) {
 		this.passInSuccessionCount = 0;
 	}
 
@@ -81,11 +92,11 @@ Undergrowth.GameManager.prototype.runNotationMove = function(move, withActuate, 
 	return bonusAllowed;
 };
 
-Undergrowth.GameManager.prototype.drawRandomTileFromTileManager = function(playerName) {
+UndergrowthGameManager.prototype.drawRandomTileFromTileManager = function(playerName) {
 	return this.tileManager.drawRandomTile(playerName);
 };
 
-Undergrowth.GameManager.prototype.revealPossibleMovePoints = function(boardPoint, ignoreActuate) {
+UndergrowthGameManager.prototype.revealPossibleMovePoints = function(boardPoint, ignoreActuate) {
 	if (!boardPoint.hasTile()) {
 		return;
 	}
@@ -96,7 +107,7 @@ Undergrowth.GameManager.prototype.revealPossibleMovePoints = function(boardPoint
 	}
 };
 
-Undergrowth.GameManager.prototype.hidePossibleMovePoints = function(ignoreActuate) {
+UndergrowthGameManager.prototype.hidePossibleMovePoints = function(ignoreActuate) {
 	this.board.removePossibleMovePoints();
 	this.tileManager.removeSelectedTileFlags();
 	if (!ignoreActuate) {
@@ -104,7 +115,7 @@ Undergrowth.GameManager.prototype.hidePossibleMovePoints = function(ignoreActuat
 	}
 };
 
-Undergrowth.GameManager.prototype.setAllLegalPointsOpen = function(player, tile, ignoreActuate) {
+UndergrowthGameManager.prototype.setAllLegalPointsOpen = function(player, tile, ignoreActuate) {
 	if (this.board.hasOpenGates()) {
 		this.board.setOpenGatePossibleMoves();
 	} else {
@@ -116,7 +127,7 @@ Undergrowth.GameManager.prototype.setAllLegalPointsOpen = function(player, tile,
 	}
 };
 
-Undergrowth.GameManager.prototype.playerCanBonusPlant = function(player) {
+UndergrowthGameManager.prototype.playerCanBonusPlant = function(player) {
 	if (!newGatesRule) {
 		return true;
 	}
@@ -129,7 +140,7 @@ Undergrowth.GameManager.prototype.playerCanBonusPlant = function(player) {
 	}
 };
 
-Undergrowth.GameManager.prototype.revealSpecialFlowerPlacementPoints = function(player) {
+UndergrowthGameManager.prototype.revealSpecialFlowerPlacementPoints = function(player) {
 	if (!newSpecialFlowerRules) {
 		this.revealOpenGates(player);
 		return;
@@ -139,21 +150,21 @@ Undergrowth.GameManager.prototype.revealSpecialFlowerPlacementPoints = function(
 	this.actuate();
 };
 
-Undergrowth.GameManager.prototype.revealPossiblePlacementPoints = function(tile) {
+UndergrowthGameManager.prototype.revealPossiblePlacementPoints = function(tile) {
 	this.board.revealPossiblePlacementPoints(tile);
 	this.actuate();
 };
 
-Undergrowth.GameManager.prototype.revealBoatBonusPoints = function(boardPoint) {
+UndergrowthGameManager.prototype.revealBoatBonusPoints = function(boardPoint) {
 	this.board.revealBoatBonusPoints(boardPoint);
 	this.actuate();
 };
 
-Undergrowth.GameManager.prototype.playerHasNotPlayedEitherSpecialTile = function(playerName) {
+UndergrowthGameManager.prototype.playerHasNotPlayedEitherSpecialTile = function(playerName) {
 	return this.tileManager.playerHasBothSpecialTilesRemaining(playerName);
 };
 
-Undergrowth.GameManager.prototype.getWinner = function() {
+UndergrowthGameManager.prototype.getWinner = function() {
 	if (this.endGameWinners.length === 1) {
 		return this.endGameWinners[0];
 	} else if (this.endGameWinners.length > 1) {
@@ -161,7 +172,7 @@ Undergrowth.GameManager.prototype.getWinner = function() {
 	}
 };
 
-Undergrowth.GameManager.prototype.getWinReason = function() {
+UndergrowthGameManager.prototype.getWinReason = function() {
 	var msg = "";
 	if (this.getWinner()) {
 		msg += " won the game with more tiles touching the Central Gardens!";
@@ -169,14 +180,14 @@ Undergrowth.GameManager.prototype.getWinReason = function() {
 	return msg + this.getScoreSummary();
 };
 
-Undergrowth.GameManager.prototype.getScoreSummary = function() {
+UndergrowthGameManager.prototype.getScoreSummary = function() {
 	return "<br />"
 		+ "Host Central Tiles: " + this.board.getNumberOfTilesTouchingCentralGardensForPlayer(HOST)
 		+ "<br />"
 		+ "Guest Central Tiles: " + this.board.getNumberOfTilesTouchingCentralGardensForPlayer(GUEST);
 };
 
-Undergrowth.GameManager.prototype.getWinResultTypeCode = function() {
+UndergrowthGameManager.prototype.getWinResultTypeCode = function() {
 	if (this.endGameWinners.length === 1) {
 		return 1;
 	} else if (this.endGameWinners.length > 1) {
@@ -184,8 +195,8 @@ Undergrowth.GameManager.prototype.getWinResultTypeCode = function() {
 	}
 };
 
-Undergrowth.GameManager.prototype.getCopy = function() {
-	var copyGame = new Undergrowth.GameManager(this.actuator, true, true);
+UndergrowthGameManager.prototype.getCopy = function() {
+	var copyGame = new UndergrowthGameManager(this.actuator, true, true);
 	copyGame.board = this.board.getCopy();
 	copyGame.tileManager = this.tileManager.getCopy();
 	return copyGame;

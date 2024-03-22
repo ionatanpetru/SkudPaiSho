@@ -1,6 +1,6 @@
 // Coop Solitaire Notation
 
-function CoopSolitaireNotationMove(text) {
+export function CoopSolitaireNotationMove(text) {
 	this.fullMoveText = text;
 	this.analyzeMove();
 }
@@ -113,7 +113,7 @@ CoopSolitaireNotationMove.prototype.equals = function(otherMove) {
 
 // --------------------------------------- //
 
-function CoopSolitaireNotationBuilder() {
+export function CoopSolitaireNotationBuilder() {
 	// this.moveNum;	// Let's try making this magic
 	// this.player;		// Magic
 	this.moveType;
@@ -166,7 +166,7 @@ CoopSolitaireNotationBuilder.prototype.getNotationMove = function(moveNum, playe
 
 
 
-function CoopSolitaireGameNotation() {
+export function CoopSolitaireGameNotation() {
 	this.notationText = "";
 	this.moves = [];
 }

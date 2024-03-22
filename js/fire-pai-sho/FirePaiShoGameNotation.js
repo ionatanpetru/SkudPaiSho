@@ -1,6 +1,6 @@
 /* Fire Pai Sho Notation */
 
-function FirePaiShoNotationMove(text) {
+export function FirePaiShoNotationMove(text) {
 	this.fullMoveText = text;
 	this.analyzeMove();
 }
@@ -156,7 +156,7 @@ FirePaiShoNotationMove.prototype.equals = function(otherMove) {
 
 // --------------------------------------- //
 
-function FirePaiShoNotationBuilder() {
+export function FirePaiShoNotationBuilder() {
 	// this.moveNum;	// Let's try making this magic
 	// this.player;		// Magic
 	this.moveType;
@@ -215,7 +215,7 @@ FirePaiShoNotationBuilder.prototype.getNotationMove = function(moveNum, player) 
 
 
 
-function FirePaiShoGameNotation() {
+export function FirePaiShoGameNotation() {
 	this.notationText = "";
 	this.moves = [];
 }

@@ -1,8 +1,11 @@
 // Capture Pai Sho Tile
 
-// var tileId = 1;	// common
 
-function CaptureTile(code, ownerCode) {
+import { GUEST, HOST } from '../CommonNotationObjects';
+import { debug } from '../GameData';
+import { tileId, tileIdIncrement } from '../skud-pai-sho/SkudPaiShoTile';
+
+export function CaptureTile(code, ownerCode) {
 	this.code = code;
 	this.ownerCode = ownerCode;
 	if (this.ownerCode === 'G') {
@@ -12,7 +15,7 @@ function CaptureTile(code, ownerCode) {
 	} else {
 		debug("INCORRECT OWNER CODE");
 	}
-	this.id = tileId++;
+	this.id = tileIdIncrement();
 	this.selectedFromPile = false;
 }
 

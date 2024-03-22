@@ -1,7 +1,7 @@
 /* Trifle specific UI interaction logic */
 
-function PaiShoGames() {}
-function Trifle() {}
+export function PaiShoGames() {}
+export function Trifle() {}
 
 Trifle.Controller = function(gameContainer, isMobile) {
 	this.actuator = new Trifle.Actuator(gameContainer, isMobile);

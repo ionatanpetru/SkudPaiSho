@@ -1,6 +1,14 @@
 /* Skud Pai Sho Harmony */
 
-function SkudPaiShoHarmony(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn, affectingLionTurtleTiles) {
+import { BASIC_FLOWER, completeHarmony, debug } from '../GameData';
+import {
+  GUEST,
+  HOST,
+  NotationPoint,
+  RowAndColumn,
+} from '../CommonNotationObjects';
+
+export function SkudPaiShoHarmony(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn, affectingLionTurtleTiles) {
 	this.tile1 = tile1;
 	this.tile1Pos = new RowAndColumn(tile1RowAndColumn.row, tile1RowAndColumn.col);
 	this.tile2 = tile2;
@@ -178,7 +186,7 @@ SkudPaiShoHarmony.prototype.crossesCenter = function() {
 
 
 // HarmonyManager manages list of harmonies
-function SkudPaiShoHarmonyManager() {
+export function SkudPaiShoHarmonyManager() {
 	this.harmonies = [];
 }
 
@@ -729,7 +737,7 @@ SkudPaiShoHarmonyManager.prototype.lookForRings = function(t1, tx, originalChain
 	var rings = [];
 	var keepLookingAtTheseHarmonies = [];
 	for (var i = 0; i < this.harmonies.length; i++) {	// Any complete rings?
-		currentChain = originalChain.slice();
+		var currentChain = originalChain.slice();
 		var hx = this.harmonies[i];
 		if (hx.containsTile(t1) && hx.notAnyOfThese(currentChain)) {
 			currentChain.push(hx);

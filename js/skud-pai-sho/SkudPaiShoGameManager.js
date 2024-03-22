@@ -1,6 +1,28 @@
 // Skud Pai Sho Game Manager
 
-function SkudPaiShoGameManager(actuator, ignoreActuate, isCopy) {
+import { ARRANGING, GUEST, HOST, PLANTING } from '../CommonNotationObjects';
+import {
+  NO_ALT_WIN,
+  OPTION_INFORMAL_START,
+  SPECIAL_FLOWERS_BOUNCE,
+  gameOptionEnabled,
+} from '../GameOptions';
+import { PaiShoMarkingManager } from "../pai-sho-common/PaiShoMarkingManager";
+import {
+  SPECIAL_FLOWER,
+  debug,
+  lessBonus,
+  limitedGatesRule,
+  newGatesRule,
+  newSpecialFlowerRules,
+} from '../GameData';
+import { SkudPaiShoBoard } from './SkudPaiShoBoard';
+import { SkudPaiShoTile } from './SkudPaiShoTile';
+import { SkudPaiShoTileManager } from './SkudPaiShoTileManager';
+import { getOpponentName } from '../pai-sho-common/PaiShoPlayerHelp';
+import { setGameLogText } from '../PaiShoMain';
+
+export function SkudPaiShoGameManager(actuator, ignoreActuate, isCopy) {
 	this.gameLogText = '';
 	this.isCopy = isCopy;
 
@@ -73,7 +95,7 @@ SkudPaiShoGameManager.prototype.runNotationMove = function(move, withActuate, mo
 
 		this.buildPlantingGameLogText(move, tile);
 	} else if (move.moveType === ARRANGING) {
-		moveResults = this.board.moveTile(move.player, move.startPoint, move.endPoint);
+		var moveResults = this.board.moveTile(move.player, move.startPoint, move.endPoint);
 		bonusAllowed = moveResults.bonusAllowed;
 
 		move.capturedTile = moveResults.capturedTile;
@@ -84,7 +106,7 @@ SkudPaiShoGameManager.prototype.runNotationMove = function(move, withActuate, mo
 			if (move.boatBonusPoint) {
 				this.board.placeTile(tile, move.bonusEndPoint, this.tileManager, move.boatBonusPoint);
 			} else {
-				placeTileResult = this.board.placeTile(tile, move.bonusEndPoint, this.tileManager);
+				var placeTileResult = this.board.placeTile(tile, move.bonusEndPoint, this.tileManager);
 				if (placeTileResult && placeTileResult.tileRemovedWithBoat) {
 					move.tileRemovedWithBoat = placeTileResult.tileRemovedWithBoat;
 				}
@@ -133,6 +155,9 @@ SkudPaiShoGameManager.prototype.runNotationMove = function(move, withActuate, mo
 			// }
 		}
 	}
+
+	this.lastPlayerName = move.player;
+	this.lastMoveNum = move.moveNum;
 
 	return bonusAllowed;
 };
@@ -273,5 +298,15 @@ SkudPaiShoGameManager.prototype.getCopy = function() {
 	var copyGame = new SkudPaiShoGameManager(this.actuator, true, true);
 	copyGame.board = this.board.getCopy();
 	copyGame.tileManager = this.tileManager.getCopy();
+	copyGame.lastPlayerName = this.lastPlayerName;
+	copyGame.lastMoveNum = this.lastMoveNum;
 	return copyGame;
+};
+
+SkudPaiShoGameManager.prototype.getNextPlayerName = function() {
+	if (this.lastPlayerName === HOST) {
+		return GUEST;
+	} else {
+		return HOST;
+	}
 };

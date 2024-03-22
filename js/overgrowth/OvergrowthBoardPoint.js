@@ -1,6 +1,6 @@
 // Board Point
 
-function OvergrowthBoardPoint() {
+export function OvergrowthBoardPoint() {
 	this.types = [];
 	this.row = -1;
 	this.col = -1;

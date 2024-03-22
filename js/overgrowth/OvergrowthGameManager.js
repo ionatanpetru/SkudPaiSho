@@ -1,6 +1,6 @@
 // Solitaire Game Manager
 
-function OvergrowthGameManager(actuator, ignoreActuate, isCopy, existingDrawnTile, existingLastDrawnTile) {
+export function OvergrowthGameManager(actuator, ignoreActuate, isCopy, existingDrawnTile, existingLastDrawnTile) {
 	this.isCopy = isCopy;
 
 	this.actuator = actuator;

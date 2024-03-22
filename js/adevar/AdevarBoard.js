@@ -1,6 +1,19 @@
 /* Pai Sho Adevar Board */
 
-function AdevarBoard() {
+import { AdevarBoardPoint, AdevarBoardPointType } from './AdevarBoardPoint';
+import { AdevarBoardSetupPoints } from './AdevarGameManager';
+import { AdevarHarmony, AdevarHarmonyManager } from './AdevarHarmony';
+import { AdevarTileCode, AdevarTileType } from './AdevarTile';
+import { HOST, NotationPoint, RowAndColumn } from '../CommonNotationObjects';
+import {
+  NON_PLAYABLE,
+  POSSIBLE_MOVE,
+} from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import { arrayIncludesOneOf, debug } from '../GameData';
+import { getOpponentName } from '../pai-sho-common/PaiShoPlayerHelp';
+import { paiShoBoardMaxRowOrCol } from '../pai-sho-common/PaiShoBoardHelp';
+
+export function AdevarBoard() {
 	this.size = new RowAndColumn(18, 18);
 	this.cells = this.brandNewForSpaces();
 

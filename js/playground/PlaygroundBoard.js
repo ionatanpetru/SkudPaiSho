@@ -1,6 +1,6 @@
 /* Pai Sho Playground Board */
 
-function PlaygroundBoard() {
+export function PlaygroundBoard() {
 	this.size = new RowAndColumn(17, 17);
 
 	if (gameOptionEnabled(FULL_GRID)) {

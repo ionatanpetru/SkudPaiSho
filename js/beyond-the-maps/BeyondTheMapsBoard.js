@@ -1,8 +1,33 @@
 /* Beyond The Maps Board */
 
-BeyondTheMaps.FULL_BOARD_SIZE_LENGTH = 18;
+import { EDGES_12x12_GAME, gameOptionEnabled } from '../GameOptions';
+import {
+  GUEST,
+  HOST,
+  NotationPoint,
+  RowAndColumn,
+} from '../CommonNotationObjects';
+import {
+  NON_PLAYABLE,
+  POSSIBLE_MOVE,
+} from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import { Trifle } from '../trifle/TrifleController';
+import { TrifleBoardPoint } from '../trifle/TrifleBoardPoint';
+import {
+  arrayContainsDuplicates,
+  debug,
+  getShortestArrayFromArrayOfArrays,
+} from '../GameData';
+import {
+  getOpponentName,
+  getPlayerCodeFromName,
+} from '../pai-sho-common/PaiShoPlayerHelp';
+import { showBadMoveModal } from '../PaiShoMain';
+import BeyondTheMapsTile, { BeyondTheMapsTileType } from './BeyondTheMapsTile';
 
-BeyondTheMaps.Board = class {
+const FULL_BOARD_SIZE_LENGTH = 18;
+
+export class BeyondTheMapsBoard {
 	constructor() {
 		if (gameOptionEnabled(EDGES_12x12_GAME)) {
 			this.size = new RowAndColumn(12, 12);
@@ -10,7 +35,7 @@ BeyondTheMaps.Board = class {
 			this.guestStartingPoint = this.cells[3][3];
 			this.hostStartingPoint = this.cells[14][14];
 		} else {
-			this.size = new RowAndColumn(BeyondTheMaps.FULL_BOARD_SIZE_LENGTH, BeyondTheMaps.FULL_BOARD_SIZE_LENGTH);
+			this.size = new RowAndColumn(FULL_BOARD_SIZE_LENGTH, FULL_BOARD_SIZE_LENGTH);
 			this.cells = this.brandNewForFullGridSpaces();
 			this.guestStartingPoint = this.cells[0][0];
 			this.hostStartingPoint = this.cells[17][17];
@@ -25,7 +50,7 @@ BeyondTheMaps.Board = class {
 		var boardPoints = [];
 
 		for (var i = 0; i < this.size.col; i++) {
-			boardPoints.push(new Trifle.BoardPoint());
+			boardPoints.push(new TrifleBoardPoint());
 		}
 
 		return boardPoints;
@@ -34,7 +59,7 @@ BeyondTheMaps.Board = class {
 	brandNewForFullGridSpaces() {
 		var cells = [];
 
-		for (var row = 0; row < BeyondTheMaps.FULL_BOARD_SIZE_LENGTH; row++) {
+		for (var row = 0; row < FULL_BOARD_SIZE_LENGTH; row++) {
 			cells[row] = this.newRow(row, this.getArrayOfBoardPoints());
 		}
 
@@ -47,18 +72,18 @@ BeyondTheMaps.Board = class {
 		}
 
 		return cells;
-	};
+	}
 
 	newRow(rowNum, points) {
 		var cells = [];
 
-		var numBlanksOnSides = (BeyondTheMaps.FULL_BOARD_SIZE_LENGTH - this.size.row) / 2;
+		var numBlanksOnSides = (FULL_BOARD_SIZE_LENGTH - this.size.row) / 2;
 
-		var nonPoint = new Trifle.BoardPoint();
+		var nonPoint = new TrifleBoardPoint();
 		nonPoint.addType(NON_PLAYABLE);
 
-		for (var i = 0; i < BeyondTheMaps.FULL_BOARD_SIZE_LENGTH; i++) {
-			if (i < numBlanksOnSides || rowNum < numBlanksOnSides || rowNum >= (BeyondTheMaps.FULL_BOARD_SIZE_LENGTH - numBlanksOnSides)) {
+		for (var i = 0; i < FULL_BOARD_SIZE_LENGTH; i++) {
+			if (i < numBlanksOnSides || rowNum < numBlanksOnSides || rowNum >= (FULL_BOARD_SIZE_LENGTH - numBlanksOnSides)) {
 				cells[i] = nonPoint;
 			} else if (i < numBlanksOnSides + this.size.col || numBlanksOnSides === 0) {
 				if (points) {
@@ -72,7 +97,7 @@ BeyondTheMaps.Board = class {
 		}
 
 		return cells;
-	};
+	}
 
 	placeTile(tile, notationPoint) {
 		var point = this.getBoardPointFromNotationPoint(notationPoint);
@@ -82,27 +107,27 @@ BeyondTheMaps.Board = class {
 		this.putTileOnPoint(tile, notationPoint);
 
 		return capturedTile;
-	};
+	}
 
 	putTileOnPoint(tile, notationPoint) {
 		var point = this.getBoardPointFromNotationPoint(notationPoint);
 
 		point.putTile(tile);
-	};
+	}
 
 	isValidRowCol(rowCol) {
 		return rowCol.row >= 0 
 			&& rowCol.col >= 0 
-			&& rowCol.row <= BeyondTheMaps.FULL_BOARD_SIZE_LENGTH - 1 
-			&& rowCol.col <= BeyondTheMaps.FULL_BOARD_SIZE_LENGTH - 1;
-	};
+			&& rowCol.row <= FULL_BOARD_SIZE_LENGTH - 1 
+			&& rowCol.col <= FULL_BOARD_SIZE_LENGTH - 1;
+	}
 
 	getSurroundingRowAndCols(rowAndCol) {
 		var rowAndCols = [];
 		for (var row = rowAndCol.row - 1; row <= rowAndCol.row + 1; row++) {
 			for (var col = rowAndCol.col - 1; col <= rowAndCol.col + 1; col++) {
 				if ((row !== rowAndCol.row || col !== rowAndCol.col)	// Not the center given point
-					&& (row >= 0 && col >= 0) && (row < BeyondTheMaps.FULL_BOARD_SIZE_LENGTH && col < BeyondTheMaps.FULL_BOARD_SIZE_LENGTH)) {	// Not outside range of the grid
+					&& (row >= 0 && col >= 0) && (row < FULL_BOARD_SIZE_LENGTH && col < FULL_BOARD_SIZE_LENGTH)) {	// Not outside range of the grid
 					var boardPoint = this.cells[row][col];
 					if (!boardPoint.isType(NON_PLAYABLE)) {	// Not non-playable
 						rowAndCols.push(new RowAndColumn(row, col));
@@ -171,13 +196,13 @@ BeyondTheMaps.Board = class {
 		if (pointAlongTheWay.row > 0) {
 			potentialMovePoints.push(this.cells[pointAlongTheWay.row - 1][pointAlongTheWay.col]);
 		}
-		if (pointAlongTheWay.row < BeyondTheMaps.FULL_BOARD_SIZE_LENGTH - 1) {
+		if (pointAlongTheWay.row < FULL_BOARD_SIZE_LENGTH - 1) {
 			potentialMovePoints.push(this.cells[pointAlongTheWay.row + 1][pointAlongTheWay.col]);
 		}
 		if (pointAlongTheWay.col > 0) {
 			potentialMovePoints.push(this.cells[pointAlongTheWay.row][pointAlongTheWay.col - 1]);
 		}
-		if (pointAlongTheWay.col < BeyondTheMaps.FULL_BOARD_SIZE_LENGTH - 1) {
+		if (pointAlongTheWay.col < FULL_BOARD_SIZE_LENGTH - 1) {
 			potentialMovePoints.push(this.cells[pointAlongTheWay.row][pointAlongTheWay.col + 1]);
 		}
 	
@@ -254,12 +279,12 @@ BeyondTheMaps.Board = class {
 	static standardMovementFunction(board, originPoint, boardPointAlongTheWay, movementInfo, moveStepNumber) {
 		var mustPreserveDirection = false; //Trifle.TileInfo.movementMustPreserveDirection(movementInfo);
 		return board.getAdjacentPointsPotentialPossibleMoves(boardPointAlongTheWay, originPoint, mustPreserveDirection, movementInfo);
-	};
+	}
 
 	setPossibleMovesForMovement(movementInfo, boardPointStart) {
 		this.inceptionCount = 0;
 		this.setPossibleMovementPointsFromMovePointsOnePathAtATime(
-			BeyondTheMaps.Board.standardMovementFunction,
+			BeyondTheMapsBoard.standardMovementFunction,
 			boardPointStart.tile,
 			movementInfo,
 			boardPointStart,
@@ -267,8 +292,8 @@ BeyondTheMaps.Board = class {
 			movementInfo.distance,
 			0,
 			[boardPointStart]);
-		debug("Inception Count: " + this.inceptionCount);
-	};
+		// debug("Inception Count: " + this.inceptionCount);
+	}
 
 	setPossibleMovementPointsFromMovePointsOnePathAtATime = function(nextPossibleMovementPointsFunction,
 																		tile,
@@ -378,7 +403,7 @@ BeyondTheMaps.Board = class {
 	}
 
 	tileCanMoveThroughPoint(tile, movementInfo, targetPoint, fromPoint) {
-		return !targetPoint.hasTile() || targetPoint.tile.tileType === BeyondTheMaps.TileType.SHIP;
+		return !targetPoint.hasTile() || targetPoint.tile.tileType === BeyondTheMapsTileType.SHIP;
 	}
 
 	removePossibleMovePoints() {
@@ -432,7 +457,7 @@ BeyondTheMaps.Board = class {
 	placeLandPiecesForPlayer(playerName, landNotationPoints) {
 		if (landNotationPoints && landNotationPoints.length > 0) {
 			landNotationPoints.forEach(landNotationPoint => {
-				var tile = new BeyondTheMaps.Tile(BeyondTheMaps.TileType.LAND, getPlayerCodeFromName(playerName));
+				var tile = new BeyondTheMapsTile(BeyondTheMapsTileType.LAND, getPlayerCodeFromName(playerName));
 				this.placeTile(tile, landNotationPoint);
 			});
 		}
@@ -505,7 +530,7 @@ BeyondTheMaps.Board = class {
 		if (nextPointArr && nextPointArr.length > 0) {
 			var possibleLandPoint = nextPointArr[0];
 			if ((!possibleLandPoint.hasTile() && !this.placingLandSeparatesShipsWithoutSurroundingEnemy(possibleLandPoint, player))
-				|| (possibleLandPoint.hasTile() && possibleLandPoint.tile.tileType === BeyondTheMaps.TileType.LAND && possibleLandPoint.tile.ownerName !== player)
+				|| (possibleLandPoint.hasTile() && possibleLandPoint.tile.tileType === BeyondTheMapsTileType.LAND && possibleLandPoint.tile.ownerName !== player)
 			) {
 				landPoint = possibleLandPoint;
 				landPoint.addType(POSSIBLE_MOVE);
@@ -520,7 +545,7 @@ BeyondTheMaps.Board = class {
 		if (nextPointArr && nextPointArr.length > 0) {
 			nextPointArr.forEach(possibleLandPoint => {
 				if ((!possibleLandPoint.hasTile() && !this.placingLandSeparatesShipsWithoutSurroundingEnemy(possibleLandPoint, player))
-					|| (possibleLandPoint.hasTile() && possibleLandPoint.tile.tileType === BeyondTheMaps.TileType.LAND && possibleLandPoint.tile.ownerName !== player)
+					|| (possibleLandPoint.hasTile() && possibleLandPoint.tile.tileType === BeyondTheMapsTileType.LAND && possibleLandPoint.tile.ownerName !== player)
 				) {
 					landPoints.push(possibleLandPoint);
 					possibleLandPoint.addType(POSSIBLE_MOVE);
@@ -537,6 +562,7 @@ BeyondTheMaps.Board = class {
 		newBoard.analyzeSeaAndLandGroups();
 
 		return newBoard.shipsSeparatedAndPlayerHasNotBeenSurrounded(getOpponentName(player));
+		// return newBoard.shipsSeparatedAndAShipHasNotBeenSurrounded(); // maybe this?
 	}
 
 	placingLandSeparatesShipsWithoutSurroundingOne(boardPoint) {
@@ -568,7 +594,7 @@ BeyondTheMaps.Board = class {
 			bothShipsPresent && hostSeaGroupId !== guestSeaGroupId)		// Ships separated and present
 			&& !(														// AND NOT:
 				!bothShipsPresent		 								// (A ship has been captured
-				|| this.playerShipSurrounded(player)								// OR a ship is cannot move)
+				|| this.playerShipSurrounded(player)					// OR a ship is cannot move)
 			);
 	}
 
@@ -594,7 +620,7 @@ BeyondTheMaps.Board = class {
 				var adjacentPoints = this.getAdjacentPoints(shipPoint);
 				var allAdjPointsFilled = true;
 				adjacentPoints.forEach(adjPoint => {
-					if (!(adjPoint.hasTile() && adjPoint.tile.tileType === BeyondTheMaps.TileType.LAND)) {
+					if (!(adjPoint.hasTile() && adjPoint.tile.tileType === BeyondTheMapsTileType.LAND)) {
 						allAdjPointsFilled = false;
 					}
 				});
@@ -625,7 +651,6 @@ BeyondTheMaps.Board = class {
 		});
 
 		if (peninsulaPoints.length) {
-			debug("El peninsulas!");
 			peninsulaPoints.forEach(peninsulaPoint => {
 				var adjacentPoints = this.getAdjacentPoints(peninsulaPoint);
 				adjacentPoints.forEach(adjacentPoint => {
@@ -654,13 +679,13 @@ BeyondTheMaps.Board = class {
 
 	pointIsPeninsulaForPlayer(boardPoint, playerName) {
 		if (boardPoint.hasTile() 
-				&& boardPoint.tile.tileType === BeyondTheMaps.TileType.LAND
+				&& boardPoint.tile.tileType === BeyondTheMapsTileType.LAND
 				&& boardPoint.tile.ownerName === playerName) {
 			// if adjacent to <= 1 lands of same player, yes
 			var adjacentFriendlyLandCount = 0;
 			this.getAdjacentPoints(boardPoint).forEach(adjacentPoint => {
 				if (adjacentPoint.hasTile() 
-						&& adjacentPoint.tile.tileType === BeyondTheMaps.TileType.LAND
+						&& adjacentPoint.tile.tileType === BeyondTheMapsTileType.LAND
 						&& adjacentPoint.tile.ownerName === playerName) {
 					adjacentFriendlyLandCount++;
 				}
@@ -692,12 +717,12 @@ BeyondTheMaps.Board = class {
 			if (!touchesEdge) {
 				var adjacentPoints = this.getAdjacentPoints(seaPoint);
 				if (adjacentPoints.length !== 4) {
-					debug("Group touches edge, means it is not surrounded");
+					// debug("Group touches edge, means it is not surrounded");
 					touchesEdge = true;
 				} else {
 					adjacentPoints.forEach(adjacentPoint => {
 						if (!seaGroup.includes(adjacentPoint)
-								&& adjacentPoint.hasTile() && adjacentPoint.tile.tileType === BeyondTheMaps.TileType.LAND
+								&& adjacentPoint.hasTile() && adjacentPoint.tile.tileType === BeyondTheMapsTileType.LAND
 								&& !surroundingPlayers.has(adjacentPoint.tile.ownerName)) {
 							surroundingPlayers.add(adjacentPoint.tile.ownerName);
 						}
@@ -822,7 +847,7 @@ BeyondTheMaps.Board = class {
 					}
 				});
 			});
-		};
+		}
 
 		touchingLandGroupIds.forEach(landGroupId => landAndSeasGroup = landAndSeasGroup.concat(this.landGroups[landGroupId]));
 
@@ -888,7 +913,7 @@ BeyondTheMaps.Board = class {
 
 					this.seaGroups.push(seaGroup);
 				}
-			} else if (bp.hasTile() && bp.tile.tileType === BeyondTheMaps.TileType.LAND) {
+			} else if (bp.hasTile() && bp.tile.tileType === BeyondTheMapsTileType.LAND) {
 				bp.seaGroupId = null;
 				if (!this.knownLandPoints.includes(bp.getNotationPointString())) {
 					var landGroup = [];
@@ -909,11 +934,10 @@ BeyondTheMaps.Board = class {
 			}
 		});
 	
-		debug("# of Sea Groups: " + this.seaGroups.length);
-		debug("# of Land Groups: " + this.landGroups.length);
-
-		debug("Ship Points:");
-		debug(this.shipPoints);
+		// debug("# of Sea Groups: " + this.seaGroups.length);
+		// debug("# of Land Groups: " + this.landGroups.length);
+		// debug("Ship Points:");
+		// debug(this.shipPoints);
 	}
 
 	collectAdjacentPointsInSeaGroup(bp, seaGroup) {
@@ -938,7 +962,7 @@ BeyondTheMaps.Board = class {
 
 		adjacentPoints.forEach(nextPoint => {
 			if (!this.knownLandPoints.includes(nextPoint.getNotationPointString())
-					&& nextPoint.hasTile() && nextPoint.tile.tileType === BeyondTheMaps.TileType.LAND
+					&& nextPoint.hasTile() && nextPoint.tile.tileType === BeyondTheMapsTileType.LAND
 					&& nextPoint.tile.ownerName === bp.tile.ownerName) {
 				landGroup.push(nextPoint);
 				nextPoint.landGroupId = bp.landGroupId;
@@ -950,19 +974,19 @@ BeyondTheMaps.Board = class {
 
 	pointIsEmptyOrShip(point) {
 		return !point.hasTile()
-			|| (point.hasTile() && point.tile.tileType === BeyondTheMaps.TileType.SHIP);
+			|| (point.hasTile() && point.tile.tileType === BeyondTheMapsTileType.SHIP);
 	}
 
 	pointIsLandForPlayer(point, ownerName) {
 		return point.hasTile() 
-			&& point.tile.tileType === BeyondTheMaps.TileType.LAND
+			&& point.tile.tileType === BeyondTheMapsTileType.LAND
 			&& point.tile.ownerName === ownerName;
 	}
 
 	countPlayerLandPieces(playerName) {
 		var landCount = 0;
 		this.forEachBoardPointWithTile(bp => {
-			if (bp.tile.ownerName === playerName && bp.tile.tileType === BeyondTheMaps.TileType.LAND) {
+			if (bp.tile.ownerName === playerName && bp.tile.tileType === BeyondTheMapsTileType.LAND) {
 				landCount++;
 			}
 		});
@@ -978,7 +1002,7 @@ BeyondTheMaps.Board = class {
 				rowAndCols.push(adjacentPoint);
 			}
 		}
-		if (rowAndCol.row < BeyondTheMaps.FULL_BOARD_SIZE_LENGTH - 1) {
+		if (rowAndCol.row < FULL_BOARD_SIZE_LENGTH - 1) {
 			var adjacentPoint = this.cells[rowAndCol.row + 1][rowAndCol.col];
 			if (!adjacentPoint.isType(NON_PLAYABLE)) {
 				rowAndCols.push(adjacentPoint);
@@ -990,7 +1014,7 @@ BeyondTheMaps.Board = class {
 				rowAndCols.push(adjacentPoint);
 			}
 		}
-		if (rowAndCol.col < BeyondTheMaps.FULL_BOARD_SIZE_LENGTH - 1) {
+		if (rowAndCol.col < FULL_BOARD_SIZE_LENGTH - 1) {
 			var adjacentPoint = this.cells[rowAndCol.row][rowAndCol.col + 1];
 			if (!adjacentPoint.isType(NON_PLAYABLE)) {
 				rowAndCols.push(adjacentPoint);
@@ -1032,7 +1056,7 @@ BeyondTheMaps.Board = class {
 	}
 
 	getCopy() {
-		var copyBoard = new BeyondTheMaps.Board();
+		var copyBoard = new BeyondTheMapsBoard();
 
 		for (var row = 0; row < this.cells.length; row++) {
 			for (var col = 0; col < this.cells[row].length; col++) {
@@ -1040,7 +1064,9 @@ BeyondTheMaps.Board = class {
 			}
 		}
 
+		copyBoard.shipPoints = { ...this.shipPoints };
+
 		return copyBoard;
 	}
 
-};
+}

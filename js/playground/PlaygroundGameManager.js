@@ -1,6 +1,6 @@
 // Skud Pai Sho Game Manager
 
-function PlaygroundGameManager(actuator, ignoreActuate, isCopy) {
+export function PlaygroundGameManager(actuator, ignoreActuate, isCopy) {
 	this.isCopy = isCopy;
 
 	this.actuator = actuator;

@@ -1,5 +1,5 @@
 
-class HonoraryTitleChecker {
+export class HonoraryTitleChecker {
 	constructor(completedGameStats) {
 		this.completedGameStats = completedGameStats;
 

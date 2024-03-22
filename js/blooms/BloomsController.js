@@ -1,5 +1,5 @@
 
-function BloomsController(gameContainer, isMobile) {
+export function BloomsController(gameContainer, isMobile) {
 	if (!isMobile) {
 		this.additionalTilePileClass = "desktop";
 	} else {

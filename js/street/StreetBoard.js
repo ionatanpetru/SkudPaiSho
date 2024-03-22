@@ -1,6 +1,6 @@
 /* Street Pai Sho Board */
 
-function StreetBoard() {
+export function StreetBoard() {
 	this.size = new RowAndColumn(17, 17);
 	this.cells = this.brandNew();
 

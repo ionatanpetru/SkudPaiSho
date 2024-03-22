@@ -1,6 +1,39 @@
 // Actuator
 
-BeyondTheMaps.Actuator = class {
+import {
+  ADEVAR_ROTATE,
+  EDGES_12x12_GAME,
+  SQUARE_SPACES,
+  gameOptionEnabled,
+} from '../GameOptions';
+import { BeyondTheMapsController } from './BeyondTheMapsController';
+import { BeyondTheMapsMoveType } from './BeyondTheMapsGameManager';
+import { ElementStyleTransform } from '../util/ElementStyleTransform';
+import {
+  MARKED,
+  NON_PLAYABLE,
+  POSSIBLE_MOVE,
+} from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import { NotationPoint } from '../CommonNotationObjects';
+import {
+  RmbDown,
+  RmbUp,
+  clearMessage,
+  pieceAnimationLength,
+  pointClicked,
+  showPointMessage,
+  showTileMessage,
+  unplayedTileClicked,
+} from '../PaiShoMain';
+import {
+  createBoardArrow,
+  createBoardPointDiv,
+  isSamePoint,
+  setupPaiShoBoard,
+} from '../ActuatorHelp';
+import { debug, peekRandomFromArray } from '../GameData';
+
+export class BeyondTheMapsActuator {
 
 	static hostTeamTilesDivId = "hostTilesContainer";
 	static guestTeamTilesDivId = "guestTilesContainer";
@@ -15,8 +48,8 @@ BeyondTheMaps.Actuator = class {
 		
 		var containers = setupPaiShoBoard(
 			this.gameContainer,
-			BeyondTheMaps.Controller.getHostTilesContainerDivs(),
-			BeyondTheMaps.Controller.getGuestTilesContainerDivs(),
+			BeyondTheMapsController.getHostTilesContainerDivs(),
+			BeyondTheMapsController.getGuestTilesContainerDivs(),
 			false,
 			ADEVAR_ROTATE,
 			true,
@@ -80,8 +113,8 @@ BeyondTheMaps.Actuator = class {
 			this.arrowContainer.appendChild(createBoardArrow(arrow[0], arrow[1]));
 		}
 
-		this.clearContainerWithId(BeyondTheMaps.Actuator.hostTeamTilesDivId);
-		this.clearContainerWithId(BeyondTheMaps.Actuator.guestTeamTilesDivId);
+		this.clearContainerWithId(BeyondTheMapsActuator.hostTeamTilesDivId);
+		this.clearContainerWithId(BeyondTheMapsActuator.guestTeamTilesDivId);
 
 		// Go through tile piles and display
 		
@@ -145,11 +178,14 @@ BeyondTheMaps.Actuator = class {
 		theDiv.setAttribute("data-pileName", pileName);
 
 		if (this.mobile) {
-			theDiv.setAttribute("onclick", "unplayedTileClicked(this); showTileMessage(this);");
+			theDiv.addEventListener('click', () => {
+				unplayedTileClicked(theDiv);
+				showTileMessage(theDiv);
+			});
 		} else {
-			theDiv.setAttribute("onclick", "unplayedTileClicked(this);");
-			theDiv.setAttribute("onmouseover", "showTileMessage(this);");
-			theDiv.setAttribute("onmouseout", "clearMessage();");
+			theDiv.addEventListener('click', () => unplayedTileClicked(theDiv));
+			theDiv.addEventListener('mouseover', () => showTileMessage(theDiv));
+			theDiv.addEventListener('mouseout', clearMessage);
 		}
 
 		tileContainer.appendChild(theDiv);
@@ -184,11 +220,11 @@ BeyondTheMaps.Actuator = class {
 			}
 
 			if (this.mobile) {
-				theDiv.setAttribute("onclick", "pointClicked(this); showPointMessage(this);");
+				theDiv.addEventListener("click", () => { pointClicked(theDiv); showPointMessage(theDiv); });
 			} else {
-				theDiv.setAttribute("onclick", "pointClicked(this);");
-				theDiv.setAttribute("onmouseover", "showPointMessage(this);");
-				theDiv.setAttribute("onmouseout", "clearMessage();");
+				theDiv.addEventListener("click", () => { pointClicked(theDiv); });
+				theDiv.addEventListener("mouseover", () => {showPointMessage(theDiv);});
+				theDiv.addEventListener('mouseout', clearMessage);
 				theDiv.addEventListener('mousedown', e => {
 					// Right Mouse Button
 					if (e.button == 2) {
@@ -264,7 +300,7 @@ BeyondTheMaps.Actuator = class {
 		var movementPath;
 		var movementStepIndex = 0;
 	
-		if (this.movePhaseData.moveType === BeyondTheMaps.MoveType.EXPLORE_SEA && boardPoint.tile) {
+		if (this.movePhaseData.moveType === BeyondTheMapsMoveType.EXPLORE_SEA && boardPoint.tile) {
 			if (isSamePoint(new NotationPoint(this.movePhaseData.endPoint), endX, endY)) {	// Piece moved
 				var moveStartPoint = new NotationPoint(this.movePhaseData.startPoint);
 				startX = moveStartPoint.rowAndColumn.col;
@@ -282,7 +318,7 @@ BeyondTheMaps.Actuator = class {
 				theImg.style.visibility = "hidden";
 				theImg.style.transform = "scale(1.5)";
 			}
-		} else if (this.movePhaseData.moveType === BeyondTheMaps.MoveType.EXPLORE_LAND && boardPoint.tile) {
+		} else if (this.movePhaseData.moveType === BeyondTheMapsMoveType.EXPLORE_LAND && boardPoint.tile) {
 			var landPointIndex = 0;
 			if (this.movePhaseData.landPoints && this.movePhaseData.landPoints.length > 0) {
 				this.movePhaseData.landPoints.forEach(landPoint => {
@@ -420,4 +456,4 @@ BeyondTheMaps.Actuator = class {
 		return peekRandomFromArray(this.tileContainerTileDivs[pileName]);
 	}
 
-};
+}

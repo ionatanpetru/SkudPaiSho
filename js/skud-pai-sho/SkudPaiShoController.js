@@ -1,13 +1,102 @@
 /* Skud Pai Sho specific UI interaction logic */
 
-var SkudConstants = {
+import {
+  ACCENT_TILE,
+  BASIC_FLOWER,
+  SPECIAL_FLOWER,
+  boatOnlyMoves,
+  debug,
+  limitedGatesRule,
+  lotusNoCapture,
+  newKnotweedRules,
+  rocksUnwheelable,
+  simpleCanonRules,
+  simpleRocks,
+  simpleSpecialFlowerRule,
+  simplest,
+  specialFlowerLimitedRule,
+} from '../GameData';
+import {
+  ARRANGING,
+  GUEST,
+  HOST,
+  NotationPoint,
+  PLANTING,
+} from '../CommonNotationObjects';
+import {
+  BRAND_NEW,
+  GameType,
+  MOVE_DONE,
+  READY_FOR_BONUS,
+  WAITING_FOR_BOAT_BONUS_POINT,
+  WAITING_FOR_BONUS_ENDPOINT,
+  WAITING_FOR_ENDPOINT,
+  activeAi,
+  activeAi2,
+  buildDropdownDiv,
+  callSubmitMove,
+  clearMessage,
+  closeModal,
+  createGameIfThatIsOk,
+  currentMoveIndex,
+  finalizeMove,
+  gameId,
+  getCurrentPlayer,
+  getGameOptionsMessageHtml,
+  getGatePointMessage,
+  getNeutralPointMessage,
+  getRedPointMessage,
+  getRedWhitePointMessage,
+  getResetMoveText,
+  getUserGamePreference,
+  getWhitePointMessage,
+  isAnimationsOn,
+  myTurn,
+  onlinePlayEnabled,
+  playingOnlineGame,
+  rerunAll,
+  setSkudTilesOption,
+  setUserGamePreference,
+  showModal,
+  showResetMoveMessage,
+  skudTilesKey,
+  tileDesignTypeKey,
+  tileDesignTypeValues,
+  toBullets,
+  userIsLoggedIn
+} from '../PaiShoMain';
+import {
+  DIAGONAL_MOVEMENT,
+  EVERYTHING_CAPTURE,
+  NO_HARMONY_VISUAL_AIDS,
+  NO_WHEELS,
+  OPTION_ALL_ACCENT_TILES,
+  OPTION_ANCIENT_OASIS_EXPANSION,
+  OPTION_DOUBLE_ACCENT_TILES,
+  OPTION_INFORMAL_START,
+  gameOptionEnabled,
+} from '../GameOptions';
+import { GATE, NEUTRAL, POSSIBLE_MOVE } from './SkudPaiShoBoardPoint';
+import { MCTS } from '../ai/MCTS';
+import { RED, SkudPaiShoTile, WHITE } from './SkudPaiShoTile';
+import { SkudAIv1 } from '../ai/SkudAIv1';
+import { SkudMctsGame } from './SkudMctsGame';
+import { SkudPaiShoActuator } from './SkudPaiShoActuator';
+import { SkudPaiShoGameManager } from './SkudPaiShoGameManager';
+import {
+  SkudPaiShoGameNotation,
+  SkudPaiShoNotationBuilder,
+  SkudPaiShoNotationMove,
+} from './SkudPaiShoGameNotation';
+
+export var SkudConstants = {
 	preferencesKey: "SkudPaiShoPreferencesKey"
 };
-var SkudPreferences = {
+export var SkudPreferences = {
 	customTilesUrl: ""
 };
 
-function SkudPaiShoController(gameContainer, isMobile) {
+export function SkudPaiShoController(gameContainer, isMobile) {
 	this.actuator = new SkudPaiShoActuator(gameContainer, isMobile, isAnimationsOn());
 
 	SkudPaiShoController.loadPreferences();
@@ -38,6 +127,16 @@ SkudPaiShoController.prototype.getGameTypeId = function() {
 
 SkudPaiShoController.prototype.resetGameManager = function() {
 	this.theGame = new SkudPaiShoGameManager(this.actuator);
+
+	var vgame = new SkudMctsGame(GUEST);
+	let iterations = 10; //more iterations -> stronger AI, more computation
+	let exploration = 0.55; //1.41 //exploration vs. explotation parameter, sqrt(2) is reasonable default (c constant in UBC forumula)
+	var mcts = new MCTS(vgame, GUEST, iterations, exploration);
+
+	this.mctsGame = {
+		game: vgame,
+		mcts: mcts
+	};
 };
 
 SkudPaiShoController.prototype.resetNotationBuilder = function() {
@@ -141,6 +240,30 @@ SkudPaiShoController.prototype.getAdditionalMessage = function() {
 	}
 
 	return msg;
+};
+
+
+SkudPaiShoController.prototype.getAdditionalMessageElement = function() {
+	var msgElement = document.createElement("span");
+	msgElement.innerText = "Play MCTS move";
+	msgElement.addEventListener('click', () => {
+		this.playMctsMove();
+	});
+	return msgElement;
+};
+
+SkudPaiShoController.prototype.playMctsMove = async function() {
+	showModal('AI Move Loading', 'AI move loading...', true);
+	setTimeout(() => {
+		var move = this.mctsGame.mcts.selectMove();
+		if (!move) {
+			showModal('AI Move', "No AI move found :(");
+			return;
+		}
+		this.gameNotation.addMove(move);
+		finalizeMove();
+		closeModal();
+	}, 50);
 };
 
 SkudPaiShoController.prototype.getExtraHarmonyBonusHelpText = function() {
@@ -623,8 +746,8 @@ SkudPaiShoController.prototype.getHelpMessageForTile = function(tile) {
 			heading = "Accent Tile: Boat";
 			if (simplest || rocksUnwheelable) {
 				message.push("The Boat moves a Flower Tile to a surrounding space or removes an Accent tile.");
-			} else if (rocksUnwheelable) {
-				message.push("The Boat moves a Flower Tile to a surrounding space or removes a Rock or Knotweed tile.");
+			// } else if (rocksUnwheelable) {
+			// 	message.push("The Boat moves a Flower Tile to a surrounding space or removes a Rock or Knotweed tile.");
 			} else {
 				message.push("The Boat moves a Flower Tile to a surrounding space or removes a Knotweed tile.");
 			}
@@ -751,6 +874,14 @@ SkudPaiShoController.prototype.getCurrentPlayer = function() {
 		return GUEST;
 	} else if (lastPlayer === GUEST) {
 		return HOST;
+	}
+};
+
+SkudPaiShoController.prototype.runMove = function(move, withActuate, moveAnimationBeginStep, skipAnimation) {
+	this.theGame.runNotationMove(move, withActuate);
+
+	if (this.mctsGame) {
+		this.mctsGame.game.playMove(move);
 	}
 };
 

@@ -1,10 +1,14 @@
 
-BeyondTheMaps.TileType = {
+import { EDGES_MOVE_4_2, gameOptionEnabled } from "../GameOptions";
+import { GUEST, HOST } from "../CommonNotationObjects";
+import { tileIdIncrement } from '../skud-pai-sho/SkudPaiShoTile';
+
+export const BeyondTheMapsTileType = {
 	SHIP: "Ship",
 	LAND: "Land"
 };
 
-BeyondTheMaps.Tile = class {
+class BeyondTheMapsTile {
 	constructor(tileType, ownerCode) {
 		this.tileType = tileType;
 		this.ownerCode = ownerCode;
@@ -13,7 +17,7 @@ BeyondTheMaps.Tile = class {
 		} else if (this.ownerCode === 'H') {
 			this.ownerName = HOST;
 		}
-		this.id = tileId++;
+		this.id = tileIdIncrement();
 	}
 
 	getConsoleDisplay() {
@@ -29,7 +33,7 @@ BeyondTheMaps.Tile = class {
 	}
 
 	getName() {
-		return BeyondTheMaps.Tile.getTileName(this.tileType);
+		return BeyondTheMapsTile.getTileName(this.tileType);
 	}
 
 	getMoveDistance() {
@@ -37,11 +41,13 @@ BeyondTheMaps.Tile = class {
 	}
 
 	getCopy() {
-		return new BeyondTheMaps.Tile(this.tileType, this.ownerCode);
+		return new BeyondTheMapsTile(this.tileType, this.ownerCode);
 	}
 
 	static getTileName(tileType) {
 		return tileType;
 	}
 
-};
+}
+
+export default BeyondTheMapsTile;

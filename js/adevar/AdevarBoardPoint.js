@@ -1,6 +1,8 @@
 // Board Point
+import { NEUTRAL, NON_PLAYABLE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import { RED, WHITE } from '../skud-pai-sho/SkudPaiShoTile';
 
-var AdevarBoardPointType = {
+export var AdevarBoardPointType = {
 	NORTH_NEUTRAL_PLOT: "Northern Open Plot",
 	EAST_NEUTRAL_PLOT: "Eastern Open Plot",
 	SOUTH_NEUTRAL_PLOT: "Southern Open Plot",
@@ -11,7 +13,7 @@ var AdevarBoardPointType = {
 	EAST_WHITE_PLOT: "Eastern White Plot"
 };
 
-function AdevarBoardPoint() {
+export function AdevarBoardPoint() {
 	this.types = [];
 	this.plotTypes = [];
 	this.row = -1;
@@ -77,14 +79,14 @@ AdevarBoardPoint.prototype.canHoldTile = function(tile, ignoreTileCheck) {
 	return true;
 };
 
-AdevarBoardPoint.prototype.isPossibleForMovementType = function(movementInfo) {
+AdevarBoardPoint.prototype.isPossibleForMovementType = function(/* movementInfo */) {
 	return false; // ??
 };
 
 AdevarBoardPoint.prototype.setMoveDistanceRemaining = function(movementInfo, distanceRemaining) {
 	this.moveDistanceRemaining = distanceRemaining;
 };
-AdevarBoardPoint.prototype.getMoveDistanceRemaining = function(movementInfo) {
+AdevarBoardPoint.prototype.getMoveDistanceRemaining = function(/* movementInfo */) {
 	return this.moveDistanceRemaining;
 };
 

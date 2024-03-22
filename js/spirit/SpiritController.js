@@ -1,6 +1,40 @@
 /* Spirit Pai Sho specific UI interaction logic */
 
-var SpiritPreferences = {
+import {
+  BRAND_NEW,
+  GameType,
+  WAITING_FOR_ENDPOINT,
+  buildPreferenceDropdownDiv,
+  callSubmitMove,
+  createGameIfThatIsOk,
+  currentMoveIndex,
+  finalizeMove,
+  gameController,
+  gameId,
+  getCurrentPlayer,
+  getLoginToken,
+  getUserGamePreference,
+  myTurn,
+  onlinePlayEnabled,
+  onlinePlayEngine,
+  playingOnlineGame,
+  rerunAll,
+  setUserGamePreference,
+  userIsLoggedIn,
+} from '../PaiShoMain';
+import { GUEST, HOST, MOVE, NotationPoint } from '../CommonNotationObjects';
+import { POSSIBLE_MOVE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import { SpiritActuator } from './SpiritActuator';
+import { SpiritGameManager } from './SpiritGameManager';
+import {
+  SpiritGameNotation,
+  SpiritNotationBuilder,
+  SpiritNotationMove,
+} from './SpiritGameNotation';
+import { SpiritTile } from './SpiritTile';
+import { debug } from '../GameData';
+
+export var SpiritPreferences = {
 	tileDesignKey: "TileDesigns",
 	tileDesignTypeValues: {
 		original: "Blue and Green",
@@ -11,7 +45,7 @@ var SpiritPreferences = {
 	}
 };
 
-function SpiritController(gameContainer, isMobile) {
+export function SpiritController(gameContainer, isMobile) {
 	this.actuator = new SpiritActuator(gameContainer, isMobile);
 	
 	this.resetGameManager();

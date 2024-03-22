@@ -2,7 +2,18 @@
 
 // --------------------------------------------- // 
 
-var PlaygroundMoveType = {
+import { BRAND_NEW } from '../PaiShoMain';
+import {
+  DEPLOY,
+  GUEST,
+  HOST,
+  MOVE,
+  NotationPoint,
+} from '../CommonNotationObjects';
+import { PlaygroundTileManager } from './PlaygroundTileManager';
+import { debug } from '../GameData';
+
+export var PlaygroundMoveType = {
 	endGame: "END_GAME",
 	hideTileLibraries: "HideTileLibraries",
 	deployToTilePile: "DeployToTilePile",
@@ -11,7 +22,7 @@ var PlaygroundMoveType = {
 	setGameBoard: "SetGameBoard"
 };
 
-var PlaygroundNotationConstants = {
+export var PlaygroundNotationConstants = {
 	moveToPile: "-mp",
 	deployToPile: "-dp",
 	fromPile: "-fp",
@@ -24,14 +35,14 @@ var PlaygroundNotationConstants = {
 };
 
 /* Numbers important! Used in math for rotation in Actuator */
-var PlaygroundTileFacingDirection = {
+export var PlaygroundTileFacingDirection = {
 	RIGHT: 1,
 	DOWN: 2,
 	LEFT: 3,
 	UP: 0
 };
 
-function PlaygroundNotationMove(text) {
+export function PlaygroundNotationMove(text) {
 	this.fullMoveText = text;
 	this.analyzeMove();
 }
@@ -151,7 +162,7 @@ PlaygroundNotationMove.prototype.equals = function(otherMove) {
 
 // --------------------------------------- //
 
-function PlaygroundNotationBuilder() {
+export function PlaygroundNotationBuilder() {
 	// this.moveNum;	// Let's try making this magic
 	// this.player;		// Magic
 	this.moveType;
@@ -195,7 +206,7 @@ PlaygroundNotationBuilder.prototype.getNotationMove = function(moveNum, player) 
 
 
 
-function PlaygroundGameNotation() {
+export function PlaygroundGameNotation() {
 	this.notationText = "";
 	this.moves = [];
 }

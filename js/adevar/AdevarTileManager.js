@@ -1,6 +1,6 @@
 /* Adevar Pai Sho Tile Manager */
 
-function AdevarTileManager(forActuating) {
+export function AdevarTileManager(forActuating) {
 	if (forActuating) {
 		this.hostTiles = this.loadTileSet('H');
 		this.guestTiles = this.loadTileSet('G');

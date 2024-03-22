@@ -18,7 +18,7 @@ window.fakeStorage = {
 	}
 };
 
-function LocalStorage() {
+export function LocalStorage() {
 	this.localEmailKey     = "localUserEmail";
 
 	var supported = this.localStorageSupported();
@@ -48,12 +48,10 @@ LocalStorage.prototype.setUserEmail = function (email) {
 
 
 
-
-
-
-
-
-function LocalSoundStorageManager() {
+/*
+* 
+*/
+export function LocalSoundStorageManager() {
 	this.soundOffKey      = "soundOff";
   
 	this.storage = window.localStorage;

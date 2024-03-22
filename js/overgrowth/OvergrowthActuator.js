@@ -1,6 +1,6 @@
 // Actuator
 
-function OvergrowthActuator(gameContainer, isMobile) {
+export function OvergrowthActuator(gameContainer, isMobile) {
 	this.gameContainer = gameContainer;
 	this.mobile = isMobile;
 
@@ -105,11 +105,14 @@ OvergrowthActuator.prototype.addTile = function(tile, mainContainer) {
 	theDiv.setAttribute("id", tile.id);
 
 	if (this.mobile) {
-		theDiv.setAttribute("onclick", "unplayedTileClicked(this); showTileMessage(this);");
+		theDiv.addEventListener('click', () => {
+				unplayedTileClicked(this);
+				showTileMessage(this);
+			});
 	} else {
-		theDiv.setAttribute("onclick", "unplayedTileClicked(this);");
-		theDiv.setAttribute("onmouseover", "showTileMessage(this);");
-		theDiv.setAttribute("onmouseout", "clearMessage();");
+		theDiv.addEventListener('click', () => unplayedTileClicked(this));
+		theDiv.addEventListener('mouseover', () => showTileMessage(this));
+		theDiv.addEventListener('mouseout', clearMessage);
 	}
 
 	container.appendChild(theDiv);
@@ -142,7 +145,7 @@ OvergrowthActuator.prototype.addBoardPoint = function(boardPoint) {
 		} else {
 			theDiv.setAttribute("onclick", "pointClicked(this);");
 			theDiv.setAttribute("onmouseover", "showPointMessage(this);");
-			theDiv.setAttribute("onmouseout", "clearMessage();");
+			theDiv.addEventListener('mouseout', clearMessage);
 			theDiv.addEventListener('mousedown', e => {
 				 // Right Mouse Button
 				if (e.button == 2) {

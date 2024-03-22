@@ -4,7 +4,7 @@
   --a-color: var(--color);
   --replay-controls-border-top: 1px solid #2c2c2c;
   --replay-button-background: inherit;
-  --bg-svg-url: url(board_darkmode.svg);
+  --bg-svg-url: url(/style/board_darkmode.svg);
   --header-border-bottom: 1px solid #2c2c2c;
   --modal-content-background-color: #1b1b19;
   --main-modal-close-color-hover: #502;
@@ -27,7 +27,7 @@
   --a-color: var(--color);
   --replay-controls-border-top: 1px solid #2c2c2c;
   --replay-button-background: inherit;
-  --bg-svg-url: url(board_darkmode.svg);
+  --bg-svg-url: url(/style/board_darkmode.svg);
   --header-border-bottom: 1px solid #2c2c2c;
   --modal-content-background-color: #1b1b19;
   --main-modal-close-color-hover: #502;
@@ -47,7 +47,7 @@
   --a-color: var(--color);
   --replay-controls-border-top: none;
   --replay-button-background: #ccc;
-  --bg-svg-url: url(board.svg);
+  --bg-svg-url: url(/board.svg);
   --header-border-bottom: unset;
   --modal-content-background-color: #fefefe;
   --main-modal-close-color-hover: #000;

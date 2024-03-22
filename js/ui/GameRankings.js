@@ -1,5 +1,5 @@
 /* Game Rankings UI */
-function viewGameRankingsClicked() {
+export function viewGameRankingsClicked() {
 	showModal("Player Game Rankings", getLoadingModalText());
 	onlinePlayEngine.getGameRankings(getLoginToken(), showGameRankingsCallback);
 }

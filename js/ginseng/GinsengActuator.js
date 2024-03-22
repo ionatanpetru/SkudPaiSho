@@ -1,5 +1,33 @@
 // Ginseng Actuator
 
+import { ElementStyleTransform } from '../util/ElementStyleTransform';
+import { GINSENG_GUEST_ROTATE, GINSENG_ROTATE } from '../GameOptions';
+import { GUEST, HOST, MOVE, NotationPoint } from '../CommonNotationObjects';
+import { Ginseng } from './GinsengController';
+import {
+  MARKED,
+  NON_PLAYABLE,
+  POSSIBLE_MOVE,
+} from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import {
+  RmbDown,
+  RmbUp,
+  clearMessage,
+  pieceAnimationLength,
+  showTileMessage,
+  unplayedTileClicked,
+} from '../PaiShoMain';
+import {
+  cos45,
+  createBoardArrow,
+  createBoardPointDiv,
+  getTilesForPlayer,
+  isSamePoint,
+  setupPaiShoBoard,
+  sin45,
+} from '../ActuatorHelp';
+import { debug } from '../GameData';
+
 Ginseng.Actuator = function(gameContainer, isMobile, enableAnimations) {
 	this.gameContainer = gameContainer;
 	this.mobile = isMobile;
@@ -134,11 +162,14 @@ Ginseng.Actuator.prototype.addTile = function(tile, tileContainer, isCaptured) {
 	}
 	if (clickable) {
 		if (this.mobile) {
-			theDiv.setAttribute("onclick", "unplayedTileClicked(this); showTileMessage(this);");
+			theDiv.addEventListener('click', () => {
+				unplayedTileClicked(theDiv);
+				showTileMessage(theDiv);
+			});
 		} else {
-			theDiv.setAttribute("onclick", "unplayedTileClicked(this);");
-			theDiv.setAttribute("onmouseover", "showTileMessage(this);");
-			theDiv.setAttribute("onmouseout", "clearMessage();");
+			theDiv.addEventListener('click', () => unplayedTileClicked(theDiv));
+			theDiv.addEventListener('mouseover', () => showTileMessage(theDiv));
+			theDiv.addEventListener('mouseout', clearMessage);
 		}
 	}
 
@@ -207,11 +238,14 @@ Ginseng.Actuator.prototype.addTeamTile = function(tile, player, isForTeamSelecti
 	theDiv.setAttribute("id", tile.id);
 
 	if (this.mobile) {
-		theDiv.setAttribute("onclick", "unplayedTileClicked(this); showTileMessage(this);");
+		theDiv.addEventListener('click', () => {
+				unplayedTileClicked(theDiv);
+				showTileMessage(theDiv);
+			});
 	} else {
-		theDiv.setAttribute("onclick", "unplayedTileClicked(this);");
-		theDiv.setAttribute("onmouseover", "showTileMessage(this);");
-		theDiv.setAttribute("onmouseout", "clearMessage();");
+		theDiv.addEventListener('click', () => unplayedTileClicked(theDiv));
+		theDiv.addEventListener('mouseover', () => showTileMessage(theDiv));
+		theDiv.addEventListener('mouseout', clearMessage);
 	}
 
 	container.appendChild(theDiv);
@@ -250,7 +284,7 @@ Ginseng.Actuator.prototype.addBoardPoint = function(boardPoint, board, moveToAni
 		} else {
 			theDiv.setAttribute("onclick", "pointClicked(this);");
 			theDiv.setAttribute("onmouseover", "showPointMessage(this);");
-			theDiv.setAttribute("onmouseout", "clearMessage();");
+			theDiv.addEventListener('mouseout', clearMessage);
 			theDiv.addEventListener('mousedown', e => {
 				 // Right Mouse Button
 				if (e.button == 2) {
@@ -401,6 +435,7 @@ Ginseng.Actuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnim
 			theImg.elementStyleTransform.setValue("scale", 1.2);	// Make the pieces look like they're picked up a little when moving, good idea or no?
 			theDiv.style.zIndex = 99;	// Make sure "picked up" pieces show up above others
 
+			// TODO notation cleanup?
 			movementPath = moveToAnimate.endPointMovementPath;
 			if (!movementPath && moveToAnimate.movementPath) {
 				movementPath = moveToAnimate.movementPath;

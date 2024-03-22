@@ -1,6 +1,6 @@
 // Tile Manager
 
-function OvergrowthTileManager(forActuating) {
+export function OvergrowthTileManager(forActuating) {
 	if (forActuating) {
 		this.hostTiles = this.loadOneOfEach('H');
 		this.guestTiles = this.loadOneOfEach('G');

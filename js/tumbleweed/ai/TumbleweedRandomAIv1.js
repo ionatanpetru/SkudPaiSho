@@ -1,6 +1,6 @@
 /* Tumbleweed Random AI */
 
-function TumbleweedRandomAIv1() {
+export function TumbleweedRandomAIv1() {
 }
 
 TumbleweedRandomAIv1.prototype.getName = function() {

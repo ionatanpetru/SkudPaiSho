@@ -1,6 +1,16 @@
 // Solitaire Notation
 
-function SolitaireNotationMove(text) {
+import {
+  ARRANGING,
+  GUEST,
+  HOST,
+  NotationPoint,
+  PLANTING,
+} from '../CommonNotationObjects';
+import { BRAND_NEW } from '../PaiShoMain';
+import { debug } from '../GameData';
+
+export function SolitaireNotationMove(text) {
 	this.fullMoveText = text;
 	this.analyzeMove();
 }
@@ -71,7 +81,7 @@ SolitaireNotationMove.prototype.analyzeMove = function() {
 		// Arranging move stuff
 
 		// Get the two points from string like: (-8,0)-(-6,3)
-		var parts = moveText.substring(moveText.indexOf('(')+1).split(')-(');
+		parts = moveText.substring(moveText.indexOf('(')+1).split(')-(');
 
 		// parts.forEach(function(val){console.log(val);});
 
@@ -113,7 +123,7 @@ SolitaireNotationMove.prototype.equals = function(otherMove) {
 
 // --------------------------------------- //
 
-function SolitaireNotationBuilder() {
+export function SolitaireNotationBuilder() {
 	// this.moveNum;	// Let's try making this magic
 	// this.player;		// Magic
 	this.moveType;
@@ -132,18 +142,18 @@ function SolitaireNotationBuilder() {
 	this.status = BRAND_NEW;
 }
 
-SolitaireNotationBuilder.prototype.getFirstMoveForHost = function(tileCode) {
-	var builder = new SolitaireNotationBuilder();
-	builder.moveType = PLANTING;
-	builder.plantedFlowerType = Tile.getClashTileCode(tileCode);
+// SolitaireNotationBuilder.prototype.getFirstMoveForHost = function(tileCode) {
+// 	var builder = new SolitaireNotationBuilder();
+// 	builder.moveType = PLANTING;
+// 	builder.plantedFlowerType = Tile.getClashTileCode(tileCode);
 
-	if (simpleCanonRules || sameStart) {
-		builder.plantedFlowerType = tileCode;
-	}
+// 	if (simpleCanonRules || sameStart) {
+// 		builder.plantedFlowerType = tileCode;
+// 	}
 
-	builder.endPoint = new NotationPoint("0,8");
-	return builder;
-};
+// 	builder.endPoint = new NotationPoint("0,8");
+// 	return builder;
+// };
 
 SolitaireNotationBuilder.prototype.getNotationMove = function(moveNum, player) {
 	var notationLine = moveNum + player.charAt(0) + ".";
@@ -166,7 +176,7 @@ SolitaireNotationBuilder.prototype.getNotationMove = function(moveNum, player) {
 
 
 
-function SolitaireGameNotation() {
+export function SolitaireGameNotation() {
 	this.notationText = "";
 	this.moves = [];
 }
@@ -199,18 +209,20 @@ SolitaireGameNotation.prototype.getPlayerMoveNum = function() {
 	var moveNum = 0;
 	var lastMove = this.moves[this.moves.length-1];
 
+	// var player;
+
 	if (lastMove) {
 		moveNum = lastMove.moveNum;
 		// At game beginning:
 		if (lastMove.moveNum === 0 && lastMove.player === HOST) {
-			player = GUEST;
+			// player = GUEST;
 		} else if (lastMove.moveNum === 0 && lastMove.player === GUEST) {
 			moveNum++;
-			player = GUEST;
+			// player = GUEST;
 		} else if (lastMove.player === HOST) {	// Usual
 			moveNum++;
 		} else {
-			player = HOST;
+			// player = HOST;
 		}
 	}
 	return moveNum;

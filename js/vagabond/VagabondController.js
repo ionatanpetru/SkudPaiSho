@@ -1,13 +1,68 @@
 /* Vagabond Pai Sho specific UI interaction logic */
 
-var VagabondConstants = {
+/* import { Client } from 'boardgame.io/client'; */
+
+import {
+  BRAND_NEW,
+  GameType,
+  READY_FOR_BONUS,
+  WAITING_FOR_ENDPOINT,
+  activeAi,
+  activeAi2,
+  buildDropdownDiv,
+  callSubmitMove,
+  clearMessage,
+  closeModal,
+  createGameIfThatIsOk,
+  currentMoveIndex,
+  finalizeMove,
+  gameController,
+  gameId,
+  getCurrentPlayer,
+  getGameOptionsMessageHtml,
+  getUserGamePreference,
+  isInReplay,
+  myTurn,
+  onlinePlayEnabled,
+  playingOnlineGame,
+  promptForCustomTileDesigns,
+  refreshMessage,
+  rerunAll,
+  setUserGamePreference,
+  showModal,
+  userIsLoggedIn,
+  vagabondTileDesignTypeKey
+} from '../PaiShoMain';
+import {
+  DEPLOY,
+  DRAW_ACCEPT,
+  GUEST,
+  HOST,
+  MOVE,
+  NotationPoint
+} from '../CommonNotationObjects';
+import { POSSIBLE_MOVE } from "../skud-pai-sho/SkudPaiShoBoardPoint";
+import { SWAP_BISON_WITH_LEMUR, gameOptionEnabled } from '../GameOptions';
+import { VagabondActuator } from './VagabondActuator';
+import { VagabondGameManager } from './VagabondGameManager';
+import {
+  VagabondGameNotation,
+  VagabondNotationBuilder,
+} from './VagabondGameNotation';
+import { VagabondMctsGame, VagabondNotationBgIoGame } from './VagabondNotationBgIoGame';
+import { VagabondRandomAIv1 } from './ai/VagabondRandomAIv1';
+import { VagabondTile, VagabondTileCodes } from './VagabondTile';
+import { debug } from "../GameData";
+import { MCTS } from '../ai/MCTS';
+
+export var VagabondConstants = {
 	preferencesKey: "VagabondPreferencesKey"
 };
-var VagabondPreferences = {
+export var VagabondPreferences = {
 	customTilesUrl: ""
 };
 
-function VagabondController(gameContainer, isMobile) {
+export function VagabondController(gameContainer, isMobile) {
 	/* Set default preferences */
 	if (!localStorage.getItem(vagabondTileDesignTypeKey)
 			|| !VagabondController.tileDesignTypeValues[localStorage.getItem(vagabondTileDesignTypeKey)]) {
@@ -68,6 +123,25 @@ VagabondController.tileDesignSupportsLemur = function(designKey) {
 
 VagabondController.prototype.resetGameManager = function() {
 	this.theGame = new VagabondGameManager(this.actuator);
+
+	var vgame = new VagabondMctsGame(GUEST);
+	let iterations = 500; //more iterations -> stronger AI, more computation
+	let exploration = 0.55; //1.41 //exploration vs. explotation parameter, sqrt(2) is reasonable default (c constant in UBC forumula)
+	var mcts = new MCTS(vgame, GUEST, iterations, exploration);
+
+	this.mctsGame = {
+		game: vgame,
+		mcts: mcts
+	};
+	
+	if (this.bgIoGameClient) {
+		this.bgIoGameClient.stop();
+	}
+
+	// this.bgIoGameClient = Client({
+	// 	game: VagabondNotationBgIoGame
+	// });
+	// this.bgIoGameClient.start();
 };
 
 VagabondController.prototype.resetNotationBuilder = function(applyDrawOffer) {
@@ -160,6 +234,29 @@ VagabondController.prototype.getAdditionalMessage = function() {
 	return msg;
 };
 
+VagabondController.prototype.getAdditionalMessageElement = function() {
+	var msgElement = document.createElement("span");
+	msgElement.innerText = "Play MCTS move";
+	msgElement.addEventListener('click', () => {
+		this.playMctsMove();
+	});
+	return msgElement;
+};
+
+VagabondController.prototype.playMctsMove = function() {
+	showModal('AI Move Loading', 'AI move loading...', true);
+	setTimeout(() => {
+		var move = this.mctsGame.mcts.selectMove();
+		if (!move) {
+			showModal('AI Move', "No AI move found :(");
+			return;
+		}
+		this.gameNotation.addMove(move);
+		finalizeMove();
+		closeModal();
+	}, 50);
+};
+
 VagabondController.prototype.gameHasEndedInDraw = function() {
 	return this.theGame.gameHasEndedInDraw;
 };
@@ -232,7 +329,7 @@ VagabondController.prototype.unplayedTileClicked = function(tileDiv) {
 
 	var tile = this.theGame.tileManager.peekTile(player, tileCode, tileId);
 
-	if (tile.ownerName !== getCurrentPlayer() || !myTurn()) {
+	if (tile.ownerName !== this.getCurrentPlayer() || !myTurn()) {
 		// Hey, that's not your tile!
 		this.checkingOutOpponentTileOrNotMyTurn = true;
 		if (!this.peekAtOpponentMoves) {
@@ -254,7 +351,7 @@ VagabondController.prototype.unplayedTileClicked = function(tileDiv) {
 		this.theGame.hidePossibleMovePoints();
 		this.resetNotationBuilder(this.notationBuilder.offerDraw);
 	}
-}
+};
 
 VagabondController.prototype.RmbDown = function(htmlPoint) {
 	var npText = htmlPoint.getAttribute("name");
@@ -262,7 +359,7 @@ VagabondController.prototype.RmbDown = function(htmlPoint) {
 	var notationPoint = new NotationPoint(npText);
 	var rowCol = notationPoint.rowAndColumn;
 	this.mouseStartPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
-}
+};
 
 VagabondController.prototype.RmbUp = function(htmlPoint) {
 	var npText = htmlPoint.getAttribute("name");
@@ -280,7 +377,7 @@ VagabondController.prototype.RmbUp = function(htmlPoint) {
 	this.mouseStartPoint = null;
 
 	this.callActuate();
-}
+};
 
 VagabondController.prototype.pointClicked = function(htmlPoint) {
 	this.theGame.markingManager.clearMarkings();
@@ -307,7 +404,7 @@ VagabondController.prototype.pointClicked = function(htmlPoint) {
 
 	if (this.notationBuilder.status === BRAND_NEW) {
 		if (boardPoint.hasTile()) {
-			if (boardPoint.tile.ownerName !== getCurrentPlayer() || !myTurn()) {
+			if (boardPoint.tile.ownerName !== this.getCurrentPlayer() || !myTurn()) {
 				debug("That's not your tile!");
 				this.checkingOutOpponentTileOrNotMyTurn = true;
 				if (!this.peekAtOpponentMoves) {
@@ -358,15 +455,15 @@ VagabondController.prototype.pointClicked = function(htmlPoint) {
 	}
 }
 
-VagabondController.prototype.skipHarmonyBonus = function() {
-	var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
-	this.gameNotation.addMove(move);
-	if (playingOnlineGame()) {
-		callSubmitMove();
-	} else {
-		finalizeMove();
-	}
-}
+// VagabondController.prototype.skipHarmonyBonus = function() {
+// 	var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
+// 	this.gameNotation.addMove(move);
+// 	if (playingOnlineGame()) {
+// 		callSubmitMove();
+// 	} else {
+// 		finalizeMove();
+// 	}
+// }
 
 VagabondController.prototype.getTheMessage = function(tile, ownerName) {
 	var message = [];
@@ -500,8 +597,24 @@ VagabondController.prototype.getCurrentPlayer = function() {
 	}
 };
 
+VagabondController.prototype.runMove = function(move, withActuate, moveAnimationBeginStep, skipAnimation) {
+	this.theGame.runNotationMove(move, withActuate);
+
+	if (this.bgIoGameClient) {
+		this.bgIoGameClient.moves.addMoveNotation(move.fullMoveText);
+	}
+
+	if (this.mctsGame) {
+		this.mctsGame.game.playMove(move);
+	}
+};
+
 VagabondController.prototype.cleanup = function() {
 	// document.querySelector(".svgContainer").classList.remove("vagabondBoardRotate");
+	
+	if (this.bgIoGameClient) {
+		this.bgIoGameClient.stop();
+	}
 };
 
 VagabondController.prototype.isSolitaire = function() {

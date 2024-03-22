@@ -1,6 +1,6 @@
 // Coop Solitaire Notation
 
-function OvergrowthNotationMove(text) {
+export function OvergrowthNotationMove(text) {
 	this.fullMoveText = text;
 	this.analyzeMove();
 }
@@ -113,7 +113,7 @@ OvergrowthNotationMove.prototype.equals = function(otherMove) {
 
 // --------------------------------------- //
 
-function OvergrowthNotationBuilder() {
+export function OvergrowthNotationBuilder() {
 	// this.moveNum;	// Let's try making this magic
 	// this.player;		// Magic
 	this.moveType;
@@ -166,7 +166,7 @@ OvergrowthNotationBuilder.prototype.getNotationMove = function(moveNum, player) 
 
 
 
-function OvergrowthGameNotation() {
+export function OvergrowthGameNotation() {
 	this.notationText = "";
 	this.moves = [];
 }

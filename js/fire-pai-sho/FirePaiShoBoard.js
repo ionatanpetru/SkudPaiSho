@@ -1,6 +1,6 @@
 /* Fire Pai Sho Board */
 
-function FirePaiShoBoard() {
+export function FirePaiShoBoard() {
 	this.size = new RowAndColumn(17, 17);
 	this.cells = this.brandNew();
 

@@ -1,5 +1,9 @@
+import { AdevarOptions } from './AdevarOptions';
+import { AdevarTileManager } from './AdevarTileManager';
+import { GUEST, HOST } from '../CommonNotationObjects';
+import { tileIdIncrement } from "../skud-pai-sho/SkudPaiShoTile";
 
-var AdevarTileType = {
+export var AdevarTileType = {
 	basic: "Basic",
 	gate: "Gate",
 	hiddenTile: "Hidden Tile",
@@ -8,7 +12,7 @@ var AdevarTileType = {
 	reflection: "Reflection"
 };
 
-var AdevarTileCode = {
+export var AdevarTileCode = {
 	blankHiddenTile: "HiddenTile",
 	lilac: "Lilac",
 	zinnia: "Zinnia",
@@ -36,7 +40,7 @@ var AdevarTileCode = {
 	blackOrchidSF: "BlackOrchidSecondFace"
 };
 
-var AdevarTileNames = {
+export var AdevarTileNames = {
 	blankHiddenTile: "Hidden Tile",
 	lilac: "Lilac",
 	zinnia: "Zinnia",
@@ -64,7 +68,7 @@ var AdevarTileNames = {
 	blackOrchidSF: "Black Orchid Second Face"
 };
 
-var AdevarInSpaceAlternateNames = {
+export var AdevarInSpaceAlternateNames = {
 	blankHiddenTile: "Hidden Tile",
 	lilac: "A-3 \"Lilac\"",
 	zinnia: "P-4 \"Zinnia\"",
@@ -90,7 +94,7 @@ var AdevarInSpaceAlternateNames = {
 	blackOrchidSF: "Jupiter's Dark Side: \"Black Orchid\""
 };
 
-function AdevarTile(code, ownerCode) {
+export function AdevarTile(code, ownerCode) {
 	this.code = code;
 	this.ownerCode = ownerCode;
 	if (this.ownerCode === 'G') {
@@ -98,7 +102,7 @@ function AdevarTile(code, ownerCode) {
 	} else if (this.ownerCode === 'H') {
 		this.ownerName = HOST;
 	}
-	this.id = tileId++;
+	this.id = tileIdIncrement();
 	this.drained = false;
 	this.selectedFromPile = false;
 	this.hidden = false;

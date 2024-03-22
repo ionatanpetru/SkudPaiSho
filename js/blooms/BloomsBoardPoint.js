@@ -1,5 +1,5 @@
 
-function BloomsBoardPoint() {
+export function BloomsBoardPoint() {
 	this.types = [];
 	this.row = -1;
 	this.col = -1;

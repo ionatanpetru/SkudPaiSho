@@ -1,11 +1,22 @@
 // Beyond The Maps Game Manager
 
-BeyondTheMaps.MoveType = {
+import { BeyondTheMapsBoard } from './BeyondTheMapsBoard';
+import { EDGES_MOVE_4_2, gameOptionEnabled } from '../GameOptions';
+import { GUEST, HOST } from '../CommonNotationObjects';
+import { PaiShoMarkingManager } from '../pai-sho-common/PaiShoMarkingManager';
+import { debug } from '../GameData';
+import {
+  guestPlayerCode,
+  hostPlayerCode,
+} from '../pai-sho-common/PaiShoPlayerHelp';
+import BeyondTheMapsTile, { BeyondTheMapsTileType } from './BeyondTheMapsTile';
+
+export var BeyondTheMapsMoveType = {
 	EXPLORE_SEA: "ExploreSea",
 	EXPLORE_LAND: "ExploreLand"
 };
 
-BeyondTheMaps.GameManager = class {
+export class BeyondTheMapsGameManager {
 	constructor(actuator, ignoreActuate, isCopy) {
 		this.isCopy = isCopy;
 	
@@ -18,10 +29,10 @@ BeyondTheMaps.GameManager = class {
 	}
 
 	setup(ignoreActuate) {
-		this.board = new BeyondTheMaps.Board();
+		this.board = new BeyondTheMapsBoard();
 
-		this.board.hostStartingPoint.putTile(new BeyondTheMaps.Tile(BeyondTheMaps.TileType.SHIP, hostPlayerCode));
-		this.board.guestStartingPoint.putTile(new BeyondTheMaps.Tile(BeyondTheMaps.TileType.SHIP, guestPlayerCode));
+		this.board.hostStartingPoint.putTile(new BeyondTheMapsTile(BeyondTheMapsTileType.SHIP, hostPlayerCode));
+		this.board.guestStartingPoint.putTile(new BeyondTheMapsTile(BeyondTheMapsTileType.SHIP, guestPlayerCode));
 	
 		if (!ignoreActuate) {
 			this.actuate();
@@ -38,9 +49,13 @@ BeyondTheMaps.GameManager = class {
 	runNotationMove(move, phaseIndex, withActuate, ignorePathFinding, ignoreWinCheck, ignoreLandfill) {
 		var moveData = move.moveData.phases[phaseIndex];
 
+		// DEBUG
+		this.debugPrintBoard();
+		// debug(moveData);
+
 		var actuateMoveData = {};
 
-		if (moveData.moveType === BeyondTheMaps.MoveType.EXPLORE_SEA) {
+		if (moveData.moveType === BeyondTheMapsMoveType.EXPLORE_SEA) {
 			if (withActuate && !ignorePathFinding) {
 				// Discover the movement path
 				var moveDistance = moveData.moveDistance 
@@ -51,11 +66,9 @@ BeyondTheMaps.GameManager = class {
 				actuateMoveData.movementPath = this.board.findPathForMovement(moveData.startPoint, moveData.endPoint, moveData.landPoint, moveDistance);
 			}
 			this.board.moveShip(moveData.startPoint, moveData.endPoint, moveData.landPoint);
-		} else if (moveData.moveType === BeyondTheMaps.MoveType.EXPLORE_LAND) {
+		} else if (moveData.moveType === BeyondTheMapsMoveType.EXPLORE_LAND) {
 			this.board.placeLandPiecesForPlayer(move.player, moveData.landPoints);
 		}
-
-		// this.board.analyzeSeaAndLandGroups();
 
 		/* Check for enclosed land for player */
 		if (!ignoreLandfill) {
@@ -63,6 +76,11 @@ BeyondTheMaps.GameManager = class {
 		}
 
 		if (!ignoreWinCheck) {
+			if (this.board.shipsSeparatedAndAShipHasNotBeenSurrounded()) {
+				this.debugPrintBoard();
+				debug("WRONG STUFF");
+			}
+
 			var playersSurrounded = this.board.aShipIsSurrounded();
 			if (playersSurrounded) {
 				// End of game, calculate scores to find winner
@@ -73,6 +91,8 @@ BeyondTheMaps.GameManager = class {
 		if (withActuate) {
 			this.actuate(move, phaseIndex, actuateMoveData);
 		}
+
+		this.lastPlayerName = move.player;
 	}
 
 	setEndOfGameWinners(playersSurrounded) {
@@ -195,13 +215,43 @@ BeyondTheMaps.GameManager = class {
 		}
 	}
 
+	getNextPlayerName = function() {
+		if (this.lastPlayerName === HOST) {
+			return GUEST;
+		} else {
+			return HOST;
+		}
+	};
+
 	getCopy() {
-		var copyGame = new BeyondTheMaps.GameManager(this.actuator, true, true);
+		var copyGame = new BeyondTheMapsGameManager(this.actuator, true, true);
 		copyGame.board = this.board.getCopy();
+		copyGame.lastPlayerName = this.lastPlayerName;
 		return copyGame;
 	}
 
 	isUsingTileReserves() {
 		return this.usingTileReserves;
 	}
-};
+
+	getShipPointForPlayer(player) {
+		return this.board.shipPoints[player];
+	}
+
+	getDebugPrintBoardStr() {
+		var boardStr = "";
+		var row = 0;
+		this.board.forEachBoardPoint(bp => {
+			if (row !== bp.row) {
+				boardStr += "\n";
+				row = bp.row;
+			}
+			boardStr += " " + bp.getDebugPrintStr();
+		});
+		return boardStr;
+	}
+
+	debugPrintBoard() {
+		debug(this.getDebugPrintBoardStr());
+	}
+}

@@ -1,6 +1,6 @@
 // BloomsRandomAIv1
 
-function BloomsRandomAIv1() {
+export function BloomsRandomAIv1() {
 	
 }
 

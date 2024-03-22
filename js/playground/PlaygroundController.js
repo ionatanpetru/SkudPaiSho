@@ -1,6 +1,6 @@
 /* Playground specific UI interaction logic */
 
-function PlaygroundController(gameContainer, isMobile) {
+export function PlaygroundController(gameContainer, isMobile) {
 	this.actuator = new PlaygroundActuator(gameContainer, isMobile, isAnimationsOn());
 
 	this.resetGameManager();

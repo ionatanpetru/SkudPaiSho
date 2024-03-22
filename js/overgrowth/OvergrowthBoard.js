@@ -1,6 +1,6 @@
 // Board
 
-function OvergrowthBoard() {
+export function OvergrowthBoard() {
 	this.size = new RowAndColumn(17, 17);
 
 	this.boardHelper = new PaiShoBoardHelper(OvergrowthBoardPoint, this.size);

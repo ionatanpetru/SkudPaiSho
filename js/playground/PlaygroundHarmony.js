@@ -1,6 +1,6 @@
 /* Skud Pai Sho Harmony */
 
-function PlaygroundHarmony(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn) {
+export function PlaygroundHarmony(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn) {
 	this.tile1 = tile1;
 	this.tile1Pos = tile1RowAndColumn;
 	this.tile2 = tile2;
@@ -127,7 +127,7 @@ PlaygroundHarmony.prototype.crossesCenter = function() {
 
 
 // HarmonyManager manages list of harmonies
-function PlaygroundHarmonyManager() {
+export function PlaygroundHarmonyManager() {
 	this.harmonies = [];
 }
 

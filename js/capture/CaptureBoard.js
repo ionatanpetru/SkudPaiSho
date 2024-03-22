@@ -1,6 +1,21 @@
 // Capture Board
 
-function CaptureBoard() {
+import { BOAT, KNOTWEED, ROCK, WHEEL, debug } from '../GameData';
+import { CaptureBoardPoint } from './CaptureBoardPoint';
+import {
+  GATE,
+  NON_PLAYABLE,
+  POSSIBLE_MOVE,
+} from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import {
+  GUEST,
+  HOST,
+  NotationPoint,
+  RowAndColumn,
+} from '../CommonNotationObjects';
+import { showBadMoveModal } from '../PaiShoMain';
+
+export function CaptureBoard() {
 	this.size = new RowAndColumn(17, 17);
 	this.cells = this.brandNew();
 
@@ -624,86 +639,86 @@ CaptureBoard.prototype.verifyAbleToReach = function(boardPointStart, boardPointE
 };
 
 CaptureBoard.prototype.pathFound = function(boardPointStart, boardPointEnd, numMoves) {
-  if (!boardPointStart || !boardPointEnd) {
-    return false; // start or end point not given
-  }
+	if (!boardPointStart || !boardPointEnd) {
+		return false; // start or end point not given
+	}
 
-  if (boardPointStart.isType(NON_PLAYABLE) || boardPointEnd.isType(NON_PLAYABLE)) {
-  	return false;	// Paths must be through playable points
-  }
+	if (boardPointStart.isType(NON_PLAYABLE) || boardPointEnd.isType(NON_PLAYABLE)) {
+		return false;	// Paths must be through playable points
+	}
 
-  if (boardPointStart.row === boardPointEnd.row && boardPointStart.col === boardPointEnd.col) {
-    return true; // Yay! start point equals end point
-  }
-  if (numMoves <= 0) {
-    return false; // No more moves left
-  }
-  
-  // Idea: Get min num moves necessary!
-  var minMoves = Math.abs(boardPointStart.row - boardPointEnd.row) + Math.abs(boardPointStart.col - boardPointEnd.col);
-  
-  if (minMoves === 1) {
-    return true; // Yay! Only 1 space away (and remember, numMoves is more than 0)
-  } else if (minMoves === 2 && this.diagonallyAdjacent(boardPointStart, boardPointEnd)) {
-  	return true;
-  }
+	if (boardPointStart.row === boardPointEnd.row && boardPointStart.col === boardPointEnd.col) {
+		return true; // Yay! start point equals end point
+	}
+	if (numMoves <= 0) {
+		return false; // No more moves left
+	}
 
-  // Check moving UP
-  var nextRow = boardPointStart.row - 1;
-  if (this.ableToReachCheck(nextRow, boardPointStart.col, boardPointEnd, numMoves)) {
-  	return true;
-  }
+	// Idea: Get min num moves necessary!
+	var minMoves = Math.abs(boardPointStart.row - boardPointEnd.row) + Math.abs(boardPointStart.col - boardPointEnd.col);
 
-  // Check moving DOWN
-  nextRow = boardPointStart.row + 1;
-  if (this.ableToReachCheck(nextRow, boardPointStart.col, boardPointEnd, numMoves)) {
-  	return true;
-  }
-
-  // Check moving LEFT
-  var nextCol = boardPointStart.col - 1;
-  if (this.ableToReachCheck(boardPointStart.row, nextCol, boardPointEnd, numMoves)) {
-  	return true;
-  }
-
-  // Check moving RIGHT
-  nextCol = boardPointStart.col + 1;
-  if (this.ableToReachCheck(boardPointStart.row, nextCol, boardPointEnd, numMoves)) {
-  	return true;
-  }
-
-  // TODO: Check Diagonals
-  // ---------------------
-  if (this.onUpRightDiagonal(boardPointStart)) {
-  	// Check up-right
-  	nextRow = boardPointStart.row - 1;
-  	nextCol = boardPointStart.col + 1;
-	if (this.ableToReachCheck(nextRow, nextCol, boardPointEnd, numMoves)) {
+	if (minMoves === 1) {
+		return true; // Yay! Only 1 space away (and remember, numMoves is more than 0)
+	} else if (minMoves === 2 && this.diagonallyAdjacent(boardPointStart, boardPointEnd)) {
 		return true;
 	}
 
-  	// Check down-left
-  	nextRow = boardPointStart.row + 1;
-  	nextCol = boardPointStart.col - 1;
-  	if (this.ableToReachCheck(nextRow, nextCol, boardPointEnd, numMoves)) {
-		return true;
-	}
-  }
-  if (this.onUpLeftDiagonal(boardPointStart)) {
-  	// Check up-left
-  	nextRow = boardPointStart.row - 1;
-  	nextCol = boardPointStart.col - 1;
-	if (this.ableToReachCheck(nextRow, nextCol, boardPointEnd, numMoves)) {
+	// Check moving UP
+	var nextRow = boardPointStart.row - 1;
+	if (this.ableToReachCheck(nextRow, boardPointStart.col, boardPointEnd, numMoves)) {
 		return true;
 	}
 
-  	// Check down-right
-  	nextRow = boardPointStart.row + 1;
-  	nextCol = boardPointStart.col + 1;
-  	if (this.ableToReachCheck(nextRow, nextCol, boardPointEnd, numMoves)) {
+	// Check moving DOWN
+	nextRow = boardPointStart.row + 1;
+	if (this.ableToReachCheck(nextRow, boardPointStart.col, boardPointEnd, numMoves)) {
 		return true;
 	}
-  }
+
+	// Check moving LEFT
+	var nextCol = boardPointStart.col - 1;
+	if (this.ableToReachCheck(boardPointStart.row, nextCol, boardPointEnd, numMoves)) {
+		return true;
+	}
+
+	// Check moving RIGHT
+	nextCol = boardPointStart.col + 1;
+	if (this.ableToReachCheck(boardPointStart.row, nextCol, boardPointEnd, numMoves)) {
+		return true;
+	}
+
+	// TODO: Check Diagonals
+	// ---------------------
+	if (this.onUpRightDiagonal(boardPointStart)) {
+		// Check up-right
+		nextRow = boardPointStart.row - 1;
+		nextCol = boardPointStart.col + 1;
+		if (this.ableToReachCheck(nextRow, nextCol, boardPointEnd, numMoves)) {
+			return true;
+		}
+
+		// Check down-left
+		nextRow = boardPointStart.row + 1;
+		nextCol = boardPointStart.col - 1;
+		if (this.ableToReachCheck(nextRow, nextCol, boardPointEnd, numMoves)) {
+			return true;
+		}
+	}
+	if (this.onUpLeftDiagonal(boardPointStart)) {
+		// Check up-left
+		nextRow = boardPointStart.row - 1;
+		nextCol = boardPointStart.col - 1;
+		if (this.ableToReachCheck(nextRow, nextCol, boardPointEnd, numMoves)) {
+			return true;
+		}
+
+		// Check down-right
+		nextRow = boardPointStart.row + 1;
+		nextCol = boardPointStart.col + 1;
+		if (this.ableToReachCheck(nextRow, nextCol, boardPointEnd, numMoves)) {
+			return true;
+		}
+	}
 };
 
 CaptureBoard.prototype.ableToReachCheck = function(nextRow, nextCol, boardPointEnd, numMoves) {

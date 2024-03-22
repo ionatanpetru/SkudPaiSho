@@ -1,6 +1,6 @@
 /* Overgrowth Pai Sho specific UI interaction logic */
 
-function OvergrowthController(gameContainer, isMobile) {
+export function OvergrowthController(gameContainer, isMobile) {
 	this.actuator = new OvergrowthActuator(gameContainer, isMobile);
 
 	this.showGameMessageUnderneath = true;

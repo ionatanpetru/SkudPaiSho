@@ -152,6 +152,7 @@ Ginseng.GameManager.prototype.buildMoveGameLogText = function(move, moveDetails)
 			var keyObject = JSON.parse(key);
 			if (promptDataEntry.movedTilePoint && promptDataEntry.movedTileDestinationPoint) {
 				var movedTilePointRowAndCol = promptDataEntry.movedTilePoint.rowAndColumn;
+				// TODO promptDataEntry field work needed
 				var movedTileDestinationRowAndCol = promptDataEntry.movedTileDestinationPoint.rowAndColumn;
 				this.gameLogText += "; Push: ";
 				this.gameLogText += "(" + Ginseng.NotationAdjustmentFunction(movedTilePointRowAndCol.row, movedTilePointRowAndCol.col) + ")-";

@@ -1,5 +1,9 @@
+import { BASIC_FLOWER } from '../GameData';
+import { GUEST, HOST } from '../CommonNotationObjects';
+import { PlaygroundTileFacingDirection } from './PlaygroundGameNotation';
+import { tileIdIncrement } from '../skud-pai-sho/SkudPaiShoTile';
 
-function PlaygroundTile(gameType, code, ownerCode) {
+export function PlaygroundTile(gameType, code, ownerCode) {
 	this.code = code;
 	this.ownerCode = ownerCode;
 	if (this.ownerCode === 'G') {
@@ -7,7 +11,7 @@ function PlaygroundTile(gameType, code, ownerCode) {
 	} else if (this.ownerCode === 'H') {
 		this.ownerName = HOST;
 	}
-	this.id = tileId++;
+	this.id = tileIdIncrement();
 	this.drained = false;
 	this.selectedFromPile = false;
 

@@ -1,6 +1,55 @@
 /* Adevar specific UI interaction logic */
 
-function AdevarController(gameContainer, isMobile) {
+import { ADEVAR_LITE, gameOptionEnabled } from '../GameOptions';
+import { AdevarActuator } from './AdevarActuator';
+import { AdevarBoardPointType } from './AdevarBoardPoint';
+import { AdevarGameManager } from './AdevarGameManager';
+import {
+  AdevarGameNotation,
+  AdevarMoveType,
+  AdevarNotationBuilder,
+} from './AdevarGameNotation';
+import { AdevarOptions } from "./AdevarOptions";
+import { AdevarTile, AdevarTileCode, AdevarTileType } from './AdevarTile';
+import { AdevarTileManager } from './AdevarTileManager';
+import {
+  BRAND_NEW,
+  GameType,
+  QueryString,
+  WAITING_FOR_ENDPOINT,
+  callSubmitMove,
+  clearMessage,
+  createGameIfThatIsOk,
+  currentGameData,
+  currentMoveIndex,
+  finalizeMove,
+  gameId,
+  getCurrentPlayer,
+  getGameOptionsMessageHtml,
+  getOnlineGameOpponentUsername,
+  getUsername,
+  iAmPlayerInCurrentOnlineGame,
+  isAnimationsOn,
+  myTurn,
+  onlinePlayEnabled,
+  playingOnlineGame,
+  refreshMessage,
+  rerunAll,
+  showReplayControls,
+  userIsLoggedIn,
+  usernameEquals
+} from '../PaiShoMain';
+import {
+  DEPLOY,
+  GUEST,
+  HOST,
+  MOVE,
+  NotationPoint
+} from '../CommonNotationObjects';
+import { POSSIBLE_MOVE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import { debug, gameDevOn } from "../GameData";
+
+export function AdevarController(gameContainer, isMobile) {
 	new AdevarOptions(); // Just to initialize
 	this.gameContainer = gameContainer;
 	this.isMobile = isMobile;

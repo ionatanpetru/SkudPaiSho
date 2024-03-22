@@ -1,5 +1,13 @@
+import {
+  FIVE_SIDED_BOARD,
+  KING_MOVES_LIKE_PAWNS,
+  gameOptionEnabled,
+} from '../GameOptions';
+import { HexentaflBoardPoint } from './HexentaflBoardPoint';
+import { POSSIBLE_MOVE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import { debug } from '../GameData';
 
-var HexentaflDirections = {
+export var HexentaflDirections = {
 	UP_RIGHT: 1,
 	DOWN_RIGHT: 2,
 	DOWN: 3,
@@ -8,7 +16,7 @@ var HexentaflDirections = {
 	DOWN_LEFT: 6
 };
 
-function HexentaflBoard() {
+export function HexentaflBoard() {
 	this.edgeLength = 4;
 	if (gameOptionEnabled(FIVE_SIDED_BOARD)) {
 		this.edgeLength = 5;
@@ -113,14 +121,14 @@ HexentaflBoard.prototype.newRow = function(numBlanks, numPoints) {
 };
 
 HexentaflBoard.prototype.putTileOnPoint = function(tile, notationPointString) {
-	point = this.getBoardPointFromNotationPoint(notationPointString);
+	var point = this.getBoardPointFromNotationPoint(notationPointString);
 	point.putTile(tile);
 };
 
 HexentaflBoard.prototype.getBoardPointFromNotationPoint = function(notationPointString) {
 	var rowAndCol = HexentaflBoardPoint.notationPointStringMap[notationPointString];
 	if (rowAndCol) {
-		point = this.cells[rowAndCol.row][rowAndCol.col];
+		var point = this.cells[rowAndCol.row][rowAndCol.col];
 		return point;
     }
 };
@@ -190,9 +198,9 @@ HexentaflBoard.prototype.getOtherPointsNeededForCapture = function(pointBeingCap
 		for (var i = 0; i < targetAdjacents.length; i++) {
 			var targetAdjacentPoint = targetAdjacents[i];
 			if (targetAdjacentPoint.types.includes(HexentaflBoardPoint.Types.normal)) {
-				c1IsAdjacentOrEqual = false;
+				var c1IsAdjacentOrEqual = false;
 				for (var j = 0; j < c1Adjacents.length; j++) {
-					c1AdjPoint = c1Adjacents[j];
+					var c1AdjPoint = c1Adjacents[j];
 					if (targetAdjacentPoint.getNotationPointString() === c1AdjPoint.getNotationPointString()
 							|| targetAdjacentPoint.getNotationPointString() === cpNps) {
 						c1IsAdjacentOrEqual = true;

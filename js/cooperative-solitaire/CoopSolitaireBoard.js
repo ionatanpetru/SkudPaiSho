@@ -1,6 +1,6 @@
 // Board
 
-function CoopSolitaireBoard() {
+export function CoopSolitaireBoard() {
 	this.size = new RowAndColumn(17, 17);
 	this.cells = this.brandNew();
 

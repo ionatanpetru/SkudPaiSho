@@ -1,6 +1,19 @@
 // Vababond Board Point
 
-function VagabondBoardPoint() {
+import {
+  ACCENT_TILE,
+  BASIC_FLOWER,
+  SPECIAL_FLOWER,
+  copyArray,
+} from '../GameData';
+import {
+  GATE,
+  NEUTRAL,
+  NON_PLAYABLE,
+} from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import { RED, WHITE } from '../skud-pai-sho/SkudPaiShoTile';
+
+export function VagabondBoardPoint() {
 	this.types = [];
 	this.row = -1;
 	this.col = -1;
@@ -104,6 +117,15 @@ VagabondBoardPoint.prototype.getCopy = function() {
 	}
 
 	return copy;
+};
+
+VagabondBoardPoint.prototype.getBgIoState = function() {
+	return {
+		types: this.types,
+		// row: this.row,
+		// col: this.col,
+		tile: this.tile.getBgIoState()
+	}
 };
 
 

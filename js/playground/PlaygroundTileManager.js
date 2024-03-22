@@ -1,6 +1,6 @@
 /* Skud Pai Sho Tile Manager */
 
-function PlaygroundTileManager(forActuating) {
+export function PlaygroundTileManager(forActuating) {
 	if (forActuating) {
 		this.hostTileLibrary = this.loadTileSet('H');
 		this.guestTileLibrary = this.loadTileSet('G');

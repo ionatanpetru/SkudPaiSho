@@ -1,6 +1,39 @@
 // Solitaire Board
 
-function SolitaireBoard() {
+import {
+  ACCENT_TILE,
+  BASIC_FLOWER,
+  BOAT,
+  KNOTWEED,
+  ORCHID,
+  ROCK,
+  WHEEL,
+  WHITE_LOTUS,
+  boatOnlyMoves,
+  debug,
+  lotusNoCapture,
+  newKnotweedRules,
+  newOrchidVulnerableRule,
+  newWheelRule,
+  rocksUnwheelable,
+  simpleRocks,
+  simpleSpecialFlowerRule,
+  simplest,
+  superRocks,
+} from '../GameData';
+import {
+  GATE,
+  NON_PLAYABLE,
+  POSSIBLE_MOVE,
+} from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import { NotationPoint, RowAndColumn } from '../CommonNotationObjects';
+import { RED, WHITE } from '../skud-pai-sho/SkudPaiShoTile';
+import { SolitaireBoardPoint } from './SolitaireBoardPoint';
+import { SolitaireHarmony, SolitaireHarmonyManager } from './SolitaireHarmony';
+import { SolitaireTile } from './SolitaireTile';
+import { showBadMoveModal } from '../PaiShoMain';
+
+export function SolitaireBoard() {
 	this.size = new RowAndColumn(17, 17);
 	this.cells = this.brandNew();
 

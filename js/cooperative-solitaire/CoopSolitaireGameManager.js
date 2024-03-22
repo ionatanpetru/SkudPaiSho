@@ -1,6 +1,6 @@
 // Solitaire Game Manager
 
-function CoopSolitaireGameManager(actuator, ignoreActuate, isCopy, existingDrawnTile, existingLastDrawnTile) {
+export function CoopSolitaireGameManager(actuator, ignoreActuate, isCopy, existingDrawnTile, existingLastDrawnTile) {
 	this.isCopy = isCopy;
 
 	this.actuator = actuator;

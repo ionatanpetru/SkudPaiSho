@@ -1,6 +1,6 @@
 /* Cooperative Solitaire Pai Sho specific UI interaction logic */
 
-function CoopSolitaireController(gameContainer, isMobile) {
+export function CoopSolitaireController(gameContainer, isMobile) {
 	this.actuator = new CoopSolitaireActuator(gameContainer, isMobile);
 
 	this.showGameMessageUnderneath = true;

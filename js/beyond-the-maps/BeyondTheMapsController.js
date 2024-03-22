@@ -1,17 +1,55 @@
 /* Beyond The Edges of The Maps specific UI interaction logic */
 
-function BeyondTheMaps() {}
+import {
+  BRAND_NEW,
+  GameType,
+  WAITING_FOR_BONUS_ENDPOINT,
+  WAITING_FOR_ENDPOINT,
+  callSubmitMove,
+  closeModal,
+  createGameIfThatIsOk,
+  currentMoveIndex,
+  finalizeMove,
+  gameId,
+  getCurrentPlayer,
+  getGameOptionsMessageHtml,
+  iAmPlayerInCurrentOnlineGame,
+  isAnimationsOn,
+  myTurn,
+  onlinePlayEnabled,
+  pieceAnimationLength,
+  playingOnlineGame,
+  refreshMessage,
+  replayIntervalLength,
+  rerunAll,
+  showModal,
+  showReplayControls,
+  userIsLoggedIn,
+} from '../PaiShoMain';
+import { BeyondTheMapsActuator } from './BeyondTheMapsActuator';
+import {
+  BeyondTheMapsGameManager,
+  BeyondTheMapsMoveType,
+} from './BeyondTheMapsGameManager';
+import { BeyondTheMapsMctsGame, BtmAction, BtmGame } from './ai/BeyondTheMapsMctsGame';
+import { BtmMoveBuilder } from './BtmMoveBuilder';
+import { EDGES_MOVE_4_2, gameOptionEnabled } from '../GameOptions';
+import { GUEST, HOST, NotationPoint } from '../CommonNotationObjects';
+import { MCTS } from '../ai/MCTS';
+import { POSSIBLE_MOVE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import { PlaygroundMoveType } from '../playground/PlaygroundGameNotation';
+import { PlaygroundTile } from '../playground/PlaygroundTile';
+import { TrifleGameNotation } from '../trifle/TrifleGameNotation';
+import { debug } from '../GameData';
+import BeyondTheMapsTile, { BeyondTheMapsTileType } from './BeyondTheMapsTile';
+import { MCTSPlayer } from '../ai/jsmcts';
 
-BeyondTheMaps.Status = {
-	WaitingForLandPoint: "WaitingForLandPoint"
-};
-
-BeyondTheMaps.Controller = class {
+export class BeyondTheMapsController {
 	constructor(gameContainer, isMobile) {
-		this.actuator = new BeyondTheMaps.Actuator(gameContainer, isMobile, isAnimationsOn());
+		this.actuator = new BeyondTheMapsActuator(gameContainer, isMobile, isAnimationsOn());
 
 		this.resetGameManager();
-		this.resetNotationBuilder();
+		this.resetMoveBuilder();
 		this.resetGameNotation();
 		this.messageToPlayer = "";
 
@@ -23,32 +61,46 @@ BeyondTheMaps.Controller = class {
 	}
 
 	resetGameManager() {
-		this.theGame = new BeyondTheMaps.GameManager(this.actuator);
+		this.theGame = new BeyondTheMapsGameManager(this.actuator);
+
+		var vgame = new BeyondTheMapsMctsGame(GUEST);
+		let iterations = 2; //more iterations -> stronger AI, more computation
+		let exploration = 0.55; //1.41 //exploration vs. explotation parameter, sqrt(2) is reasonable default (c constant in UBC forumula)
+		var mcts = new MCTS(vgame, GUEST, iterations, exploration);
+
+		this.mctsGame = {
+			game: vgame,
+			mcts: mcts
+		};
+
+
+		var maxTrials = 1;
+		var maxTime = 100;
+
+		var btmGame = new BtmGame();
+		var mctsPlayer = new MCTSPlayer({ nTrials: maxTrials });
+
+		this.jsMctsGame = {
+			maxTrials: maxTrials,
+			maxTime: maxTime,
+			game: btmGame,
+			mctsPlayer: mctsPlayer
+		};
+		this.jsMctsGame.mctsPlayer.searchCallback = (state) => {
+			debug("searchCallback");
+		};
 	}
 
 	resetNotationBuilder() {
-		/* Purposely using Trifle game notation as it is generic and json */
-		this.notationBuilder = new Trifle.NotationBuilder();
-		this.notationBuilder.moveData = {};
-		this.notationBuilder.moveData.phases = [];
-		this.notationBuilder.phaseIndex = -1;
+		this.resetMoveBuilder();
 	}
 
-	resetNotationBuilderPhase() {
-		this.notationBuilder.moveData.phases.pop();
-		this.notationBuilder.phaseIndex--;
-		this.notationBuilder.status = BRAND_NEW;
-	}
-
-	beginNewMovePhase() {
-		this.notationBuilder.phaseIndex++;
-		this.notationBuilder.moveData.phases[this.notationBuilder.phaseIndex] = {};
-	}
-	getCurrentMovePhase() {
-		return this.notationBuilder.moveData.phases[this.notationBuilder.phaseIndex];
+	resetMoveBuilder() {
+		this.moveBuilder = new BtmMoveBuilder();
 	}
 
 	resetGameNotation() {
+		// TODO: Create GameNotationManager to encapsulate things better so this class doesn't need the gameNotation as much?
 		this.gameNotation = this.getNewGameNotation();
 	}
 
@@ -58,7 +110,7 @@ BeyondTheMaps.Controller = class {
 
 	getNewGameNotation() {
 		/* Purposely using Trifle game notation as it is generic and json */
-		return new Trifle.GameNotation();
+		return new TrifleGameNotation();
 	}
 
 	static getHostTilesContainerDivs() {
@@ -74,7 +126,7 @@ BeyondTheMaps.Controller = class {
 	}
 
 	resetMove() {
-		if (this.notationBuilder.status === BRAND_NEW) {
+		if (this.moveBuilder.status === BRAND_NEW) {
 			// Remove last move
 			this.gameNotation.removeLastMove();
 		}
@@ -121,35 +173,81 @@ BeyondTheMaps.Controller = class {
 		return msg;
 	}
 
+	getAdditionalMessageElement() {
+		var msgElement = document.createElement("button");
+		msgElement.innerText = "Play MCTS move";
+		msgElement.addEventListener('click', () => {
+			// this.playMctsMove(true);
+			this.computerMove(true);
+		});
+		return msgElement;
+	}
+
+	computerMove(autoKeepGoing) {
+		if (this.theGame.getWinResultTypeCode() > 0) {
+			return;
+		}
+		showModal('AI Move Loading', 'AI move loading...', true);
+        var state = this.jsMctsGame.mctsPlayer.startThinking(this.jsMctsGame.game);
+        state.startTime = Date.now();
+        this.mctsTimer = window.setTimeout(() => {
+          this.computerMove_continue(state, autoKeepGoing)
+        }, 10);
+      }
+      computerMove_continue(state, autoKeepGoing) {
+        var now = Date.now();
+        if (now-state.startTime < this.jsMctsGame.maxTime 
+			&& this.jsMctsGame.mctsPlayer.continueThinking(state, 1000)) {
+        //   $("#msg").text("Thinking... ("+Math.ceil((this.jsMctsGame.maxTime-(now-state.startTime))/1000)+"s)");
+          this.mctsTimer = window.setTimeout(() => {
+            this.computerMove_continue(state, autoKeepGoing)
+          }, 10);
+          return;
+		} else {
+			var chosenAction = this.jsMctsGame.mctsPlayer.stopThinking(state);
+			// $(cells[a.pos-1]).addClass("marked"+computerPlayer);
+			// $(cells[a.pos-1]).addClass("movehilite");
+			this.jsMctsGame.game.doAction(chosenAction);
+			// play_continue();
+			this.gameNotation.addMove(chosenAction.move);
+			finalizeMove();
+			closeModal();
+
+			// 
+			if (autoKeepGoing) {
+				setTimeout(() => {
+					this.computerMove(autoKeepGoing);
+				}, 1500);
+			}
+		}
+      }
+	
+	async playMctsMove(autoPlayNext) {
+		showModal('AI Move Loading', 'AI move loading...', true);
+		setTimeout(() => {
+			var move = this.mctsGame.mcts.selectMove();
+			if (!move) {
+				showModal('AI Move', "No AI move found :(");
+				return;
+			}
+			this.gameNotation.addMove(move);
+			finalizeMove();
+			closeModal();
+
+			if (autoPlayNext) {
+				setTimeout(() => {
+					this.playMctsMove(autoPlayNext);
+				}, 2000);
+			}
+		}, 50);
+	}
+
 	gamePreferenceSet(preferenceKey) {
 		// 
 	}
 
 	startOnlineGame() {
 		createGameIfThatIsOk(this.getGameTypeId());
-	}
-
-	canExploreSea() {
-		var canExploreSea = true;
-		if (this.notationBuilder.moveData.phases.length > 0) {
-			this.notationBuilder.moveData.phases.forEach(phaseData => {
-				if (phaseData.moveType === BeyondTheMaps.MoveType.EXPLORE_SEA) {
-					canExploreSea = false;
-				}
-			});
-		}
-		return canExploreSea;
-	}
-	canExploreLand() {
-		var canExploreLand = true;
-		if (this.notationBuilder.moveData.phases.length > 0) {
-			this.notationBuilder.moveData.phases.forEach(phaseData => {
-				if (phaseData.moveType === BeyondTheMaps.MoveType.EXPLORE_LAND) {
-					canExploreLand = false;
-				}
-			});
-		}
-		return canExploreLand;
 	}
 
 	unplayedTileClicked(tileDiv) {
@@ -172,21 +270,20 @@ BeyondTheMaps.Controller = class {
 		var rowCol = notationPoint.rowAndColumn;
 		var boardPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
 
-		if (this.notationBuilder.status === BRAND_NEW) {
+		if (this.moveBuilder.getStatus() === BRAND_NEW) {
 			if (boardPoint.hasTile()) {
 				if (boardPoint.tile.ownerName !== getCurrentPlayer()) {
 					debug("That's not your tile!");
 					return;
 				}
 				
-				if (boardPoint.tile.tileType === BeyondTheMaps.TileType.SHIP
-						&& this.canExploreSea()) {
-					this.notationBuilder.status = WAITING_FOR_ENDPOINT;
-					this.beginNewMovePhase();
-					this.getCurrentMovePhase().moveType = BeyondTheMaps.MoveType.EXPLORE_SEA;
-					this.notationBuilder.player = this.getCurrentPlayer();
-					this.notationBuilder.currentPlayer = this.getCurrentPlayer();
-					this.getCurrentMovePhase().startPoint = npText;
+				if (boardPoint.tile.tileType === BeyondTheMapsTileType.SHIP
+						&& this.moveBuilder.canExploreSea()) {
+					this.moveBuilder.setStatus(WAITING_FOR_ENDPOINT);
+					this.moveBuilder.beginNewPhase();
+					this.moveBuilder.getCurrentPhase().moveType = BeyondTheMapsMoveType.EXPLORE_SEA;
+					this.moveBuilder.setPlayer(this.getCurrentPlayer());
+					this.moveBuilder.getCurrentPhase().startPoint = npText;
 
 					var moveDistance = 6;
 					if (gameOptionEnabled(EDGES_MOVE_4_2)) {
@@ -195,72 +292,70 @@ BeyondTheMaps.Controller = class {
 
 					this.theGame.revealPossibleMovePoints(boardPoint, false, moveDistance);
 					refreshMessage();
-				} else if (boardPoint.tile.tileType === BeyondTheMaps.TileType.LAND
-						&& this.canExploreLand()) {
-					this.notationBuilder.status = WAITING_FOR_ENDPOINT;
-					this.beginNewMovePhase();
-					this.getCurrentMovePhase().moveType = BeyondTheMaps.MoveType.EXPLORE_LAND;
-					this.notationBuilder.player = this.getCurrentPlayer();
-					this.notationBuilder.currentPlayer = this.getCurrentPlayer();
+				} else if (boardPoint.tile.tileType === BeyondTheMapsTileType.LAND
+						&& this.moveBuilder.canExploreLand()) {
+					this.moveBuilder.setStatus(WAITING_FOR_ENDPOINT);
+					this.moveBuilder.beginNewPhase();
+					this.moveBuilder.getCurrentPhase().moveType = BeyondTheMapsMoveType.EXPLORE_LAND;
+					this.moveBuilder.setPlayer(this.getCurrentPlayer());
 
 					var possiblePointsFound = this.theGame.revealPossibleExploreLandPoints(this.getCurrentPlayer());
 
 					if (!possiblePointsFound) {
-						if (this.notationBuilder.phaseIndex === 0) {
+						if (this.moveBuilder.getPhaseIndex() === 0) {
 							this.messageToPlayer = "Explore Sea first";
 						} else {
 							this.completeMovePhase();
 						}
-						this.resetNotationBuilderPhase();
+						this.moveBuilder.resetPhase();
 					}
 
 					refreshMessage();
 				}
 			}
-		} else if (this.notationBuilder.status === WAITING_FOR_ENDPOINT) {
+		} else if (this.moveBuilder.getStatus() === WAITING_FOR_ENDPOINT) {
 			if (boardPoint.isType(POSSIBLE_MOVE) 
-					&& this.getCurrentMovePhase().moveType === BeyondTheMaps.MoveType.EXPLORE_SEA) {
+					&& this.moveBuilder.getCurrentPhase().moveType === BeyondTheMapsMoveType.EXPLORE_SEA) {
 				// They're trying to move their Ship there! And they can! Exciting!
-				this.getCurrentMovePhase().endPoint = npText;
+				this.moveBuilder.getCurrentPhase().endPoint = npText;
 				var possiblePaths = boardPoint.possibleMovementPaths;
 				this.theGame.hidePossibleMovePoints();
 
-				var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
-				this.theGame.runNotationMove(move, this.notationBuilder.phaseIndex, false, true, true, true);
+				var move = this.moveBuilder.getNotationMove(this.gameNotation);
+				this.theGame.runNotationMove(move, this.moveBuilder.getPhaseIndex(), false, true, true, true);
 
-				var landPointsPossible = this.theGame.markPossibleLandPointsForMovement(this.getCurrentMovePhase().startPoint, boardPoint, possiblePaths, this.notationBuilder.player);
+				var landPointsPossible = this.theGame.markPossibleLandPointsForMovement(this.moveBuilder.getCurrentPhase().startPoint, boardPoint, possiblePaths, this.moveBuilder.getPlayer());
 
 				if (landPointsPossible.length > 1) {
 					// Land points are marked on the board as Possible points now
-					this.notationBuilder.status = WAITING_FOR_BONUS_ENDPOINT;
+					this.moveBuilder.setStatus(WAITING_FOR_BONUS_ENDPOINT);
 				} else {
 					if (landPointsPossible.length > 0) {
-						this.getCurrentMovePhase().landPoint = landPointsPossible[0].getNotationPointString();
-						this.theGame.board.placeLandPiecesForPlayer(this.getCurrentPlayer(), [this.getCurrentMovePhase().landPoint]);
-						// this.theGame.board.analyzeSeaAndLandGroups();
+						this.moveBuilder.getCurrentPhase().landPoint = landPointsPossible[0].getNotationPointString();
+						this.theGame.board.placeLandPiecesForPlayer(this.getCurrentPlayer(), [this.moveBuilder.getCurrentPhase().landPoint]);
 						this.theGame.board.fillEnclosedLandForPlayer(this.getCurrentPlayer());
 					}
 					this.theGame.hidePossibleMovePoints();
 					this.completeMovePhase();
 				}
 			} else if (boardPoint.isType(POSSIBLE_MOVE) 
-					&& this.getCurrentMovePhase().moveType === BeyondTheMaps.MoveType.EXPLORE_LAND) {
+					&& this.moveBuilder.getCurrentPhase().moveType === BeyondTheMapsMoveType.EXPLORE_LAND) {
 				// Adding land woo!
 				this.theGame.hidePossibleMovePoints();
-				if (!this.getCurrentMovePhase().landPoints) {
-					this.getCurrentMovePhase().landPoints = [];
+				if (!this.moveBuilder.getCurrentPhase().landPoints) {
+					this.moveBuilder.getCurrentPhase().landPoints = [];
 				}
-				this.getCurrentMovePhase().landPoints.push(htmlPoint.getAttribute("name"));
+				this.moveBuilder.getCurrentPhase().landPoints.push(htmlPoint.getAttribute("name"));
 
-				var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
-				this.theGame.runNotationMove(move, this.notationBuilder.phaseIndex, false, true, true, true);
+				var move = this.moveBuilder.getNotationMove(this.gameNotation);
+				this.theGame.runNotationMove(move, this.moveBuilder.getPhaseIndex(), false, true, true, true);
 
 				var exploreLandNumber = 3;
 				if (gameOptionEnabled(EDGES_MOVE_4_2)) {
 					exploreLandNumber = 2;
 				}
 
-				if (this.getCurrentMovePhase().landPoints.length < exploreLandNumber) {
+				if (this.moveBuilder.getCurrentPhase().landPoints.length < exploreLandNumber) {
 					// More!
 					var landIsPossible = this.theGame.revealPossibleContinueExploreLandPoints(this.getCurrentPlayer(), boardPoint);
 					if (!landIsPossible) {
@@ -270,16 +365,11 @@ BeyondTheMaps.Controller = class {
 					this.completeMovePhase();
 				}
 			}
-			// else {
-			// 	this.theGame.hidePossibleMovePoints();
-			// 	this.resetNotationBuilderPhase();
-			// }
-		} else if (this.notationBuilder.status === WAITING_FOR_BONUS_ENDPOINT) {
+		} else if (this.moveBuilder.getStatus() === WAITING_FOR_BONUS_ENDPOINT) {
 			if (boardPoint.isType(POSSIBLE_MOVE)) {
-				this.getCurrentMovePhase().landPoint = npText;
+				this.moveBuilder.getCurrentPhase().landPoint = npText;
 				
-				this.theGame.board.placeLandPiecesForPlayer(this.getCurrentPlayer(), [this.getCurrentMovePhase().landPoint]);
-				// this.theGame.board.analyzeSeaAndLandGroups();
+				this.theGame.board.placeLandPiecesForPlayer(this.getCurrentPlayer(), [this.moveBuilder.getCurrentPhase().landPoint]);
 				this.theGame.board.fillEnclosedLandForPlayer(this.getCurrentPlayer());
 				this.theGame.hidePossibleMovePoints();
 				
@@ -289,7 +379,7 @@ BeyondTheMaps.Controller = class {
 	}
 
 	completeMove() {
-		var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
+		var move = this.moveBuilder.getNotationMove(this.gameNotation);
 
 		// Move all set. Add it to the notation!
 		this.gameNotation.addMove(move);
@@ -301,22 +391,24 @@ BeyondTheMaps.Controller = class {
 		} else {
 			finalizeMove();
 		}
+
+		if (this.mctsGame.game.state.playerName !== move.player) {
+			// this.playMctsMove();
+			// this.computerMove();
+		}
 	}
 
 	completeMovePhase() {
 		this.messageToPlayer = "";
 		refreshMessage();
 
-		var moveIsComplete = this.notationBuilder.moveData.phases.length >= 2
+		var moveIsComplete = this.moveBuilder.getNumPhases() >= 2
 							|| this.gameNotation.moves.length === 0;
 
-		this.notationBuilder.status = BRAND_NEW;
+		this.moveBuilder.setStatus(BRAND_NEW);
 
 		if (moveIsComplete) {
 			this.completeMove();
-		} else {
-			// Run this phase so far -- Controller interaction already has done it
-			// this.theGame.runNotationMove(move, this.notationBuilder.phaseIndex, false, true);
 		}
 	}
 
@@ -324,7 +416,7 @@ BeyondTheMaps.Controller = class {
 		var divName = tileDiv.getAttribute("name");	// Like: GW5 or HL
 		var tileId = parseInt(tileDiv.getAttribute("id"));
 
-		var tile = new BeyondTheMaps.Tile(null, divName.substring(1), divName.charAt(0));
+		var tile = new BeyondTheMapsTile(null, divName.substring(1), divName.charAt(0));
 
 		var message = [];
 
@@ -437,14 +529,18 @@ BeyondTheMaps.Controller = class {
 			}
 			this.currentlyRunningMove = false;
 		}
+
+		// 
+		if (this.mctsGame) {
+			this.mctsGame.game.playMove(move);
+		}
+		if (this.jsMctsGame) {
+			this.jsMctsGame.game.doAction(new BtmAction(move));
+		}
 	}
 
 	isStillRunningMove() {
 		return this.currentlyRunningMove;
-	}
-
-	cleanup() {
-		// Nothing
 	}
 
 	RmbDown(htmlPoint) {
@@ -473,4 +569,4 @@ BeyondTheMaps.Controller = class {
 		this.callActuate();
 	}
 
-};
+}

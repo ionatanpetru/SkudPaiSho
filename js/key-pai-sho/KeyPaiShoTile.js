@@ -1,5 +1,25 @@
 /* Key Pai Sho Tile */
 
+import {
+  ACCENT_TILE,
+  BAMBOO,
+  BASIC_FLOWER,
+  BOAT,
+  KNOTWEED,
+  LION_TURTLE,
+  ORCHID,
+  POND,
+  ROCK,
+  SPECIAL_FLOWER,
+  WHEEL,
+  WHITE_LOTUS,
+  debug,
+  newOrchidClashRule,
+} from '../GameData';
+import { GUEST, HOST } from '../CommonNotationObjects';
+import { KeyPaiSho } from './KeyPaiShoController';
+import { RED, WHITE, tileIdIncrement } from '../skud-pai-sho/SkudPaiShoTile';
+
 KeyPaiSho.TileCodes = {
 	Red3: 'R3',
 	RedO: 'RO',	// Red "Orthogonal"
@@ -21,7 +41,7 @@ KeyPaiSho.Tile = function(code, ownerCode) {
 	} else {
 		debug("INCORRECT OWNER CODE");
 	}
-	this.id = tileId++;
+	this.id = tileIdIncrement();
 	this.drained = false;
 	this.selectedFromPile = false;
 

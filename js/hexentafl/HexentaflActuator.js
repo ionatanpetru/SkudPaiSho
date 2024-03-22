@@ -1,6 +1,11 @@
+import { FIVE_SIDED_BOARD, gameOptionEnabled } from "../GameOptions";
+import { HexentaflBoardPoint } from './HexentaflBoardPoint';
+import { POSSIBLE_MOVE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import { createDivWithClass, createDivWithId, removeChildren } from "../ActuatorHelp";
+import { gameController } from '../PaiShoMain';
 
 /* Create boardContainer, hostTilesContainer, and guestTilesContainer */
-function HexentaflActuator(gameContainer, isMobile, hostTilesContainerDivs, guestTilesContainerDivs) {
+export function HexentaflActuator(gameContainer, isMobile, hostTilesContainerDivs, guestTilesContainerDivs) {
 	this.gameContainer = gameContainer;
 	this.isMobile = isMobile;
 
@@ -27,8 +32,6 @@ function HexentaflActuator(gameContainer, isMobile, hostTilesContainerDivs, gues
 	var tilePileContainer = createDivWithClass("tilePileContainer");
 	var gameMessage2 = createDivWithClass("gameMessage2");
 
-	var hostTilesContainerDivs = hostTilesContainerDivs;
-	var guestTilesContainerDivs = guestTilesContainerDivs;
 	hostTilesContainer.innerHTML = hostTilesContainerDivs;
 	guestTilesContainer.innerHTML = guestTilesContainerDivs;
 

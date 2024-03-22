@@ -1,6 +1,9 @@
 /* For showing users helpful tips that can be dismissed */
 
-var OnBoardingKeys = {
+import { dateIsBetween } from "./GameData";
+import { closeModal, showModal } from "./PaiShoMain";
+
+export var OnBoardingKeys = {
 	confirmMoveButtonHelpDismissed: "confirmMoveButtonHelpDismissed",
 	gameCrafterAnnouncementDissmissed: "gameCrafterAnnouncementDismissed",
 	gameCrafterCrowdSaleDismissed: "gameCrafterCrowdSaleDismissed",
@@ -11,9 +14,9 @@ var OnBoardingKeys = {
 	passwordAnnouncementDismissed: "passwordAnnouncementDismissed"
 };
 
-function OnboardingFunctions() {
+export function OnboardingFunctions() {
 
-};
+}
 
 OnboardingFunctions.showOnLoadAnnouncements = function() {
 	if (dateIsBetween("11/01/2021", "01/24/2022")) {
@@ -44,7 +47,7 @@ OnboardingFunctions.closeCurrentAnnouncement = function() {
 };
 
 OnboardingFunctions.resetOnBoarding = function() {
-	Object.keys(OnBoardingKeys).forEach(function(key, index) {
+	Object.keys(OnBoardingKeys).forEach(function(key) {
 		localStorage.removeItem(OnBoardingKeys[key]);
 	});
 };
@@ -74,7 +77,7 @@ OnboardingFunctions.showTheGameCrafterSetAnnouncement = function() {
 			localStorage.setItem(OnBoardingKeys.gameCrafterAnnouncementDissmissed, "true");
 			OnboardingFunctions.closeCurrentAnnouncement();
 		};
-	yesNoOptions.noText = "Close";
+		yesNoOptions.noText = "Close";
 		showModal(
 			"Pai Sho Set Giveaway!",
 			"Coming soon, a Pai Sho set printed by TheGameCrafter, designed by The Garden Gate. And you can win a copy! <a href='https://skudpaisho.com/discord' target='_blank'>Join the Discord</a> for more information on how to get a chance to win. (Hint: Be playing lots of games, and be in the Discord!)"
@@ -92,7 +95,7 @@ OnboardingFunctions.showTheGameCrafterCrowdSaleAnnouncement = function() {
 			localStorage.setItem(OnBoardingKeys.gameCrafterCrowdSaleDismissed, "true");
 			OnboardingFunctions.closeCurrentAnnouncement();
 		};
-	yesNoOptions.noText = "Close";
+		yesNoOptions.noText = "Close";
 		showModal(
 			"On Sale Now - The Garden Gate Pai Sho Set!",
 			"The Pai Sho set printed by TheGameCrafter, designed by The Garden Gate, is <a href='https://www.thegamecrafter.com/crowdsale/the-garden-gate-pai-sho-set' target='_blank'>on sale now! Order it here!</a> As more copies are ordered during the sale, the price goes down for everyone. <br /><br />This set includes tiles to play Skud Pai Sho, Vagabond Pai Sho, Adevăr Pai Sho, and more! <br /><br /><a href='https://skudpaisho.com/discord' target='_blank'>Join the Discord community</a> for more information."
@@ -129,7 +132,7 @@ OnboardingFunctions.showTheGameCrafterGiveaway202211Announcement = function() {
 			localStorage.setItem(OnBoardingKeys.gameCrafterGiveaway202211Dismissed, "true");
 			OnboardingFunctions.closeCurrentAnnouncement();
 		};
-	yesNoOptions.noText = "Close";
+		yesNoOptions.noText = "Close";
 		showModal(
 			"Pai Sho Set Giveaway!",
 			"At the end of this week, I'll draw a name and give away a The Garden Gate TheGameCrafter Pai Sho set! <a href='https://skudpaisho.com/discord' target='_blank'>Join the Discord</a> to find details on how to enter."
@@ -148,7 +151,7 @@ OnboardingFunctions.showTheGameCrafterSet202210Announcement = function() {
 			localStorage.setItem(OnBoardingKeys.gameCrafter202210Dissmissed, "true");
 			OnboardingFunctions.closeCurrentAnnouncement();
 		};
-	yesNoOptions.noText = "Close";
+		yesNoOptions.noText = "Close";
 		showModal(
 			"Get your TheGameCrafter Sets now!",
 			"Soon, TheGameCrafter needs to raise prices of due to rising costs of components. If you are interested in getting one of the TheGameCrafter sets we have, now is the time before the prices go up! "
@@ -170,7 +173,7 @@ OnboardingFunctions.showGinseng2_0Announcement = function() {
 			localStorage.setItem(OnBoardingKeys.ginseng2_0Dismissed, "true");
 			OnboardingFunctions.closeCurrentAnnouncement();
 		};
-	yesNoOptions.noText = "Close";
+		yesNoOptions.noText = "Close";
 		showModal(
 			"Ginseng Pai Sho 2.0 is here!",
 			"Ginseng Pai Sho is now Ginseng 2.0! Check out the changes to the rules in the Help tab of a new Ginseng game - remember to hover over the tiles to see their descriptions."
@@ -189,7 +192,7 @@ OnboardingFunctions.showPasswordAnnouncement = function() {
 			localStorage.setItem(OnBoardingKeys.passwordAnnouncementDismissed, "true");
 			OnboardingFunctions.closeCurrentAnnouncement();
 		};
-	yesNoOptions.noText = "Close";
+		yesNoOptions.noText = "Close";
 		showModal(
 			"Password support on The Garden Gate",
 			"The Garden Gate now supports password login in addition to the email verification login system. "

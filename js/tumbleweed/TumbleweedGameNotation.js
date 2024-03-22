@@ -7,7 +7,7 @@ var TumbleweedNotationVars = {
 	PASS_TURN: "-"
 };
 
-function TumbleweedNotationMove(text) {
+export function TumbleweedNotationMove(text) {
 	this.fullMoveText = text;
 	this.analyzeMove();
 }
@@ -66,7 +66,7 @@ TumbleweedNotationMove.prototype.equals = function(otherMove) {
 
 // --------------------------------------- //
 
-function TumbleweedNotationBuilder() {
+export function TumbleweedNotationBuilder() {
 	this.deployPoint;
 	this.passTurn = false;
 	this.swap = false;
@@ -102,7 +102,7 @@ TumbleweedNotationBuilder.prototype.moveComplete = function() {
 
 
 
-function TumbleweedGameNotation() {
+export function TumbleweedGameNotation() {
 	this.notationText = "";
 	this.moves = [];
 }

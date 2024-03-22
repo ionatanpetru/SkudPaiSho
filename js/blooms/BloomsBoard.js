@@ -1,5 +1,5 @@
 
-function BloomsBoard() {
+export function BloomsBoard() {
 	this.edgeLength = 5;
 	if (gameOptionEnabled(FOUR_SIDED_BOARD)) {
 		this.edgeLength = 4;

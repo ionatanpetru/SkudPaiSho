@@ -2,7 +2,18 @@
 
 // --------------------------------------------- // 
 
-function SpiritNotationMove(text) {
+import { BRAND_NEW } from '../PaiShoMain';
+import {
+  DEPLOY,
+  GUEST,
+  HOST,
+  INITIAL_SETUP,
+  MOVE,
+  NotationPoint,
+} from '../CommonNotationObjects';
+import { debug } from '../GameData';
+
+export function SpiritNotationMove(text) {
 	this.fullMoveText = text;
 	this.analyzeMove();
 }
@@ -73,7 +84,7 @@ SpiritNotationMove.prototype.equals = function(otherMove) {
 
 // --------------------------------------- //
 
-function SpiritNotationBuilder() {
+export function SpiritNotationBuilder() {
 	// this.moveNum;	// Let's try making this magic
 	// this.player;		// Magic
 	this.moveType;
@@ -104,7 +115,7 @@ SpiritNotationBuilder.prototype.getNotationMove = function(moveNum, player) {
 
 
 
-function SpiritGameNotation() {
+export function SpiritGameNotation() {
 	this.notationText = "";
 	this.moves = [];
 }

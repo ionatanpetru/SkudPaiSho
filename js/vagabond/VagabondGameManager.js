@@ -1,6 +1,15 @@
 // Vagabond Game Manager
 
-function VagabondGameManager(actuator, ignoreActuate, isCopy) {
+import { DEPLOY, DRAW_ACCEPT, GUEST, HOST, MOVE } from '../CommonNotationObjects';
+import { PaiShoMarkingManager } from '../pai-sho-common/PaiShoMarkingManager';
+import { VagabondBoard } from './VagabondBoard';
+import { VagabondTile } from './VagabondTile';
+import { VagabondTileManager } from './VagabondTileManager';
+import { debug } from '../GameData';
+import { getOpponentName } from '../pai-sho-common/PaiShoPlayerHelp';
+import { setGameLogText } from '../PaiShoMain';
+
+export function VagabondGameManager(actuator, ignoreActuate, isCopy) {
 	this.gameLogText = '';
 	this.isCopy = isCopy;
 
@@ -33,6 +42,9 @@ VagabondGameManager.prototype.actuate = function (moveToAnimate) {
 };
 
 VagabondGameManager.prototype.runNotationMove = function(move, withActuate) {
+	if (!move || !move.fullMoveText) {
+		debug("No move?");
+	}
 	debug("Running Move: " + move.fullMoveText);
 
 	if (move.moveType === DEPLOY) {
@@ -57,6 +69,8 @@ VagabondGameManager.prototype.runNotationMove = function(move, withActuate) {
 	if (withActuate) {
 		this.actuate(move);
 	}
+
+	this.lastPlayerName = move.player;
 };
 
 VagabondGameManager.prototype.buildDeployGameLogText = function(move, tile) {
@@ -133,9 +147,18 @@ VagabondGameManager.prototype.getWinResultTypeCode = function() {
 	}
 };
 
+VagabondGameManager.prototype.getNextPlayerName = function() {
+	if (this.lastPlayerName === HOST) {
+		return GUEST;
+	} else {
+		return HOST;
+	}
+};
+
 VagabondGameManager.prototype.getCopy = function() {
 	var copyGame = new VagabondGameManager(this.actuator, true, true);
 	copyGame.board = this.board.getCopy();
 	copyGame.tileManager = this.tileManager.getCopy();
+	copyGame.lastPlayerName = this.lastPlayerName;
 	return copyGame;
 };

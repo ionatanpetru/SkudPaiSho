@@ -1,5 +1,5 @@
 
-function TumbleweedController(gameContainer, isMobile) {
+export function TumbleweedController(gameContainer, isMobile) {
 	if (!isMobile) {
 		this.additionalTilePileClass = "desktop";
 	} else {

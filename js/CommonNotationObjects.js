@@ -1,30 +1,30 @@
 // Common Notation Objects and Variables
 
-var GUEST = "GUEST";
-var HOST = "HOST";
-var OTHER_PLAYER = "OTHER";
+export var GUEST = "GUEST";
+export var HOST = "HOST";
+export var OTHER_PLAYER = "OTHER";
 
 // Turn actions ----------------
-var PLANTING = "Planting";
-var ARRANGING = "Arranging";
+export var PLANTING = "Planting";
+export var ARRANGING = "Arranging";
 
-var DEPLOY = "Deploy";
-var MOVE = "Move";
-var SETUP = "Setup";	// Because it is shorter than the old existing "Initial Setup" string
+export var DEPLOY = "Deploy";
+export var MOVE = "Move";
+export var SETUP = "Setup";	// Because it is shorter than the old existing "Initial Setup" string
 
-var TEAM_SELECTION = "Team Selection";
+export var TEAM_SELECTION = "Team Selection";
 
-var INITIAL_SETUP = "Initial Setup";
+export var INITIAL_SETUP = "Initial Setup";
 // -----------------------------
 
-var DRAW_OFFER = "~~"; //"≈";
-var DRAW_REFUSE = "=/="; //"≠";
-var DRAW_ACCEPT = "==";
-var PASS_TURN = "--";
+export var DRAW_OFFER = "~~"; //"≈";
+export var DRAW_REFUSE = "=/="; //"≠";
+export var DRAW_ACCEPT = "==";
+export var PASS_TURN = "--";
 
 // ---------
 
-function RowAndColumn(row, col) {
+export function RowAndColumn(row, col) {
 	this.row = row;
 	this.col = col;
 
@@ -43,7 +43,7 @@ RowAndColumn.prototype.getNotationPoint = function() {
 
 // --------------------------------------------- // 
 
-function NotationPoint(text) {
+export function NotationPoint(text) {
 	this.pointText = text;
 
 	var parts = this.pointText.split(',');

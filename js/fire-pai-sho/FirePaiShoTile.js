@@ -1,6 +1,30 @@
 /* Skud Pai Sho Tile */
 
-function FirePaiShoTile(code, ownerCode) {
+import {
+  ACCENT_TILE,
+  BADGERMOLE,
+  BASIC_FLOWER,
+  BOAT,
+  DRAGON,
+  FLYING_BISON,
+  KNOTWEED,
+  KOI,
+  LION_TURTLE,
+  ORCHID,
+  ORIGINAL_BENDER,
+  ROCK,
+  SPECIAL_FLOWER,
+  WHEEL,
+  WHITE_LOTUS,
+  debug,
+  newOrchidClashRule,
+  superHarmonies,
+} from '../GameData';
+import { ETHEREAL_ACCENT_TILES, gameOptionEnabled } from '../GameOptions';
+import { GUEST, HOST } from '../CommonNotationObjects';
+import { RED, WHITE, tileIdIncrement } from '../skud-pai-sho/SkudPaiShoTile';
+
+export function FirePaiShoTile(code, ownerCode) {
 	this.code = code;
 	this.ownerCode = ownerCode;
 	if (this.ownerCode === 'G') {
@@ -10,7 +34,7 @@ function FirePaiShoTile(code, ownerCode) {
 	} else {
 		debug("INCORRECT OWNER CODE");
 	}
-	this.id = tileId++;
+	this.id = tileIdIncrement();
 	this.boosted = false;
 	this.ethereal = false;
 	this.selectedFromPile = false;

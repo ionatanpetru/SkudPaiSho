@@ -1,5 +1,5 @@
 
-function TumbleweedGameManager(actuator, ignoreActuate, isCopy) {
+export function TumbleweedGameManager(actuator, ignoreActuate, isCopy) {
 	this.isCopy = isCopy;
 	this.actuator = actuator;
 

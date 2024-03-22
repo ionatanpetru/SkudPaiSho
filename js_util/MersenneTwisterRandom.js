@@ -66,7 +66,7 @@
    email: m-mat @ math.sci.hiroshima-u.ac.jp (remove space)
 */
 
-var MersenneTwister = function(seed) {
+export var MersenneTwister = function(seed) {
     if (seed == undefined) {
       seed = new Date().getTime();
     } 
@@ -198,7 +198,7 @@ var MersenneTwister = function(seed) {
   /* These real versions are due to Isaku Wada, 2002/01/09 added */
 
 
-function getRandomizer() {
+export function getRandomizer() {
   if (playingOnlineGame() && gameController && gameController.getMoveNumber) {
     return new MersenneTwister(gameId + gameController.getMoveNumber());
   }

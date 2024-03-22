@@ -1,6 +1,6 @@
 // Coop Solitaire Harmony
 
-function OvergrowthHarmony(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn) {
+export function OvergrowthHarmony(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn) {
 	this.tile1 = tile1;
 	this.tile1Pos = tile1RowAndColumn;
 	this.tile2 = tile2;
@@ -125,7 +125,7 @@ OvergrowthHarmony.prototype.crossesCenter = function() {
 
 
 // HarmonyManager manages list of harmonies
-function OvergrowthHarmonyManager() {
+export function OvergrowthHarmonyManager() {
 	this.harmonies = [];
 	this.clashes = [];
 }

@@ -1,6 +1,9 @@
 /* Vagabond Random AI */
 
-function VagabondRandomAIv1() {
+import { VagabondAiHelp } from './VagabondAiHelp';
+import { removeRandomFromArray } from '../../GameData';
+
+export function VagabondRandomAIv1() {
 	this.aiHelp = new VagabondAiHelp();
 }
 

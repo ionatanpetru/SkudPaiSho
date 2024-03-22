@@ -8,8 +8,8 @@
 
 	<!-- Images of classic tile designs used in Skud Pai Sho are originally from the Lotus Gambit rules community at http://lotusgambit.pbworks.com/w/page/45592429/Home -->
 
-	<link href="style/main.css?v=20230718-071536" rel="stylesheet" type="text/css">
-	<link id="overrideCSS" href="" rel="stylesheet" type="text/css">
+	<link href="style/main.css?v=20240316-041418" rel="stylesheet" type="text/css">
+	<link id="overrideCSS" href="style/empty.css" rel="stylesheet" type="text/css">
 
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -33,11 +33,11 @@
 
 	<!-- <link href="favicon.ico" rel="shortcut icon"> -->
 	<!-- <link href="meta/apple-touch-icon.png" rel="apple-touch-icon"> -->
-	<link href="meta/apple-touch-startup-image-640x1096.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)"
-		rel="apple-touch-startup-image">
+	<!-- <link href="meta/apple-touch-startup-image-640x1096.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)"
+		rel="apple-touch-startup-image"> -->
 	<!-- iPhone 5+ -->
-	<link href="meta/apple-touch-startup-image-640x920.png" media="(device-width: 320px) and (device-height: 480px) and (-webkit-device-pixel-ratio: 2)"
-		rel="apple-touch-startup-image">
+	<!-- <link href="meta/apple-touch-startup-image-640x920.png" media="(device-width: 320px) and (device-height: 480px) and (-webkit-device-pixel-ratio: 2)"
+		rel="apple-touch-startup-image"> -->
 	<!-- iPhone, retina -->
 	<meta content="yes" name="apple-mobile-web-app-capable">
 	<meta content="black" name="apple-mobile-web-app-status-bar-style">
@@ -66,7 +66,7 @@
 	<!-- Sidenav -->
 	<div id="mySidenav" class="sidenav">
 		<div class="sidenavContent">
-			<div class="closebtn" onclick="closeNav();">&nbsp;&times;</div>
+			<div id='sidenavCloseDiv' class="closebtn">&nbsp;&times;</div>
 			<h1>The Garden Gate</h1>
 			<hr />
 			<div id="sideMenuAvContainer" class="gone"></div>
@@ -239,9 +239,9 @@
 			</div> -->
 			<div class="helpContainer" id="help">
 				<div class="tab">
-					<button class="tablinks" onclick="openTab(event, 'helpTextTab')" id="defaultOpenTab">Help</button>
-					<button id='globalChatTabHeader' class="tablinks" onclick="openTab(event, 'globalChatTab');">Links/Chat <i class="fa-brands fa-discord"></i></button>
-					<button id='chatTab' class="tablinks" onclick="openTab(event, 'gameChatTab'); dismissChatAlert();">Game Chat</button>
+					<button id="defaultOpenTab" class="tablinks">Help</button>
+					<button id='globalChatTabHeader' class="tablinks">Links/Chat <i class="fa-brands fa-discord"></i></button>
+					<button id='chatTab' class="tablinks">Game Chat</button>
 				</div>
 
 				<div id='helpTextTab' class="tabcontent">
@@ -460,14 +460,15 @@
 	
 
 	<!-- jquery cloud reference -->
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script> -->
 
 	<!-- Util js -->
-	<script src="js_util/0_lz-string.min.js"></script>
-	<script src="js_util/MersenneTwisterRandom.js"></script>
+	<!-- <script src="./js_util/0_lz-string.min.js"></script>
+	<script src="./js_util/MersenneTwisterRandom.js"></script> -->
 
 	<!-- Compressed TGG Code -->
-	<script src="psmin_20230718-071536.js"></script>
+	<!-- <script src="./psmin_20240316-041418.js"></script> -->
+	<script type="module" src="./js/PaiShoMain.js"></script>
 </body>
 
 </html>

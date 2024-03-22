@@ -1,6 +1,16 @@
 // Tile Manager
 
-function SolitaireTileManager(forActuating) {
+import { ACCENT_TILE, SPECIAL_FLOWER, debug } from '../GameData';
+import { GUEST, HOST } from '../CommonNotationObjects';
+import {
+  OPTION_DOUBLE_TILES,
+  OPTION_INSANE_TILES,
+  gameOptionEnabled,
+} from '../GameOptions';
+import { SolitaireTile } from './SolitaireTile';
+import { getRandomizer } from '../../js_util/MersenneTwisterRandom';
+
+export function SolitaireTileManager(forActuating) {
 	this.playerCode = 'H'
 	
 	if (forActuating) {
@@ -14,7 +24,7 @@ SolitaireTileManager.prototype.loadTileSet = function(ownerCode) {
 	return this.loadSolitaireSet(ownerCode, false, true);
 };
 
-SolitaireTileManager.prototype.loadSolitaireSet = function(ownerCode, doubleTiles, includeAccentTiles) {
+SolitaireTileManager.prototype.loadSolitaireSet = function(ownerCode, /* doubleTiles, includeAccentTiles */) {
 	var tiles = [];
 
 	var numAccentTiles = 2;
@@ -148,7 +158,7 @@ SolitaireTileManager.prototype.grabTile = function(player, tileCode) {
 	var tile;
 	for (var i = 0; i < tilePile.length; i++) {
 		if (tilePile[i].code === tileCode) {
-			newTileArr = tilePile.splice(i, 1);
+			var newTileArr = tilePile.splice(i, 1);
 			tile = newTileArr[0];
 			break;
 		}

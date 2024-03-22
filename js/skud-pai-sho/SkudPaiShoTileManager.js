@@ -1,6 +1,26 @@
 /* Skud Pai Sho Tile Manager */
 
-function SkudPaiShoTileManager(forActuating) {
+import {
+  ACCENT_TILE,
+  BASIC_FLOWER,
+  SPECIAL_FLOWER,
+  copyArray,
+  debug,
+  simpleCanonRules,
+} from '../GameData';
+import { GUEST, HOST } from '../CommonNotationObjects';
+import {
+  NO_WHEELS,
+  OPTION_ANCIENT_OASIS_EXPANSION,
+  gameOptionEnabled,
+} from '../GameOptions';
+import { SkudPaiShoTile } from './SkudPaiShoTile';
+import {
+  getPlayerCodeFromName,
+  hostPlayerCode,
+} from '../pai-sho-common/PaiShoPlayerHelp';
+
+export function SkudPaiShoTileManager(forActuating) {
 	if (forActuating) {
 		this.hostTiles = this.loadOneOfEach('H');
 		this.guestTiles = this.loadOneOfEach('G');
@@ -124,7 +144,7 @@ SkudPaiShoTileManager.prototype.grabTile = function(player, tileCode) {
 	var tile;
 	for (var i = 0; i < tilePile.length; i++) {
 		if (tilePile[i].code === tileCode) {
-			newTileArr = tilePile.splice(i, 1);
+			var newTileArr = tilePile.splice(i, 1);
 			tile = newTileArr[0];
 			break;
 		}

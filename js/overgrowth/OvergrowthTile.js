@@ -1,6 +1,22 @@
 // Tile
 
-function OvergrowthTile(code, ownerCode) {
+import {
+  ACCENT_TILE,
+  BASIC_FLOWER,
+  BOAT,
+  KNOTWEED,
+  ORCHID,
+  ROCK,
+  SPECIAL_FLOWER,
+  WHEEL,
+  WHITE_LOTUS,
+  debug,
+  superHarmonies,
+} from '../GameData';
+import { GUEST, HOST } from '../CommonNotationObjects';
+import { RED, WHITE, tileIdIncrement } from '../skud-pai-sho/SkudPaiShoTile';
+
+export function OvergrowthTile(code, ownerCode) {
 	this.code = code;
 	this.ownerCode = ownerCode;
 	if (this.ownerCode === 'G') {
@@ -12,7 +28,7 @@ function OvergrowthTile(code, ownerCode) {
 	} else {
 		debug("INCORRECT OWNER CODE");
 	}
-	this.id = tileId++;
+	this.id = tileIdIncrement();
 	this.drained = false;
 	this.selectedFromPile = false;
 

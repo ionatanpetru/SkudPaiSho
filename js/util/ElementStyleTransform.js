@@ -1,5 +1,5 @@
 /* Dom Element Style Transform Helper */
-class ElementStyleTransform {
+export class ElementStyleTransform {
 
 	constructor(parentElement) {
 		this.parentElement = parentElement;

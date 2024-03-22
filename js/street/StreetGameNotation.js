@@ -1,6 +1,6 @@
 /* Skud Pai Sho Notation */
 
-function StreetNotationMove(text) {
+export function StreetNotationMove(text) {
 	this.fullMoveText = text;
 	this.analyzeMove();
 }
@@ -88,7 +88,7 @@ StreetNotationMove.prototype.equals = function(otherMove) {
 
 // --------------------------------------- //
 
-function StreetNotationBuilder() {
+export function StreetNotationBuilder() {
 	// this.moveNum;	// Magic
 	// this.player;		// Magic
 	this.moveType;
@@ -143,7 +143,7 @@ StreetNotationBuilder.prototype.getNotationMove = function(moveNum, player) {
 
 
 
-function StreetGameNotation() {
+export function StreetGameNotation() {
 	this.notationText = "";
 	this.moves = [];
 }

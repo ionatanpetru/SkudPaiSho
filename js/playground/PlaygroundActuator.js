@@ -1,6 +1,6 @@
 // Actuator
 
-function PlaygroundActuator(gameContainer, isMobile, enableAnimations) {
+export function PlaygroundActuator(gameContainer, isMobile, enableAnimations) {
 	this.gameContainer = gameContainer;
 	this.mobile = isMobile;
 
@@ -232,11 +232,14 @@ PlaygroundActuator.prototype.addTile = function(tile, tileContainer, pileName) {
 	theDiv.setAttribute("data-pileName", pileName);
 
 	if (this.mobile) {
-		theDiv.setAttribute("onclick", "unplayedTileClicked(this); showTileMessage(this);");
+		theDiv.addEventListener('click', () => {
+				unplayedTileClicked(this);
+				showTileMessage(this);
+			});
 	} else {
-		theDiv.setAttribute("onclick", "unplayedTileClicked(this);");
-		theDiv.setAttribute("onmouseover", "showTileMessage(this);");
-		theDiv.setAttribute("onmouseout", "clearMessage();");
+		theDiv.addEventListener('click', () => unplayedTileClicked(this));
+		theDiv.addEventListener('mouseover', () => showTileMessage(this));
+		theDiv.addEventListener('mouseout', clearMessage);
 	}
 
 	tileContainer.appendChild(theDiv);
@@ -317,7 +320,7 @@ PlaygroundActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate)
 		} else {
 			theDiv.setAttribute("onclick", "pointClicked(this);");
 			theDiv.setAttribute("onmouseover", "showPointMessage(this);");
-			theDiv.setAttribute("onmouseout", "clearMessage();");
+			theDiv.addEventListener('mouseout', clearMessage);
 			theDiv.addEventListener('mousedown', e => {
 				 // Right Mouse Button
 				if (e.button == 2) {

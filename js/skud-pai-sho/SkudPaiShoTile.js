@@ -1,11 +1,34 @@
 /* Skud Pai Sho Tile */
 
-var RED = "Red";
-var WHITE = "White";
+import {
+  ACCENT_TILE,
+  BAMBOO,
+  BASIC_FLOWER,
+  BOAT,
+  KNOTWEED,
+  LION_TURTLE,
+  ORCHID,
+  POND,
+  ROCK,
+  SPECIAL_FLOWER,
+  WHEEL,
+  WHITE_LOTUS,
+  debug,
+  newOrchidClashRule,
+  superHarmonies
+} from '../GameData';
+import { GUEST, HOST } from "../CommonNotationObjects";
 
-var tileId = 1;
+export var RED = "Red";
+export var WHITE = "White";
 
-function SkudPaiShoTile(code, ownerCode) {
+export var tileId = 1;
+export function tileIdIncrement() {
+	tileId++;
+	return tileId;
+}
+
+export function SkudPaiShoTile(code, ownerCode) {
 	this.code = code;
 	this.ownerCode = ownerCode;
 	if (this.ownerCode === 'G') {
@@ -15,7 +38,7 @@ function SkudPaiShoTile(code, ownerCode) {
 	} else {
 		debug("INCORRECT OWNER CODE");
 	}
-	this.id = tileId++;
+	this.id = tileIdIncrement();
 	this.drained = false;
 	this.selectedFromPile = false;
 

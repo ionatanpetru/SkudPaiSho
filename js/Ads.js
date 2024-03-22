@@ -1,6 +1,9 @@
 /* For controlling Ads spaces and appearances in UI */
 
-function Ads() {
+import { peekRandomFromArray } from "./GameData";
+import { showModal } from "./PaiShoMain";
+
+export function Ads() {
 
 }
 
@@ -109,7 +112,7 @@ Ads.enableAds = function(shouldShowAds) {
 				Ads.showRandomPopupAd();
 			}
 		});
-		
+
 		var topAvContainerDiv = document.getElementById("topAvContainer");
 		if (topAvContainerDiv) {
 			topAvContainerDiv.classList.remove("gone");
@@ -145,13 +148,13 @@ Ads.enableAds = function(shouldShowAds) {
 
 Ads.minimalAdsEnabled = function() {
 	var topAvContainerDiv = document.getElementById("topAvContainer");
-		topAvContainerDiv.classList.add("gone");
+	topAvContainerDiv.classList.add("gone");
 
-		var footerAvContainerDiv = document.getElementById("footerAvContainer");
-		footerAvContainerDiv.classList.add("gone");
+	var footerAvContainerDiv = document.getElementById("footerAvContainer");
+	footerAvContainerDiv.classList.add("gone");
 
-		var sideMenuAvContainerDiv = document.getElementById("sideMenuAvContainer");
-		sideMenuAvContainerDiv.classList.add("gone");
+	var sideMenuAvContainerDiv = document.getElementById("sideMenuAvContainer");
+	sideMenuAvContainerDiv.classList.add("gone");
 };
 
 Ads.getAdInfo = function(adKey) {
@@ -209,7 +212,7 @@ Ads.showTopAd = function(adKey) {
 
 Ads.showRandomTopAd = function() {
 	var wideAdsList = Ads.AdsList.filter(adInfo => adInfo.shape === "wide");
-	Ads.showTopAd(peekRandomFromArray(wideAdsList).key)
+	Ads.showTopAd(peekRandomFromArray(wideAdsList).key);
 };
 
 Ads.showFooterAd = function(adKey) {
@@ -225,7 +228,7 @@ Ads.showFooterAd = function(adKey) {
 
 Ads.showRandomFooterAd = function() {
 	var wideAdsList = Ads.AdsList.filter(adInfo => adInfo.shape === "wide");
-	Ads.showFooterAd(peekRandomFromArray(wideAdsList).key)
+	Ads.showFooterAd(peekRandomFromArray(wideAdsList).key);
 };
 
 Ads.showSideMenuAd = function(adKey) {
@@ -241,7 +244,7 @@ Ads.showSideMenuAd = function(adKey) {
 
 Ads.showRandomSideMenuAd = function() {
 	var tallAdsList = Ads.AdsList.filter(adInfo => adInfo.shape === "tall");
-	Ads.showSideMenuAd(peekRandomFromArray(tallAdsList).key)
+	Ads.showSideMenuAd(peekRandomFromArray(tallAdsList).key);
 };
 
 Ads.showChatTabAd = function(adKey) {
@@ -260,7 +263,7 @@ Ads.showChatTabAd = function(adKey) {
 
 Ads.showRandomChatTabAd = function() {
 	var boxAdsList = Ads.AdsList.filter(adInfo => adInfo.shape === "box");
-	Ads.showChatTabAd(peekRandomFromArray(boxAdsList).key)
+	Ads.showChatTabAd(peekRandomFromArray(boxAdsList).key);
 };
 
 Ads.showSponsorMessagesTeaserPopup = function() {

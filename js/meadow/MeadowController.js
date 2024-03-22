@@ -1,5 +1,5 @@
 
-function MeadowController(gameContainer, isMobile) {
+export function MeadowController(gameContainer, isMobile) {
 	if (!isMobile) {
 		this.additionalTilePileClass = "desktop";
 	} else {

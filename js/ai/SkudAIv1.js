@@ -1,6 +1,27 @@
 // SkudAIv1
 
-function SkudAIv1() {
+import {
+  ACCENT_TILE,
+  BASIC_FLOWER,
+  debug,
+  simpleCanonRules,
+} from '../GameData';
+import {
+  ARRANGING,
+  GUEST,
+  HOST,
+  NotationPoint,
+  PLANTING,
+  RowAndColumn,
+} from '../CommonNotationObjects';
+import { POSSIBLE_MOVE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import {
+  SkudPaiShoNotationBuilder,
+  SkudPaiShoNotationMove,
+} from '../skud-pai-sho/SkudPaiShoGameNotation';
+import { WAITING_FOR_ENDPOINT } from '../PaiShoMain';
+
+export function SkudAIv1() {
 	this.scoreDepth = 1;	// This can't go higher than 1... Or can it?
 	this.greatScoreThreshold = new Map();
 	this.greatScoreThreshold.set(2, 9);
@@ -299,7 +320,7 @@ SkudAIv1.prototype.addPlantMoves = function(moves, game, player) {
 			var endPoints = this.getPossibleMovePoints(game);
 
 			for (var j = 0; j < endPoints.length; j++) {
-				notationBuilder = new SkudPaiShoNotationBuilder();
+				var notationBuilder = new SkudPaiShoNotationBuilder();
 				notationBuilder.moveType = PLANTING;
 
 				notationBuilder.plantedFlowerType = tile.code;
@@ -338,6 +359,7 @@ SkudAIv1.prototype.addArrangeMoves = function(moves, game, player) {
 		var endPoints = this.getPossibleMovePoints(game);
 
 		for (var j = 0; j < endPoints.length; j++) {
+			var notationBuilder = new SkudPaiShoNotationBuilder();
 			notationBuilder.status = WAITING_FOR_ENDPOINT;
 			notationBuilder.moveType = ARRANGING;
 			notationBuilder.startPoint = new NotationPoint(this.getNotation(startPoint));
@@ -422,7 +444,7 @@ SkudAIv1.prototype.getBasicFlowerTileCode = function(game) {
 		if (tilePile[i].type === BASIC_FLOWER) {
 			return tilePile[i].code;
 		}
-	};
+	}
 };
 
 

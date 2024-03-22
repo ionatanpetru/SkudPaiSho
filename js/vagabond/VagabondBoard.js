@@ -1,6 +1,17 @@
 // Vagabond Board
 
-function VagabondBoard() {
+import {
+  GATE,
+  NON_PLAYABLE,
+  POSSIBLE_MOVE,
+} from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import { GUEST, HOST, RowAndColumn } from '../CommonNotationObjects';
+import { VagabondBoardPoint } from './VagabondBoardPoint';
+import { VagabondTileCodes } from './VagabondTile';
+import { copyArray, debug } from '../GameData';
+import { showBadMoveModal } from '../PaiShoMain';
+
+export function VagabondBoard() {
 	this.size = new RowAndColumn(17, 17);
 	this.cells = this.brandNew();
 
@@ -693,10 +704,6 @@ VagabondBoard.prototype.canMoveTileToPoint = function(player, boardPointStart, b
 				rowEnd = bp.row;
 			}
 
-			if (bp2.row === 5 && bp2.col === 5) {
-				debug("hi");
-			}
-
 			// Scan for tile in the way from start to end point
 			for (var row = rowStart; row < rowEnd; row++) {
 				var col = bp.row + bp.col - row;
@@ -875,14 +882,25 @@ VagabondBoard.prototype.setPossibleMovePoints = function(boardPointStart) {
 		return;
 	}
 	// Apply "possible move point" type to applicable boardPoints
+	
 	var player = boardPointStart.tile.ownerName;
-	for (var row = 0; row < this.cells.length; row++) {
-		for (var col = 0; col < this.cells[row].length; col++) {
-			if (this.canMoveTileToPoint(player, boardPointStart, this.cells[row][col])) {
-				this.cells[row][col].addType(POSSIBLE_MOVE);
+	// for (var row = 0; row < this.cells.length; row++) {
+	// 	for (var col = 0; col < this.cells[row].length; col++) {
+	// 		if (this.canMoveTileToPoint(player, boardPointStart, this.cells[row][col])) {
+	// 			this.cells[row][col].addType(POSSIBLE_MOVE);
+	// 		}
+	// 	}
+	// }
+
+	this.cells.forEach(row => {
+		row.forEach(boardPoint => {
+			if (!boardPoint.isType(NON_PLAYABLE)) {
+				if (this.canMoveTileToPoint(player, boardPointStart, boardPoint)) {
+					boardPoint.addType(POSSIBLE_MOVE);
+				}
 			}
-		}
-	}
+		});
+	});
 };
 
 VagabondBoard.prototype.removePossibleMovePoints = function() {
@@ -985,6 +1003,18 @@ VagabondBoard.prototype.getCopy = function() {
 	copyBoard.glPlayed = this.glPlayed;
 	
 	return copyBoard;
+};
+
+VagabondBoard.prototype.getBgIoState = function() {
+	var boardState = [];
+
+	this.cells.forEach(row => {
+		var rowState = [];
+		row.forEach(boardPoint => {
+			rowState.push(boardPoint.getBgIoState());
+		});
+		boardState.push(rowState);
+	});
 };
 
 
