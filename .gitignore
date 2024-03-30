@@ -366,3 +366,6 @@ images/Adevar/sleek/Old
 images/Fire_unneeded/
 images/Ginseng/patola/Patola Mountain Range.svg
 images/SkudPaiSho/gaoling/Gaoling.svg
+node_modules
+.parcel-cache
+dist
