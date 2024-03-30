@@ -243,14 +243,14 @@ SkudPaiShoController.prototype.getAdditionalMessage = function() {
 };
 
 
-SkudPaiShoController.prototype.getAdditionalMessageElement = function() {
+/* SkudPaiShoController.prototype.getAdditionalMessageElement = function() {
 	var msgElement = document.createElement("span");
 	msgElement.innerText = "Play MCTS move";
 	msgElement.addEventListener('click', () => {
 		this.playMctsMove();
 	});
 	return msgElement;
-};
+}; */
 
 SkudPaiShoController.prototype.playMctsMove = async function() {
 	showModal('AI Move Loading', 'AI move loading...', true);

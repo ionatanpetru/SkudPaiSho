@@ -173,7 +173,7 @@ export class BeyondTheMapsController {
 		return msg;
 	}
 
-	getAdditionalMessageElement() {
+	/* getAdditionalMessageElement() {
 		var msgElement = document.createElement("button");
 		msgElement.innerText = "Play MCTS move";
 		msgElement.addEventListener('click', () => {
@@ -181,7 +181,7 @@ export class BeyondTheMapsController {
 			this.computerMove(true);
 		});
 		return msgElement;
-	}
+	} */
 
 	computerMove(autoKeepGoing) {
 		if (this.theGame.getWinResultTypeCode() > 0) {

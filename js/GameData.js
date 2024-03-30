@@ -30,8 +30,8 @@ export function setCustomBoardUrl(newValue) {
 	customBoardUrl = newValue;
 }
 
-export var debugOn = !false;
-export var gameDevOn = !false;
+export var debugOn = false;
+export var gameDevOn = false;
 
 /* Set to true if building for iOS, else set to false */
 export var ios = false;

@@ -234,14 +234,14 @@ VagabondController.prototype.getAdditionalMessage = function() {
 	return msg;
 };
 
-VagabondController.prototype.getAdditionalMessageElement = function() {
+/* VagabondController.prototype.getAdditionalMessageElement = function() {
 	var msgElement = document.createElement("span");
 	msgElement.innerText = "Play MCTS move";
 	msgElement.addEventListener('click', () => {
 		this.playMctsMove();
 	});
 	return msgElement;
-};
+}; */
 
 VagabondController.prototype.playMctsMove = function() {
 	showModal('AI Move Loading', 'AI move loading...', true);
