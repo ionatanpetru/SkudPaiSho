@@ -326,6 +326,12 @@ var createNonRankedGamePreferredKey = "createNonRankedGamePreferred";
 	  defaultEmailMessageText = document.querySelector(".footer").innerHTML;
 
 	  buildBoardDesignsValues();
+
+	  if (dateIsAprilFools()) {
+		  Ads.enableAds(true);
+		  GameType.SkudPaiSho.gameOptions.push(DIAGONAL_MOVEMENT, EVERYTHING_CAPTURE);
+		  GameType.VagabondPaiSho.gameOptions.push(V_DOUBLE_MOVE_DISTANCE);
+	  }
   
 	  if (QueryString.game && !QueryString.gameType) {
 		  QueryString.gameType = "1";
@@ -444,11 +450,6 @@ var createNonRankedGamePreferredKey = "createNonRankedGamePreferred";
   
 	  // Open default help/chat tab
 	  document.getElementById("defaultOpenTab").click();
-
-	  if (dateIsBetween("04/01/2023", "04/02/2023")) {
-		Ads.enableAds(true);
-		GameType.SkudPaiSho.gameOptions.push(DIAGONAL_MOVEMENT, EVERYTHING_CAPTURE);
-	  }
 
 	  if (!debugOn && !QueryString.game && (localStorage.getItem(welcomeTutorialDismissedKey) !== 'true' || !userIsLoggedIn())) {
 		  showWelcomeTutorial();
@@ -2435,6 +2436,9 @@ var GameType = {
 		gameOptions: [
 			OPTION_DOUBLE_TILES,
 			SWAP_BISON_WITH_LEMUR
+		],
+		secretGameOptions: [
+			V_DOUBLE_MOVE_DISTANCE
 		]
 	},
 	Adevar: {

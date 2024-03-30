@@ -138,6 +138,10 @@ VagabondController.prototype.getAdditionalMessage = function() {
 			msg += "Sign in to enable online gameplay. Or, start playing a local game by making a move.";
 		}
 
+		if (dateIsAprilFools()) {
+			msg += '<br /><br /><strong>Try the Double Movement Distance game option, it\'s more fun!<br /><img src="https://skudpaisho.com/images/aprilfools/irohwink.png" width=160px></strong>';
+		}
+
 		msg += getGameOptionsMessageHtml(GameType.VagabondPaiSho.gameOptions);
 	} else if (!this.theGame.hasEnded() && myTurn()) {
 		if (this.gameNotation.lastMoveHasDrawOffer() && this.promptToAcceptDraw) {
