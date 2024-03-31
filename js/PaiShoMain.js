@@ -2665,7 +2665,8 @@ var GameType = {
 		color: "var(--bloomscolor)",
 		description: "A territory battle on a hexagonal board.",
 		coverImg: "hexagon.png",
-		rulesUrl: "https://www.nickbentley.games/blooms-rules/",
+		// rulesUrl: "https://www.nickbentley.games/blooms-rules/",
+		rulesUrl: "https://boardgamegeek.com/boardgame/249095/blooms",
 		gameOptions: [
 			SHORTER_GAME,
 			FOUR_SIDED_BOARD,
@@ -2681,7 +2682,8 @@ var GameType = {
 		color: "var(--meadowcolor)",
 		description: "A territory battle on a hexagonal board.",
 		coverImg: "hexagon.png",
-		rulesUrl: "https://www.nickbentley.games/medo-rules-and-tips/",
+		// rulesUrl: "https://www.nickbentley.games/medo-rules-and-tips/",
+		rulesUrl: "https://boardgamegeek.com/boardgame/353305/medo",
 		gameOptions: [
 			SHORTER_GAME,
 			FOUR_SIDED_BOARD,
