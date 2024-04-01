@@ -1,3 +1,36 @@
+import { BloomsActuator } from './BloomsActuator';
+import { BloomsGameManager } from './BloomsGameManager';
+import {
+  BloomsGameNotation,
+  BloomsNotationBuilder,
+} from './BloomsGameNotation';
+import { BloomsRandomAIv1 } from './ai/BloomsRandomAIv1';
+import {
+  EIGHT_SIDED_BOARD,
+  FOUR_SIDED_BOARD,
+  HEXHEX_10,
+  SIX_SIDED_BOARD,
+  gameOptionEnabled,
+} from '../GameOptions';
+import { GUEST, HOST } from '../CommonNotationObjects';
+import {
+  GameType,
+  activeAi,
+  callSubmitMove,
+  createGameIfThatIsOk,
+  currentMoveIndex,
+  finalizeMove,
+  getCurrentPlayer,
+  getGameOptionsMessageHtml,
+  getResetMoveText,
+  myTurn,
+  onlinePlayEnabled,
+  playingOnlineGame,
+  refreshMessage,
+  rerunAll,
+} from '../PaiShoMain';
+import { debug } from '../GameData';
+import { hostPlayerCode } from '../pai-sho-common/PaiShoPlayerHelp';
 
 export function BloomsController(gameContainer, isMobile) {
 	if (!isMobile) {
@@ -78,7 +111,7 @@ BloomsController.prototype.resetMove = function() {
 /* Required by Main */
 BloomsController.prototype.getDefaultHelpMessageText = function() {
 	return "<h4>Blooms</h4>"
-	+ "<p><em>A game by <a href='https://www.nickbentley.games/blooms-rules/' target='_blank'>Nick Bentley</a>.</em> Blooms is a territory game that's a bit like the classical game Go, but shorter, easier to learn, and more colorful.</p>"
+	+ "<p><em>A game by <a href='https://boardgamegeek.com/boardgame/249095/blooms' target='_blank'>Nick Bentley</a>.</em> Blooms is a territory game that's a bit like the classical game Go, but shorter, easier to learn, and more colorful.</p>"
 	+ "<h4>Definitions</h4>"
 	+ "<p><em><strong>Bloom:</strong></em> A <em>bloom</em> is an entire group of connected stones on the board of the same color. A single stone (unconnected to others of the same color) is also a bloom.</p>"
 	+ "<p><em><strong>Fenced:</strong></em> A bloom is <em>fenced</em> when there are no empty spaces adjacent to any of the bloom's stones.</p>"
@@ -88,7 +121,7 @@ BloomsController.prototype.getDefaultHelpMessageText = function() {
 	+ "<li>From then on, starting with the Guest, the players take turns. On your turn, you must place 1 or 2 stones onto any empty spaces. If you place 2, they must be different colors. Then, all fenced enemy blooms are captured.</li>"
 	+ "<li>The first player to have captured the set target number of stones and advancing your score-keeping stone all the way around the scoring track, wins.</li>"
 	+ "</ol>"
-	+ "<p>Read the official rules and more about the game <a href='https://www.nickbentley.games/blooms-rules/' target='_blank'>here</a>.</p>";
+	+ "<p>Read the official rules and more about the game <a href='https://boardgamegeek.com/boardgame/249095/blooms' target='_blank'>here</a>.</p>";
 };
 
 /* Required by Main */

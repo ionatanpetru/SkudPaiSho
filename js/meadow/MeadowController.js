@@ -1,3 +1,36 @@
+import {
+  DYNAMIC_GROUP_LIMIT,
+  EIGHT_SIDED_BOARD,
+  FOUR_SIDED_BOARD,
+  SIX_SIDED_BOARD,
+  gameOptionEnabled,
+} from '../GameOptions';
+import { GUEST, HOST } from '../CommonNotationObjects';
+import {
+  GameType,
+  activeAi,
+  callSubmitMove,
+  createGameIfThatIsOk,
+  currentMoveIndex,
+  finalizeMove,
+  getCurrentPlayer,
+  getGameOptionsMessageHtml,
+  getResetMoveText,
+  myTurn,
+  onlinePlayEnabled,
+  playingOnlineGame,
+  refreshMessage,
+  rerunAll,
+} from '../PaiShoMain';
+import { MeadowActuator } from './MeadowActuator';
+import { MeadowGameManager } from './MeadowGameManager';
+import {
+  MeadowGameNotation,
+  MeadowNotationBuilder,
+} from './MeadowGameNotation';
+import { MeadowRandomAIv1 } from './ai/MeadowRandomAIv1';
+import { debug } from '../GameData';
+import { hostPlayerCode } from '../pai-sho-common/PaiShoPlayerHelp';
 
 export function MeadowController(gameContainer, isMobile) {
 	if (!isMobile) {
@@ -78,7 +111,7 @@ MeadowController.prototype.resetMove = function() {
 /* Required by Main */
 MeadowController.prototype.getDefaultHelpMessageText = function() {
 	var msg = "<h4>Medo</h4>"
-	+ "<p><em>A game by <a href='https://www.nickbentley.games/medo-rules-and-tips/' target='_blank'>Nick Bentley</a>.</em> Medo is a minimalist 2-player strategy game inspired by the idea of flowers competing for space in a meadow.</p>"
+	+ "<p><em>A game by <a href='https://boardgamegeek.com/boardgame/353305/medo' target='_blank'>Nick Bentley</a>.</em> Medo is a minimalist 2-player strategy game inspired by the idea of flowers competing for space in a meadow.</p>"
 	+ "<h4>Definitions</h4>"
 	+ "<p><em><strong>Group:</strong></em> A <em>group</em> is an entire group of connected stones on the board of the same color. A single stone (unconnected to others of the same color) is also a group.</p>"
 	+ "<p><em><strong>Smothered:</strong></em> A group is <em>smothered</em> when it is not touching any empty spaces.</p>"
@@ -89,7 +122,7 @@ MeadowController.prototype.getDefaultHelpMessageText = function() {
 	+ "<li>From then on, starting with the Guest, the players take turns. On your turn, you must place 1 or 2 stones onto any empty spaces (If you place 2, they must be different colors). Then, all <em>smothered</em> enemy groups are captured, and then <em>overgrown</em> enemy groups are captured.</li>"
 	+ "<li>The first player to have captured the set target number of stones and advancing your score-keeping stone all the way around the scoring track, wins.</li>"
 	+ "</ol>"
-	+ "<p>Read the official rules and more about the game <a href='https://www.nickbentley.games/medo-rules-and-tips/' target='_blank'>here</a>.</p>";
+	+ "<p>Read the official rules and more about the game <a href='https://boardgamegeek.com/boardgame/353305/medo' target='_blank'>here</a>.</p>";
 
 	if (gameOptionEnabled(DYNAMIC_GROUP_LIMIT)) {
 		msg += "<p>Group limit based on board size is enabled, so the group limit is the size of the board instead of 5.</p>";
