@@ -1,4 +1,6 @@
-import { QueryString } from "./PaiShoMain";
+import html2canvas from 'html2canvas';
+
+import { QueryString, gameContainerDiv, showModal } from "./PaiShoMain";
 
 export var newKnotweedRules = true;  // They're good. Always on!
 export var simpleCanonRules = false;
@@ -354,6 +356,31 @@ export async function copyTextToClipboard(theText, triggerButton) {
 		console.error('Failed to copy!', err);
 	}
 }
+
+export async function copyDivToClipboard() {
+    html2canvas(document.querySelector(".board-container")).then(canvas => {
+		// document.body.appendChild(canvas)
+
+		/*
+		var dataURL = canvas.toDataURL();
+		var img = new Image();
+		img.src = dataURL;
+		document.body.appendChild(img);
+		*/
+
+		// Convert the canvas content to a blob
+		canvas.toBlob(function(blob) {
+			// Copy the image to the clipboard
+			navigator.clipboard.write([
+				new ClipboardItem({ 'image/png': blob })
+			]).then(function() {
+				showModal("Board Image Copied!", "Board image copied!");
+			}, function(err) {
+				console.error('Could not copy image to clipboard: ', err);
+			});
+		}, 'image/png');
+	});
+  }
 
 /* Date */
 export function dateIsBetween(date1MMSlashDDSlashYYYY, date2MMSlashDDSlashYYYY) {

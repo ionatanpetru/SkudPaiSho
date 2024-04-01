@@ -3,6 +3,7 @@
 	"lockfileVersion": 1,
 	"dependencies": {
 		"boardgame.io": "^0.50.2",
+		"html2canvas": "^1.4.1",
 		"jquery": "^3.7.1",
 		"lz-string": "^1.5.0",
 		"package.json": "^2.0.1"

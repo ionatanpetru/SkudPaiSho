@@ -108,6 +108,7 @@ import { VagabondController } from "./vagabond/VagabondController";
 import { applyBoardOptionToBgSvg, mobileAndTabletcheck } from "./ActuatorHelp";
 import {
   arrayIncludesAll,
+  copyDivToClipboard,
   copyObject,
   copyTextToClipboard,
   customBoardUrl,
@@ -2819,7 +2820,8 @@ export var GameType = {
 		color: "var(--bloomscolor)",
 		description: "A territory battle on a hexagonal board.",
 		coverImg: "hexagon.png",
-		rulesUrl: "https://www.nickbentley.games/blooms-rules/",
+		// rulesUrl: "https://www.nickbentley.games/blooms-rules/",
+		rulesUrl: "https://boardgamegeek.com/boardgame/249095/blooms",
 		gameOptions: [
 			SHORTER_GAME,
 			FOUR_SIDED_BOARD,
@@ -2835,7 +2837,8 @@ export var GameType = {
 		color: "var(--meadowcolor)",
 		description: "A territory battle on a hexagonal board.",
 		coverImg: "hexagon.png",
-		rulesUrl: "https://www.nickbentley.games/medo-rules-and-tips/",
+		// rulesUrl: "https://www.nickbentley.games/medo-rules-and-tips/",
+		rulesUrl: "https://boardgamegeek.com/boardgame/353305/medo",
 		gameOptions: [
 			SHORTER_GAME,
 			FOUR_SIDED_BOARD,
@@ -5351,6 +5354,9 @@ document.onkeyup = function(e) {
 	} else if (e.ctrlKey && e.altKey && (e.which || e.keyCode) == 78) {
 		/* Ctrl + Alt + N */
 		newGameClicked();
+	} else if (e.ctrlKey && e.altKey && (e.which || e.keyCode) == 80) {
+		/* Ctrl + Alt + P */
+		copyDivToClipboard();	// TODO fix name, which games are supported, etc
 	} else if (e.ctrlKey && e.altKey && (e.which || e.keyCode)) {
 		if (gameController && gameController.shortcutKey) {
 			gameController.shortcutKey(e.which || e.keyCode);
