@@ -18,6 +18,8 @@ import {
   getUsername,
   pieceAnimationLength,
   piecePlaceAnimation,
+  pointClicked,
+  showPointMessage,
   showTileMessage,
   unplayedTileClicked,
 } from '../PaiShoMain';
@@ -277,10 +279,10 @@ AdevarActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate) {
 		}
 		
 		if (this.mobile) {
-			theDiv.setAttribute("onclick", "pointClicked(this); showPointMessage(this);");
+			theDiv.addEventListener("click", () => { pointClicked(theDiv); showPointMessage(theDiv);});
 		} else {
-			theDiv.setAttribute("onclick", "pointClicked(this);");
-			theDiv.setAttribute("onmouseover", "showPointMessage(this);");
+			theDiv.addEventListener("click", () => { pointClicked(theDiv);});
+			theDiv.addEventListener("mouseover", () => { showPointMessage(theDiv);});
 			theDiv.addEventListener('mouseout', clearMessage);
 			theDiv.addEventListener('mousedown', e => {
 				 // Right Mouse Button

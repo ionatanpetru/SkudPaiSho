@@ -2,6 +2,17 @@
 
 // --------------------------------------------- // 
 
+import { AdevarTileCode, AdevarTileType } from './AdevarTile';
+import { BRAND_NEW } from '../PaiShoMain';
+import {
+  DEPLOY,
+  GUEST,
+  HOST,
+  MOVE,
+  NotationPoint,
+} from '../CommonNotationObjects';
+import { debug } from '../GameData';
+
 export var AdevarMoveType = {
 	chooseHiddenTile: "cHT:"
 };

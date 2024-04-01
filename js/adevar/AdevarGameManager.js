@@ -72,7 +72,7 @@ export var AdevarBoardSetupPoints = {
 	}
 };
 
-var AdevarOrientalLilyObjectivePoints = [
+export var AdevarOrientalLilyObjectivePoints = [
 	/* Pre-3.9.6 */
 	/*
 	{

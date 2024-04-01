@@ -1,5 +1,11 @@
 /* Adevar Pai Sho Tile Manager */
 
+import { ADEVAR_LITE, gameOptionEnabled } from '../GameOptions';
+import { AdevarTile, AdevarTileCode, AdevarTileType } from './AdevarTile';
+import { GUEST } from '../CommonNotationObjects';
+import { TwoWayMap, debug } from '../GameData';
+import { getPlayerCodeFromName } from '../pai-sho-common/PaiShoPlayerHelp';
+
 export function AdevarTileManager(forActuating) {
 	if (forActuating) {
 		this.hostTiles = this.loadTileSet('H');
@@ -97,7 +103,7 @@ AdevarTileManager.prototype.grabTile = function(player, tileCode) {
 	var tile;
 	for (var i = 0; i < tilePile.length; i++) {
 		if (tilePile[i].code === tileCode) {
-			newTileArr = tilePile.splice(i, 1);
+			var newTileArr = tilePile.splice(i, 1);
 			tile = newTileArr[0];
 			break;
 		}

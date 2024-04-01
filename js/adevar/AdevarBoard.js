@@ -1,10 +1,13 @@
 /* Pai Sho Adevar Board */
 
 import { AdevarBoardPoint, AdevarBoardPointType } from './AdevarBoardPoint';
-import { AdevarBoardSetupPoints } from './AdevarGameManager';
+import {
+  AdevarBoardSetupPoints,
+  AdevarOrientalLilyObjectivePoints
+} from './AdevarGameManager';
 import { AdevarHarmony, AdevarHarmonyManager } from './AdevarHarmony';
 import { AdevarTileCode, AdevarTileType } from './AdevarTile';
-import { HOST, NotationPoint, RowAndColumn } from '../CommonNotationObjects';
+import { GUEST, HOST, NotationPoint, RowAndColumn } from '../CommonNotationObjects';
 import {
   NON_PLAYABLE,
   POSSIBLE_MOVE,
