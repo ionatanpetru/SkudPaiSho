@@ -27,12 +27,13 @@ AdevarOptions.tileDesignTypeKey = "adevarTileDesignTypeKey";
 
 /* Adevar tile designs */
 AdevarOptions.tileDesignTypeValues = {
-	classic: "Adevar Classic",
-	sleek: "Adevar Sleek",
-	monochrome: "Adevar Monochrome",
-	// spoopy: "Adevar Spoopy",
-	icy: "Adevar Icy",
-	irl: "Adevar TGG Red Oak & Walnut",
+	frumos: "Frumos",
+	classic: "Classic",
+	sleek: "Sleek",
+	monochrome: "Monochrome",
+	// spoopy: "Spoopy",
+	icy: "Icy",
+	irl: "TGG Red Oak & Walnut",
 	chuji: "Chuji by Sirstotes",
 	space2: "Adevar In Space! by Sirstotes",
 	asta: "Asta by Sirstotes"
@@ -67,11 +68,11 @@ AdevarOptions.buildToggleViewAsGuestDiv = function() {
 };
 
 AdevarOptions.enableSpoopyTiles = function() {
-	AdevarOptions.tileDesignTypeValues['spoopy'] = "Adevar Spoopy";
+	AdevarOptions.tileDesignTypeValues['spoopy'] = "Spoopy";
 };
 
 AdevarOptions.enableChristmasTiles = function() {
-	AdevarOptions.tileDesignTypeValues['christmas'] = "Adevar Christmas";
+	AdevarOptions.tileDesignTypeValues['christmas'] = "Christmas";
 };
 
 AdevarOptions.commenceSpoopy = function() {
