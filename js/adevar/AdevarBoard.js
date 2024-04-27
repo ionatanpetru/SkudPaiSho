@@ -763,7 +763,7 @@ AdevarBoard.prototype.playerHasGateInOpponentNeutralPlot = function(player) {
 	var targetPlot = player === HOST ? AdevarBoardPointType.NORTH_NEUTRAL_PLOT : AdevarBoardPointType.SOUTH_NEUTRAL_PLOT;
 	this.forEachBoardPointWithTile(function(boardPoint) {
 		if (boardPoint.tile.type === AdevarTileType.gate && boardPoint.tile.ownerName === player
-				&& boardPoint.isType(targetPlot) && (boardPoint.plotTypes.length === 1 || boardPoint.plotTypes.length === .5)) {
+				&& boardPoint.isType(targetPlot) && (boardPoint.plotTypes.length === 1 || boardPoint.plotTypes.length > 1)) {
 			hasGateInOpponentNeutralPlot = true;
 		}
 	});
