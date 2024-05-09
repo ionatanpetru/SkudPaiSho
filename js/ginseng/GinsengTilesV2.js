@@ -580,7 +580,8 @@ Ginseng.TileInfo.defineGinsengTilesV2 = function() {
 				triggers: [
 					{
 						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsInLineOfSight,
-						targetTeams: [Trifle.TileTeam.friendly]
+						targetTeams: [Trifle.TileTeam.friendly],
+						sightDistance: gameOptionEnabled(GINSENG_GINSENG_5) ? 5 : 99
 					}
 				],
 				targetTypes: [Trifle.TargetType.triggerTargetTiles]

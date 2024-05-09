@@ -981,12 +981,15 @@ PaiShoGames.Board.prototype.getPointsNextToTilesInLineOfSight = function(movemen
 	return jumpPoints;
 };
 
-PaiShoGames.Board.prototype.getPointsForTilesInLineOfSight = function(originPoint) {
+PaiShoGames.Board.prototype.getPointsForTilesInLineOfSight = function(originPoint, distance) {
 	var lineOfSightPoints = [];
+	if (!distance) {
+		distance = 99;
+	}
 	
 	/* Scan in all directions, if a tile found, add to list */
 	var tileFound = false;
-	for (var row = originPoint.row + 1; row <= paiShoBoardMaxRowOrCol && !tileFound; row++) {
+	for (var row = originPoint.row + 1; row <= paiShoBoardMaxRowOrCol && !tileFound && row <= originPoint.row + distance; row++) {
 		var checkPoint = this.cells[row][originPoint.col];
 		if (checkPoint.hasTile()) {
 			tileFound = true;
@@ -995,7 +998,7 @@ PaiShoGames.Board.prototype.getPointsForTilesInLineOfSight = function(originPoin
 	}
 
 	tileFound = false;
-	for (var row = originPoint.row - 1; row >= 0 && !tileFound; row--) {
+	for (var row = originPoint.row - 1; row >= 0 && !tileFound && row >= originPoint.row - distance; row--) {
 		var checkPoint = this.cells[row][originPoint.col];
 		if (checkPoint.hasTile()) {
 			tileFound = true;
@@ -1004,7 +1007,7 @@ PaiShoGames.Board.prototype.getPointsForTilesInLineOfSight = function(originPoin
 	}
 
 	tileFound = false;
-	for (var col = originPoint.col + 1; col <= paiShoBoardMaxRowOrCol && !tileFound; col++) {
+	for (var col = originPoint.col + 1; col <= paiShoBoardMaxRowOrCol && !tileFound && col <= originPoint.col + distance; col++) {
 		var checkPoint = this.cells[originPoint.row][col];
 		if (checkPoint.hasTile()) {
 			tileFound = true;
@@ -1013,7 +1016,7 @@ PaiShoGames.Board.prototype.getPointsForTilesInLineOfSight = function(originPoin
 	}
 
 	tileFound = false;
-	for (var col = originPoint.col - 1; col >= 0 && !tileFound; col--) {
+	for (var col = originPoint.col - 1; col >= 0 && !tileFound && col >= originPoint.col - distance; col--) {
 		var checkPoint = this.cells[originPoint.row][col];
 		if (checkPoint.hasTile()) {
 			tileFound = true;
