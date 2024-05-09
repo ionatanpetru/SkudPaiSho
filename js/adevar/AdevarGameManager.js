@@ -521,8 +521,8 @@ AdevarGameManager.prototype.checkWinForPlayer = function(player) {
 
 	switch(hiddenTile.code) {
 		case AdevarTileCode.iris:
-			/* Objective: Have 2 tiles in each Red Plot, and 3 tiles in each White Plot */
-			hasWin = this.board.playerHasFullRedAndWhitePlots(player);
+			/* Objective: Have 2 tiles in each Red Plot, and 3 tiles in one White Plot */
+			hasWin = this.board.playerHasFullRedAndOneWhitePlots(player);
 			break;
 		case AdevarTileCode.orientalLily:
 			hasWin = this.playerHasOrientalLilyWin(player);
@@ -557,17 +557,8 @@ AdevarGameManager.prototype.checkWinForPlayer = function(player) {
 };
 
 AdevarGameManager.prototype.hasBlackOrchidWin = function(player) {
-	/* Objective: [Beta] Call a Gate completely in opponent's starting Neutral Plot */
-	// return this.board.playerHasGateInOpponentNeutralPlot(player);
-
 	/* Objective: Have more tiles in each plot (except opponent's starting Neutral Plot) than opponent */
-	//if (gameOptionEnabled(BLACK_ORCHID_BUFF)) {
-		return this.board.playerHasEqualOrMoreBasicTilesInEachNonOwnedPlot(player);
-//	}
-//	else {
-//		return this.board.playerHasMoreBasicTilesInEachNonOwnedPlot(player);
-//	}
-	// return this.board.playerHasMoreBasicTilesInEachNonOwnedNonRedPlot(player);
+	return this.board.playerHasEqualOrMoreBasicTilesInEachNonOwnedPlot(player);
 };
 
 AdevarGameManager.prototype.playerHasWhiteLotusWin = function(player) {
@@ -599,8 +590,8 @@ AdevarGameManager.prototype.playerHasWhiteRoseWin = function(player) {
 	/* Objective: [Old] Capture opponent's Reflection tile */
 	// return this.playersWhoHaveCapturedReflection.includes(player);
 
-	/* Objective: Call a Gate completely in opponent's starting Neutral Plot */
-	return this.board.playerHasGateInOpponentNeutralPlot(player);
+	/* Objective: Call a Gate touching opponent's starting Neutral Plot */
+	return this.board.playerHasGateTouchingOpponentNeutralPlot(player);
 };
 
 AdevarGameManager.prototype.playerHasEcheveriaWin = function(player) {
