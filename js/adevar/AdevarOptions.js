@@ -9,9 +9,10 @@ function AdevarOptions() {
 		AdevarOptions.enableChristmasTiles();
 	}
 
+	/* Set default tile designs */
 	if (!localStorage.getItem(AdevarOptions.tileDesignTypeKey)
 		|| !AdevarOptions.tileDesignTypeValues[localStorage.getItem(AdevarOptions.tileDesignTypeKey)]) {
-		AdevarOptions.setTileDesignsPreference("classic", true);
+		AdevarOptions.setTileDesignsPreference("frumos", true);
 	}
 
 	AdevarOptions.viewAsGuest = false || AdevarOptions.viewAsGuest;
