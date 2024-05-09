@@ -1129,11 +1129,11 @@ AdevarBoard.prototype.playerHasFullRedAndOneWhitePlots = function(player) {
 		|| this.basicTilePlotCounts[AdevarBoardPointType.WEST_WHITE_PLOT][player] === 3);
 };
 
-AdevarBoard.prototype.playerHasTwoTilesInEachRedWhitePlot = function(player) {
-	return this.basicTilePlotCounts[AdevarBoardPointType.NORTH_RED_PLOT][player] === 2
-		&& this.basicTilePlotCounts[AdevarBoardPointType.SOUTH_RED_PLOT][player] === 2
-		&& this.basicTilePlotCounts[AdevarBoardPointType.EAST_WHITE_PLOT][player] === 2
-		&& this.basicTilePlotCounts[AdevarBoardPointType.WEST_WHITE_PLOT][player] === 2;
+AdevarBoard.prototype.playerHasAtLeastTwoTilesInEachRedAndWhitePlot = function(player) {
+	return this.basicTilePlotCounts[AdevarBoardPointType.NORTH_RED_PLOT][player] >= 2
+		&& this.basicTilePlotCounts[AdevarBoardPointType.SOUTH_RED_PLOT][player] >= 2
+		&& this.basicTilePlotCounts[AdevarBoardPointType.EAST_WHITE_PLOT][player] >= 2
+		&& this.basicTilePlotCounts[AdevarBoardPointType.WEST_WHITE_PLOT][player] >= 2;
 };
 
 AdevarBoard.prototype.playerHasMoreBasicTilesInEachNonOwnedPlot = function(player) {
