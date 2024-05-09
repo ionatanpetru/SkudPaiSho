@@ -521,8 +521,8 @@ AdevarGameManager.prototype.checkWinForPlayer = function(player) {
 
 	switch(hiddenTile.code) {
 		case AdevarTileCode.iris:
-			/* Objective: Have 2 tiles in each Red Plot, and 3 tiles in one White Plot */
-			hasWin = this.board.playerHasFullRedAndOneWhitePlots(player);
+			/* Objective: Have 2 tiles in each Red and White Plot */
+			hasWin = this.board.playerHasTwoTilesInEachRedWhitePlot(player);
 			break;
 		case AdevarTileCode.orientalLily:
 			hasWin = this.playerHasOrientalLilyWin(player);
