@@ -1,9 +1,9 @@
 
-Trifle.MoveTargetTileToPileAbilityBrain = function(abilityObject) {
+export function TrifleMoveTargetTileToPileAbilityBrain(abilityObject) {
 	this.abilityObject = abilityObject;
 }
 
-Trifle.MoveTargetTileToPileAbilityBrain.prototype.activateAbility = function() {
+TrifleMoveTargetTileToPileAbilityBrain.prototype.activateAbility = function() {
 	var targetTiles = this.abilityObject.abilityTargetTiles;
 
 	this.movedTiles = [];

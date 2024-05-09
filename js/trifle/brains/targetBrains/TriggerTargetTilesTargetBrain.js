@@ -1,5 +1,6 @@
+import { TrifleTargetHelper } from '../TargetHelper';
 
-Trifle.TriggerTargetTilesTargetBrain = function(abilityObject) {
+export function TrifleTriggerTargetTilesTargetBrain(abilityObject) {
 	this.abilityObject = abilityObject;
 	this.board = abilityObject.board;
 
@@ -9,7 +10,7 @@ Trifle.TriggerTargetTilesTargetBrain = function(abilityObject) {
 	this.setTargets();
 }
 
-Trifle.TriggerTargetTilesTargetBrain.prototype.setTargets = function() {
+TrifleTriggerTargetTilesTargetBrain.prototype.setTargets = function() {
 	this.targetTiles = [];
 	this.targetTilePoints = [];
 
@@ -28,7 +29,7 @@ Trifle.TriggerTargetTilesTargetBrain.prototype.setTargets = function() {
 	}
 	
 	possibleTargetPoints.forEach(function(boardPointWithTile) {
-		var targetHelper = new Trifle.TargetHelper(self.abilityObject, boardPointWithTile, self);
+		var targetHelper = new TrifleTargetHelper(self.abilityObject, boardPointWithTile, self);
 		if (targetHelper.tileIsTargeted()) {
 			self.targetTiles.push(boardPointWithTile.tile);
 			self.targetTilePoints.push(boardPointWithTile);
@@ -36,7 +37,7 @@ Trifle.TriggerTargetTilesTargetBrain.prototype.setTargets = function() {
 	});
 
 	possibleTargetTiles.forEach(function(possibleTargetTile) {
-		var targetHelper = new Trifle.TargetHelper(self.abilityObject, null, self, possibleTargetTile);
+		var targetHelper = new TrifleTargetHelper(self.abilityObject, null, self, possibleTargetTile);
 		if (targetHelper.tileIsTargeted() && !self.targetTiles.includes(possibleTargetTile)) {
 			self.targetTiles.push(possibleTargetTile);
 		}

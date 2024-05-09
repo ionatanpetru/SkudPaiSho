@@ -1,5 +1,7 @@
+import { TEMPLE } from '../../TrifleBoardPoint';
+import { TrifleTriggerHelper } from '../TriggerHelper';
 
-Trifle.WhenTargetTileLandsInTempleTriggerBrain = function(triggerContext) {
+export function TrifleWhenTargetTileLandsInTempleTriggerBrain(triggerContext) {
 	this.targetTiles = [];
 	this.targetTilePoints = [];
 	this.board = triggerContext.board;
@@ -14,12 +16,12 @@ Trifle.WhenTargetTileLandsInTempleTriggerBrain = function(triggerContext) {
 	this.thisTilePoint = triggerContext.pointWithTile;
 }
 
-Trifle.WhenTargetTileLandsInTempleTriggerBrain.prototype.isTriggerMet = function() {
+TrifleWhenTargetTileLandsInTempleTriggerBrain.prototype.isTriggerMet = function() {
 	/* Look at the tile that moved, did it just land in Temple? Is it targeted? */
 	
 	if (this.possibleTargetTilePoint && this.possibleTargetTilePoint.tile === this.possibleTargetTile) {
 		if (this.possibleTargetTilePoint.isType(TEMPLE)) {
-			var triggerHelper = new Trifle.TriggerHelper(this.triggerContext, this.possibleTargetTilePoint);
+			var triggerHelper = new TrifleTriggerHelper(this.triggerContext, this.possibleTargetTilePoint);
 			if (triggerHelper.tileIsTargeted()) {
 				this.targetTiles.push(this.possibleTargetTilePoint.tile);
 				this.targetTilePoints.push(this.possibleTargetTilePoint);

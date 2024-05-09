@@ -1,8 +1,8 @@
 
-Trifle.SimpleOngoingAbilityBrain = function(abilityObject) {
+export function TrifleSimpleOngoingAbilityBrain(abilityObject) {
 	this.abilityObject = abilityObject;
 }
 
-Trifle.SimpleOngoingAbilityBrain.prototype.activateAbility = function() {
+TrifleSimpleOngoingAbilityBrain.prototype.activateAbility = function() {
 	// debug("Simple Ongoing ability activating...");
 };

@@ -1,9 +1,10 @@
+import { debug } from '../../../GameData';
 
-Trifle.ImmobilizeTilesAbilityBrain = function(abilityObject) {
+export function TrifleImmobilizeTilesAbilityBrain(abilityObject) {
 	this.abilityObject = abilityObject;
 }
 
-Trifle.ImmobilizeTilesAbilityBrain.prototype.activateAbility = function() {
+TrifleImmobilizeTilesAbilityBrain.prototype.activateAbility = function() {
 	debug("Immobilize Tiles ability activating...");
 	// Attach ability to target tile
 	// Get target tiles
@@ -11,6 +12,5 @@ Trifle.ImmobilizeTilesAbilityBrain.prototype.activateAbility = function() {
 
 	debug("Target Tiles:");
 	debug(targetTiles);
-
 	
 };

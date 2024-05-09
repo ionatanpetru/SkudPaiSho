@@ -1,5 +1,12 @@
+import {
+  TrifleAbilitiesForType,
+  TrifleAbilityName,
+  TrifleAbilityType,
+  TrifleTileTeam
+} from './TrifleTileInfo';
+import { debug } from '../GameData';
 
-Trifle.AbilityManager = function(board, customAbilityActivationOrder) {
+export function TrifleAbilityManager(board, customAbilityActivationOrder) {
 	this.board = board;
 	this.tileManager = board.tileManager;
 	this.abilities = [];
@@ -8,15 +15,15 @@ Trifle.AbilityManager = function(board, customAbilityActivationOrder) {
 	this.abilityActivationOrder = customAbilityActivationOrder;
 }
 
-Trifle.AbilityManager.prototype.setReadyAbilities = function(readyAbilities) {
+TrifleAbilityManager.prototype.setReadyAbilities = function(readyAbilities) {
 	this.readyAbilities = readyAbilities;
 };
 
-Trifle.AbilityManager.prototype.setAbilitiesWithPromptTargetsNeeded = function(abilitiesWithPromptTargetsNeeded) {
+TrifleAbilityManager.prototype.setAbilitiesWithPromptTargetsNeeded = function(abilitiesWithPromptTargetsNeeded) {
 	this.abilitiesWithPromptTargetsNeeded = abilitiesWithPromptTargetsNeeded;
 };
 
-Trifle.AbilityManager.prototype.activateReadyAbilitiesOrPromptForTargets = function() {
+TrifleAbilityManager.prototype.activateReadyAbilitiesOrPromptForTargets = function() {
 	var activateObj = this.activateReadyAbilities();
 	this.ensurePromptsStillNeeded();
 	if (this.abilitiesWithPromptTargetsNeeded && this.abilitiesWithPromptTargetsNeeded.length > 0) {
@@ -29,7 +36,7 @@ Trifle.AbilityManager.prototype.activateReadyAbilitiesOrPromptForTargets = funct
 	}
 };
 
-Trifle.AbilityManager.prototype.ensurePromptsStillNeeded = function() {
+TrifleAbilityManager.prototype.ensurePromptsStillNeeded = function() {
 	if (this.abilitiesWithPromptTargetsNeeded && this.abilitiesWithPromptTargetsNeeded.length > 0) {
 		var index = 0;
 		var removeThese = [];
@@ -50,7 +57,7 @@ Trifle.AbilityManager.prototype.ensurePromptsStillNeeded = function() {
 	}
 };
 
-Trifle.AbilityManager.prototype.activateReadyAbilities = function() {
+TrifleAbilityManager.prototype.activateReadyAbilities = function() {
 	var boardHasChanged = false;
 	var tileRecords = {
 		capturedTiles: [],
@@ -109,8 +116,8 @@ Trifle.AbilityManager.prototype.activateReadyAbilities = function() {
 	if (!boardHasChanged) {
 		// Default ability activation order
 		var abilityActivationOrder = [
-			Trifle.AbilityName.cancelAbilities,
-			Trifle.AbilityName.cancelAbilitiesTargetingTiles
+			TrifleAbilityName.cancelAbilities,
+			TrifleAbilityName.cancelAbilitiesTargetingTiles
 		];
 
 		if (this.abilityActivationOrder) {
@@ -146,7 +153,7 @@ Trifle.AbilityManager.prototype.activateReadyAbilities = function() {
 	};
 };
 
-Trifle.AbilityManager.prototype.doTheActivateThing = function(ability, tileRecords, abilitiesActivated) {
+TrifleAbilityManager.prototype.doTheActivateThing = function(ability, tileRecords, abilitiesActivated) {
 	var capturedTiles = tileRecords.capturedTiles;
 	var tilesMovedToPiles = tileRecords.tilesMovedToPiles;
 
@@ -191,7 +198,7 @@ Trifle.AbilityManager.prototype.doTheActivateThing = function(ability, tileRecor
 		}
 
 		// If this is a cancelAbilities ability.. should it cancel some ability that's already active?
-		if (ability.abilityType === Trifle.AbilityName.cancelAbilities) {
+		if (ability.abilityType === TrifleAbilityName.cancelAbilities) {
 			this.abilities.forEach(existingAbility => {
 				if (existingAbility.activated && this.abilityIsCanceled(existingAbility)) {
 					debug("Freshly canceled ability: " + existingAbility.abilityType + " from " + existingAbility.sourceTile.ownerCode + existingAbility.sourceTile.code);
@@ -203,7 +210,7 @@ Trifle.AbilityManager.prototype.doTheActivateThing = function(ability, tileRecor
 	return boardHasChanged;
 };
 
-Trifle.AbilityManager.prototype.getReadyAbilitiesWithTriggeringActions = function(triggeringActions) {
+TrifleAbilityManager.prototype.getReadyAbilitiesWithTriggeringActions = function(triggeringActions) {
 	var matchingReadyAbilities = [];
 
 	if (triggeringActions && triggeringActions.length > 0) {
@@ -232,7 +239,7 @@ Trifle.AbilityManager.prototype.getReadyAbilitiesWithTriggeringActions = functio
  * Return `true` if ability is new and not already active, aka ability is ready to activate.
  * @param {*} ability 
  */
-Trifle.AbilityManager.prototype.addNewAbility = function(ability) {
+TrifleAbilityManager.prototype.addNewAbility = function(ability) {
 	var added = false;
 
 	if (!this.abilitiesAlreadyIncludes(ability) && !this.abilityIsCanceled(ability)) {
@@ -245,7 +252,7 @@ Trifle.AbilityManager.prototype.addNewAbility = function(ability) {
 	return added;
 };
 
-Trifle.AbilityManager.prototype.markExistingMatchingAbility = function(otherAbility) {
+TrifleAbilityManager.prototype.markExistingMatchingAbility = function(otherAbility) {
 	this.abilities.forEach(function(existingAbility) {
 		if (existingAbility.appearsToBeTheSameAs(otherAbility)) {
 			existingAbility.preserve = true;
@@ -254,7 +261,7 @@ Trifle.AbilityManager.prototype.markExistingMatchingAbility = function(otherAbil
 	});
 };
 
-Trifle.AbilityManager.prototype.abilitiesAlreadyIncludes = function(otherAbility) {
+TrifleAbilityManager.prototype.abilitiesAlreadyIncludes = function(otherAbility) {
 	var abilityFound = false;
 	this.abilities.forEach(function(existingAbility) {
 		if (existingAbility.appearsToBeTheSameAs(otherAbility)) {
@@ -265,7 +272,7 @@ Trifle.AbilityManager.prototype.abilitiesAlreadyIncludes = function(otherAbility
 	return abilityFound;
 };
 
-Trifle.AbilityManager.prototype.abilityTargetingTileExists = function(abilityName, tile) {
+TrifleAbilityManager.prototype.abilityTargetingTileExists = function(abilityName, tile) {
 	var targetsTile = false;
 	this.abilities.forEach(function(ability) {
 		if (ability.abilityType === abilityName
@@ -277,7 +284,7 @@ Trifle.AbilityManager.prototype.abilityTargetingTileExists = function(abilityNam
 	return targetsTile;
 };
 
-Trifle.AbilityManager.prototype.getAbilitiesTargetingTile = function(abilityName, tile) {
+TrifleAbilityManager.prototype.getAbilitiesTargetingTile = function(abilityName, tile) {
 	var abilitiesTargetingTile = [];
 	this.abilities.forEach(function(ability) {
 		if (ability.abilityType === abilityName
@@ -289,7 +296,7 @@ Trifle.AbilityManager.prototype.getAbilitiesTargetingTile = function(abilityName
 	return abilitiesTargetingTile;
 };
 
-Trifle.AbilityManager.prototype.getAbilitiesTargetingTileFromSourceTile = function(abilityName, tile, sourceTile) {
+TrifleAbilityManager.prototype.getAbilitiesTargetingTileFromSourceTile = function(abilityName, tile, sourceTile) {
 	var abilitiesTargetingTile = [];
 	this.abilities.forEach(function(ability) {
 		if (ability.abilityType === abilityName
@@ -301,18 +308,18 @@ Trifle.AbilityManager.prototype.getAbilitiesTargetingTileFromSourceTile = functi
 	return abilitiesTargetingTile;
 };
 
-Trifle.AbilityManager.prototype.abilityIsCanceled = function(abilityObject) {
+TrifleAbilityManager.prototype.abilityIsCanceled = function(abilityObject) {
 	var isCanceled = false;
-	var affectingCancelAbilities = this.getAbilitiesTargetingTile(Trifle.AbilityName.cancelAbilities, abilityObject.sourceTile);
+	var affectingCancelAbilities = this.getAbilitiesTargetingTile(TrifleAbilityName.cancelAbilities, abilityObject.sourceTile);
 
 	affectingCancelAbilities.forEach(function(cancelingAbility) {
 		// Does canceling ability affecting tile cancel this kind of ability?
-		if (cancelingAbility.abilityInfo.targetAbilityTypes.includes(Trifle.AbilityType.all)) {
+		if (cancelingAbility.abilityInfo.targetAbilityTypes.includes(TrifleAbilityType.all)) {
 			isCanceled = true;
 		}
 
 		cancelingAbility.abilityInfo.targetAbilityTypes.forEach(function(canceledAbilityType) {
-			var abilitiesForType = Trifle.AbilitiesForType[canceledAbilityType];
+			var abilitiesForType = TrifleAbilitiesForType[canceledAbilityType];
 			if (abilitiesForType && abilitiesForType.length && abilitiesForType.includes(abilityObject.abilityInfo.type)) {
 				isCanceled = true;
 			} else if (abilityObject.abilityInfo.type === canceledAbilityType) {
@@ -324,25 +331,25 @@ Trifle.AbilityManager.prototype.abilityIsCanceled = function(abilityObject) {
 	return isCanceled;
 };
 
-Trifle.AbilityManager.prototype.targetingIsCanceled = function(abilitySourceTile, abilityType, possibleTargetTile) {
+TrifleAbilityManager.prototype.targetingIsCanceled = function(abilitySourceTile, abilityType, possibleTargetTile) {
 	var isCanceled = false;
-	var affectingCancelAbilities = this.getAbilitiesTargetingTile(Trifle.AbilityName.cancelAbilitiesTargetingTiles, possibleTargetTile);
+	var affectingCancelAbilities = this.getAbilitiesTargetingTile(TrifleAbilityName.cancelAbilitiesTargetingTiles, possibleTargetTile);
 
 	affectingCancelAbilities.forEach(function(cancelingAbility) {
 		if (!cancelingAbility.abilityInfo.cancelAbilitiesFromTeam
 			|| (
-				(cancelingAbility.abilityInfo.cancelAbilitiesFromTeam === Trifle.TileTeam.enemy && cancelingAbility.sourceTile.ownerName !== abilitySourceTile.ownerName)
-				|| (cancelingAbility.abilityInfo.cancelAbilitiesFromTeam === Trifle.TileTeam.friendly && cancelingAbility.sourceTile.ownerName === abilitySourceTile.ownerName)
+				(cancelingAbility.abilityInfo.cancelAbilitiesFromTeam === TrifleTileTeam.enemy && cancelingAbility.sourceTile.ownerName !== abilitySourceTile.ownerName)
+				|| (cancelingAbility.abilityInfo.cancelAbilitiesFromTeam === TrifleTileTeam.friendly && cancelingAbility.sourceTile.ownerName === abilitySourceTile.ownerName)
 				)
 		) {
 			if (cancelingAbility.abilityInfo.targetAbilityTypes) {
 				// Does canceling ability affecting tile cancel this kind of ability?
-				if (cancelingAbility.abilityInfo.targetAbilityTypes.includes(Trifle.AbilityType.all)) {
+				if (cancelingAbility.abilityInfo.targetAbilityTypes.includes(TrifleAbilityType.all)) {
 					isCanceled = true;
 				}
 
 				cancelingAbility.abilityInfo.targetAbilityTypes.forEach(function(canceledAbilityType) {
-					var abilitiesForType = Trifle.AbilitiesForType[canceledAbilityType];
+					var abilitiesForType = TrifleAbilitiesForType[canceledAbilityType];
 					if (abilitiesForType && abilitiesForType.length && abilitiesForType.includes(abilityType)) {
 						isCanceled = true;
 					} else if (abilityType === canceledAbilityType) {
@@ -361,7 +368,7 @@ Trifle.AbilityManager.prototype.targetingIsCanceled = function(abilitySourceTile
 	return isCanceled;
 };
 
-Trifle.AbilityManager.prototype.tickDurationAbilities = function() {
+TrifleAbilityManager.prototype.tickDurationAbilities = function() {
 	// TODO: Something like this old tick code did:
 	/* for (var i = this.activeDurationAbilities.length - 1; i >= 0; i--) {
 		var durationAbilityDetails = this.activeDurationAbilities[i];
@@ -376,7 +383,7 @@ Trifle.AbilityManager.prototype.tickDurationAbilities = function() {
 	} */
 };
 
-Trifle.AbilityManager.prototype.promptForNextNeededTargets = function() {
+TrifleAbilityManager.prototype.promptForNextNeededTargets = function() {
 	if (!(this.abilitiesWithPromptTargetsNeeded && this.abilitiesWithPromptTargetsNeeded.length > 0)) {
 		debug("Error: No abilities that need prompt targets found");
 		return {};
@@ -392,7 +399,7 @@ Trifle.AbilityManager.prototype.promptForNextNeededTargets = function() {
 
 	neededPromptInfo.abilitySourceTile = abilityObject.sourceTile;
 	neededPromptInfo.sourceAbility = abilityObject;
-	neededPromptInfo.sourceTileKey = Trifle.AbilityManager.buildSourceTileKeyObject(abilityObject.sourceTile);
+	neededPromptInfo.sourceTileKey = TrifleAbilityManager.buildSourceTileKeyObject(abilityObject.sourceTile);
 	var sourceTileKeyStr = JSON.stringify(neededPromptInfo.sourceTileKey);
 
 	var nextNeededPromptTargetInfo;
@@ -405,7 +412,7 @@ Trifle.AbilityManager.prototype.promptForNextNeededTargets = function() {
 	});
 
 	if (nextNeededPromptTargetInfo) {
-		var abilityBrain = Trifle.BrainFactory.createAbilityBrain(abilityObject.abilityType, abilityObject);
+		var abilityBrain = TrifleBrainFactory.createAbilityBrain(abilityObject.abilityType, abilityObject);
 		var promptTargetsExist = abilityBrain.promptForTarget(nextNeededPromptTargetInfo, sourceTileKeyStr);
 		if (promptTargetsExist) {
 			neededPromptInfo.currentPromptTargetId = nextNeededPromptTargetInfo.promptId;
@@ -421,7 +428,7 @@ Trifle.AbilityManager.prototype.promptForNextNeededTargets = function() {
 	return { neededPromptInfo: neededPromptInfo };
 };
 
-Trifle.AbilityManager.buildSourceTileKeyObject = function(abilitySourceTile) {
+TrifleAbilityManager.buildSourceTileKeyObject = function(abilitySourceTile) {
 	return {
 		tileOwner: abilitySourceTile.ownerCode,
 		tileCode: abilitySourceTile.code,

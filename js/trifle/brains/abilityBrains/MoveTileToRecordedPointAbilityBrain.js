@@ -1,9 +1,10 @@
+import { debug } from '../../../GameData';
 
-Trifle.MoveTileToRecordedPointAbilityBrain = function(abilityObject) {
+export function TrifleMoveTileToRecordedPointAbilityBrain(abilityObject) {
 	this.abilityObject = abilityObject;
 }
 
-Trifle.MoveTileToRecordedPointAbilityBrain.prototype.activateAbility = function() {
+TrifleMoveTileToRecordedPointAbilityBrain.prototype.activateAbility = function() {
 	var targetTilePoint = this.abilityObject.abilityTargetTilePoints[0];
 	var targetTile = this.abilityObject.abilityTargetTiles[0];
 

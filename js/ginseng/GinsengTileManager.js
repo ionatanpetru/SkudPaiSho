@@ -1,34 +1,39 @@
 // Tile Manager
 
+import { GUEST, HOST } from '../CommonNotationObjects';
+import { GinsengTileCodes } from './GinsengTiles';
+import { debug } from '../GameData';
+import { TrifleTile } from '../trifle/TrifleTile';
+
 var STANDARD = "Standard";
 var RESTRICTED_BY_OPPONENT_TILE_ZONE = "Restricted by opponent tile zone";
 
-Ginseng.TileManager = function() {
+export var GinsengTileManager = function() {
 	this.hostTiles = this.loadTileSet('H');
 	this.guestTiles = this.loadTileSet('G');
 	this.capturedTiles = [];
 	this.customPiles = {};
 };
 
-Ginseng.TileManager.prototype.loadTileSet = function(ownerCode) {
+GinsengTileManager.prototype.loadTileSet = function(ownerCode) {
 	var tiles = [];
 
-	tiles.push(new Trifle.Tile(Ginseng.TileCodes.WhiteLotus, ownerCode));
-	tiles.push(new Trifle.Tile(Ginseng.TileCodes.Koi, ownerCode));
-	tiles.push(new Trifle.Tile(Ginseng.TileCodes.Dragon, ownerCode));
-	tiles.push(new Trifle.Tile(Ginseng.TileCodes.Badgermole, ownerCode));
-	tiles.push(new Trifle.Tile(Ginseng.TileCodes.Bison, ownerCode));
-	tiles.push(new Trifle.Tile(Ginseng.TileCodes.LionTurtle, ownerCode));
+	tiles.push(new TrifleTile(GinsengTileCodes.WhiteLotus, ownerCode));
+	tiles.push(new TrifleTile(GinsengTileCodes.Koi, ownerCode));
+	tiles.push(new TrifleTile(GinsengTileCodes.Dragon, ownerCode));
+	tiles.push(new TrifleTile(GinsengTileCodes.Badgermole, ownerCode));
+	tiles.push(new TrifleTile(GinsengTileCodes.Bison, ownerCode));
+	tiles.push(new TrifleTile(GinsengTileCodes.LionTurtle, ownerCode));
 	for (var i = 0; i < 2; i++) {
-		tiles.push(new Trifle.Tile(Ginseng.TileCodes.Wheel, ownerCode));
-		tiles.push(new Trifle.Tile(Ginseng.TileCodes.Ginseng, ownerCode));
-		tiles.push(new Trifle.Tile(Ginseng.TileCodes.Orchid, ownerCode));
+		tiles.push(new TrifleTile(GinsengTileCodes.Wheel, ownerCode));
+		tiles.push(new TrifleTile(GinsengTileCodes.Ginseng, ownerCode));
+		tiles.push(new TrifleTile(GinsengTileCodes.Orchid, ownerCode));
 	}
 
 	return tiles;
 };
 
-Ginseng.TileManager.prototype.grabTile = function(player, tileCode) {
+GinsengTileManager.prototype.grabTile = function(player, tileCode) {
 	var tilePile = this.hostTiles;
 	if (player === GUEST) {
 		tilePile = this.guestTiles;
@@ -37,7 +42,7 @@ Ginseng.TileManager.prototype.grabTile = function(player, tileCode) {
 	var tile;
 	for (var i = 0; i < tilePile.length; i++) {
 		if (tilePile[i].code === tileCode) {
-			newTileArr = tilePile.splice(i, 1);
+			var newTileArr = tilePile.splice(i, 1);
 			tile = newTileArr[0];
 			break;
 		}
@@ -50,12 +55,12 @@ Ginseng.TileManager.prototype.grabTile = function(player, tileCode) {
 	return tile;
 };
 
-Ginseng.TileManager.prototype.grabCapturedTile = function(player, tileCode) {
+GinsengTileManager.prototype.grabCapturedTile = function(player, tileCode) {
 	var tile;
 	for (var i = 0; i < this.capturedTiles.length; i++) {
 		if (this.capturedTiles[i].ownerName === player 
 				&& this.capturedTiles[i].code === tileCode) {
-			newTileArr = this.capturedTiles.splice(i, 1);
+			var newTileArr = this.capturedTiles.splice(i, 1);
 			tile = newTileArr[0];
 			break;
 		}
@@ -68,7 +73,7 @@ Ginseng.TileManager.prototype.grabCapturedTile = function(player, tileCode) {
 	return tile;
 };
 
-Ginseng.TileManager.prototype.peekTile = function(player, tileCode, tileId) {
+GinsengTileManager.prototype.peekTile = function(player, tileCode, tileId) {
 	var tilePile = this.hostTiles;
 	if (player === GUEST) {
 		tilePile = this.guestTiles;
@@ -103,7 +108,7 @@ Ginseng.TileManager.prototype.peekTile = function(player, tileCode, tileId) {
 	return tile;
 };
 
-Ginseng.TileManager.prototype.removeSelectedTileFlags = function() {
+GinsengTileManager.prototype.removeSelectedTileFlags = function() {
 	this.hostTiles.forEach(function(tile) {
 		tile.selectedFromPile = false;
 	});
@@ -112,7 +117,7 @@ Ginseng.TileManager.prototype.removeSelectedTileFlags = function() {
 	});
 };
 
-Ginseng.TileManager.prototype.unselectTiles = function(player) {
+GinsengTileManager.prototype.unselectTiles = function(player) {
 	var tilePile = this.getPlayerTilePile(player);
 
 	tilePile.forEach(function(tile) {
@@ -120,14 +125,14 @@ Ginseng.TileManager.prototype.unselectTiles = function(player) {
 	});
 }
 
-Ginseng.TileManager.prototype.putTileBack = function(tile) {
+GinsengTileManager.prototype.putTileBack = function(tile) {
 	var player = tile.ownerName;
 	var tilePile = this.getPlayerTilePile(player);
 
 	tilePile.push(tile);
 };
 
-Ginseng.TileManager.prototype.addToCapturedTiles = function(tiles) {
+GinsengTileManager.prototype.addToCapturedTiles = function(tiles) {
 	tiles.forEach((tile) => {
 		if (tile.moveToPile) {
 			this.addToPile(tile, tile.moveToPile);
@@ -140,34 +145,34 @@ Ginseng.TileManager.prototype.addToCapturedTiles = function(tiles) {
 	});
 };
 
-Ginseng.TileManager.prototype.addToPile = function(tile, pileName) {
+GinsengTileManager.prototype.addToPile = function(tile, pileName) {
 	if (!this.customPiles[pileName]) {
 		this.customPiles[pileName] = [];
 	}
 	this.customPiles[pileName].push(tile);
 };
 
-Ginseng.TileManager.prototype.getTeamSize = function() {
+GinsengTileManager.prototype.getTeamSize = function() {
 	return 11;
 };
 
-Ginseng.TileManager.prototype.hostTeamIsFull = function() {
+GinsengTileManager.prototype.hostTeamIsFull = function() {
 	return this.playerTeamIsFull(HOST);
 };
 
-Ginseng.TileManager.prototype.guestTeamIsFull = function() {
+GinsengTileManager.prototype.guestTeamIsFull = function() {
 	return this.playerTeamIsFull(GUEST);
 };
 
-Ginseng.TileManager.prototype.playerTeamIsFull = function(player) {
+GinsengTileManager.prototype.playerTeamIsFull = function(player) {
 	return this.getPlayerTeam(player).length >= this.getTeamSize();
 };
 
-Ginseng.TileManager.prototype.playersAreSelectingTeams = function() {
+GinsengTileManager.prototype.playersAreSelectingTeams = function() {
 	return !this.hostTeamIsFull() || !this.guestTeamIsFull();
 };
 
-Ginseng.TileManager.prototype.getPlayerTeam = function(player) {
+GinsengTileManager.prototype.getPlayerTeam = function(player) {
 	var playerTeam = this.hostTeam;
 	if (player === GUEST) {
 		playerTeam = this.guestTeam;
@@ -175,7 +180,7 @@ Ginseng.TileManager.prototype.getPlayerTeam = function(player) {
 	return playerTeam;
 };
 
-Ginseng.TileManager.prototype.getPlayerTilePile = function(player) {
+GinsengTileManager.prototype.getPlayerTilePile = function(player) {
 	var tilePile = this.hostTiles;
 	if (player === GUEST) {
 		tilePile = this.guestTiles;
@@ -183,12 +188,12 @@ Ginseng.TileManager.prototype.getPlayerTilePile = function(player) {
 	return tilePile;
 };
 
-Ginseng.TileManager.prototype.getAllTiles = function() {
+GinsengTileManager.prototype.getAllTiles = function() {
 	return this.hostTiles.concat(this.guestTiles);
 };
 
-Ginseng.TileManager.prototype.getCopy = function() {
-	var copy = new Ginseng.TileManager();
+GinsengTileManager.prototype.getCopy = function() {
+	var copy = new GinsengTileManager();
 
 	// copy this.hostTiles and this.guestTiles
 

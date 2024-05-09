@@ -3,7 +3,8 @@
 import { ElementStyleTransform } from '../util/ElementStyleTransform';
 import { GINSENG_GUEST_ROTATE, GINSENG_ROTATE } from '../GameOptions';
 import { GUEST, HOST, MOVE, NotationPoint } from '../CommonNotationObjects';
-import { Ginseng } from './GinsengController';
+import { GinsengController } from './GinsengController';
+import { GinsengOptions } from './GinsengOptions';
 import {
   MARKED,
   NON_PLAYABLE,
@@ -28,7 +29,7 @@ import {
 } from '../ActuatorHelp';
 import { debug } from '../GameData';
 
-Ginseng.Actuator = function(gameContainer, isMobile, enableAnimations) {
+export function GinsengActuator(gameContainer, isMobile, enableAnimations) {
 	this.gameContainer = gameContainer;
 	this.mobile = isMobile;
 
@@ -36,26 +37,26 @@ Ginseng.Actuator = function(gameContainer, isMobile, enableAnimations) {
 
 	var containers = setupPaiShoBoard(
 		this.gameContainer, 
-		Ginseng.Controller.getHostTilesContainerDivs(),
-		Ginseng.Controller.getGuestTilesContainerDivs(), 
+		GinsengController.getHostTilesContainerDivs(),
+		GinsengController.getGuestTilesContainerDivs(), 
 		true,
-		Ginseng.Options.viewAsGuest ? GINSENG_GUEST_ROTATE : GINSENG_ROTATE
+		GinsengOptions.viewAsGuest ? GINSENG_GUEST_ROTATE : GINSENG_ROTATE
 	);
 
 	this.boardContainer = containers.boardContainer;
 	this.arrowContainer = containers.arrowContainer;
 	this.hostTilesContainer = containers.hostTilesContainer;
 	this.guestTilesContainer = containers.guestTilesContainer;
-};
+}
 
-Ginseng.Actuator.hostTeamTilesDivId = "hostTilesContainer";
-Ginseng.Actuator.guestTeamTilesDivId = "guestTilesContainer";
+GinsengActuator.hostTeamTilesDivId = "hostTilesContainer";
+GinsengActuator.guestTeamTilesDivId = "guestTilesContainer";
 
-Ginseng.Actuator.prototype.setAnimationOn = function(isOn) {
+GinsengActuator.prototype.setAnimationOn = function(isOn) {
 	this.animationOn = isOn;
 };
 
-Ginseng.Actuator.prototype.actuate = function(board, tileManager, markingManager, moveToAnimate, moveDetails) {
+GinsengActuator.prototype.actuate = function(board, tileManager, markingManager, moveToAnimate, moveDetails) {
 	var self = this;
 
 	debug("Move to animate: ");
@@ -66,7 +67,7 @@ Ginseng.Actuator.prototype.actuate = function(board, tileManager, markingManager
 	});
 };
 
-Ginseng.Actuator.prototype.htmlify = function(board, tileManager, markingManager, moveToAnimate, moveDetails) {
+GinsengActuator.prototype.htmlify = function(board, tileManager, markingManager, moveToAnimate, moveDetails) {
 	this.clearContainer(this.boardContainer);
 	this.clearContainer(this.arrowContainer);
 
@@ -93,8 +94,8 @@ Ginseng.Actuator.prototype.htmlify = function(board, tileManager, markingManager
 
 	/* Player Tiles */
 
-	self.clearContainerWithId(Ginseng.Actuator.hostTeamTilesDivId);
-	self.clearContainerWithId(Ginseng.Actuator.guestTeamTilesDivId);
+	self.clearContainerWithId(GinsengActuator.hostTeamTilesDivId);
+	self.clearContainerWithId(GinsengActuator.guestTeamTilesDivId);
 	
 	var hostCapturedTiles = getTilesForPlayer(tileManager.capturedTiles, HOST);
 	var guestCapturedTiles = getTilesForPlayer(tileManager.capturedTiles, GUEST);
@@ -133,7 +134,7 @@ Ginseng.Actuator.prototype.htmlify = function(board, tileManager, markingManager
 	}
 };
 
-Ginseng.Actuator.prototype.addTile = function(tile, tileContainer, isCaptured) {
+GinsengActuator.prototype.addTile = function(tile, tileContainer, isCaptured) {
 	if (!tile) {
 		return;
 	}
@@ -176,30 +177,30 @@ Ginseng.Actuator.prototype.addTile = function(tile, tileContainer, isCaptured) {
 	tileContainer.appendChild(theDiv);
 };
 
-Ginseng.Actuator.prototype.clearContainer = function (container) {
+GinsengActuator.prototype.clearContainer = function (container) {
 	while (container.firstChild) {
 		container.removeChild(container.firstChild);
 	}
 };
 
-Ginseng.Actuator.prototype.clearContainerWithId = function(containerIdName) {
+GinsengActuator.prototype.clearContainerWithId = function(containerIdName) {
 	var container = document.getElementById(containerIdName);
 	if (container) {
 		this.clearContainer(container);
 	}
 };
 
-// Ginseng.Actuator.prototype.clearTileContainer = function(tile) {
+// GinsengActuator.prototype.clearTileContainer = function(tile) {
 // 	var container = document.querySelector("." + tile.getImageName());
 // 	while (container.firstChild) {
 // 		container.removeChild(container.firstChild);
 // 	}
 // };
 
-Ginseng.Actuator.prototype.addLineBreakInTilePile = function(player) {
+GinsengActuator.prototype.addLineBreakInTilePile = function(player) {
 	var containerDivId = player === HOST 
-								? Ginseng.Actuator.hostTeamTilesDivId
-								: Ginseng.Actuator.guestTeamTilesDivId;
+								? GinsengActuator.hostTeamTilesDivId
+								: GinsengActuator.guestTeamTilesDivId;
 	var container = document.getElementById(containerDivId);
 
 	var theBr = document.createElement("br");
@@ -207,12 +208,12 @@ Ginseng.Actuator.prototype.addLineBreakInTilePile = function(player) {
 	container.appendChild(theBr);
 };
 
-Ginseng.Actuator.prototype.addTeamTile = function(tile, player, isForTeamSelection) {
+GinsengActuator.prototype.addTeamTile = function(tile, player, isForTeamSelection) {
 	var self = this;
 
 	var containerDivId = player === HOST 
-								? Ginseng.Actuator.hostTeamTilesDivId
-								: Ginseng.Actuator.guestTeamTilesDivId;
+								? GinsengActuator.hostTeamTilesDivId
+								: GinsengActuator.guestTeamTilesDivId;
 	var container = document.getElementById(containerDivId);
 
 	var theDiv = document.createElement("div");
@@ -251,10 +252,10 @@ Ginseng.Actuator.prototype.addTeamTile = function(tile, player, isForTeamSelecti
 	container.appendChild(theDiv);
 };
 
-Ginseng.Actuator.prototype.addBoardPoint = function(boardPoint, board, moveToAnimate, moveDetails) {
+GinsengActuator.prototype.addBoardPoint = function(boardPoint, board, moveToAnimate, moveDetails) {
 	var self = this;
 
-	var theDiv = createBoardPointDiv(boardPoint, null, Ginseng.NotationAdjustmentFunction);
+	var theDiv = createBoardPointDiv(boardPoint, null, GinsengNotationAdjustmentFunction);
 
 	if (!boardPoint.isType(NON_PLAYABLE)) {
 		theDiv.classList.add("activePoint");
@@ -262,7 +263,7 @@ Ginseng.Actuator.prototype.addBoardPoint = function(boardPoint, board, moveToAni
 			theDiv.classList.add("markedPoint");
 		}
 		
-		if (Ginseng.Options.viewAsGuest) {
+		if (GinsengOptions.viewAsGuest) {
 			theDiv.classList.add("ginsengGuestPointRotate");
 		} else {
 			theDiv.classList.add("ginsengPointRotate");
@@ -271,7 +272,7 @@ Ginseng.Actuator.prototype.addBoardPoint = function(boardPoint, board, moveToAni
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
 			theDiv.classList.add("possibleMove");
 			if (board.currentlyDeployingTileInfo && board.currentlyDeployingTileInfo.attributes
-					&& board.currentlyDeployingTileInfo.attributes.includes(Ginseng.AttributeType.gigantic)) {
+					&& board.currentlyDeployingTileInfo.attributes.includes(GinsengAttributeType.gigantic)) {
 				// Gigantic!
 				this.adjustBoardPointForGiganticDeploy(theDiv, boardPoint);
 			}
@@ -312,7 +313,7 @@ Ginseng.Actuator.prototype.addBoardPoint = function(boardPoint, board, moveToAni
 		theImg.elementStyleTransform = new ElementStyleTransform(theImg);
 
 		theImg.elementStyleTransform.setValue("rotate", 270, "deg");
-		if (Ginseng.Options.viewAsGuest) {
+		if (GinsengOptions.viewAsGuest) {
 			theImg.elementStyleTransform.adjustValue("rotate", 180, "deg");
 		}
 
@@ -354,7 +355,7 @@ Ginseng.Actuator.prototype.addBoardPoint = function(boardPoint, board, moveToAni
 			theImgCaptured.classList.add("underneath");
 
 			theImgCaptured.elementStyleTransform.setValue("rotate", 270, "deg");
-			if (Ginseng.Options.viewAsGuest) {
+			if (GinsengOptions.viewAsGuest) {
 				theImgCaptured.elementStyleTransform.adjustValue("rotate", 180, "deg");
 			}
 
@@ -382,7 +383,7 @@ Ginseng.Actuator.prototype.addBoardPoint = function(boardPoint, board, moveToAni
 	}
 };
 
-Ginseng.Actuator.prototype.getCapturedTileFromMove = function(moveDetails) {
+GinsengActuator.prototype.getCapturedTileFromMove = function(moveDetails) {
 	if (moveDetails && moveDetails.capturedTiles && moveDetails.capturedTiles.length === 1) {
 		return moveDetails.capturedTiles[0];
 	}
@@ -390,7 +391,7 @@ Ginseng.Actuator.prototype.getCapturedTileFromMove = function(moveDetails) {
 };
 
 /* Can remove? */
-Ginseng.Actuator.prototype.adjustBoardPointForGiganticDeploy = function(theDiv, boardPoint) {
+GinsengActuator.prototype.adjustBoardPointForGiganticDeploy = function(theDiv, boardPoint) {
 	var x = boardPoint.col, y = boardPoint.row, ox = x, oy = y;
 
 	var pointSizeMultiplierX = 34;
@@ -418,7 +419,7 @@ Ginseng.Actuator.prototype.adjustBoardPointForGiganticDeploy = function(theDiv, 
 	theDiv.style.transform = "scale(" + scaleValue + ")";
 };
 
-Ginseng.Actuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnimate, theImg, theDiv, moveDetails) {
+GinsengActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnimate, theImg, theDiv, moveDetails) {
 	if (!this.animationOn) return;
 
 	var startX = boardPoint.col, startY = boardPoint.row, endX = startX, endY = startY;
@@ -521,18 +522,18 @@ Ginseng.Actuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnim
 	}, pieceAnimationLength * (movementStepIndex + 0.5));
 };
 
-Ginseng.Actuator.prototype.getTileSrcPath = function(tile) {
-	if (Ginseng.Controller.isUsingCustomTileDesigns()) {
-		return Ginseng.Controller.getCustomTileDesignsUrl();
+GinsengActuator.prototype.getTileSrcPath = function(tile) {
+	if (GinsengController.isUsingCustomTileDesigns()) {
+		return GinsengController.getCustomTileDesignsUrl();
 	} else {
 		var srcValue = "images/";
-		var gameImgDir = "Ginseng/" + localStorage.getItem(Ginseng.Options.tileDesignTypeKey);
+		var gameImgDir = "Ginseng/" + localStorage.getItem(GinsengOptions.tileDesignTypeKey);
 		srcValue = srcValue + gameImgDir + "/";
 		return srcValue;
 	}
 };
 
-Ginseng.Actuator.prototype.printBoard = function(board) {
+GinsengActuator.prototype.printBoard = function(board) {
 
 	debug("");
 	var rowNum = 0;

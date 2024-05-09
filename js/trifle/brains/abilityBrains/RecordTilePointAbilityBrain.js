@@ -1,9 +1,9 @@
 
-Trifle.RecordTilePointAbilityBrain = function(abilityObject) {
+export function TrifleRecordTilePointAbilityBrain(abilityObject) {
 	this.abilityObject = abilityObject;
 }
 
-Trifle.RecordTilePointAbilityBrain.prototype.activateAbility = function() {
+TrifleRecordTilePointAbilityBrain.prototype.activateAbility = function() {
 	var targetTilePoints = this.abilityObject.abilityTargetTilePoints;
 
 	var self = this;

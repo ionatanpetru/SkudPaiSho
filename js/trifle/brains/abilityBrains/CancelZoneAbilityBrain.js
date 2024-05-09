@@ -1,5 +1,6 @@
+import { debug } from '../../../GameData';
 
-Trifle.CancelZoneAbilityBrain = function(abilityObject) {
+export function TrifleCancelZoneAbilityBrain(abilityObject) {
 	this.abilityObject = abilityObject;
 
 	this.targetTiles = [];
@@ -7,22 +8,22 @@ Trifle.CancelZoneAbilityBrain = function(abilityObject) {
 	this.setTargetTiles();
 }
 
-Trifle.CancelZoneAbilityBrain.prototype.setTargetTiles = function() {
+TrifleCancelZoneAbilityBrain.prototype.setTargetTiles = function() {
 	this.targetTiles = this.abilityObject.targetTiles;
 
 	debug("Target Tiles:");
 	debug(this.targetTiles);
 };
 
-Trifle.CancelZoneAbilityBrain.prototype.activateAbility = function() {
+TrifleCancelZoneAbilityBrain.prototype.activateAbility = function() {
 	debug("Cancel Zone ability activating...");
 	// Nothing to do, ability just exists
 };
 
-Trifle.CancelZoneAbilityBrain.prototype.getTargetTiles = function() {
+TrifleCancelZoneAbilityBrain.prototype.getTargetTiles = function() {
 	return this.targetTiles;
 }
 
-Trifle.CancelZoneAbilityBrain.prototype.getTargetTilesPoints = function() {
+TrifleCancelZoneAbilityBrain.prototype.getTargetTilesPoints = function() {
 	return this.targetTilePoints;
 };

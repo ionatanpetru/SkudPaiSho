@@ -1,12 +1,11 @@
 // Tile
 
 import { GUEST, HOST } from '../CommonNotationObjects';
-import { PaiShoGames, Trifle } from './TrifleController';
 import { debug } from '../GameData';
 
-Trifle.tileId = 1;
+export var TrifleTileId = 1;
 
-Trifle.Tile = function(code, ownerCode) {
+export var TrifleTile = function(code, ownerCode) {
 	this.code = code;
 	this.ownerCode = ownerCode;
 	if (this.ownerCode === 'G') {
@@ -16,19 +15,23 @@ Trifle.Tile = function(code, ownerCode) {
 	} else {
 		debug("INCORRECT OWNER CODE");
 	}
-	this.id = Trifle.tileId++;
+	this.id = TrifleTileId++;
 	this.selectedFromPile = false;
 }
 
-Trifle.Tile.prototype.getImageName = function() {
+TrifleTile.prototype.resetTrifleTileId = function() {
+	TrifleTileId = 1;
+};
+
+TrifleTile.prototype.getImageName = function() {
 	return this.ownerCode + "" + this.code;
 };
 
-Trifle.Tile.prototype.canMove = function(first_argument) {
+TrifleTile.prototype.canMove = function(first_argument) {
 	return !(this.code === 'C' || this.code === 'F');
 };
 
-Trifle.Tile.prototype.getMoveDistance = function() {
+TrifleTile.prototype.getMoveDistance = function() {
 	if (this.code === 'L' || this.code === 'B') {
 		return 1;
 	} else if (this.code === 'S') {
@@ -38,30 +41,30 @@ Trifle.Tile.prototype.getMoveDistance = function() {
 	return 0;
 };
 
-Trifle.Tile.prototype.isFlowerTile = function() {
+TrifleTile.prototype.isFlowerTile = function() {
 	// Must be L, C, F
 	return this.code === 'L' || this.code === 'C' || this.code === 'F';
 };
 
-Trifle.Tile.prototype.hasCaptureAbility = function() {
+TrifleTile.prototype.hasCaptureAbility = function() {
 	// Must be D, W, S
 	return this.code === 'D' || this.code === 'W' || this.code === 'S';
 };
 
-Trifle.Tile.prototype.getName = function() {
-	return Trifle.Tile.getTileName(this.code);
+TrifleTile.prototype.getName = function() {
+	return TrifleTile.getTileName(this.code);
 };
 
-Trifle.Tile.prototype.getNotationName = function() {
+TrifleTile.prototype.getNotationName = function() {
 	return this.ownerCode + "" + this.code;
 }
 
-Trifle.Tile.prototype.getCopy = function() {
-	return new Trifle.Tile(this.code, this.ownerCode);
+TrifleTile.prototype.getCopy = function() {
+	return new TrifleTile(this.code, this.ownerCode);
 };
 
 
-Trifle.Tile.getTileName = function(tileCode) {
+TrifleTile.getTileName = function(tileCode) {
 	var name = "";
 
 	if (PaiShoGames.currentTileNames && PaiShoGames.currentTileNames[tileCode]) {
@@ -77,18 +80,18 @@ Trifle.Tile.getTileName = function(tileCode) {
 	return name;
 };
 
-Trifle.Tile.prototype.getOwnerCodeIdObject = function() {
+TrifleTile.prototype.getOwnerCodeIdObject = function() {
 	return {
 		ownerName: this.ownerName,
 		code: this.code,
 		id: this.id
 	};
 };
-Trifle.Tile.prototype.getOwnerCodeIdObjectString = function() {
+TrifleTile.prototype.getOwnerCodeIdObjectString = function() {
 	return JSON.stringify(this.getOwnerCodeIdObject());
 };
 
-Trifle.Tile.getTeamLimitForTile = function(tileCode) {
+TrifleTile.getTeamLimitForTile = function(tileCode) {
 	var tileData = PaiShoGames.currentTileMetadata[tileCode];
 	if (tileData) {
 		if (tileData.teamLimit) {

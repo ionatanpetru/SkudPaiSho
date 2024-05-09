@@ -1,5 +1,6 @@
+import { TrifleTriggerHelper } from '../TriggerHelper';
 
-Trifle.WhileTargetTileIsInLineOfSightTriggerBrain = function(triggerContext) {
+export function TrifleWhileTargetTileIsInLineOfSightTriggerBrain(triggerContext) {
 	this.board = triggerContext.board;
 	this.triggerContext = triggerContext;
 	this.targetTiles = [];
@@ -10,7 +11,7 @@ Trifle.WhileTargetTileIsInLineOfSightTriggerBrain = function(triggerContext) {
 	this.thisTilePoint = triggerContext.pointWithTile;
 }
 
-Trifle.WhileTargetTileIsInLineOfSightTriggerBrain.prototype.isTriggerMet = function() {
+TrifleWhileTargetTileIsInLineOfSightTriggerBrain.prototype.isTriggerMet = function() {
 	this.targetTiles = [];
 
 	var sightTilePoints = this.board.getPointsForTilesInLineOfSight(this.thisTilePoint);
@@ -19,7 +20,7 @@ Trifle.WhileTargetTileIsInLineOfSightTriggerBrain.prototype.isTriggerMet = funct
 
 	sightTilePoints.forEach(function(sightTilePoint) {
 		if (sightTilePoint.hasTile()) {	// It should, but why not check? We're inside a BRAIN for crying out loud!
-			var triggerHelper = new Trifle.TriggerHelper(self.triggerContext, sightTilePoint);
+			var triggerHelper = new TrifleTriggerHelper(self.triggerContext, sightTilePoint);
 			if (triggerHelper.tileIsTargeted()) {
 				self.targetTiles.push(sightTilePoint.tile);
 				self.targetTilePoints.push(sightTilePoint);

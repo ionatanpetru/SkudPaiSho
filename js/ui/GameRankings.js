@@ -1,4 +1,14 @@
 /* Game Rankings UI */
+import {
+  closeModal,
+  getLoadingModalText,
+  getLoginToken,
+  getUsername,
+  onlinePlayEngine,
+  showModal,
+} from '../PaiShoMain';
+import { debug } from '../GameData';
+
 export function viewGameRankingsClicked() {
 	showModal("Player Game Rankings", getLoadingModalText());
 	onlinePlayEngine.getGameRankings(getLoginToken(), showGameRankingsCallback);

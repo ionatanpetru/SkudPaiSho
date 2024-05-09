@@ -16,6 +16,8 @@ import { GUEST, HOST, RowAndColumn } from '../CommonNotationObjects';
 import { RED, WHITE } from '../skud-pai-sho/SkudPaiShoTile';
 import { BeyondTheMapsTileType } from '../beyond-the-maps/BeyondTheMapsTile';
 
+export var TEMPLE = GATE;
+
 export function TrifleBoardPoint() {
 	this.types = [];
 	this.row = -1;

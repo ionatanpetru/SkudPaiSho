@@ -1,21 +1,26 @@
+import { POSSIBLE_MOVE } from '../../../skud-pai-sho/SkudPaiShoBoardPoint';
+import { TrifleAbilityManager } from '../../TrifleAbilityManager';
+import { TrifleBrainFactory } from '../BrainFactory';
+import { TrifleTargetPromptId, TrifleTargetType } from '../../TrifleTileInfo';
+import { debug } from '../../../GameData';
 
-Trifle.MoveTargetTileAbilityBrain = function(abilityObject) {
+export function TrifleMoveTargetTileAbilityBrain(abilityObject) {
 	this.abilityObject = abilityObject;
 }
 
-Trifle.MoveTargetTileAbilityBrain.prototype.activateAbility = function() {
+TrifleMoveTargetTileAbilityBrain.prototype.activateAbility = function() {
 	var promptTargetInfo = this.abilityObject.promptTargetInfo;
 
 	debug("PUSHING");
 
-	var sourceTileKey = JSON.stringify(Trifle.AbilityManager.buildSourceTileKeyObject(this.abilityObject.sourceTile));
+	var sourceTileKey = JSON.stringify(TrifleAbilityManager.buildSourceTileKeyObject(this.abilityObject.sourceTile));
 
 	if (promptTargetInfo 
 			&& promptTargetInfo[sourceTileKey]
-			&& promptTargetInfo[sourceTileKey][Trifle.TargetPromptId.movedTilePoint]
-			&& promptTargetInfo[sourceTileKey][Trifle.TargetPromptId.movedTileDestinationPoint]) {
-		var movedTilePoint = promptTargetInfo[sourceTileKey][Trifle.TargetPromptId.movedTilePoint];
-		var movedTileDestinationPoint = promptTargetInfo[sourceTileKey][Trifle.TargetPromptId.movedTileDestinationPoint];
+			&& promptTargetInfo[sourceTileKey][TrifleTargetPromptId.movedTilePoint]
+			&& promptTargetInfo[sourceTileKey][TrifleTargetPromptId.movedTileDestinationPoint]) {
+		var movedTilePoint = promptTargetInfo[sourceTileKey][TrifleTargetPromptId.movedTilePoint];
+		var movedTileDestinationPoint = promptTargetInfo[sourceTileKey][TrifleTargetPromptId.movedTileDestinationPoint];
 		
 		var movedTileBoardPoint = this.abilityObject.board.getBoardPointFromRowAndCol(movedTilePoint.rowAndColumn);
 		var movedTileDestBoardPoint = this.abilityObject.board.getBoardPointFromRowAndCol(movedTileDestinationPoint.rowAndColumn);
@@ -35,20 +40,20 @@ Trifle.MoveTargetTileAbilityBrain.prototype.activateAbility = function() {
 	}
 };
 
-Trifle.MoveTargetTileAbilityBrain.prototype.promptForTarget = function(nextNeededPromptTargetInfo, sourceTileKeyStr, checkForTargetsOnly) {
+TrifleMoveTargetTileAbilityBrain.prototype.promptForTarget = function(nextNeededPromptTargetInfo, sourceTileKeyStr, checkForTargetsOnly) {
 	var promptTargetsExist = false;
 
 	debug("Need to prompt for target: " + nextNeededPromptTargetInfo.promptId);
 
 	/*
 	Move Target Tile requires these targets:
-	- Trifle.TargetPromptId.movedTilePoint
-	- Trifle.TargetPromptId.movedTileDestinationPoint
+	- TrifleTargetPromptId.movedTilePoint
+	- TrifleTargetPromptId.movedTileDestinationPoint
 	 */
 
-	if (nextNeededPromptTargetInfo.promptId === Trifle.TargetPromptId.movedTilePoint) {
+	if (nextNeededPromptTargetInfo.promptId === TrifleTargetPromptId.movedTilePoint) {
 		if (this.abilityObject.abilityInfo.targetTypes.length === 1
-				&& this.abilityObject.abilityInfo.targetTypes.includes(Trifle.TargetType.triggerTargetTiles)) {
+				&& this.abilityObject.abilityInfo.targetTypes.includes(TrifleTargetType.triggerTargetTiles)) {
 			/* this.abilityObject.triggerTargetTilePoints.forEach((targetTilePoint) => {
 				targetTilePoint.addType(POSSIBLE_MOVE);
 			}); */	// This breaks when targeting only certain trigger targets, which we need to do
@@ -56,7 +61,7 @@ Trifle.MoveTargetTileAbilityBrain.prototype.promptForTarget = function(nextNeede
 			var abilityTargetTilePoints = [];
 			if (this.abilityObject.abilityInfo.targetTypes && this.abilityObject.abilityInfo.targetTypes.length) {
 				this.abilityObject.abilityInfo.targetTypes.forEach((targetType) => {
-					var targetBrain = Trifle.BrainFactory.createTargetBrain(targetType, this.abilityObject);
+					var targetBrain = TrifleBrainFactory.createTargetBrain(targetType, this.abilityObject);
 		
 					abilityTargetTiles = abilityTargetTiles.concat(targetBrain.targetTiles);
 					abilityTargetTilePoints = abilityTargetTilePoints.concat(targetBrain.targetTilePoints);
@@ -72,11 +77,11 @@ Trifle.MoveTargetTileAbilityBrain.prototype.promptForTarget = function(nextNeede
 		} else {
 			debug("Prompting not supported yet for this ability");
 		}
-	} else if (nextNeededPromptTargetInfo.promptId === Trifle.TargetPromptId.movedTileDestinationPoint
+	} else if (nextNeededPromptTargetInfo.promptId === TrifleTargetPromptId.movedTileDestinationPoint
 			&& !checkForTargetsOnly) {
 		// this.abilityObject.board.promptForBoardPointInAVeryHackyWay();
 
-		var movedTilePoint = this.abilityObject.promptTargetInfo[sourceTileKeyStr][Trifle.TargetPromptId.movedTilePoint];
+		var movedTilePoint = this.abilityObject.promptTargetInfo[sourceTileKeyStr][TrifleTargetPromptId.movedTilePoint];
 
 		if (this.abilityObject.abilityInfo.targetTileMovements) {
 			this.abilityObject.abilityInfo.targetTileMovements.forEach((movementInfo) => {

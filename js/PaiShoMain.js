@@ -86,7 +86,7 @@ import { Elo } from "./util/elo";
 import { FirePaiShoController } from './fire-pai-sho/FirePaiShoController';
 import { GUEST, HOST } from "./CommonNotationObjects";
 import { GameClock } from "./util/GameClock";
-import { Ginseng } from './ginseng/GinsengController';
+import { GinsengController } from './ginseng/GinsengController';
 import { HexentaflController } from './hexentafl/HexentaflController';
 import { HonoraryTitleChecker } from './honorary-titles/HonoraryTitleChecker';
 import { KeyPaiSho } from './key-pai-sho/KeyPaiShoController';
@@ -101,7 +101,7 @@ import { SolitaireController } from './solitaire/SolitaireController';
 import { SoundManager } from "./SoundManager";
 import { SpiritController } from './spirit/SpiritController';
 import { StreetController } from './street/StreetController';
-import { Trifle } from './trifle/TrifleController';
+import { TrifleController } from './trifle/TrifleController';
 import { TumbleweedController } from './tumbleweed/TumbleweedController';
 import { UndergrowthController } from './undergrowth/UndergrowthController';
 import { VagabondController } from "./vagabond/VagabondController";
@@ -122,6 +122,7 @@ import {
   runningOnAndroid,
   setCustomBoardUrl
 } from './GameData';
+import { setupUiEvents } from './ui/UiSetup';
 
 
 export var QueryString = function() {
@@ -415,35 +416,6 @@ export var createNonRankedGamePreferredKey = "createNonRankedGamePreferred";
 
 // var sendJoinGameChatMessage = false;
 /* --- */
-
-function setupUiEvents() {
-	var sidenavCloseDiv = document.getElementById('sidenavCloseDiv');
-	if (sidenavCloseDiv) {
-		sidenavCloseDiv.addEventListener('click', closeNav);
-	}
-
-	var helpTabHeader = document.getElementById('defaultOpenTab');
-	if (helpTabHeader) {
-		helpTabHeader.addEventListener('click', (event) => {
-			openTab(event, 'helpTextTab');
-		});
-	}
-
-	var globalChatTabHeader = document.getElementById('globalChatTabHeader');
-	if (globalChatTabHeader) {
-		globalChatTabHeader.addEventListener('click', (event) => {
-			openTab(event, 'globalChatTab');
-		});
-	}
-
-	var chatTabHeader = document.getElementById('chatTab');
-	if (chatTabHeader) {
-		chatTabHeader.addEventListener('click', (event) => {
-			openTab(event, 'gameChatTab');
-			dismissChatAlert();
-		});
-	}
-}
 
 window.requestAnimationFrame(function() {
 
@@ -2194,6 +2166,71 @@ export function callFailed() {
 	showModal("", "Unable to load.");
 }
 
+export function showModalElem(headingText, modalMessageElement, onlyCloseByClickingX, yesNoOptions, useInvisibleModal) {
+	// Make sure sidenav is closed
+	closeNav();
+
+	// Get the modal
+	var modal = document.getElementById('myMainModal');
+
+	if (!useInvisibleModal) {
+		modal.classList.add('modalDefaultBackground');
+	} else {
+		modal.classList.remove('modalDefaultBackground');
+	}
+
+	// Get the <span> element that closes the modal
+	var span = document.getElementsByClassName("myMainModalClose")[0];
+
+	var modalHeading = document.getElementById('modalHeading');
+	modalHeading.innerText = headingText;
+
+	var modalMessage = document.getElementById('modalMessage');
+	modalMessage.innerHTML = '';
+	modalMessage.appendChild(modalMessageElement);
+
+	if (yesNoOptions && yesNoOptions.yesFunction) {
+		modalMessage.appendChild(document.createElement("br"));
+		modalMessage.appendChild(document.createElement("br"));
+
+		var yesDiv = document.createElement("div");
+		yesDiv.innerText = yesNoOptions.yesText ? yesNoOptions.yesText : "OK";
+		yesDiv.classList.add("clickableText");
+		yesDiv.onclick = yesNoOptions.yesFunction;
+		modalMessage.appendChild(yesDiv);
+
+		modalMessage.appendChild(document.createElement("br"));
+		var noDiv = document.createElement("div");
+		noDiv.innerText = yesNoOptions.noText ? yesNoOptions.noText : "Cancel";
+		noDiv.classList.add("clickableText");
+		if (yesNoOptions.noFunction) {
+			noDiv.onclick = yesNoOptions.noFunction;
+		} else {
+			noDiv.onclick = closeModal;
+		}
+		modalMessage.appendChild(noDiv);
+	}
+
+	// When the user clicks the button, open the modal
+	modal.style.display = "block";
+
+	// When the user clicks on <span> (x), close the modal
+	span.onclick = function() {
+		closeModal();
+	};
+
+	if (tutorialInProgress) {
+		onlyCloseByClickingX = true;
+	}
+
+	// When the user clicks anywhere outside of the modal, close it
+	window.onclick = function(event) {
+		if (event.target == modal && !onlyCloseByClickingX) {
+			closeModal();
+		}
+	};
+}
+
 export function showModal(headingHTMLText, modalMessageHTMLText, onlyCloseByClickingX, yesNoOptions, useInvisibleModal) {
 	// Make sure sidenav is closed
 	closeNav();
@@ -2932,7 +2969,7 @@ export function getGameControllerForGameType(gameTypeId) {
 			break;
 		case GameType.Trifle.id:
 			// if (gameDevOn || usernamionof.... GameType.Trifle.usersWithAccess.includes(getUsername())) {
-			controller = new Trifle.Controller(gameContainerDiv, isMobile);
+			controller = new TrifleController(gameContainerDiv, isMobile);
 			// } else {
 			// 	closeGame();
 			// }
@@ -2950,7 +2987,7 @@ export function getGameControllerForGameType(gameTypeId) {
 			controller = new FirePaiShoController(gameContainerDiv, isMobile);
 			break;
 		case GameType.Ginseng.id:
-			controller = new Ginseng.Controller(gameContainerDiv, isMobile);
+			controller = new GinsengController(gameContainerDiv, isMobile);
 			break;
 		case GameType.KeyPaiSho.id:
 			controller = new KeyPaiSho.Controller(gameContainerDiv, isMobile);
@@ -3378,7 +3415,6 @@ var showMyGamesCallback = function showMyGamesCallback(results) {
 	message += "<br /><br /><div>You are currently signed in as " + getUsername() + ".</div>";
 	message += "<div><span class='skipBonus' onclick='showChangePasswordModal();'>Click here to update your password.</span></div>";
 	message += "<div><span class='skipBonus' onclick='showSignOutModal();'>Click here to sign out.</span></div>";
-	// message += "<br /><div><span class='skipBonus' onclick='showAccountSettings();'>Account Settings</span></div><br />";
 	showModal("Active Games", message);
 };
 
@@ -3403,11 +3439,10 @@ export function emailNotificationsCheckboxClicked() {
 	onlinePlayEngine.updateEmailNotificationsSetting(getUserId(), value, emptyCallback);
 }
 
-var getEmailNotificationsSettingCallback = function getEmailNotificationsSettingCallback(result) {
+/* var getEmailNotificationsSettingCallback = function getEmailNotificationsSettingCallback(result) {
 	document.getElementById("emailNotificationsCheckbox").checked = (result && result.startsWith("Y"));
-};
-
-export function showAccountSettings() {
+}; */
+/* export function showAccountSettings() {
 	var message = "Note: Email notifications are not working right now. Maybe in the future they will be back.<br />";
 
 	message += "<div><input id='emailNotificationsCheckbox' type='checkbox' onclick='emailNotificationsCheckboxClicked();'>Email Notifications</div>";
@@ -3415,11 +3450,29 @@ export function showAccountSettings() {
 	showModal("Settings", message);
 
 	onlinePlayEngine.getEmailNotificationsSetting(getUserId(), getEmailNotificationsSettingCallback);
-}
+} */
 
 export function showCurrentlyOfflineModal() {
 	if (!window.navigator.onLine) {
-		showModal("Currently Offline", "Currently offline, please try again when connected to the Internet. <br /><br /><span class='skipBonus' onclick='closeModal();'>OK</span>");
+		var containerDiv = document.createElement("div");
+
+		var messageText = document.createTextNode("Currently offline, please try again when connected to the Internet.");
+		containerDiv.appendChild(messageText);
+
+		var lineBreak1 = document.createElement("br");
+		containerDiv.appendChild(lineBreak1);
+
+		var lineBreak2 = document.createElement("br");
+		containerDiv.appendChild(lineBreak2);
+
+		var okButton = document.createElement("span");
+		okButton.className = "skipBonus";
+		okButton.textContent = "OK";
+		okButton.onclick = function() {
+			closeModal();
+		};
+		containerDiv.appendChild(okButton);
+		showModalElem("Currently Offline", containerDiv);
 	}
 }
 
@@ -3993,41 +4046,80 @@ export function getSidenavNewGameEntryForGameType(gameType) {
 	return "<div class='sidenavEntry'><span class='sidenavLink skipBonus' onclick='setGameController(" + gameType.id + "); closeModal();'>" + gameType.desc + "</span><span>&nbsp;-&nbsp;<i class='fa fa-book' aria-hidden='true'></i>&nbsp;</span><a href='" + gameType.rulesUrl + "' target='_blank' class='newGameRulesLink sidenavLink'>Rules</a></div>";
 }
 
-export function getNewGameEntryForGameType(gameType) {
+function getNewGameEntryForGameType(gameType) {
+	var newGameElem = document.createElement('div');
+
 	if (
 		gameDevOn
 		|| !gameType.usersWithAccess
 		|| usernameIsOneOf(gameType.usersWithAccess)
 	) {
 		if (localStorage.getItem("data-theme") == "stotes") {
-			var small = "small";
+			var small = true;
 			if (gameType.desc == "Skud Pai Sho") {
-				small = "";
+				small = false;
 			}
 			if (gameType.desc == "Adevăr Pai Sho") {
-				small = "";
+				small = false;
 			}
 			if (gameType.desc == "Vagabond Pai Sho") {
-				small = "";
+				small = false;
 			}
-			return '<div class="gameDiv ' + small + '" style="background-color:' + gameType.color + ';"><img ondblclick="setGameController(' + gameType.id + '); closeModal();" src="style/game-icons/' + gameType.coverImg + '"><h3 onclick="setGameController(' + gameType.id + '); closeModal();">' + gameType.desc + '</h3><div class="gameDiv-hidden"><span class="rulesSpan"><i class="fa fa-book" aria-hidden="true"></i>&nbsp;<a href="' + gameType.rulesUrl + '" target="_blank">Rules</a></span><p>' + gameType.description + '</p></div></div>';
+			// return '<div class="gameDiv ' + small + '" style="background-color:' + gameType.color + ';"><img ondblclick="setGameController(' + gameType.id + '); closeModal();" src="style/game-icons/' + gameType.coverImg + '"><h3 onclick="setGameController(' + gameType.id + '); closeModal();">' + gameType.desc + '</h3><div class="gameDiv-hidden"><span class="rulesSpan"><i class="fa fa-book" aria-hidden="true"></i>&nbsp;<a href="' + gameType.rulesUrl + '" target="_blank">Rules</a></span><p>' + gameType.description + '</p></div></div>';
+			newGameElem.classList.add('gameDiv');
+			if (small) {
+				newGameElem.classList.add('small');
+			}
+			newGameElem.style.backgroundColor = gameType.color
+			// todo......
 		} else {
-			return "<div class='newGameEntry'><span class='clickableText' onclick='setGameController(" + gameType.id + "); closeModal();'>" + gameType.desc + "</span><span>&nbsp;-&nbsp;<i class='fa fa-book' aria-hidden='true'></i>&nbsp;</span><a href='" + gameType.rulesUrl + "' target='_blank' class='newGameRulesLink'>Rules</a></div>";
+			// return "<div class='newGameEntry'><span class='clickableText' onclick='setGameController(" + gameType.id + "); closeModal();'>" + gameType.desc + "</span><span>&nbsp;-&nbsp;<i class='fa fa-book' aria-hidden='true'></i>&nbsp;</span><a href='" + gameType.rulesUrl + "' target='_blank' class='newGameRulesLink'>Rules</a></div>";
+			// newGameElem.classList.add('newGameEntry');
+			// Create the div element
+			var div = document.createElement("div");
+			div.className = "newGameEntry";
+
+			// Create the span element for clickable text
+			var spanClickableText = document.createElement("span");
+			spanClickableText.className = "clickableText";
+			spanClickableText.textContent = gameType.desc;
+			spanClickableText.onclick = function() {
+				setGameController(gameType.id);
+				closeModal();
+			};
+
+			// Create the span element for the icon
+			var spanIcon = document.createElement("span");
+			spanIcon.innerHTML = "&nbsp;-&nbsp;<i class='fa fa-book' aria-hidden='true'></i>&nbsp;";
+
+			// Create the anchor element for rules link
+			var anchorRules = document.createElement("a");
+			anchorRules.href = gameType.rulesUrl;
+			anchorRules.target = "_blank";
+			anchorRules.className = "newGameRulesLink";
+			anchorRules.textContent = "Rules";
+
+			// Append the elements to the div
+			div.appendChild(spanClickableText);
+			div.appendChild(spanIcon);
+			div.appendChild(anchorRules);
+
+			return div;
 		}
 	}
-	return "";
+	return newGameElem;
 }
 
 export function newGameClicked() {
-	var message = "<div class='gameDivContainer'>";
+	var messageElem = document.createElement('div');
+	messageElem.className = 'gameDivContainer';
 
 	Object.keys(GameType).forEach(function(key, index) {
-		message += getNewGameEntryForGameType(GameType[key]);
+		var newGameEntryElem = getNewGameEntryForGameType(GameType[key]);
+		messageElem.appendChild(newGameEntryElem);
 	});
 
-	message += "</div>";
-
-	showModal("New Game", message);
+	showModalElem("New Game", messageElem);
 }
 
 var getCountOfGamesWhereUserTurnCallback = function getCountOfGamesWhereUserTurnCallback(count) {

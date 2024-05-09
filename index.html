@@ -72,14 +72,14 @@
 			<div id="sideMenuAvContainer" class="gone"></div>
 			<div class='sidenavSection odd'>
 				<div class='sidenavSectionHeader'>Play</div>
-				<div class='sidenavEntry sidenavLink skipBonus' onclick='accountHeaderClicked();'>
+				<div class='sidenavEntry sidenavLink skipBonus' id="sidenavMyGames">
 					<i class="fa fa-user" aria-hidden="true"></i> View my games
 					<span id='myGamesNumberMyTurn'></span>
 				</div>
 				<div class='sidenavEntry sidenavLink skipBonus' onclick='viewGameSeeksClicked();'>
 					<i class="fa fa-plug" aria-hidden="true"></i> Join a game
 				</div>
-				<div class='sidenavEntry sidenavLink skipBonus' onclick='newGameClicked();'>
+				<div class='sidenavEntry sidenavLink skipBonus' id="sidenavNewGame">
 					<i class="fa fa-plus-circle" aria-hidden="true"></i> New game
 				</div>
 				<div class='sidenavEntry sidenavLink skipBonus' onclick='viewTournamentsClicked();'>
@@ -163,7 +163,7 @@
 
 	<div class="header">
 		<div class="sidenavMenuButton">
-			<span style="cursor:pointer; vertical-align: top;" onclick="openNav();">
+			<span style="cursor:pointer; vertical-align: top;" id="sidenavOpenButton">
 				<h1>
 					<span class="stretchText sidenavMenuButtonText" id='sidenavMenuButton'>&#8801;</span>
 				</h1>
@@ -172,26 +172,26 @@
 		<div class="headerLeft">
 			<h1>&nbsp;</h1>
 		</div>
-		<div class="headerLeft" style="cursor:pointer;" onclick="openNav();">
+		<div class="headerLeft" style="cursor:pointer;" id="sidenavHeaderDiv">
 			<h1 id='siteHeading'>The Garden Gate</h1>
 		</div>
 		<div class="headerRightContainer">
-			<span class="headerRight clickableText" onclick='accountHeaderClicked();'>
+			<span class="headerRight clickableText" id="accountHeaderSpan">
 				<i class="fa fa-user" aria-hidden="true"></i><span id="headerRightText4"> <span id='accountHeaderLinkText'>Sign In</span></span>
 			</span>
 			<div class="headerRight">&nbsp;|&nbsp;</div>
-			<span class="headerRight clickableText" onclick='newGameClicked();'>
+			<span class="headerRight clickableText" id="menuNewGame">
 				<i class="fa fa-plus-circle" aria-hidden="true"></i> <span id="headerRightText3">New</span></span>
 			<div class="headerRight">&nbsp;|&nbsp;</div>
-			<span class="headerRight clickableText" onclick='viewGameSeeksClicked();'>
+			<span id="headerJoinLink" class="headerRight clickableText">
 				<i class="fa fa-plug" aria-hidden="true"></i> <span id="headerRightText2">Join</span>
 			</span>
 			<div class="headerRight">&nbsp;|&nbsp;</div>
-			<span class="headerRight clickableText" onclick='openShop();'>
+			<span id="headerShopLink" class="headerRight clickableText">
 				<i class="fa fa-shopping-cart" aria-hidden="true"></i>
 			</span>
 			<div class="headerRight">&nbsp;|&nbsp;</div>
-			<span class="headerRight clickableText" onclick='discordLinkClicked();'>
+			<span id="headerDiscordLink" class="headerRight clickableText">
 				<i class="fa-brands fa-discord"></i>
 			</span>
 		</div>

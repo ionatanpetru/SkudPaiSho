@@ -1,7 +1,7 @@
+import { TrifleAbilityManager } from './TrifleAbilityManager';
+import { arrayIntersection, debug } from '../GameData';
 
-
-
-Trifle.Ability = function(abilityContext) {
+export function TrifleAbility(abilityContext) {
 	this.board = abilityContext.board;
 	this.abilityType = abilityContext.tileAbilityInfo.type;
 	this.abilityInfo = abilityContext.tileAbilityInfo;
@@ -19,7 +19,7 @@ Trifle.Ability = function(abilityContext) {
 	this.abilityTargetTilePoints = [];
 	// this.setAbilityTargetTiles();	// This happens during activation now
 
-	this.abilityBrain = Trifle.BrainFactory.createAbilityBrain(this.abilityType, this);
+	this.abilityBrain = TrifleBrainFactory.createAbilityBrain(this.abilityType, this);
 	// this.abilityTargetTiles = this.abilityBrain.getTargetTiles();
 	// this.abilityTargetTilePoints = this.abilityBrain.getTargetTilePoints();
 
@@ -27,7 +27,7 @@ Trifle.Ability = function(abilityContext) {
 	this.activated = false;
 }
 
-Trifle.Ability.prototype.hasNeededPromptTargetInfo = function() {
+TrifleAbility.prototype.hasNeededPromptTargetInfo = function() {
 	var hasPromptInfo = true;
 	var neededPromptTargetsInfo = this.abilityInfo.neededPromptTargetsInfo;
 	if (neededPromptTargetsInfo && neededPromptTargetsInfo.length >= 1) {
@@ -45,16 +45,16 @@ Trifle.Ability.prototype.hasNeededPromptTargetInfo = function() {
 	return hasPromptInfo;
 };
 
-Trifle.Ability.prototype.worthy = function() {
+TrifleAbility.prototype.worthy = function() {
 	return !this.abilityInfo.neededPromptTargetsInfo
 		|| (this.abilityInfo.neededPromptTargetsInfo
 		&& this.promptTargetsExist());
 };
 
-Trifle.Ability.prototype.promptTargetInfoPresent = function(neededPromptTargetInfo) {
+TrifleAbility.prototype.promptTargetInfoPresent = function(neededPromptTargetInfo) {
 	var hasTarget = false;
 
-	var sourceTileKey = JSON.stringify(Trifle.AbilityManager.buildSourceTileKeyObject(this.sourceTile));
+	var sourceTileKey = JSON.stringify(TrifleAbilityManager.buildSourceTileKeyObject(this.sourceTile));
 
 	return this.promptTargetInfo 
 		&& this.promptTargetInfo[sourceTileKey]
@@ -62,7 +62,7 @@ Trifle.Ability.prototype.promptTargetInfoPresent = function(neededPromptTargetIn
 			|| this.promptTargetInfo[sourceTileKey][neededPromptTargetInfo.promptId]);
 };
 
-Trifle.Ability.prototype.promptTargetsExist = function() {
+TrifleAbility.prototype.promptTargetsExist = function() {
 	var promptTargetsExist = false;
 
 	var abilityObject = this;
@@ -71,7 +71,7 @@ Trifle.Ability.prototype.promptTargetsExist = function() {
 
 	neededPromptInfo.abilitySourceTile = abilityObject.sourceTile;
 	neededPromptInfo.sourceAbility = abilityObject;
-	neededPromptInfo.sourceTileKey = Trifle.AbilityManager.buildSourceTileKeyObject(abilityObject.sourceTile);
+	neededPromptInfo.sourceTileKey = TrifleAbilityManager.buildSourceTileKeyObject(abilityObject.sourceTile);
 	var sourceTileKeyStr = JSON.stringify(neededPromptInfo.sourceTileKey);
 
 	var nextNeededPromptTargetInfo = abilityObject.abilityInfo.neededPromptTargetsInfo[0];
@@ -84,14 +84,14 @@ Trifle.Ability.prototype.promptTargetsExist = function() {
 	// });
 
 	if (nextNeededPromptTargetInfo) {
-		var abilityBrain = Trifle.BrainFactory.createAbilityBrain(abilityObject.abilityType, abilityObject);
+		var abilityBrain = TrifleBrainFactory.createAbilityBrain(abilityObject.abilityType, abilityObject);
 		promptTargetsExist = abilityBrain.promptForTarget(nextNeededPromptTargetInfo, sourceTileKeyStr, true);
 	}
 
 	return promptTargetsExist;
 };
 
-Trifle.Ability.prototype.setAbilityTargetTiles = function() {
+TrifleAbility.prototype.setAbilityTargetTiles = function() {
 	this.targetBrains = [];
 	
 	this.abilityTargetTiles = [];
@@ -101,7 +101,7 @@ Trifle.Ability.prototype.setAbilityTargetTiles = function() {
 
 	if (this.abilityInfo.targetTypes && this.abilityInfo.targetTypes.length) {
 		this.abilityInfo.targetTypes.forEach(function(targetType) {
-			var targetBrain = Trifle.BrainFactory.createTargetBrain(targetType, self);
+			var targetBrain = TrifleBrainFactory.createTargetBrain(targetType, self);
 
 			self.targetBrains.push(targetBrain);
 
@@ -117,7 +117,7 @@ Trifle.Ability.prototype.setAbilityTargetTiles = function() {
 	// TODO all this ^^^^^
 };
 
-Trifle.Ability.prototype.activateAbility = function() {
+TrifleAbility.prototype.activateAbility = function() {
 	debug("Activating ability: " + this.abilityInfo.type + " from " + this.sourceTile.ownerCode + this.sourceTile.code);
 	this.setAbilityTargetTiles();
 
@@ -127,16 +127,16 @@ Trifle.Ability.prototype.activateAbility = function() {
 	}
 };
 
-Trifle.Ability.prototype.deactivate = function() {
+TrifleAbility.prototype.deactivate = function() {
 	// What needed to do?
 	this.activated = false;
 };
 
-Trifle.Ability.prototype.boardChangedAfterActivation = function() {
+TrifleAbility.prototype.boardChangedAfterActivation = function() {
 	return this.boardChanged;
 };
 
-Trifle.Ability.prototype.setTriggerTargetTiles = function() {
+TrifleAbility.prototype.setTriggerTargetTiles = function() {
 	this.triggerTargetTiles = null;
 
 	var self = this;
@@ -159,7 +159,7 @@ Trifle.Ability.prototype.setTriggerTargetTiles = function() {
 	}
 };
 
-Trifle.Ability.prototype.getTriggerTypeTargets = function(triggerType) {
+TrifleAbility.prototype.getTriggerTypeTargets = function(triggerType) {
 	var targetTiles = [];
 	var targetTilePoints = [];
 
@@ -178,7 +178,7 @@ Trifle.Ability.prototype.getTriggerTypeTargets = function(triggerType) {
 	};
 };
 
-Trifle.Ability.prototype.appearsToBeTheSameAs = function(otherAbility) {
+TrifleAbility.prototype.appearsToBeTheSameAs = function(otherAbility) {
 	return otherAbility 
 		&& this.abilityType === otherAbility.abilityType
 		&& this.sourceTile.id === otherAbility.sourceTile.id
@@ -187,15 +187,15 @@ Trifle.Ability.prototype.appearsToBeTheSameAs = function(otherAbility) {
 		&& this.sourceTilePoint === otherAbility.sourceTilePoint;
 };
 
-Trifle.Ability.prototype.abilityTargetsTile = function(tile) {
+TrifleAbility.prototype.abilityTargetsTile = function(tile) {
 	return this.abilityTargetTiles.includes(tile);
 };
 
-Trifle.Ability.prototype.isPriority = function(priorityLevel) {
+TrifleAbility.prototype.isPriority = function(priorityLevel) {
 	return this.abilityInfo.priority === priorityLevel;
 };
 
-Trifle.Ability.prototype.getTitle = function() {
+TrifleAbility.prototype.getTitle = function() {
 	if (this.abilityInfo.title) {
 		return this.abilityInfo.title;
 	} else {
@@ -203,7 +203,7 @@ Trifle.Ability.prototype.getTitle = function() {
 	}
 };
 
-Trifle.Ability.prototype.getNeededPromptTargetInfo = function(promptTargetId) {
+TrifleAbility.prototype.getNeededPromptTargetInfo = function(promptTargetId) {
 	var matchingPromptTargetInfo;
 	if (this.abilityInfo.neededPromptTargetsInfo && this.abilityInfo.neededPromptTargetsInfo.length) {
 		this.abilityInfo.neededPromptTargetsInfo.forEach(function(promptTargetInfo) {
@@ -215,31 +215,31 @@ Trifle.Ability.prototype.getNeededPromptTargetInfo = function(promptTargetId) {
 	return matchingPromptTargetInfo;
 };
 
-Trifle.Ability.prototype.getSummaryLines = function() {
+TrifleAbility.prototype.getSummaryLines = function() {
 	var lines = [];
 	var abilityTitle = this.abilityType;
 	if (this.abilityInfo.title) {
 		abilityTitle = this.abilityInfo.title;
 	}
 	lines.push("=== " + abilityTitle + " ===");
-	lines.push("- Source Tile: " + this.sourceTile.ownerName + " " + Trifle.Tile.getTileName(this.sourceTile.code));
+	lines.push("- Source Tile: " + this.sourceTile.ownerName + " " + TrifleTile.getTileName(this.sourceTile.code));
 	var targetTileNames = [];
 	this.abilityTargetTiles.forEach((abilityTargetTile) => {
-		targetTileNames.push(" " + abilityTargetTile.ownerName + " " + Trifle.Tile.getTileName(abilityTargetTile.code));
+		targetTileNames.push(" " + abilityTargetTile.ownerName + " " + TrifleTile.getTileName(abilityTargetTile.code));
 	});
 	lines.push("- Target Tiles:" + targetTileNames);
 
 	return lines;
 };
 
-Trifle.Ability.prototype.triggerStillMet = function() {
+TrifleAbility.prototype.triggerStillMet = function() {
 	var triggers = this.abilityInfo.triggers;
 	if (triggers && triggers.length
 			&& this.sourceTilePoint.tile === this.sourceTile) {
 		var allTriggerConditionsMet = true;
 
 		triggers.forEach(triggerInfo => {
-			// if (Trifle.TriggerHelper.hasInfo(triggerInfo)) {
+			// if (TrifleTriggerHelper.hasInfo(triggerInfo)) {
 			// 	triggerContext.currentTrigger = triggerInfo;
 			// 	var brain = self.brainFactory.createTriggerBrain(triggerInfo, triggerContext);
 			// 	if (brain && brain.isTriggerMet && self.activationRequirementsAreMet(triggerInfo, tile, triggerContext)) {
@@ -263,7 +263,7 @@ Trifle.Ability.prototype.triggerStillMet = function() {
 	return false;
 };
 
-Trifle.Ability.prototype.getTriggeringActions = function() {
+TrifleAbility.prototype.getTriggeringActions = function() {
 	var allTriggeringActions = [];
 
 	Object.values(this.triggerBrainMap).forEach(triggerBrain => {

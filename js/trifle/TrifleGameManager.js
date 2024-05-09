@@ -1,19 +1,19 @@
 // Trifle Game Manager
 
-Trifle.GameManager = function(actuator, ignoreActuate, isCopy) {
+export function TrifleGameManager(actuator, ignoreActuate, isCopy) {
 	this.gameLogText = '';
 	this.isCopy = isCopy;
 
 	this.actuator = actuator;
 
-	this.tileManager = new Trifle.TileManager();
+	this.tileManager = new TrifleTileManager();
 	this.markingManager = new PaiShoMarkingManager();
 
 	this.setup(ignoreActuate);
 }
 
 // Set up the game
-Trifle.GameManager.prototype.setup = function (ignoreActuate) {
+TrifleGameManager.prototype.setup = function (ignoreActuate) {
 
 	this.board = new PaiShoGames.Board(this.tileManager);
 	this.board.useTrifleTempleRules = true;
@@ -29,7 +29,7 @@ Trifle.GameManager.prototype.setup = function (ignoreActuate) {
 };
 
 // Sends the updated board to the actuator
-Trifle.GameManager.prototype.actuate = function () {
+TrifleGameManager.prototype.actuate = function () {
 	if (this.isCopy) {
 		return;
 	}
@@ -37,7 +37,7 @@ Trifle.GameManager.prototype.actuate = function () {
 	setGameLogText(this.gameLogText);
 };
 
-Trifle.GameManager.prototype.runNotationMove = function(move, withActuate) {
+TrifleGameManager.prototype.runNotationMove = function(move, withActuate) {
 	debug("Running Move: " + move.fullMoveText);
 
 	this.board.tickDurationAbilities();
@@ -45,7 +45,7 @@ Trifle.GameManager.prototype.runNotationMove = function(move, withActuate) {
 	if (move.moveType === TEAM_SELECTION) {
 		var self = this;
 		move.teamTileCodes.forEach(function(tileCode){
-			var tile = new Trifle.Tile(tileCode, move.playerCode);
+			var tile = new TrifleTile(tileCode, move.playerCode);
 			self.tileManager.addToTeamIfOk(tile);
 		});
 		this.buildTeamSelectionGameLogText(move);
@@ -55,7 +55,7 @@ Trifle.GameManager.prototype.runNotationMove = function(move, withActuate) {
 		this.buildDeployGameLogText(move, tile);
 
 		/* Banner played? Could use this in future, currently in Board. */
-		if (Trifle.TileInfo.tileIsBanner(PaiShoGames.currentTileMetadata[tile.code])) {
+		if (TrifleTileInfo.tileIsBanner(PaiShoGames.currentTileMetadata[tile.code])) {
 			if (tile.ownerName === HOST) {
 				this.hostBannerPlayed = true;
 			} else {
@@ -70,7 +70,7 @@ Trifle.GameManager.prototype.runNotationMove = function(move, withActuate) {
 		if (moveDetails.capturedTiles && moveDetails.capturedTiles.length) {
 			var self = this;
 			moveDetails.capturedTiles.forEach(function(capturedTile) {
-				if (capturedTile && Trifle.TileInfo.tileIsBanner(PaiShoGames.currentTileMetadata[capturedTile.code])) {
+				if (capturedTile && TrifleTileInfo.tileIsBanner(PaiShoGames.currentTileMetadata[capturedTile.code])) {
 					self.winners.push(getOpponentName(capturedTile.ownerName));
 				}
 			});
@@ -84,16 +84,16 @@ Trifle.GameManager.prototype.runNotationMove = function(move, withActuate) {
 	}
 };
 
-Trifle.GameManager.prototype.buildTeamSelectionGameLogText = function(move) {
+TrifleGameManager.prototype.buildTeamSelectionGameLogText = function(move) {
 	this.gameLogText = move.player + " selected their team";
 };
-Trifle.GameManager.prototype.buildDeployGameLogText = function(move, tile) {
-	this.gameLogText = move.player + ' placed ' + Trifle.Tile.getTileName(tile.code) + ' at ' + move.endPoint.pointText;
+TrifleGameManager.prototype.buildDeployGameLogText = function(move, tile) {
+	this.gameLogText = move.player + ' placed ' + TrifleTile.getTileName(tile.code) + ' at ' + move.endPoint.pointText;
 };
-Trifle.GameManager.prototype.buildMoveGameLogText = function(move, moveDetails) {
-	this.gameLogText = move.player + ' moved ' + Trifle.Tile.getTileName(moveDetails.movedTile.code) + ' from ' + move.startPoint.pointText + ' to ' + move.endPoint.pointText;
+TrifleGameManager.prototype.buildMoveGameLogText = function(move, moveDetails) {
+	this.gameLogText = move.player + ' moved ' + TrifleTile.getTileName(moveDetails.movedTile.code) + ' from ' + move.startPoint.pointText + ' to ' + move.endPoint.pointText;
 	if (moveDetails.capturedTiles && moveDetails.capturedTiles.length > 0) {
-		this.gameLogText += ' and captured ' + getOpponentName(move.player) + '\'s ';// + Trifle.Tile.getTileName(moveDetails.capturedTile.code);
+		this.gameLogText += ' and captured ' + getOpponentName(move.player) + '\'s ';// + TrifleTile.getTileName(moveDetails.capturedTile.code);
 		var first = true;
 		moveDetails.capturedTiles.forEach(function(capturedTile) {
 			if (!first) {
@@ -101,16 +101,16 @@ Trifle.GameManager.prototype.buildMoveGameLogText = function(move, moveDetails) 
 			} else {
 				first = false;
 			}
-			this.gameLogText += Trifle.Tile.getTileName(capturedTile.code);
+			this.gameLogText += TrifleTile.getTileName(capturedTile.code);
 		});
 	}
 };
 
-Trifle.GameManager.prototype.playersAreSelectingTeams = function() {
+TrifleGameManager.prototype.playersAreSelectingTeams = function() {
 	return this.tileManager.playersAreSelectingTeams();
 };
 
-Trifle.GameManager.prototype.getPlayerTeamSelectionTileCodeList = function(player) {
+TrifleGameManager.prototype.getPlayerTeamSelectionTileCodeList = function(player) {
 	var team = this.tileManager.getPlayerTeam(player);
 	var codeList = [];
 	team.forEach(function(tile){
@@ -119,7 +119,7 @@ Trifle.GameManager.prototype.getPlayerTeamSelectionTileCodeList = function(playe
 	return codeList.toString();
 };
 
-Trifle.GameManager.prototype.addTileToTeam = function(tile) {
+TrifleGameManager.prototype.addTileToTeam = function(tile) {
 	var addedOk = this.tileManager.addToTeamIfOk(tile);
 	if (addedOk) {
 		this.actuate();
@@ -127,16 +127,16 @@ Trifle.GameManager.prototype.addTileToTeam = function(tile) {
 	return this.tileManager.playerTeamIsFull(tile.ownerName);
 };
 
-Trifle.GameManager.prototype.removeTileFromTeam = function(tile) {
+TrifleGameManager.prototype.removeTileFromTeam = function(tile) {
 	this.tileManager.removeTileFromTeam(tile);
 	this.actuate();
 };
 
-Trifle.GameManager.prototype.hasEnded = function() {
+TrifleGameManager.prototype.hasEnded = function() {
 	return this.getWinResultTypeCode() > 0;
 };
 
-Trifle.GameManager.prototype.revealPossibleMovePoints = function(boardPoint, ignoreActuate) {
+TrifleGameManager.prototype.revealPossibleMovePoints = function(boardPoint, ignoreActuate) {
 	if (!boardPoint.hasTile()) {
 		return;
 	}
@@ -147,7 +147,7 @@ Trifle.GameManager.prototype.revealPossibleMovePoints = function(boardPoint, ign
 	}
 };
 
-Trifle.GameManager.prototype.hidePossibleMovePoints = function(ignoreActuate) {
+TrifleGameManager.prototype.hidePossibleMovePoints = function(ignoreActuate) {
 	this.board.removePossibleMovePoints();
 	this.tileManager.removeSelectedTileFlags();
 	if (!ignoreActuate) {
@@ -155,7 +155,7 @@ Trifle.GameManager.prototype.hidePossibleMovePoints = function(ignoreActuate) {
 	}
 };
 
-Trifle.GameManager.prototype.revealDeployPoints = function(tile, ignoreActuate) {
+TrifleGameManager.prototype.revealDeployPoints = function(tile, ignoreActuate) {
 	this.board.setDeployPointsPossibleMoves(tile);
 	
 	if (!ignoreActuate) {
@@ -163,17 +163,17 @@ Trifle.GameManager.prototype.revealDeployPoints = function(tile, ignoreActuate) 
 	}
 };
 
-Trifle.GameManager.prototype.getWinner = function() {
+TrifleGameManager.prototype.getWinner = function() {
 	if (this.winners.length === 1) {
 		return this.winners[0];
 	}
 };
 
-Trifle.GameManager.prototype.getWinReason = function() {
+TrifleGameManager.prototype.getWinReason = function() {
 	return " has captured the opponent's Banner Tile and won the game!";
 };
 
-Trifle.GameManager.prototype.getWinResultTypeCode = function() {
+TrifleGameManager.prototype.getWinResultTypeCode = function() {
 	if (this.winners.length === 1) {
 		return 1;	// Standard win is 1
 	} else if (this.gameHasEndedInDraw) {
@@ -181,8 +181,8 @@ Trifle.GameManager.prototype.getWinResultTypeCode = function() {
 	}
 };
 
-Trifle.GameManager.prototype.getCopy = function() {
-	var copyGame = new Trifle.GameManager(this.actuator, true, true);
+TrifleGameManager.prototype.getCopy = function() {
+	var copyGame = new TrifleGameManager(this.actuator, true, true);
 	copyGame.board = this.board.getCopy();
 	copyGame.tileManager = this.tileManager.getCopy();
 	return copyGame;

@@ -1,22 +1,32 @@
+import {
+  GameType,
+  buildDropdownDiv,
+  currentGameData,
+  gameController,
+  promptForCustomTileDesigns,
+  usernameEquals,
+} from '../PaiShoMain';
 
-Ginseng.Options = function() {
-	if (!localStorage.getItem(Ginseng.Options.tileDesignTypeKey)
-		|| !Ginseng.Options.tileDesignTypeValues[localStorage.getItem(Ginseng.Options.tileDesignTypeKey)]) {
-		Ginseng.Options.setTileDesignsPreference("gaoling", true);
+export function GinsengOptions() {
+	if (!localStorage.getItem(GinsengOptions.tileDesignTypeKey)
+		|| !GinsengOptions.tileDesignTypeValues[localStorage.getItem(GinsengOptions.tileDesignTypeKey)]) {
+		GinsengOptions.setTileDesignsPreference("gaoling", true);
 	}
 
-	Ginseng.Options.viewAsGuest = false || Ginseng.Options.viewAsGuest;
-	if (currentGameData && currentGameData.gameTypeId === GameType.Ginseng.id && usernameEquals(currentGameData.guestUsername)) {
-		Ginseng.Options.viewAsGuest = true;
+	GinsengOptions.viewAsGuest = false || GinsengOptions.viewAsGuest;
+	if (currentGameData && currentGameData.gameTypeId === GameType.Ginsengid && usernameEquals(currentGameData.guestUsername)) {
+		GinsengOptions.viewAsGuest = true;
 	}
-	if (currentGameData && currentGameData.gameTypeId === GameType.Ginseng.id && usernameEquals(currentGameData.hostUsername)) {
-		Ginseng.Options.viewAsGuest = false;
+	if (currentGameData && currentGameData.gameTypeId === GameType.Ginsengid && usernameEquals(currentGameData.hostUsername)) {
+		GinsengOptions.viewAsGuest = false;
 	}
 }
 
-Ginseng.Options.tileDesignTypeKey = "ginsengTileDesignTypeKey";
+GinsengOptions.Preferences = {};
 
-Ginseng.Options.tileDesignTypeValues = {
+GinsengOptions.tileDesignTypeKey = "ginsengTileDesignTypeKey";
+
+GinsengOptions.tileDesignTypeValues = {
 	gaoling: "Gaoling",
 	gaipan: "Gaipan",
 	omashu: "Omashu",
@@ -33,31 +43,31 @@ Ginseng.Options.tileDesignTypeValues = {
 	custom: "Use Custom Designs"
 };
 
-Ginseng.Options.setTileDesignsPreference = function(tileDesignKey, ignoreActuate) {
+GinsengOptions.setTileDesignsPreference = function(tileDesignKey, ignoreActuate) {
 	if (tileDesignKey === 'custom') {
-		promptForCustomTileDesigns(GameType.Ginseng, Ginseng.Preferences.customTilesUrl);
+		promptForCustomTileDesigns(GameType.Ginseng, GinsengOptions.Preferences.customTilesUrl);
 	} else {
-		localStorage.setItem(Ginseng.Options.tileDesignTypeKey, tileDesignKey);
+		localStorage.setItem(GinsengOptions.tileDesignTypeKey, tileDesignKey);
 		if (gameController && gameController.callActuate && !ignoreActuate) {
 			gameController.callActuate();
 		}
 	}
 };
 
-Ginseng.Options.buildTileDesignDropdownDiv = function(alternateLabelText) {
+GinsengOptions.buildTileDesignDropdownDiv = function(alternateLabelText) {
 	var labelText = alternateLabelText ? alternateLabelText : "Tile Designs";
-	return buildDropdownDiv("GinsengTileDesignDropdown", labelText + ":", Ginseng.Options.tileDesignTypeValues,
-							localStorage.getItem(Ginseng.Options.tileDesignTypeKey),
+	return buildDropdownDiv("GinsengTileDesignDropdown", labelText + ":", GinsengOptions.tileDesignTypeValues,
+							localStorage.getItem(GinsengOptions.tileDesignTypeKey),
 							function() {
-								Ginseng.Options.setTileDesignsPreference(this.value);
+								GinsengOptions.setTileDesignsPreference(this.value);
 							});
 };
 
-Ginseng.Options.buildToggleViewAsGuestDiv = function() {
+GinsengOptions.buildToggleViewAsGuestDiv = function() {
 	var div = document.createElement("div");
 	var message = "Viewing board as Host";
 	var linkText = "View as Guest";
-	if (Ginseng.Options.viewAsGuest) {
+	if (GinsengOptions.viewAsGuest) {
 		message = "Viewing board as Guest";
 		linkText = "View as Host";
 	}

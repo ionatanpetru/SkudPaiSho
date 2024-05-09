@@ -7,7 +7,7 @@ import {
   NON_PLAYABLE,
   POSSIBLE_MOVE,
 } from '../skud-pai-sho/SkudPaiShoBoardPoint';
-import { PaiShoGames, Trifle } from './TrifleController';
+import { TrifleController } from './TrifleController';
 import {
   RmbDown,
   RmbUp,
@@ -16,6 +16,9 @@ import {
   showTileMessage,
   unplayedTileClicked,
 } from '../PaiShoMain';
+import { TrifleAttributeType } from './TrifleTileInfo';
+import { TrifleTile } from './TrifleTile';
+import { TrifleTileCodes } from './TrifleTiles';
 import {
   cos45,
   createBoardArrow,
@@ -29,14 +32,14 @@ import {
   hostPlayerCode,
 } from '../pai-sho-common/PaiShoPlayerHelp';
 
-Trifle.Actuator = function(gameContainer, isMobile) {
+export function TrifleActuator(gameContainer, isMobile) {
 	this.gameContainer = gameContainer;
 	this.mobile = isMobile;
 
 	var containers = setupPaiShoBoard(
 		this.gameContainer, 
-		Trifle.Controller.getHostTilesContainerDivs(),
-		Trifle.Controller.getGuestTilesContainerDivs(), 
+		TrifleController.getHostTilesContainerDivs(),
+		TrifleController.getGuestTilesContainerDivs(), 
 		true
 	);
 
@@ -46,12 +49,12 @@ Trifle.Actuator = function(gameContainer, isMobile) {
 	this.guestTilesContainer = containers.guestTilesContainer;
 }
 
-// Trifle.Actuator.imagePath = "images/Trifle/standard/";
-Trifle.Actuator.imagePath = "images/Trifle/chuji/";
-Trifle.Actuator.hostTeamTilesDivId = "hostTilesContainer";
-Trifle.Actuator.guestTeamTilesDivId = "guestTilesContainer";
+// TrifleActuator.imagePath = "images/Trifle/standard/";
+TrifleActuator.imagePath = "images/Trifle/chuji/";
+TrifleActuator.hostTeamTilesDivId = "hostTilesContainer";
+TrifleActuator.guestTeamTilesDivId = "guestTilesContainer";
 
-Trifle.Actuator.prototype.actuate = function(board, tileManager, markingManager) {
+TrifleActuator.prototype.actuate = function(board, tileManager, markingManager) {
 	var self = this;
 
 	// self.printBoard(board);
@@ -61,7 +64,7 @@ Trifle.Actuator.prototype.actuate = function(board, tileManager, markingManager)
 	});
 };
 
-Trifle.Actuator.prototype.htmlify = function(board, tileManager, markingManager) {
+TrifleActuator.prototype.htmlify = function(board, tileManager, markingManager) {
 	this.clearContainer(this.boardContainer);
 	this.clearContainer(this.arrowContainer);
 
@@ -89,8 +92,8 @@ Trifle.Actuator.prototype.htmlify = function(board, tileManager, markingManager)
 	/* Player Tiles */
 	/* Team Tiles */
 	// Go through tile piles and clear containers
-	self.clearContainerWithId(Trifle.Actuator.hostTeamTilesDivId);
-	self.clearContainerWithId(Trifle.Actuator.guestTeamTilesDivId);
+	self.clearContainerWithId(TrifleActuator.hostTeamTilesDivId);
+	self.clearContainerWithId(TrifleActuator.guestTeamTilesDivId);
 	if (tileManager.playersAreSelectingTeams() && !tileManager.hostTeamIsFull()
 			|| !tileManager.playersAreSelectingTeams()) {
 		tileManager.hostTiles.forEach(function(tile) {
@@ -108,46 +111,46 @@ Trifle.Actuator.prototype.htmlify = function(board, tileManager, markingManager)
 	if (!tileManager.hostTeamIsFull()) {
 		this.addLineBreakInTilePile(HOST);
 		this.addLineBreakInTilePile(HOST);
-		Object.keys(Trifle.TileCodes).forEach(function(key,index) {
+		Object.keys(TrifleTileCodes).forEach(function(key,index) {
 			if (PaiShoGames.currentTileMetadata[key] && PaiShoGames.currentTileMetadata[key].available) {
-				self.addTeamTile(new Trifle.Tile(Trifle.TileCodes[key], hostPlayerCode), HOST, true);
+				self.addTeamTile(new TrifleTile(TrifleTileCodes[key], hostPlayerCode), HOST, true);
 			}
 		});
 	} else if (!tileManager.guestTeamIsFull()) {
 		this.addLineBreakInTilePile(GUEST);
 		this.addLineBreakInTilePile(GUEST);
-		Object.keys(Trifle.TileCodes).forEach(function(key,index) {
+		Object.keys(TrifleTileCodes).forEach(function(key,index) {
 			if (PaiShoGames.currentTileMetadata[key] && PaiShoGames.currentTileMetadata[key].available) {
-				self.addTeamTile(new Trifle.Tile(Trifle.TileCodes[key], guestPlayerCode), GUEST, true);
+				self.addTeamTile(new TrifleTile(TrifleTileCodes[key], guestPlayerCode), GUEST, true);
 			}
 		});
 	}
 };
 
-Trifle.Actuator.prototype.clearContainer = function (container) {
+TrifleActuator.prototype.clearContainer = function (container) {
 	while (container.firstChild) {
 		container.removeChild(container.firstChild);
 	}
 };
 
-Trifle.Actuator.prototype.clearContainerWithId = function(containerIdName) {
+TrifleActuator.prototype.clearContainerWithId = function(containerIdName) {
 	var container = document.getElementById(containerIdName);
 	if (container) {
 		this.clearContainer(container);
 	}
 };
 
-// Trifle.Actuator.prototype.clearTileContainer = function(tile) {
+// TrifleActuator.prototype.clearTileContainer = function(tile) {
 // 	var container = document.querySelector("." + tile.getImageName());
 // 	while (container.firstChild) {
 // 		container.removeChild(container.firstChild);
 // 	}
 // };
 
-Trifle.Actuator.prototype.addLineBreakInTilePile = function(player) {
+TrifleActuator.prototype.addLineBreakInTilePile = function(player) {
 	var containerDivId = player === HOST 
-								? Trifle.Actuator.hostTeamTilesDivId
-								: Trifle.Actuator.guestTeamTilesDivId;
+								? TrifleActuator.hostTeamTilesDivId
+								: TrifleActuator.guestTeamTilesDivId;
 	var container = document.getElementById(containerDivId);
 
 	var theBr = document.createElement("br");
@@ -155,12 +158,12 @@ Trifle.Actuator.prototype.addLineBreakInTilePile = function(player) {
 	container.appendChild(theBr);
 };
 
-Trifle.Actuator.prototype.addTeamTile = function(tile, player, isForTeamSelection) {
+TrifleActuator.prototype.addTeamTile = function(tile, player, isForTeamSelection) {
 	var self = this;
 
 	var containerDivId = player === HOST 
-								? Trifle.Actuator.hostTeamTilesDivId
-								: Trifle.Actuator.guestTeamTilesDivId;
+								? TrifleActuator.hostTeamTilesDivId
+								: TrifleActuator.guestTeamTilesDivId;
 	var container = document.getElementById(containerDivId);
 
 	var theDiv = document.createElement("div");
@@ -177,7 +180,7 @@ Trifle.Actuator.prototype.addTeamTile = function(tile, player, isForTeamSelectio
 
 	var theImg = document.createElement("img");
 
-	var srcValue = Trifle.Actuator.imagePath;
+	var srcValue = TrifleActuator.imagePath;
 
 	theImg.src = srcValue + tile.getImageName() + ".png";
 	theDiv.appendChild(theImg);
@@ -199,7 +202,7 @@ Trifle.Actuator.prototype.addTeamTile = function(tile, player, isForTeamSelectio
 	container.appendChild(theDiv);
 };
 
-Trifle.Actuator.prototype.addBoardPoint = function(boardPoint, board) {
+TrifleActuator.prototype.addBoardPoint = function(boardPoint, board) {
 	var self = this;
 
 	var theDiv = createBoardPointDiv(boardPoint);
@@ -213,7 +216,7 @@ Trifle.Actuator.prototype.addBoardPoint = function(boardPoint, board) {
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
 			theDiv.classList.add("possibleMove");
 			if (board.currentlyDeployingTileInfo && board.currentlyDeployingTileInfo.attributes
-					&& board.currentlyDeployingTileInfo.attributes.includes(Trifle.AttributeType.gigantic)) {
+					&& board.currentlyDeployingTileInfo.attributes.includes(TrifleAttributeType.gigantic)) {
 				// Gigantic!
 				this.adjustBoardPointForGiganticDeploy(theDiv, boardPoint);
 			}
@@ -257,7 +260,7 @@ Trifle.Actuator.prototype.addBoardPoint = function(boardPoint, board) {
 			this.doAnimateBoardPoint(boardPoint, moveToAnimate, theImg, theDiv);
 		}
 
-		var srcValue = Trifle.Actuator.imagePath;
+		var srcValue = TrifleActuator.imagePath;
 		
 		theImg.src = srcValue + boardPoint.tile.getImageName() + ".png";
 		
@@ -277,7 +280,7 @@ Trifle.Actuator.prototype.addBoardPoint = function(boardPoint, board) {
 	}
 };
 
-Trifle.Actuator.prototype.adjustBoardPointForGiganticDeploy = function(theDiv, boardPoint) {
+TrifleActuator.prototype.adjustBoardPointForGiganticDeploy = function(theDiv, boardPoint) {
 	var x = boardPoint.col, y = boardPoint.row, ox = x, oy = y;
 
 	var pointSizeMultiplierX = 34;
@@ -305,7 +308,7 @@ Trifle.Actuator.prototype.adjustBoardPointForGiganticDeploy = function(theDiv, b
 	theDiv.style.transform = "scale(" + scaleValue + ")";
 };
 
-Trifle.Actuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnimate, theImg, theDiv) {
+TrifleActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnimate, theImg, theDiv) {
 	// if (!this.animationOn) return;
 
 	var x = boardPoint.col, y = boardPoint.row, ox = x, oy = y;
@@ -380,7 +383,7 @@ Trifle.Actuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnima
 	}, pieceAnimationLength);
 };
 
-Trifle.Actuator.prototype.printBoard = function(board) {
+TrifleActuator.prototype.printBoard = function(board) {
 
 	debug("");
 	var rowNum = 0;

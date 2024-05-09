@@ -1,9 +1,9 @@
 
-Trifle.CaptureTargetTilesAbilityBrain = function(abilityObject) {
+export function TrifleCaptureTargetTilesAbilityBrain(abilityObject) {
 	this.abilityObject = abilityObject;
 }
 
-Trifle.CaptureTargetTilesAbilityBrain.prototype.activateAbility = function() {
+TrifleCaptureTargetTilesAbilityBrain.prototype.activateAbility = function() {
 	var targetTilePoints = this.abilityObject.abilityTargetTilePoints;
 
 	this.capturedTiles = [];

@@ -11,7 +11,6 @@ import {
   NON_PLAYABLE,
   POSSIBLE_MOVE,
 } from '../skud-pai-sho/SkudPaiShoBoardPoint';
-import { Trifle } from '../trifle/TrifleController';
 import { TrifleBoardPoint } from '../trifle/TrifleBoardPoint';
 import {
   arrayContainsDuplicates,
@@ -277,7 +276,7 @@ export class BeyondTheMapsBoard {
 	}
 
 	static standardMovementFunction(board, originPoint, boardPointAlongTheWay, movementInfo, moveStepNumber) {
-		var mustPreserveDirection = false; //Trifle.TileInfo.movementMustPreserveDirection(movementInfo);
+		var mustPreserveDirection = false; //TrifleTileInfo.movementMustPreserveDirection(movementInfo);
 		return board.getAdjacentPointsPotentialPossibleMoves(boardPointAlongTheWay, originPoint, mustPreserveDirection, movementInfo);
 	}
 

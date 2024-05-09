@@ -1,5 +1,6 @@
+import { TrifleTargetHelper } from '../TargetHelper';
 
-Trifle.ThisTileTargetBrain = class {
+export class TrifleThisTileTargetBrain {
 	constructor(abilityObject) {
 		this.abilityObject = abilityObject;
 		this.board = abilityObject.board;
@@ -14,7 +15,7 @@ Trifle.ThisTileTargetBrain = class {
 		this.targetTiles = [];
 		this.targetTilePoints = [];
 
-		var targetHelper = new Trifle.TargetHelper(this.abilityObject, this.abilityObject.sourceTilePoint, this, this.abilityObject.sourceTile);
+		var targetHelper = new TrifleTargetHelper(this.abilityObject, this.abilityObject.sourceTilePoint, this, this.abilityObject.sourceTile);
 		if (targetHelper.tileIsTargeted()) {
 			this.targetTiles.push(this.abilityObject.sourceTile);
 			this.targetTilePoints.push(this.abilityObject.sourceTilePoint);
@@ -23,7 +24,7 @@ Trifle.ThisTileTargetBrain = class {
 }
 
 /* Version using .prototype: */
-/* Trifle.ThisTileTargetBrain = function(abilityObject) {
+/* TrifleThisTileTargetBrain = function(abilityObject) {
 	this.abilityObject = abilityObject;
 	this.board = abilityObject.board;
 
@@ -33,11 +34,11 @@ Trifle.ThisTileTargetBrain = class {
 	this.setTargets();
 }
 
-Trifle.ThisTileTargetBrain.prototype.setTargets = function() {
+TrifleThisTileTargetBrain.prototype.setTargets = function() {
 	this.targetTiles = [];
 	this.targetTilePoints = [];
 
-	var targetHelper = new Trifle.TargetHelper(this.abilityObject, this.abilityObject.sourceTilePoint, this);
+	var targetHelper = new TrifleTargetHelper(this.abilityObject, this.abilityObject.sourceTilePoint, this);
 	if (targetHelper.tileIsTargeted()) {
 		this.targetTiles.push(this.abilityObject.sourceTile);
 		this.targetTilePoints.push(this.abilityObject.sourceTilePoint);

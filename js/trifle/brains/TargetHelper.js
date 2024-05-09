@@ -1,8 +1,11 @@
+import { TrifleTileCategory, TrifleTileTeam } from '../TrifleTileInfo';
+import { arrayIncludesOneOf, debug } from '../../GameData';
+import { currentTileMetadata } from '../PaiShoGamesTileMetadata';
 
-Trifle.TargetHelper = function(abilityObject, possibleTargetTilePoint, targetBrain, possibleTargetTile) {
+export function TrifleTargetHelper(abilityObject, possibleTargetTilePoint, targetBrain, possibleTargetTile) {
 	this.abilityObject = abilityObject;
 	this.abilityInfo = abilityObject.abilityInfo;
-	this.tileMetadata = PaiShoGames.currentTileMetadata;
+	this.tileMetadata = currentTileMetadata;
 
 	this.possibleTargetTilePoint = possibleTargetTilePoint;
 
@@ -17,9 +20,9 @@ Trifle.TargetHelper = function(abilityObject, possibleTargetTilePoint, targetBra
 	}
 
 	this.targetBrain = targetBrain;
-};
+}
 
-Trifle.TargetHelper.prototype.tileIsTargeted = function() {
+TrifleTargetHelper.prototype.tileIsTargeted = function() {
 	return this.possibleTargetTile
 			&& this.targetingIsNotCanceledCheck()
 			&& this.targetTeamsCheck()
@@ -28,7 +31,7 @@ Trifle.TargetHelper.prototype.tileIsTargeted = function() {
 			&& this.targetTileNamesCheck();
 };
 
-Trifle.TargetHelper.prototype.targetingIsNotCanceledCheck = function() {
+TrifleTargetHelper.prototype.targetingIsNotCanceledCheck = function() {
 	if (this.abilityInfo.inevitable) {
 		return true;
 	}
@@ -37,13 +40,13 @@ Trifle.TargetHelper.prototype.targetingIsNotCanceledCheck = function() {
 	return !targetingIsCanceled;
 };
 
-Trifle.TargetHelper.prototype.targetTeamsCheck = function() {
+TrifleTargetHelper.prototype.targetTeamsCheck = function() {
 	if (this.abilityInfo.targetTeams) {
 		var possibleTargetTileOwner = this.possibleTargetTile.ownerName;
 
-		var isFriendlyTargetedTile = this.abilityInfo.targetTeams.includes(Trifle.TileTeam.friendly)
+		var isFriendlyTargetedTile = this.abilityInfo.targetTeams.includes(TrifleTileTeam.friendly)
 				&& possibleTargetTileOwner === this.abilityObject.sourceTile.ownerName;
-		var isEnemyTargetedTile = this.abilityInfo.targetTeams.includes(Trifle.TileTeam.enemy)
+		var isEnemyTargetedTile = this.abilityInfo.targetTeams.includes(TrifleTileTeam.enemy)
 				&& possibleTargetTileOwner !== this.abilityObject.sourceTile.ownerName;
 
 		return isFriendlyTargetedTile || isEnemyTargetedTile;
@@ -52,20 +55,20 @@ Trifle.TargetHelper.prototype.targetTeamsCheck = function() {
 	}
 };
 
-Trifle.TargetHelper.prototype.targetTileTypesCheck = function() {
+TrifleTargetHelper.prototype.targetTileTypesCheck = function() {
 	if (this.abilityInfo.targetTileTypes) {
-		return this.abilityInfo.targetTileTypes.includes(Trifle.TileCategory.allTileTypes)
+		return this.abilityInfo.targetTileTypes.includes(TrifleTileCategory.allTileTypes)
 			|| arrayIncludesOneOf(this.possibleTargetTileInfo.types, this.abilityInfo.targetTileTypes)
-			|| (this.abilityInfo.targetTileTypes.includes(Trifle.TileCategory.thisTile)
+			|| (this.abilityInfo.targetTileTypes.includes(TrifleTileCategory.thisTile)
 				&& this.possibleTargetTile === this.abilityObject.sourceTile)
-			|| (this.abilityInfo.targetTileTypes.includes(Trifle.TileCategory.allButThisTile)
+			|| (this.abilityInfo.targetTileTypes.includes(TrifleTileCategory.allButThisTile)
 				&& this.possibleTargetTile !== this.abilityObject.sourceTile);
 	} else {
 		return true;
 	}
 };
 
-Trifle.TargetHelper.prototype.targetTileIdentifiersCheck = function() {
+TrifleTargetHelper.prototype.targetTileIdentifiersCheck = function() {
 	if (this.abilityInfo.targetTileIdentifiers && this.possibleTargetTileInfo.identifiers) {
 		return arrayIncludesOneOf(this.abilityInfo.targetTileIdentifiers, this.possibleTargetTileInfo.identifiers);
 	} else {
@@ -73,10 +76,10 @@ Trifle.TargetHelper.prototype.targetTileIdentifiersCheck = function() {
 	}
 };
 
-Trifle.TargetHelper.prototype.targetTileNamesCheck = function() {
+TrifleTargetHelper.prototype.targetTileNamesCheck = function() {
 	if (this.abilityInfo.targetTileCodes) {
 		return arrayIncludesOneOf(this.abilityInfo.targetTileCodes, [this.possibleTargetTile.code])
-			|| (this.abilityInfo.targetTileCodes.includes(Trifle.TileCategory.allButThisTile)
+			|| (this.abilityInfo.targetTileCodes.includes(TrifleTileCategory.allButThisTile)
 				&& this.possibleTargetTile.code !== this.abilityObject.sourceTile.code);
 	} else {
 		return true;

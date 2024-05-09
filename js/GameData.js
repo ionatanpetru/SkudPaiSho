@@ -446,5 +446,12 @@ export function doBrowserCheck() {
 	}
 }
 
+export function clearObject(myObject) {
+	for (const prop in myObject) {
+		if (Object.prototype.hasOwnProperty.call(myObject, prop)) {
+		  delete myObject[prop];
+		}
+	  }
+}
 
 
