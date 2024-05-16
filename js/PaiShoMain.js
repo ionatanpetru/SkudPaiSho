@@ -2463,14 +2463,14 @@ var GameType = {
 		coverImg: "ginseng.png",
 		rulesUrl: "https://skudpaisho.com/site/games/ginseng-pai-sho/",
 		gameOptions: [
-			DIAGONAL_BISON_ABILITY_TESTING,
 			GINSENG_GINSENG_5
 		],
 		secretGameOptions: [
 			LION_TURTLE_ABILITY_ANYWHERE,
 			SWAP_BISON_AND_DRAGON,
 			SWAP_BISON_AND_DRAGON_ABILITIES,
-			GINSENG_1_POINT_0
+			GINSENG_1_POINT_0,
+			DIAGONAL_BISON_ABILITY_TESTING
 		]
 	},
 	FirePaiSho: {
