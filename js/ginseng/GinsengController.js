@@ -120,7 +120,7 @@ Ginseng.Controller.prototype.getDefaultHelpMessageText = function() {
 			+ '<ul>'
 			+ '<li>Players take alternating turns. When it is your turn, select and move a tile according to its specified movement and apply any triggered abilities.</li>'
 			+ '</ul>'
-			+ '<p><strong>Draw</strong></p>'
+			+ '<p><strong><center>Draw</center></strong></p>'
 			+ '<ul>'
 			+ '<li>If a player reaches a point where no moves are possible, the game results in a draw.</li>'
 			+ '</ul>'
