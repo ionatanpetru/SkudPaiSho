@@ -27,6 +27,8 @@ Ginseng.Controller = function(gameContainer, isMobile) {
 
 	this.showDebugInfo = false;
 
+	this.supportsMoveLogMessages = true;
+
 	if (gameOptionEnabled(GINSENG_1_POINT_0)) {
 		this.isInviteOnly = true;
 	}
@@ -113,17 +115,17 @@ Ginseng.Controller.prototype.getDefaultHelpMessageText = function() {
 	if (gameOptionEnabled(GINSENG_2_POINT_0) || !gameOptionEnabled(GINSENG_1_POINT_0)) {
 		return '<h4>Ginseng Pai Sho</h4>'
 			+ '<p><strong><center>How to win</center></strong></p>'
-			+ '<ul>'
-			+ '<li>To win a game of Ginseng Pai Sho, you must be the first player to move your White Lotus from its starting point to the other side of the Border (or midline) and into your opponent´s territory.</li>'
-			+ '</ul>'
+			// + '<ul>'
+			+ '<p>To win a game of Ginseng Pai Sho, you must be the first player to move your White Lotus from its starting point to the other side of the Border (or midline) and into your opponent´s territory.<p>'
+			// + '</ul>'
 			+ '<p><strong><center>Taking a turn</center></strong></p>'
-			+ '<ul>'
-			+ '<li>Players take alternating turns. When it is your turn, select and move a tile according to its specified movement and apply any triggered abilities.</li>'
-			+ '</ul>'
+			// + '<ul>'
+			+ '<p>Players take alternating turns. When it is your turn, select and move a tile according to its specified movement and apply any triggered abilities.</p>'
+			// + '</ul>'
 			+ '<p><strong><center>Draw</center></strong></p>'
-			+ '<ul>'
-			+ '<li>If a player reaches a point where no moves are possible, the game results in a draw.</li>'
-			+ '</ul>'
+			// + '<ul>'
+			+ '<p>If a player reaches a point where no moves are possible, the game results in a draw.</p>'
+			// + '</ul>'
 			+ '<p><strong><center>General rules</center></strong></p>'
 			+ '<p>Here are the four fundamental rules that apply to most of the tiles in Ginseng Pai Sho, distilled for easy understanding. However, it is worth noticing that there are exceptions to this simplicity. The White Lotus, Ginseng, and Wheel do not adhere strictly to these rules. Hover over any tile to see where they might differ from the general rules.</p>'
 			+ '<ul>'
@@ -308,7 +310,7 @@ Ginseng.Controller.prototype.confirmAcceptDraw = function() {
 		this.gameNotation.addMove(move);
 
 		if (playingOnlineGame()) {
-			callSubmitMove();
+			callSubmitMove(null, null, { fullMoveText: this.theGame.gameLogText });
 		} else {
 			finalizeMove();
 		}
@@ -493,7 +495,7 @@ Ginseng.Controller.prototype.completeMove = function() {
 	} else {
 		this.gameNotation.addMove(move);
 		if (playingOnlineGame()) {
-			callSubmitMove();
+			callSubmitMove(null, null, { fullMoveText: this.theGame.gameLogText });
 		} else {
 			// finalizeMove();
 			quickFinalizeMove();
@@ -505,7 +507,7 @@ Ginseng.Controller.prototype.skipHarmonyBonus = function() {
 	var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
 	this.gameNotation.addMove(move);
 	if (playingOnlineGame()) {
-		callSubmitMove();
+		callSubmitMove(null, null, { fullMoveText: this.theGame.gameLogText });
 	} else {
 		finalizeMove();
 	}
