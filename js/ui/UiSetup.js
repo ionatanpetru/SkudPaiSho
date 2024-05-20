@@ -1,4 +1,16 @@
-import { accountHeaderClicked, closeNav, discordLinkClicked, dismissChatAlert, newGameClicked, openNav, openShop, openTab, viewGameSeeksClicked } from '../PaiShoMain';
+import {
+  accountHeaderClicked,
+  closeNav,
+  discordLinkClicked,
+  dismissChatAlert,
+  newGameClicked,
+  openNav,
+  openShop,
+  openTab,
+  sendChat,
+  sendGlobalChat,
+  viewGameSeeksClicked
+} from '../PaiShoMain';
 
 export function setupUiEvents() {
 	/* Sidenav Open/Close */
@@ -41,25 +53,43 @@ export function setupUiEvents() {
 	}
 
 	/* New Game */
-	addElementEvent('menuNewGame', 'click', newGameClicked);
-	addElementEvent('sidenavNewGame', 'click', newGameClicked);
+	addEventToElementId('menuNewGame', 'click', newGameClicked);
+	addEventToElementId('sidenavNewGame', 'click', newGameClicked);
 
 	/* Sign In / My Games */
-	addElementEvent('accountHeaderSpan', 'click', accountHeaderClicked);
-	addElementEvent('sidenavMyGames', 'click', accountHeaderClicked);
+	addEventToElementId('accountHeaderSpan', 'click', accountHeaderClicked);
+	addEventToElementId('sidenavMyGames', 'click', accountHeaderClicked);
 
 	/* Header */
-	addElementEvent('headerDiscordLink', 'click', discordLinkClicked);
-	addElementEvent('headerShopLink', 'click', openShop);
-	addElementEvent('headerJoinLink', 'click', viewGameSeeksClicked);
+	addEventToElementId('headerDiscordLink', 'click', discordLinkClicked);
+	addEventToElementId('headerShopLink', 'click', openShop);
+	addEventToElementId('headerJoinLink', 'click', viewGameSeeksClicked);
 
 
 
+	addEventToElementId('globalChatMessageInput', 'keypress', e => {
+		var code = (e.keyCode ? e.keyCode : e.which);
+		if (code == 13) {
+			sendGlobalChat();
+		}
+	});
+
+	addEventToElementId('chatMessageInput', 'keypress', e => {
+		var code = (e.keyCode ? e.keyCode : e.which);
+		if (code == 13) {
+			sendChat();
+		}
+	});
 }
 
-function addElementEvent(elementId, eventName, callback) {
-	var element = document.getElementById(elementId);
+
+export function addEventToElement(element, eventName, callback) {
 	if (element) {
 		element.addEventListener(eventName, callback);
 	}
+}
+
+export function addEventToElementId(elementId, eventName, callback) {
+	var element = document.getElementById(elementId);
+	addEventToElement(element, eventName, callback);
 }

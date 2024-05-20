@@ -94,6 +94,13 @@ export function masterDebug(str) {
 	console.log(str);
 }
 
+export function convertToDomObject(htmlStr) {
+	var parser = new DOMParser();
+	var doc = parser.parseFromString('<div class="htmlMessageDiv">' + htmlStr + '</div>', 'text/html');
+	var div = doc.body.firstChild;
+	return div;
+}
+
 // Tile Types
 
 export var BASIC_FLOWER = "Basic Flower";

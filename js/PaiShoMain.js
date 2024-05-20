@@ -4,82 +4,82 @@ import $ from 'jquery';
 import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
 
 import {
-  ADEVAR_LITE,
-  ADEVAR_ROTATE,
-  BONUS_MOVEMENT_5,
-  BONUS_MOVEMENT_BASED_ON_NUM_CAPTIVES,
-  BOTTOMLESS_RESERVES,
-  CHOOSE_NEUTRAL_STACK_SPACE,
-  CRUMBLEWEED,
-  DIAGONAL_BISON_ABILITY_TESTING,
-  DIAGONAL_MOVEMENT,
-  DYNAMIC_GROUP_LIMIT,
-  EDGES_12x12_GAME,
-  EDGES_MOVE_4_2,
-  EIGHT_SIDED_BOARD,
-  ETHEREAL_ACCENT_TILES,
-  EVERYTHING_CAPTURE,
-  FIVE_SIDED_BOARD,
-  FORMAL_WIN_CONDITION,
-  FOUR_SIDED_BOARD,
-  FULL_GRID,
-  FULL_POINTS_SCORING,
-  GINSENG_1_POINT_0,
-  GINSENG_ROTATE,
-  HEXHEX_10,
-  HEXHEX_11,
-  HEXHEX_6,
-  HIDE_RESERVE_TILES,
-  IGNORE_CLASHING,
-  KING_MOVES_LIKE_PAWNS,
-  LESS_TILES,
-  LION_TURTLE_ABILITY_ANYWHERE,
-  MIDLINE_OPENER,
-  MORE_ATTACKERS,
-  NO_ALT_WIN,
-  NO_EFFECT_TILES,
-  NO_HARMONY_VISUAL_AIDS,
-  NO_REINFORCEMENT,
-  NO_SETUP_PHASE,
-  NO_WHEELS,
-  OPTION_ANCIENT_OASIS_EXPANSION,
-  OPTION_ATTACKERS_MOVE_FIRST,
-  OPTION_DOUBLE_ACCENT_TILES,
-  OPTION_DOUBLE_TILES,
-  OPTION_FULL_TILES,
-  OPTION_INFORMAL_START,
-  OPTION_INSANE_TILES,
-  ORIGINAL_BENDER_EXPANSION,
-  ORIGINAL_BOARD_SETUP,
-  PLAY_IN_SPACES,
-  RELEASE_CAPTIVE_TILES,
-  RUMBLEWEED,
-  SHORTER_GAME,
-  SIX_SIDED_BOARD,
-  SPECIAL_FLOWERS_BOUNCE,
-  SPECTATORS_CAN_PLAY,
-  SQUARE_SPACES,
-  SWAP_BISON_AND_DRAGON,
-  SWAP_BISON_AND_DRAGON_ABILITIES,
-  SWAP_BISON_WITH_LEMUR,
-  TUMBLE_6,
-  TUMPLETORE,
-  UNDERGROWTH_SIMPLE,
-  VAGABOND_ROTATE,
-  VARIABLE_ACCENT_TILES,
-  gameOptionEnabled,
-  getGameOptionDescription
+	ADEVAR_LITE,
+	ADEVAR_ROTATE,
+	BONUS_MOVEMENT_5,
+	BONUS_MOVEMENT_BASED_ON_NUM_CAPTIVES,
+	BOTTOMLESS_RESERVES,
+	CHOOSE_NEUTRAL_STACK_SPACE,
+	CRUMBLEWEED,
+	DIAGONAL_BISON_ABILITY_TESTING,
+	DIAGONAL_MOVEMENT,
+	DYNAMIC_GROUP_LIMIT,
+	EDGES_12x12_GAME,
+	EDGES_MOVE_4_2,
+	EIGHT_SIDED_BOARD,
+	ETHEREAL_ACCENT_TILES,
+	EVERYTHING_CAPTURE,
+	FIVE_SIDED_BOARD,
+	FORMAL_WIN_CONDITION,
+	FOUR_SIDED_BOARD,
+	FULL_GRID,
+	FULL_POINTS_SCORING,
+	GINSENG_1_POINT_0,
+	GINSENG_ROTATE,
+	HEXHEX_10,
+	HEXHEX_11,
+	HEXHEX_6,
+	HIDE_RESERVE_TILES,
+	IGNORE_CLASHING,
+	KING_MOVES_LIKE_PAWNS,
+	LESS_TILES,
+	LION_TURTLE_ABILITY_ANYWHERE,
+	MIDLINE_OPENER,
+	MORE_ATTACKERS,
+	NO_ALT_WIN,
+	NO_EFFECT_TILES,
+	NO_HARMONY_VISUAL_AIDS,
+	NO_REINFORCEMENT,
+	NO_SETUP_PHASE,
+	NO_WHEELS,
+	OPTION_ANCIENT_OASIS_EXPANSION,
+	OPTION_ATTACKERS_MOVE_FIRST,
+	OPTION_DOUBLE_ACCENT_TILES,
+	OPTION_DOUBLE_TILES,
+	OPTION_FULL_TILES,
+	OPTION_INFORMAL_START,
+	OPTION_INSANE_TILES,
+	ORIGINAL_BENDER_EXPANSION,
+	ORIGINAL_BOARD_SETUP,
+	PLAY_IN_SPACES,
+	RELEASE_CAPTIVE_TILES,
+	RUMBLEWEED,
+	SHORTER_GAME,
+	SIX_SIDED_BOARD,
+	SPECIAL_FLOWERS_BOUNCE,
+	SPECTATORS_CAN_PLAY,
+	SQUARE_SPACES,
+	SWAP_BISON_AND_DRAGON,
+	SWAP_BISON_AND_DRAGON_ABILITIES,
+	SWAP_BISON_WITH_LEMUR,
+	TUMBLE_6,
+	TUMPLETORE,
+	UNDERGROWTH_SIMPLE,
+	VAGABOND_ROTATE,
+	VARIABLE_ACCENT_TILES,
+	gameOptionEnabled,
+	getGameOptionDescription
 } from './GameOptions';
 import { AdevarController } from "./adevar/AdevarController";
 import { AdevarOptions } from './adevar/AdevarOptions';
 import { Ads } from "./Ads";
 import {
-  BeyondTheMapsController,
+	BeyondTheMapsController,
 } from './beyond-the-maps/BeyondTheMapsController';
 import { BloomsController } from './blooms/BloomsController';
 import { CaptureController } from './capture/CaptureController';
 import {
-  CoopSolitaireController,
+	CoopSolitaireController,
 } from './cooperative-solitaire/CoopSolitaireController';
 import { DummyAppCaller, IOSCaller } from "./AppCaller";
 import { Elo } from "./util/elo";
@@ -105,24 +105,25 @@ import { TrifleController } from './trifle/TrifleController';
 import { TumbleweedController } from './tumbleweed/TumbleweedController';
 import { UndergrowthController } from './undergrowth/UndergrowthController';
 import { VagabondController } from "./vagabond/VagabondController";
+import { addEventToElement, addEventToElementId, setupUiEvents } from './ui/UiSetup';
 import { applyBoardOptionToBgSvg, mobileAndTabletcheck } from "./ActuatorHelp";
 import {
-  arrayIncludesAll,
-  copyDivToClipboard,
-  copyObject,
-  copyTextToClipboard,
-  customBoardUrl,
-  dateIsBetween,
-  debug,
-  debugOn,
-  gameDevOn,
-  humanYearsToTreeYears,
-  ios,
-  randomIntFromInterval,
-  runningOnAndroid,
-  setCustomBoardUrl
+	arrayIncludesAll,
+	convertToDomObject,
+	copyDivToClipboard,
+	copyObject,
+	copyTextToClipboard,
+	customBoardUrl,
+	dateIsBetween,
+	debug,
+	debugOn,
+	gameDevOn,
+	humanYearsToTreeYears,
+	ios,
+	randomIntFromInterval,
+	runningOnAndroid,
+	setCustomBoardUrl
 } from './GameData';
-import { setupUiEvents } from './ui/UiSetup';
 
 
 export var QueryString = function() {
@@ -506,7 +507,7 @@ window.requestAnimationFrame(function() {
 		url = "https://skudpaisho.com/";
 	}
 
-	if (url.startsWith("file") && !ios && !runningOnAndroid) {
+	if ((url.startsWith("file") || url.includes("localhost")) && !ios && !runningOnAndroid) {
 		onlinePlayEnabled = false;
 	}
 
@@ -681,9 +682,12 @@ export function resumeOnlinePlay() {
 	onlinePlayPaused = false;
 }
 
-export function showOnlinePlayPausedModal() {
+function showOnlinePlayPausedModal() {
 	closeGame();
-	showModal("Online Play Paused", "Sorry, something was wrong and online play is currently paused. Take a break for some tea!<br /><br />You may attempt to <span class='skipBonus' onclick='resumeOnlinePlay(); closeModal();'>resume online play</span>.", true);
+	var modalElement = convertToDomObject("Sorry, something was wrong and online play is currently paused. Take a break for some tea!<br /><br />You may attempt to <span id='resumeOnlinePlaySpan' class='skipBonus'>resume online play</span>.");
+	var resumeOnlinePlaySpan = modalElement.querySelector('#resumeOnlinePlaySpan');
+	addEventToElement(resumeOnlinePlaySpan, 'click', () => { resumeOnlinePlay(); closeModal(); });
+	showModalElem("Online Play Paused", modalElement, true);
 }
 
 var initialVerifyLoginCallback = function initialVerifyLoginCallback(response) {
@@ -2251,7 +2255,9 @@ export function showModal(headingHTMLText, modalMessageHTMLText, onlyCloseByClic
 	modalHeading.innerHTML = headingHTMLText;
 
 	var modalMessage = document.getElementById('modalMessage');
-	modalMessage.innerHTML = modalMessageHTMLText;
+	modalMessage.innerHTML = '';
+	// modalMessage.innerHTML = modalMessageHTMLText;
+	modalMessage.appendChild(convertToDomObject(modalMessageHTMLText));
 
 	if (yesNoOptions && yesNoOptions.yesFunction) {
 		modalMessage.appendChild(document.createElement("br"));
@@ -3767,7 +3773,7 @@ export function viewGameSeeksClicked() {
 
 var getActiveGamesCountCallback = function getActiveGamesCountCallback(count) {
 	var activeCountDiv = document.getElementById('activeGamesCountDisplay');
-	if (activeCountDiv) {
+	if (activeCountDiv && Number.isFinite(count)) {
 		activeCountDiv.innerText = count + " games active in the past 24 hours!";
 	}
 };
@@ -4161,7 +4167,7 @@ var sendChatCallback = function sendChatCallback(result) {
 	}
 };
 
-var sendChat = function(chatMessageIfDifferentFromInput) {
+export var sendChat = function(chatMessageIfDifferentFromInput) {
 	var chatMessage = htmlEscape(document.getElementById('chatMessageInput').value).trim();
 	if (chatMessageIfDifferentFromInput) {
 		chatMessage = chatMessageIfDifferentFromInput;
@@ -4238,19 +4244,20 @@ export function submitHumanAge() {
 	}
 }
 
-document.getElementById('chatMessageInput').onkeypress = function(e) {
-	var code = (e.keyCode ? e.keyCode : e.which);
-	if (code == 13) {
-		sendChat();
-	}
-};
+// IN UI SETUP
+// document.getElementById('chatMessageInput').onkeypress = function(e) {
+// 	var code = (e.keyCode ? e.keyCode : e.which);
+// 	if (code == 13) {
+// 		sendChat();
+// 	}
+// };
 
 var sendGlobalChatCallback = function sendGlobalChatCallback(result) {
 	document.getElementById('sendGlobalChatMessageButton').innerHTML = "Send";
 	document.getElementById('globalChatMessageInput').value = "";
 };
 
-var sendGlobalChat = function() {
+export var sendGlobalChat = function() {
 	var chatMessage = htmlEscape(document.getElementById('globalChatMessageInput').value).trim();
 	chatMessage = chatMessage.replace(/\n/g, ' ');	// Convert newlines to spaces.
 	if (chatMessage) {
@@ -4259,12 +4266,13 @@ var sendGlobalChat = function() {
 	}
 };
 
-document.getElementById('globalChatMessageInput').onkeypress = function(e) {
-	var code = (e.keyCode ? e.keyCode : e.which);
-	if (code == 13) {
-		sendGlobalChat();
-	}
-};
+// In UI SETUP
+// document.getElementById('globalChatMessageInput').onkeypress = function(e) {
+// 	var code = (e.keyCode ? e.keyCode : e.which);
+// 	if (code == 13) {
+// 		sendGlobalChat();
+// 	}
+// };
 
 export function htmlEscape(str) {
 	return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
