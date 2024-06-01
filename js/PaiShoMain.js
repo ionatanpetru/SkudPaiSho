@@ -89,7 +89,7 @@ import { GameClock } from "./util/GameClock";
 import { GinsengController } from './ginseng/GinsengController';
 import { HexentaflController } from './hexentafl/HexentaflController';
 import { HonoraryTitleChecker } from './honorary-titles/HonoraryTitleChecker';
-import { KeyPaiSho } from './key-pai-sho/KeyPaiShoController';
+import { KeyPaiShoController } from './key-pai-sho/KeyPaiShoController';
 import { LocalStorage } from "./LocalStorage";
 import { MeadowController } from './meadow/MeadowController';
 import { OnboardingFunctions } from "./OnBoardingVars";
@@ -105,7 +105,7 @@ import { TrifleController } from './trifle/TrifleController';
 import { TumbleweedController } from './tumbleweed/TumbleweedController';
 import { UndergrowthController } from './undergrowth/UndergrowthController';
 import { VagabondController } from "./vagabond/VagabondController";
-import { addEventToElement, addEventToElementId, setupUiEvents } from './ui/UiSetup';
+import { addEventToElement, setupUiEvents } from './ui/UiSetup';
 import { applyBoardOptionToBgSvg, mobileAndTabletcheck } from "./ActuatorHelp";
 import {
 	arrayIncludesAll,
@@ -2996,7 +2996,7 @@ export function getGameControllerForGameType(gameTypeId) {
 			controller = new GinsengController(gameContainerDiv, isMobile);
 			break;
 		case GameType.KeyPaiSho.id:
-			controller = new KeyPaiSho.Controller(gameContainerDiv, isMobile);
+			controller = new KeyPaiShoController(gameContainerDiv, isMobile);
 			break;
 		case GameType.BeyondTheMaps.id:
 			controller = new BeyondTheMapsController(gameContainerDiv, isMobile);
