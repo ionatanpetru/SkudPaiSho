@@ -1,6 +1,14 @@
 /* Key Pai Sho Harmony */
 
-KeyPaiSho.Harmony = function(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn) {
+import {
+  GUEST,
+  HOST,
+  NotationPoint,
+  RowAndColumn,
+} from '../CommonNotationObjects';
+import { completeHarmony, debug } from '../GameData';
+
+export function KeyPaiShoHarmony(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn) {
 	this.tile1 = tile1;
 	this.tile1Pos = new RowAndColumn(tile1RowAndColumn.row, tile1RowAndColumn.col);
 	this.tile2 = tile2;
@@ -11,7 +19,7 @@ KeyPaiSho.Harmony = function(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn)
 	this.addOwner(this.tile2.ownerCode, this.tile2.ownerName);
 }
 
-KeyPaiSho.Harmony.prototype.addOwner = function(ownerCode, ownerName) {
+KeyPaiShoHarmony.prototype.addOwner = function(ownerCode, ownerName) {
 	if (!this.hasOwner(ownerName)) {
 		this.owners.push({
 			ownerCode: ownerCode,
@@ -20,7 +28,7 @@ KeyPaiSho.Harmony.prototype.addOwner = function(ownerCode, ownerName) {
 	}
 };
 
-KeyPaiSho.Harmony.prototype.hasOwner = function(ownerName) {
+KeyPaiShoHarmony.prototype.hasOwner = function(ownerName) {
 	for (var i = 0; i < this.owners.length; i++) {
 		if (this.owners[i].ownerName === ownerName) {
 			return true;
@@ -28,7 +36,7 @@ KeyPaiSho.Harmony.prototype.hasOwner = function(ownerName) {
 	}
 };
 
-KeyPaiSho.Harmony.prototype.equals = function(otherHarmony) {
+KeyPaiShoHarmony.prototype.equals = function(otherHarmony) {
 	if (this.tile1 === otherHarmony.tile1 || this.tile1 === otherHarmony.tile2) {
 		if (this.tile2 === otherHarmony.tile1 || this.tile2 === otherHarmony.tile2) {
 			return true;
@@ -37,7 +45,7 @@ KeyPaiSho.Harmony.prototype.equals = function(otherHarmony) {
 	return false;
 };
 
-KeyPaiSho.Harmony.prototype.notAnyOfThese = function(harmonies) {
+KeyPaiShoHarmony.prototype.notAnyOfThese = function(harmonies) {
 	for (var i = 0; i < harmonies.length; i++) {
 		if (this.equals(harmonies[i])) {
 			return false;
@@ -46,11 +54,11 @@ KeyPaiSho.Harmony.prototype.notAnyOfThese = function(harmonies) {
 	return true;
 };
 
-KeyPaiSho.Harmony.prototype.containsTile = function(tile) {
+KeyPaiShoHarmony.prototype.containsTile = function(tile) {
 	return (this.tile1 === tile || this.tile2 === tile);
 };
 
-KeyPaiSho.Harmony.prototype.getTileThatIsNotThisOne = function(tile) {
+KeyPaiShoHarmony.prototype.getTileThatIsNotThisOne = function(tile) {
 	if (this.tile1 === tile) {
 		return this.tile2;
 	} else if (this.tile2 === tile) {
@@ -60,11 +68,11 @@ KeyPaiSho.Harmony.prototype.getTileThatIsNotThisOne = function(tile) {
 	}
 };
 
-KeyPaiSho.Harmony.prototype.containsTilePos = function(pos) {
+KeyPaiShoHarmony.prototype.containsTilePos = function(pos) {
 	return this.tile1Pos.samesies(pos) || this.tile2Pos.samesies(pos);
 };
 
-KeyPaiSho.Harmony.prototype.getPosThatIsNotThisOne = function(pos) {
+KeyPaiShoHarmony.prototype.getPosThatIsNotThisOne = function(pos) {
 	if (this.tile1Pos.samesies(pos)) {
 		return this.tile2Pos;
 	} else if(this.tile2Pos.samesies(pos)) {
@@ -74,11 +82,11 @@ KeyPaiSho.Harmony.prototype.getPosThatIsNotThisOne = function(pos) {
 	}
 };
 
-KeyPaiSho.Harmony.prototype.getString = function() {
+KeyPaiShoHarmony.prototype.getString = function() {
 	return this.owners + " (" + this.tile1Pos.notationPointString + ")-(" + this.tile2Pos.notationPointString + ")";
 };
 
-KeyPaiSho.Harmony.prototype.getDirectionForTile = function(tile) {
+KeyPaiShoHarmony.prototype.getDirectionForTile = function(tile) {
 	if (!this.containsTile(tile)) {
 		return;
 	}
@@ -107,7 +115,7 @@ KeyPaiSho.Harmony.prototype.getDirectionForTile = function(tile) {
 	}
 };
 
-KeyPaiSho.Harmony.prototype.crossesMidline = function() {
+KeyPaiShoHarmony.prototype.crossesMidline = function() {
 	var rowHigh = this.tile1Pos.row;
 	var rowLow = this.tile2Pos.row;
 	if (this.tile1Pos.row < this.tile2Pos.row) {
@@ -131,7 +139,7 @@ KeyPaiSho.Harmony.prototype.crossesMidline = function() {
 	}
 };
 
-KeyPaiSho.Harmony.prototype.crossesCenter = function() {
+KeyPaiShoHarmony.prototype.crossesCenter = function() {
 	var rowHigh = this.tile1Pos.row;
 	var rowLow = this.tile2Pos.row;
 	if (this.tile1Pos.row < this.tile2Pos.row) {
@@ -160,23 +168,23 @@ KeyPaiSho.Harmony.prototype.crossesCenter = function() {
 
 
 // HarmonyManager manages list of harmonies
-KeyPaiSho.HarmonyManager = function() {
+export function KeyPaiShoHarmonyManager() {
 	this.harmonies = [];
 	this.harmonyMinima = 4;	// Default value
-};
+}
 
-KeyPaiSho.HarmonyManager.prototype.setHarmonyMinima = function(harmonyMinima) {
+KeyPaiShoHarmonyManager.prototype.setHarmonyMinima = function(harmonyMinima) {
 	this.harmonyMinima = harmonyMinima;
 };
 
-KeyPaiSho.HarmonyManager.prototype.printHarmonies = function() {
+KeyPaiShoHarmonyManager.prototype.printHarmonies = function() {
 	debug("All Harmonies:");
 	for (var i = 0; i < this.harmonies.length; i++) {
 		debug(this.harmonies[i].getString());
 	}
 };
 
-KeyPaiSho.HarmonyManager.prototype.getHarmoniesWithThisTile = function(tile) {
+KeyPaiShoHarmonyManager.prototype.getHarmoniesWithThisTile = function(tile) {
 	var results = [];
 	this.harmonies.forEach(function(harmony) {
 		if (harmony.containsTile(tile)) {
@@ -186,7 +194,7 @@ KeyPaiSho.HarmonyManager.prototype.getHarmoniesWithThisTile = function(tile) {
 	return results;
 };
 
-KeyPaiSho.HarmonyManager.prototype.addHarmony = function(harmony) {
+KeyPaiShoHarmonyManager.prototype.addHarmony = function(harmony) {
 	// Add harmony if it doesn't already exist
 
 	// Does it exist in old set of harmonies?
@@ -214,7 +222,7 @@ KeyPaiSho.HarmonyManager.prototype.addHarmony = function(harmony) {
 	}
 };
 
-KeyPaiSho.HarmonyManager.prototype.addHarmonies = function(harmoniesToAdd) {
+KeyPaiShoHarmonyManager.prototype.addHarmonies = function(harmoniesToAdd) {
 	if (!harmoniesToAdd) {
 		return;
 	}
@@ -224,11 +232,11 @@ KeyPaiSho.HarmonyManager.prototype.addHarmonies = function(harmoniesToAdd) {
 	}
 };
 
-KeyPaiSho.HarmonyManager.prototype.clearList = function() {
+KeyPaiShoHarmonyManager.prototype.clearList = function() {
 	this.harmonies = [];
 };
 
-KeyPaiSho.HarmonyManager.prototype.numHarmoniesForPlayer = function(player) {
+KeyPaiShoHarmonyManager.prototype.numHarmoniesForPlayer = function(player) {
 	var count = 0;
 	for (var i = 0; i < this.harmonies.length; i++) {
 		if (this.harmonies[i].hasOwner(player)) {
@@ -238,7 +246,7 @@ KeyPaiSho.HarmonyManager.prototype.numHarmoniesForPlayer = function(player) {
 	return count;
 };
 
-KeyPaiSho.HarmonyManager.prototype.getPlayerWithMostHarmonies = function() {
+KeyPaiShoHarmonyManager.prototype.getPlayerWithMostHarmonies = function() {
 	var hostCount = this.numHarmoniesForPlayer(HOST);
 	var guestCount = this.numHarmoniesForPlayer(GUEST);
 
@@ -249,7 +257,7 @@ KeyPaiSho.HarmonyManager.prototype.getPlayerWithMostHarmonies = function() {
 	}
 };
 
-KeyPaiSho.HarmonyManager.prototype.getPlayerWithMostHarmoniesCrossingMidlines = function() {
+KeyPaiShoHarmonyManager.prototype.getPlayerWithMostHarmoniesCrossingMidlines = function() {
 	var hostCount = this.getNumCrossingMidlinesForPlayer(HOST);
 	var guestCount = this.getNumCrossingMidlinesForPlayer(GUEST);
 
@@ -263,7 +271,7 @@ KeyPaiSho.HarmonyManager.prototype.getPlayerWithMostHarmoniesCrossingMidlines = 
 	}
 };
 
-KeyPaiSho.HarmonyManager.prototype.getNumCrossingMidlinesForPlayer = function(player) {
+KeyPaiShoHarmonyManager.prototype.getNumCrossingMidlinesForPlayer = function(player) {
 	var count = 0;
 	for (var i = 0; i < this.harmonies.length; i++) {
 		if (this.harmonies[i].hasOwner(player)) {
@@ -275,7 +283,7 @@ KeyPaiSho.HarmonyManager.prototype.getNumCrossingMidlinesForPlayer = function(pl
 	return count;
 };
 
-KeyPaiSho.HarmonyManager.prototype.getNumCrossingCenterForPlayer = function(player) {
+KeyPaiShoHarmonyManager.prototype.getNumCrossingCenterForPlayer = function(player) {
 	var count = 0;
 	for (var i = 0; i < this.harmonies.length; i++) {
 		if (this.harmonies[i].hasOwner(player)) {
@@ -287,7 +295,7 @@ KeyPaiSho.HarmonyManager.prototype.getNumCrossingCenterForPlayer = function(play
 	return count;
 };
 
-KeyPaiSho.HarmonyManager.prototype.ringLengthForPlayer = function(player) {
+KeyPaiShoHarmonyManager.prototype.ringLengthForPlayer = function(player) {
 	var rings = this.getHarmonyChains();
 	var longest = 0;
 
@@ -305,7 +313,7 @@ KeyPaiSho.HarmonyManager.prototype.ringLengthForPlayer = function(player) {
 	return longest;
 };
 
-KeyPaiSho.HarmonyManager.prototype.getPlayerWithLongestChain = function() {
+KeyPaiShoHarmonyManager.prototype.getPlayerWithLongestChain = function() {
 	var hostLength = this.ringLengthForPlayer(HOST);
 	var guestLength = this.ringLengthForPlayer(GUEST);
 
@@ -316,7 +324,7 @@ KeyPaiSho.HarmonyManager.prototype.getPlayerWithLongestChain = function() {
 	}
 };
 
-KeyPaiSho.HarmonyManager.prototype.hasNewHarmony = function(player, oldHarmonies) {
+KeyPaiShoHarmonyManager.prototype.hasNewHarmony = function(player, oldHarmonies) {
 	// There's a new harmony if a player's tile has a harmony with a tile it didn't before
 	
 	// If current harmony list has one that oldHarmonies does not
@@ -346,7 +354,7 @@ KeyPaiSho.HarmonyManager.prototype.hasNewHarmony = function(player, oldHarmonies
 	return newHarmonies.length > 0;
 };
 
-KeyPaiSho.HarmonyManager.prototype.getHarmonyChains = function(minimumChainLength) {
+KeyPaiShoHarmonyManager.prototype.getHarmonyChains = function(minimumChainLength) {
 	var self = this;
 
 	var rings = [];
@@ -404,7 +412,7 @@ KeyPaiSho.HarmonyManager.prototype.getHarmonyChains = function(minimumChainLengt
 	 */
 };
 
-KeyPaiSho.HarmonyManager.prototype.harmonyRingExists = function() {
+KeyPaiShoHarmonyManager.prototype.harmonyRingExists = function() {
 	// Chain of harmonies around the center of the board
 
 	var self = this;
@@ -425,7 +433,7 @@ KeyPaiSho.HarmonyManager.prototype.harmonyRingExists = function() {
 	return verifiedHarmonyRingOwners;
 };
 
-KeyPaiSho.HarmonyManager.prototype.ringContains345 = function(ring) {
+KeyPaiShoHarmonyManager.prototype.ringContains345 = function(ring) {
 	// 
 	var has3 = false;
 	var has4 = false;
@@ -456,7 +464,7 @@ KeyPaiSho.HarmonyManager.prototype.ringContains345 = function(ring) {
 };
 
 // I think this works.
-KeyPaiSho.HarmonyManager.prototype.verifyHarmonyRing = function(ring) {
+KeyPaiShoHarmonyManager.prototype.verifyHarmonyRing = function(ring) {
 	// Verify harmonies in ring go around center of board
 	// debug("In verifyHarmonyRing()");
 
@@ -567,7 +575,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 **/
-KeyPaiSho.HarmonyManager.prototype.isPointInsideShape = function(notationPoint, shapePoints) {
+KeyPaiShoHarmonyManager.prototype.isPointInsideShape = function(notationPoint, shapePoints) {
 	var x = notationPoint.x;
 	var y = notationPoint.y;
 
@@ -590,7 +598,7 @@ KeyPaiSho.HarmonyManager.prototype.isPointInsideShape = function(notationPoint, 
 	return inside;
 };
 
-KeyPaiSho.HarmonyManager.prototype.isPointInsideShape_alternate = function(notationPoint, poly) {
+KeyPaiShoHarmonyManager.prototype.isPointInsideShape_alternate = function(notationPoint, poly) {
 	var pt = [notationPoint.x, notationPoint.y];
     for(var c = false, i = -1, l = poly.length, j = l - 1; ++i < l; j = i)
         ((poly[i][1] <= pt[1] && pt[1] < poly[j][1]) || (poly[j][1] <= pt[1] && pt[1] < poly[i][1]))
@@ -600,7 +608,7 @@ KeyPaiSho.HarmonyManager.prototype.isPointInsideShape_alternate = function(notat
 };
 
 /* Working function */
-KeyPaiSho.HarmonyManager.prototype.isCenterInsideShapeOld = function(shapePoints) {
+KeyPaiShoHarmonyManager.prototype.isCenterInsideShapeOld = function(shapePoints) {
 	var x = 0;
 	var y = 0;
 	var inside = false;
@@ -631,7 +639,7 @@ KeyPaiSho.HarmonyManager.prototype.isCenterInsideShapeOld = function(shapePoints
 };
 
 /* Based on Winding Number algorithm https://gist.github.com/thejambi/6ae53b6ab2636c8aff367195efeb4f44 */
-KeyPaiSho.HarmonyManager.prototype.isCenterInsideShape = function(vs) {
+KeyPaiShoHarmonyManager.prototype.isCenterInsideShape = function(vs) {
 	var x = .5;
 	var y = -.5;
 
@@ -658,14 +666,14 @@ KeyPaiSho.HarmonyManager.prototype.isCenterInsideShape = function(vs) {
 
 	return wn != 0;
 };
-KeyPaiSho.HarmonyManager.prototype.isLeft = function(P0, P1, P2) {
+KeyPaiShoHarmonyManager.prototype.isLeft = function(P0, P1, P2) {
     var res = ( (P1[0] - P0[0]) * (P2[1] - P0[1])
             - (P2[0] -  P0[0]) * (P1[1] - P0[1]) );
     return res;
 };
 
 
-KeyPaiSho.HarmonyManager.prototype.ringsMatch = function(ring1, ring2) {
+KeyPaiShoHarmonyManager.prototype.ringsMatch = function(ring1, ring2) {
 	// Must be same size to qualify as matching
 	if (ring1.length !== ring2.length) {
 		return false;
@@ -689,11 +697,11 @@ KeyPaiSho.HarmonyManager.prototype.ringsMatch = function(ring1, ring2) {
 	return h1Matches;
 };
 
-KeyPaiSho.HarmonyManager.prototype.lookForRings = function(t1, tx, originalChain, minimumChainLength) {
+KeyPaiShoHarmonyManager.prototype.lookForRings = function(t1, tx, originalChain, minimumChainLength) {
 	var rings = [];
 	var keepLookingAtTheseHarmonies = [];
 	for (var i = 0; i < this.harmonies.length; i++) {	// Any complete rings?
-		currentChain = originalChain.slice();
+		var currentChain = originalChain.slice();
 		var hx = this.harmonies[i];
 		if (hx.containsTile(t1) && hx.notAnyOfThese(currentChain)) {
 			currentChain.push(hx);
@@ -718,7 +726,7 @@ KeyPaiSho.HarmonyManager.prototype.lookForRings = function(t1, tx, originalChain
 	return rings;
 };
 
-KeyPaiSho.HarmonyManager.prototype.lookForRing = function(t1, tx, chain) {
+KeyPaiShoHarmonyManager.prototype.lookForRing = function(t1, tx, chain) {
 	// Look for different harmony that includes t1
 	for (var i = 0; i < this.harmonies.length; i++) {
 		var hx = this.harmonies[i];

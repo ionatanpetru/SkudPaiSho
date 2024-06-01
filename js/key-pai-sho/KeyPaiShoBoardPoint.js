@@ -1,18 +1,31 @@
 // Board Point
 
-KeyPaiSho.BoardPoint = function() {
+import { ACCENT_TILE, BASIC_FLOWER, SPECIAL_FLOWER } from '../GameData';
+import {
+  GATE,
+  NEUTRAL,
+  NON_PLAYABLE,
+  gateDot,
+  thickDot,
+  thinDot,
+  whiteDot,
+} from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import { GUEST, HOST } from '../CommonNotationObjects';
+import { RED, WHITE } from '../skud-pai-sho/SkudPaiShoTile';
+
+export function KeyPaiShoBoardPoint() {
 	this.types = [];
 	this.row = -1;
 	this.col = -1;
 }
 
-KeyPaiSho.BoardPoint.prototype.addType = function(type) {
+KeyPaiShoBoardPoint.prototype.addType = function(type) {
 	if (!this.types.includes(type)) {
 		this.types.push(type);
 	}
 };
 
-KeyPaiSho.BoardPoint.prototype.removeType = function(type) {
+KeyPaiShoBoardPoint.prototype.removeType = function(type) {
 	for (var i = 0; i < this.types.length; i++) {
 		if (this.types[i] === type) {
 			this.types.splice(i, 1);
@@ -20,7 +33,7 @@ KeyPaiSho.BoardPoint.prototype.removeType = function(type) {
 	}
 };
 
-KeyPaiSho.BoardPoint.prototype.getConsoleDisplay = function() {
+KeyPaiShoBoardPoint.prototype.getConsoleDisplay = function() {
 	if (this.tile) {
 		return this.tile.getConsoleDisplay();
 	} else {
@@ -57,30 +70,30 @@ KeyPaiSho.BoardPoint.prototype.getConsoleDisplay = function() {
 	}
 };
 
-KeyPaiSho.BoardPoint.prototype.putTile = function(tile) {
+KeyPaiShoBoardPoint.prototype.putTile = function(tile) {
 	this.tile = tile;
 };
 
-KeyPaiSho.BoardPoint.prototype.hasTile = function() {
+KeyPaiShoBoardPoint.prototype.hasTile = function() {
 	if (this.tile) {
 		return true;
 	}
 	return false;
 };
 
-KeyPaiSho.BoardPoint.prototype.hasTileOfType = function(types) {
+KeyPaiShoBoardPoint.prototype.hasTileOfType = function(types) {
 	return this.tile && types && types.includes(this.tile.type);
 };
 
-KeyPaiSho.BoardPoint.prototype.isType = function(type) {
+KeyPaiShoBoardPoint.prototype.isType = function(type) {
 	return this.types.includes(type);
 };
 
-KeyPaiSho.BoardPoint.prototype.isOpenGate = function() {
+KeyPaiShoBoardPoint.prototype.isOpenGate = function() {
 	return !this.hasTile() && this.types.includes(GATE);
 };
 
-KeyPaiSho.BoardPoint.prototype.removeTile = function() {
+KeyPaiShoBoardPoint.prototype.removeTile = function() {
 	var theTile = this.tile;
 
 	this.tile = null;
@@ -88,19 +101,19 @@ KeyPaiSho.BoardPoint.prototype.removeTile = function() {
 	return theTile;
 };
 
-KeyPaiSho.BoardPoint.prototype.drainTile = function() {
+KeyPaiShoBoardPoint.prototype.drainTile = function() {
 	if (this.tile) {
 		this.tile.drain();
 	}
 };
 
-KeyPaiSho.BoardPoint.prototype.restoreTile = function() {
+KeyPaiShoBoardPoint.prototype.restoreTile = function() {
 	if (this.tile) {
 		this.tile.restore();
 	}
 };
 
-KeyPaiSho.BoardPoint.prototype.canHoldTile = function(tile, ignoreTileCheck) {
+KeyPaiShoBoardPoint.prototype.canHoldTile = function(tile, ignoreTileCheck) {
 	// Validate this point's ability to hold given tile
 
 	if (this.isType(NON_PLAYABLE)) {
@@ -132,7 +145,7 @@ KeyPaiSho.BoardPoint.prototype.canHoldTile = function(tile, ignoreTileCheck) {
 	return false;
 };
 
-KeyPaiSho.BoardPoint.prototype.betweenPlayerHarmony = function(player) {
+KeyPaiShoBoardPoint.prototype.betweenPlayerHarmony = function(player) {
 	if (player === GUEST) {
 		return this.betweenHarmonyGuest;
 	} else if (player === HOST) {
@@ -141,18 +154,18 @@ KeyPaiSho.BoardPoint.prototype.betweenPlayerHarmony = function(player) {
 	return false;
 };
 
-KeyPaiSho.BoardPoint.prototype.setMoveDistanceRemaining = function(movementInfo, distanceRemaining) {
+KeyPaiShoBoardPoint.prototype.setMoveDistanceRemaining = function(movementInfo, distanceRemaining) {
 	this.moveDistanceRemaining = distanceRemaining;
 };
-KeyPaiSho.BoardPoint.prototype.getMoveDistanceRemaining = function(movementInfo) {
+KeyPaiShoBoardPoint.prototype.getMoveDistanceRemaining = function(movementInfo) {
 	return this.moveDistanceRemaining;
 };
-KeyPaiSho.BoardPoint.prototype.clearPossibleMovementTypes = function() {
+KeyPaiShoBoardPoint.prototype.clearPossibleMovementTypes = function() {
 	this.moveDistanceRemaining = null;
 };
 
-KeyPaiSho.BoardPoint.prototype.getCopy = function() {
-	var copy = new KeyPaiSho.BoardPoint();
+KeyPaiShoBoardPoint.prototype.getCopy = function() {
+	var copy = new KeyPaiShoBoardPoint();
 
 	// this.types
 	for (var i = 0; i < this.types.length; i++) {
@@ -176,69 +189,69 @@ KeyPaiSho.BoardPoint.prototype.getCopy = function() {
 
 // Point makers
 
-KeyPaiSho.BoardPoint.neutral = function() {
-	var point = new KeyPaiSho.BoardPoint();
+KeyPaiShoBoardPoint.neutral = function() {
+	var point = new KeyPaiShoBoardPoint();
 	point.addType(NEUTRAL);
 
 	return point;
 };
 
-KeyPaiSho.BoardPoint.gate = function() {
-	var point = new KeyPaiSho.BoardPoint();
+KeyPaiShoBoardPoint.gate = function() {
+	var point = new KeyPaiShoBoardPoint();
 	point.addType(GATE);
 
 	return point;
 };
 
-KeyPaiSho.BoardPoint.red = function() {
-	var point = new KeyPaiSho.BoardPoint();
+KeyPaiShoBoardPoint.red = function() {
+	var point = new KeyPaiShoBoardPoint();
 	point.addType(RED);
 
 	return point;
 };
 
-KeyPaiSho.BoardPoint.white = function() {
-	var point = new KeyPaiSho.BoardPoint();
+KeyPaiShoBoardPoint.white = function() {
+	var point = new KeyPaiShoBoardPoint();
 	point.addType(WHITE);
 
 	return point;
 };
 
-KeyPaiSho.BoardPoint.redWhite = function() {
-	var point = new KeyPaiSho.BoardPoint();
+KeyPaiShoBoardPoint.redWhite = function() {
+	var point = new KeyPaiShoBoardPoint();
 	point.addType(RED);
 	point.addType(WHITE);
 
 	return point;
 };
 
-KeyPaiSho.BoardPoint.redWhiteNeutral = function() {
-	var point = new KeyPaiSho.BoardPoint();
+KeyPaiShoBoardPoint.redWhiteNeutral = function() {
+	var point = new KeyPaiShoBoardPoint();
 	point.addType(RED);
-	point.addType(WHITE);
-	point.addType(NEUTRAL);
-
-	return point;
-};
-
-KeyPaiSho.BoardPoint.redNeutral = function() {
-	var point = new KeyPaiSho.BoardPoint();
-	point.addType(RED);
-	point.addType(NEUTRAL);
-
-	return point;
-};
-
-KeyPaiSho.BoardPoint.whiteNeutral = function() {
-	var point = new KeyPaiSho.BoardPoint();
 	point.addType(WHITE);
 	point.addType(NEUTRAL);
 
 	return point;
 };
 
-KeyPaiSho.BoardPoint.nonPlayable = function() {
-	var point = new KeyPaiSho.BoardPoint();
+KeyPaiShoBoardPoint.redNeutral = function() {
+	var point = new KeyPaiShoBoardPoint();
+	point.addType(RED);
+	point.addType(NEUTRAL);
+
+	return point;
+};
+
+KeyPaiShoBoardPoint.whiteNeutral = function() {
+	var point = new KeyPaiShoBoardPoint();
+	point.addType(WHITE);
+	point.addType(NEUTRAL);
+
+	return point;
+};
+
+KeyPaiShoBoardPoint.nonPlayable = function() {
+	var point = new KeyPaiShoBoardPoint();
 	point.addType(NON_PLAYABLE);
 
 	return point;

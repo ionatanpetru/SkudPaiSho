@@ -1,11 +1,23 @@
 /* Key Pai Sho Notation */
 
-KeyPaiSho.NotationMove = function(text) {
+import {
+  ARRANGING,
+  GUEST,
+  HOST,
+  NotationPoint,
+  PLANTING,
+} from '../CommonNotationObjects';
+import { BRAND_NEW } from '../PaiShoMain';
+import { KeyPaiShoTile } from './KeyPaiShoTile';
+import { NO_EFFECT_TILES, gameOptionEnabled } from '../GameOptions';
+import { debug, sameStart, simpleCanonRules } from '../GameData';
+
+export function KeyPaiShoNotationMove(text) {
 	this.fullMoveText = text;
 	this.analyzeMove();
 }
 
-KeyPaiSho.NotationMove.prototype.analyzeMove = function() {
+KeyPaiShoNotationMove.prototype.analyzeMove = function() {
 	this.valid = true;
 
 	// Get move number
@@ -97,15 +109,15 @@ KeyPaiSho.NotationMove.prototype.analyzeMove = function() {
 	}
 };
 
-KeyPaiSho.NotationMove.prototype.hasHarmonyBonus = function() {
+KeyPaiShoNotationMove.prototype.hasHarmonyBonus = function() {
 	return typeof this.bonusTileCode !== 'undefined';
 };
 
-KeyPaiSho.NotationMove.prototype.isValidNotation = function() {
+KeyPaiShoNotationMove.prototype.isValidNotation = function() {
 	return this.valid;
 };
 
-KeyPaiSho.NotationMove.prototype.equals = function(otherMove) {
+KeyPaiShoNotationMove.prototype.equals = function(otherMove) {
 	return this.fullMoveText === otherMove.fullMoveText;
 };
 
@@ -113,7 +125,7 @@ KeyPaiSho.NotationMove.prototype.equals = function(otherMove) {
 
 // --------------------------------------- //
 
-KeyPaiSho.NotationBuilder = function() {
+export function KeyPaiShoNotationBuilder() {
 	// this.moveNum;	// Let's try making this magic
 	// this.player;		// Magic
 	this.moveType;
@@ -132,10 +144,10 @@ KeyPaiSho.NotationBuilder = function() {
 	this.status = BRAND_NEW;
 }
 
-KeyPaiSho.NotationBuilder.prototype.getFirstMoveForHost = function(tileCode) {
-	var builder = new KeyPaiSho.NotationBuilder();
+KeyPaiShoNotationBuilder.prototype.getFirstMoveForHost = function(tileCode) {
+	var builder = new KeyPaiShoNotationBuilder();
 	builder.moveType = PLANTING;
-	builder.plantedFlowerType = KeyPaiSho.Tile.getClashTileCode(tileCode);
+	builder.plantedFlowerType = KeyPaiShoTile.getClashTileCode(tileCode);
 
 	if (simpleCanonRules || sameStart) {
 		builder.plantedFlowerType = tileCode;
@@ -145,7 +157,7 @@ KeyPaiSho.NotationBuilder.prototype.getFirstMoveForHost = function(tileCode) {
 	return builder;
 };
 
-KeyPaiSho.NotationBuilder.prototype.getNotationMove = function(moveNum, player) {
+KeyPaiShoNotationBuilder.prototype.getNotationMove = function(moveNum, player) {
 	var bonusChar = '+';
 	// if (onlinePlayEnabled) {
 	// 	bonusChar = '_';
@@ -163,29 +175,29 @@ KeyPaiSho.NotationBuilder.prototype.getNotationMove = function(moveNum, player) 
 		notationLine += this.plantedFlowerType + "(" + this.endPoint.pointText + ")";
 	}
 	
-	return new KeyPaiSho.NotationMove(notationLine);
+	return new KeyPaiShoNotationMove(notationLine);
 };
 
 // --------------------------------------- //
 
 
 
-KeyPaiSho.GameNotation = function() {
+export function KeyPaiShoGameNotation() {
 	this.notationText = "";
 	this.moves = [];
 }
 
-KeyPaiSho.GameNotation.prototype.setNotationText = function(text) {
+KeyPaiShoGameNotation.prototype.setNotationText = function(text) {
 	this.notationText = text;
 	this.loadMoves();
 };
 
-KeyPaiSho.GameNotation.prototype.addNotationLine = function(text) {
+KeyPaiShoGameNotation.prototype.addNotationLine = function(text) {
 	this.notationText += ";" + text.trim();
 	this.loadMoves();
 };
 
-KeyPaiSho.GameNotation.prototype.addMove = function(move) {
+KeyPaiShoGameNotation.prototype.addMove = function(move) {
 	if (this.notationText) {
 		this.notationText += ";" + move.fullMoveText;
 	} else {
@@ -194,14 +206,16 @@ KeyPaiSho.GameNotation.prototype.addMove = function(move) {
 	this.loadMoves();
 };
 
-KeyPaiSho.GameNotation.prototype.removeLastMove = function() {
+KeyPaiShoGameNotation.prototype.removeLastMove = function() {
 	this.notationText = this.notationText.substring(0, this.notationText.lastIndexOf(";"));
 	this.loadMoves();
 };
 
-KeyPaiSho.GameNotation.prototype.getPlayerMoveNum = function() {
+KeyPaiShoGameNotation.prototype.getPlayerMoveNum = function() {
 	var moveNum = 0;
 	var lastMove = this.moves[this.moves.length-1];
+
+	var player;
 
 	if (lastMove) {
 		moveNum = lastMove.moveNum;
@@ -222,7 +236,7 @@ KeyPaiSho.GameNotation.prototype.getPlayerMoveNum = function() {
 	return moveNum;
 };
 
-KeyPaiSho.GameNotation.prototype.getNotationMoveFromBuilder = function(builder) {
+KeyPaiShoGameNotation.prototype.getNotationMoveFromBuilder = function(builder) {
 	// Example simple Arranging move: 7G.(8,0)-(7,1)
 
 	var moveNum = 0;
@@ -242,7 +256,7 @@ KeyPaiSho.GameNotation.prototype.getNotationMoveFromBuilder = function(builder) 
 	return builder.getNotationMove(moveNum, player);
 };
 
-KeyPaiSho.GameNotation.prototype.loadMoves = function() {
+KeyPaiShoGameNotation.prototype.loadMoves = function() {
 	this.moves = [];
 	var lines = [];
 	if (this.notationText) {
@@ -256,7 +270,7 @@ KeyPaiSho.GameNotation.prototype.loadMoves = function() {
 	var self = this;
 	var lastPlayer = GUEST;
 	lines.forEach(function(line) {
-		var move = new KeyPaiSho.NotationMove(line);
+		var move = new KeyPaiShoNotationMove(line);
 		if (move.isValidNotation() && move.player !== lastPlayer) {
 			self.moves.push(move);
 			lastPlayer = move.player;
@@ -266,7 +280,7 @@ KeyPaiSho.GameNotation.prototype.loadMoves = function() {
 	});
 };
 
-KeyPaiSho.GameNotation.prototype.getNotationHtml = function() {
+KeyPaiShoGameNotation.prototype.getNotationHtml = function() {
 	var lines = [];
 	if (this.notationText) {
 		if (this.notationText.includes(';')) {
@@ -285,7 +299,7 @@ KeyPaiSho.GameNotation.prototype.getNotationHtml = function() {
 	return notationHtml;
 };
 
-KeyPaiSho.GameNotation.prototype.getNotationForEmail = function() {
+KeyPaiShoGameNotation.prototype.getNotationForEmail = function() {
 	var lines = [];
 	if (this.notationText) {
 		if (this.notationText.includes(';')) {
@@ -304,16 +318,16 @@ KeyPaiSho.GameNotation.prototype.getNotationForEmail = function() {
 	return notationHtml;
 };
 
-KeyPaiSho.GameNotation.prototype.notationTextForUrl = function() {
+KeyPaiShoGameNotation.prototype.notationTextForUrl = function() {
 	var str = this.notationText;
 	return str;
 };
 
-KeyPaiSho.GameNotation.prototype.getLastMoveText = function() {
+KeyPaiShoGameNotation.prototype.getLastMoveText = function() {
 	return this.moves[this.moves.length - 1].fullMoveText;
 };
 
-KeyPaiSho.GameNotation.prototype.getLastMoveNumber = function() {
+KeyPaiShoGameNotation.prototype.getLastMoveNumber = function() {
 	return this.moves[this.moves.length - 1].moveNum;
 };
 

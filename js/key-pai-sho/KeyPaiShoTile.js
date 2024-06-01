@@ -17,10 +17,9 @@ import {
   newOrchidClashRule,
 } from '../GameData';
 import { GUEST, HOST } from '../CommonNotationObjects';
-import { KeyPaiSho } from './KeyPaiShoController';
 import { RED, WHITE, tileIdIncrement } from '../skud-pai-sho/SkudPaiShoTile';
 
-KeyPaiSho.TileCodes = {
+export const KeyPaiShoTileCodes = {
 	Red3: 'R3',
 	RedO: 'RO',	// Red "Orthogonal"
 	RedD: 'RD',	// Red "Diagonal"
@@ -31,7 +30,7 @@ KeyPaiSho.TileCodes = {
 	Orchid: 'OR'
 };
 
-KeyPaiSho.Tile = function(code, ownerCode) {
+export function KeyPaiShoTile(code, ownerCode) {
 	this.code = code;
 	this.ownerCode = ownerCode;
 	if (this.ownerCode === 'G') {
@@ -45,7 +44,7 @@ KeyPaiSho.Tile = function(code, ownerCode) {
 	this.drained = false;
 	this.selectedFromPile = false;
 
-	if (this.code === KeyPaiSho.TileCodes.Lotus || this.code === KeyPaiSho.TileCodes.Orchid) {
+	if (this.code === KeyPaiShoTileCodes.Lotus || this.code === KeyPaiShoTileCodes.Orchid) {
 		this.type = SPECIAL_FLOWER;
 		this.setSpecialFlowerInfo();
 	} else if (this.code.length === 2 && (this.code.includes('R') || this.code.includes('W'))) {
@@ -66,7 +65,7 @@ KeyPaiSho.Tile = function(code, ownerCode) {
 	}
 }
 
-KeyPaiSho.Tile.prototype.setAccentInfo = function() {
+KeyPaiShoTile.prototype.setAccentInfo = function() {
 	if (this.code === 'R') {
 		this.accentType = ROCK;
 	} else if (this.code === 'W') {
@@ -84,15 +83,15 @@ KeyPaiSho.Tile.prototype.setAccentInfo = function() {
 	}
 };
 
-KeyPaiSho.Tile.prototype.setSpecialFlowerInfo = function() {
-	if (this.code === KeyPaiSho.TileCodes.Lotus) {
+KeyPaiShoTile.prototype.setSpecialFlowerInfo = function() {
+	if (this.code === KeyPaiShoTileCodes.Lotus) {
 		this.specialFlowerType = WHITE_LOTUS;
-	} else if (this.code === KeyPaiSho.TileCodes.Orchid) {
+	} else if (this.code === KeyPaiShoTileCodes.Orchid) {
 		this.specialFlowerType = ORCHID;
 	}
 };
 
-KeyPaiSho.Tile.prototype.getConsoleDisplay = function() {
+KeyPaiShoTile.prototype.getConsoleDisplay = function() {
 	if (!this.drained) {
 		return this.ownerCode + "" + this.code;
 	} else {
@@ -100,12 +99,12 @@ KeyPaiSho.Tile.prototype.getConsoleDisplay = function() {
 	}
 };
 
-KeyPaiSho.Tile.prototype.getImageName = function() {
+KeyPaiShoTile.prototype.getImageName = function() {
 	return this.ownerCode + "" + this.code;
 };
 
-KeyPaiSho.Tile.prototype.formsHarmonyWith = function(otherTile, surroundsLionTurtle) {
-	if (this.type !== BASIC_FLOWER && this.code !== KeyPaiSho.TileCodes.Lotus) {
+KeyPaiShoTile.prototype.formsHarmonyWith = function(otherTile, surroundsLionTurtle) {
+	if (this.type !== BASIC_FLOWER && this.code !== KeyPaiShoTileCodes.Lotus) {
 		return false;
 	}
 	
@@ -114,13 +113,13 @@ KeyPaiSho.Tile.prototype.formsHarmonyWith = function(otherTile, surroundsLionTur
 	}
 
 	if (otherTile.ownerName !== this.ownerName 
-		&& !(otherTile.code === KeyPaiSho.TileCodes.Lotus || this.code === KeyPaiSho.TileCodes.Lotus)) {
+		&& !(otherTile.code === KeyPaiShoTileCodes.Lotus || this.code === KeyPaiShoTileCodes.Lotus)) {
 		return false;
 	}
 	return true;
 };
 
-KeyPaiSho.Tile.prototype.clashesWith = function(otherTile) {
+KeyPaiShoTile.prototype.clashesWith = function(otherTile) {
 	if (newOrchidClashRule) {
 		if (this.ownerName !== otherTile.ownerName) {
 			if (this.specialFlowerType === ORCHID || otherTile.specialFlowerType === ORCHID) {
@@ -134,46 +133,46 @@ KeyPaiSho.Tile.prototype.clashesWith = function(otherTile) {
 		&& this.basicValue === otherTile.basicValue);
 };
 
-KeyPaiSho.Tile.prototype.getMoveDistance = function() {
+KeyPaiShoTile.prototype.getMoveDistance = function() {
 	if (this.type === BASIC_FLOWER) {
 		if (this.basicValue === '3') {
 			return 3;
 		} else {
 			return 5
 		}
-	} else if (this.code === KeyPaiSho.TileCodes.Lotus) {
+	} else if (this.code === KeyPaiShoTileCodes.Lotus) {
 		return 2;
-	} else if (this.code === KeyPaiSho.TileCodes.Orchid) {
+	} else if (this.code === KeyPaiShoTileCodes.Orchid) {
 		return 1;
 	}
 	return 0;
 };
 
-KeyPaiSho.Tile.prototype.getHarmonyDistance = function() {
+KeyPaiShoTile.prototype.getHarmonyDistance = function() {
 	if (this.type === BASIC_FLOWER) {
 		return this.getMoveDistance();
-	} else if (this.code === KeyPaiSho.TileCodes.Lotus) {
+	} else if (this.code === KeyPaiShoTileCodes.Lotus) {
 		return 20;
 	}
 };
 
-KeyPaiSho.Tile.prototype.hasOrthogonalMovement = function() {
+KeyPaiShoTile.prototype.hasOrthogonalMovement = function() {
 	if (this.type === BASIC_FLOWER) {
 		return this.basicValue === '3' || this.basicValue === 'O';
 	} else {
-		return this.code === KeyPaiSho.TileCodes.Lotus;
+		return this.code === KeyPaiShoTileCodes.Lotus;
 	}
 };
 
-KeyPaiSho.Tile.prototype.hasDiagonalMovement = function() {
+KeyPaiShoTile.prototype.hasDiagonalMovement = function() {
 	if (this.type === BASIC_FLOWER) {
 		return this.basicValue === '3' || this.basicValue === 'D';
 	} else {
-		return this.code === KeyPaiSho.TileCodes.Lotus;
+		return this.code === KeyPaiShoTileCodes.Lotus;
 	}
 };
 
-KeyPaiSho.Tile.prototype.getMovementDirectionWording = function() {
+KeyPaiShoTile.prototype.getMovementDirectionWording = function() {
 	var directionWording = "";
 	if (this.hasOrthogonalMovement()) {
 		directionWording += "Horizontally/Vertically";
@@ -187,34 +186,34 @@ KeyPaiSho.Tile.prototype.getMovementDirectionWording = function() {
 	return directionWording;
 };
 
-KeyPaiSho.Tile.prototype.movementMustPreserveDirection = function() {
-	if (this.code === KeyPaiSho.TileCodes.Lotus) {
+KeyPaiShoTile.prototype.movementMustPreserveDirection = function() {
+	if (this.code === KeyPaiShoTileCodes.Lotus) {
 		return false;
 	} else {
 		return true;
 	}
 };
 
-KeyPaiSho.Tile.prototype.drain = function() {
+KeyPaiShoTile.prototype.drain = function() {
 	if (this.type === BASIC_FLOWER) {
 		this.drained = true;
 	}
 };
 
-KeyPaiSho.Tile.prototype.restore = function() {
+KeyPaiShoTile.prototype.restore = function() {
 	this.drained = false;
 };
 
-KeyPaiSho.Tile.prototype.getName = function() {
-	return KeyPaiSho.Tile.getTileName(this.code);
+KeyPaiShoTile.prototype.getName = function() {
+	return KeyPaiShoTile.getTileName(this.code);
 };
 
-KeyPaiSho.Tile.prototype.getCopy = function() {
-	return new KeyPaiSho.Tile(this.code, this.ownerCode);
+KeyPaiShoTile.prototype.getCopy = function() {
+	return new KeyPaiShoTile(this.code, this.ownerCode);
 };
 
 
-KeyPaiSho.Tile.getTileName = function(tileCode) {
+KeyPaiShoTile.getTileName = function(tileCode) {
 	var name = "";
 	
 	if (tileCode.length > 1) {
@@ -247,9 +246,9 @@ KeyPaiSho.Tile.getTileName = function(tileCode) {
 			name = "Knotweed";
 		} else if (tileCode === 'B') {
 			name = "Boat";
-		} else if (tileCode === KeyPaiSho.TileCodes.Orchid) {
+		} else if (tileCode === KeyPaiShoTileCodes.Orchid) {
 			name = "Orchid";
-		} else if (tileCode === KeyPaiSho.TileCodes.Lotus) {
+		} else if (tileCode === KeyPaiShoTileCodes.Lotus) {
 			name = "White Lotus";
 		} else if (tileCode === 'P') {
 			name = "Pond";
@@ -263,7 +262,7 @@ KeyPaiSho.Tile.getTileName = function(tileCode) {
 	return name;
 };
 
-KeyPaiSho.Tile.getClashTileCode = function(tileCode) {
+KeyPaiShoTile.getClashTileCode = function(tileCode) {
 	if (tileCode.length === 2) {
 		if (tileCode.startsWith("R")) {
 			return "W" + tileCode.charAt(1);

@@ -1,6 +1,25 @@
 /* Key Pai Sho Tile Manager */
 
-KeyPaiSho.TileManager = function(forActuating) {
+import {
+  ACCENT_TILE,
+  BASIC_FLOWER,
+  SPECIAL_FLOWER,
+  copyArray,
+  debug,
+} from '../GameData';
+import { GUEST, HOST } from '../CommonNotationObjects';
+import { KeyPaiShoTile, KeyPaiShoTileCodes } from './KeyPaiShoTile';
+import {
+  NO_EFFECT_TILES,
+  OPTION_ANCIENT_OASIS_EXPANSION,
+  gameOptionEnabled,
+} from '../GameOptions';
+import {
+  getPlayerCodeFromName,
+  hostPlayerCode,
+} from '../pai-sho-common/PaiShoPlayerHelp';
+
+export function KeyPaiShoTileManager(forActuating) {
 	if (forActuating) {
 		this.hostTiles = this.loadOneOfEach('H');
 		this.guestTiles = this.loadOneOfEach('G');
@@ -14,19 +33,19 @@ KeyPaiSho.TileManager = function(forActuating) {
 	this.additionalAncientOasisCount = 0;
 }
 
-KeyPaiSho.TileManager.prototype.loadTileSet = function(ownerCode) {
+KeyPaiShoTileManager.prototype.loadTileSet = function(ownerCode) {
 	var tiles = [];
 
 	if (!gameOptionEnabled(NO_EFFECT_TILES)) {
 		// 1 of each accent tile
-		tiles.push(new KeyPaiSho.Tile('R', ownerCode));
-		tiles.push(new KeyPaiSho.Tile('W', ownerCode));
-		tiles.push(new KeyPaiSho.Tile('K', ownerCode));
-		tiles.push(new KeyPaiSho.Tile('B', ownerCode));
+		tiles.push(new KeyPaiShoTile('R', ownerCode));
+		tiles.push(new KeyPaiShoTile('W', ownerCode));
+		tiles.push(new KeyPaiShoTile('K', ownerCode));
+		tiles.push(new KeyPaiShoTile('B', ownerCode));
 
 		// 1 of each special flower
-		// tiles.push(new KeyPaiSho.Tile(KeyPaiSho.TileCodes.Lotus, ownerCode));
-		tiles.push(new KeyPaiSho.Tile(KeyPaiSho.TileCodes.Orchid, ownerCode));
+		// tiles.push(new KeyPaiShoTile(KeyPaiShoTileCodes.Lotus, ownerCode));
+		tiles.push(new KeyPaiShoTile(KeyPaiShoTileCodes.Orchid, ownerCode));
 
 		tiles.forEach(function(tile) {
 			tile.selectedFromPile = true;
@@ -34,27 +53,27 @@ KeyPaiSho.TileManager.prototype.loadTileSet = function(ownerCode) {
 	}
 
 	/* Keep the next line to test White Lotus */
-	tiles.push(new KeyPaiSho.Tile(KeyPaiSho.TileCodes.Lotus, ownerCode));
+	tiles.push(new KeyPaiShoTile(KeyPaiShoTileCodes.Lotus, ownerCode));
 
 	// 3 of each basic flower
 	for (var i = 0; i < 3; i++) {
-		tiles.push(new KeyPaiSho.Tile(KeyPaiSho.TileCodes.Red3, ownerCode));
-		tiles.push(new KeyPaiSho.Tile(KeyPaiSho.TileCodes.RedO, ownerCode));
-		tiles.push(new KeyPaiSho.Tile(KeyPaiSho.TileCodes.RedD, ownerCode));
-		tiles.push(new KeyPaiSho.Tile(KeyPaiSho.TileCodes.White3, ownerCode));
-		tiles.push(new KeyPaiSho.Tile(KeyPaiSho.TileCodes.WhiteO, ownerCode));
-		tiles.push(new KeyPaiSho.Tile(KeyPaiSho.TileCodes.WhiteD, ownerCode));
+		tiles.push(new KeyPaiShoTile(KeyPaiShoTileCodes.Red3, ownerCode));
+		tiles.push(new KeyPaiShoTile(KeyPaiShoTileCodes.RedO, ownerCode));
+		tiles.push(new KeyPaiShoTile(KeyPaiShoTileCodes.RedD, ownerCode));
+		tiles.push(new KeyPaiShoTile(KeyPaiShoTileCodes.White3, ownerCode));
+		tiles.push(new KeyPaiShoTile(KeyPaiShoTileCodes.WhiteO, ownerCode));
+		tiles.push(new KeyPaiShoTile(KeyPaiShoTileCodes.WhiteD, ownerCode));
 	}
 
 	return tiles;
 };
 
-KeyPaiSho.TileManager.prototype.loadSimpleCanonSet = function(ownerCode) {
+KeyPaiShoTileManager.prototype.loadSimpleCanonSet = function(ownerCode) {
 	var tiles = [];
 
 	// Accent tiles
 	for (var i = 0; i < 2; i++) {
-		tiles.push(new KeyPaiSho.Tile('W', ownerCode));
+		tiles.push(new KeyPaiShoTile('W', ownerCode));
 	}
 
 	tiles.forEach(function(tile) {
@@ -63,45 +82,45 @@ KeyPaiSho.TileManager.prototype.loadSimpleCanonSet = function(ownerCode) {
 
 	// Basic flowers
 	for (var i = 0; i < 6; i++) {
-		tiles.push(new KeyPaiSho.Tile("R3", ownerCode));
-		tiles.push(new KeyPaiSho.Tile("W5", ownerCode));
+		tiles.push(new KeyPaiShoTile("R3", ownerCode));
+		tiles.push(new KeyPaiShoTile("W5", ownerCode));
 	}
 
 	// Special flowers
-	tiles.push(new KeyPaiSho.Tile('L', ownerCode));
-	tiles.push(new KeyPaiSho.Tile('O', ownerCode));
+	tiles.push(new KeyPaiShoTile('L', ownerCode));
+	tiles.push(new KeyPaiShoTile('O', ownerCode));
 
 	return tiles;
 };
 
-KeyPaiSho.TileManager.prototype.loadOneOfEach = function(ownerCode) {
+KeyPaiShoTileManager.prototype.loadOneOfEach = function(ownerCode) {
 	var tiles = [];
 
-	tiles.push(new KeyPaiSho.Tile('R', ownerCode));
-	tiles.push(new KeyPaiSho.Tile('W', ownerCode));
-	tiles.push(new KeyPaiSho.Tile('K', ownerCode));
-	tiles.push(new KeyPaiSho.Tile('B', ownerCode));
+	tiles.push(new KeyPaiShoTile('R', ownerCode));
+	tiles.push(new KeyPaiShoTile('W', ownerCode));
+	tiles.push(new KeyPaiShoTile('K', ownerCode));
+	tiles.push(new KeyPaiShoTile('B', ownerCode));
 
 	if (gameOptionEnabled(OPTION_ANCIENT_OASIS_EXPANSION)) {
-		tiles.push(new KeyPaiSho.Tile('P', ownerCode));
-		tiles.push(new KeyPaiSho.Tile('M', ownerCode));
-		tiles.push(new KeyPaiSho.Tile('T', ownerCode));
+		tiles.push(new KeyPaiShoTile('P', ownerCode));
+		tiles.push(new KeyPaiShoTile('M', ownerCode));
+		tiles.push(new KeyPaiShoTile('T', ownerCode));
 	}
 
-	tiles.push(new KeyPaiSho.Tile(KeyPaiSho.TileCodes.Red3, ownerCode));
-	tiles.push(new KeyPaiSho.Tile(KeyPaiSho.TileCodes.RedO, ownerCode));
-	tiles.push(new KeyPaiSho.Tile(KeyPaiSho.TileCodes.RedD, ownerCode));
-	tiles.push(new KeyPaiSho.Tile(KeyPaiSho.TileCodes.White3, ownerCode));
-	tiles.push(new KeyPaiSho.Tile(KeyPaiSho.TileCodes.WhiteO, ownerCode));
-	tiles.push(new KeyPaiSho.Tile(KeyPaiSho.TileCodes.WhiteD, ownerCode));
+	tiles.push(new KeyPaiShoTile(KeyPaiShoTileCodes.Red3, ownerCode));
+	tiles.push(new KeyPaiShoTile(KeyPaiShoTileCodes.RedO, ownerCode));
+	tiles.push(new KeyPaiShoTile(KeyPaiShoTileCodes.RedD, ownerCode));
+	tiles.push(new KeyPaiShoTile(KeyPaiShoTileCodes.White3, ownerCode));
+	tiles.push(new KeyPaiShoTile(KeyPaiShoTileCodes.WhiteO, ownerCode));
+	tiles.push(new KeyPaiShoTile(KeyPaiShoTileCodes.WhiteD, ownerCode));
 
-	tiles.push(new KeyPaiSho.Tile(KeyPaiSho.TileCodes.Lotus, ownerCode));
-	tiles.push(new KeyPaiSho.Tile(KeyPaiSho.TileCodes.Orchid, ownerCode));
+	tiles.push(new KeyPaiShoTile(KeyPaiShoTileCodes.Lotus, ownerCode));
+	tiles.push(new KeyPaiShoTile(KeyPaiShoTileCodes.Orchid, ownerCode));
 
 	return tiles;
 };
 
-KeyPaiSho.TileManager.prototype.grabTile = function(player, tileCode) {
+KeyPaiShoTileManager.prototype.grabTile = function(player, tileCode) {
 	var tilePile = this.hostTiles;
 	if (player === GUEST) {
 		tilePile = this.guestTiles;
@@ -110,7 +129,7 @@ KeyPaiSho.TileManager.prototype.grabTile = function(player, tileCode) {
 	var tile;
 	for (var i = 0; i < tilePile.length; i++) {
 		if (tilePile[i].code === tileCode) {
-			newTileArr = tilePile.splice(i, 1);
+			var newTileArr = tilePile.splice(i, 1);
 			tile = newTileArr[0];
 			break;
 		}
@@ -123,7 +142,7 @@ KeyPaiSho.TileManager.prototype.grabTile = function(player, tileCode) {
 			var oasisTileCodes = ['M','P','T'];
 			if (oasisTileCodes.includes(tileCode)) {
 				this.additionalAncientOasisCount++;
-				tile = new KeyPaiSho.Tile(tileCode, getPlayerCodeFromName(player));
+				tile = new KeyPaiShoTile(tileCode, getPlayerCodeFromName(player));
 			}
 		}
 	}
@@ -131,7 +150,7 @@ KeyPaiSho.TileManager.prototype.grabTile = function(player, tileCode) {
 	return tile;
 };
 
-KeyPaiSho.TileManager.prototype.numberOfAccentTilesPerPlayerSet = function() {
+KeyPaiShoTileManager.prototype.numberOfAccentTilesPerPlayerSet = function() {
 	var tileSet = this.loadTileSet(hostPlayerCode);
 	var accentTileCount = 0;
 	for (var i = 0; i < tileSet.length; i++) {
@@ -142,7 +161,7 @@ KeyPaiSho.TileManager.prototype.numberOfAccentTilesPerPlayerSet = function() {
 	return accentTileCount;
 };
 
-KeyPaiSho.TileManager.prototype.peekTile = function(player, tileCode, tileId) {
+KeyPaiShoTileManager.prototype.peekTile = function(player, tileCode, tileId) {
 	var tilePile = this.hostTiles;
 	if (player === GUEST) {
 		tilePile = this.guestTiles;
@@ -171,7 +190,7 @@ KeyPaiSho.TileManager.prototype.peekTile = function(player, tileCode, tileId) {
 	return tile;
 };
 
-KeyPaiSho.TileManager.prototype.removeSelectedTileFlags = function() {
+KeyPaiShoTileManager.prototype.removeSelectedTileFlags = function() {
 	this.hostTiles.forEach(function(tile) {
 		tile.selectedFromPile = false;
 	});
@@ -180,7 +199,7 @@ KeyPaiSho.TileManager.prototype.removeSelectedTileFlags = function() {
 	});
 };
 
-KeyPaiSho.TileManager.prototype.unselectTiles = function(player) {
+KeyPaiShoTileManager.prototype.unselectTiles = function(player) {
 	var tilePile = this.hostTiles;
 	if (player === GUEST) {
 		tilePile = this.guestTiles;
@@ -191,7 +210,7 @@ KeyPaiSho.TileManager.prototype.unselectTiles = function(player) {
 	});
 }
 
-KeyPaiSho.TileManager.prototype.putTileBack = function(tile) {
+KeyPaiShoTileManager.prototype.putTileBack = function(tile) {
 	var player = tile.ownerName;
 	var tilePile = this.hostTiles;
 	if (player === GUEST) {
@@ -201,7 +220,7 @@ KeyPaiSho.TileManager.prototype.putTileBack = function(tile) {
 	tilePile.push(tile);
 };
 
-KeyPaiSho.TileManager.prototype.aPlayerIsOutOfBasicFlowerTiles = function() {
+KeyPaiShoTileManager.prototype.aPlayerIsOutOfBasicFlowerTiles = function() {
 	// Check Host
 	var hostHasBasic = false;
 	for (var i = 0; i < this.hostTiles.length; i++) {
@@ -228,7 +247,7 @@ KeyPaiSho.TileManager.prototype.aPlayerIsOutOfBasicFlowerTiles = function() {
 	}
 };
 
-KeyPaiSho.TileManager.prototype.getPlayerWithMoreAccentTiles = function() {
+KeyPaiShoTileManager.prototype.getPlayerWithMoreAccentTiles = function() {
 	var hostCount = 0;
 	for (var i = 0; i < this.hostTiles.length; i++) {
 		if (this.hostTiles[i].type === ACCENT_TILE) {
@@ -250,7 +269,7 @@ KeyPaiSho.TileManager.prototype.getPlayerWithMoreAccentTiles = function() {
 	}
 };
 
-KeyPaiSho.TileManager.prototype.playerHasBothSpecialTilesRemaining = function(player) {
+KeyPaiShoTileManager.prototype.playerHasBothSpecialTilesRemaining = function(player) {
 	var tilePile = this.hostTiles;
 	if (player === GUEST) {
 		tilePile = this.guestTiles;
@@ -267,8 +286,8 @@ KeyPaiSho.TileManager.prototype.playerHasBothSpecialTilesRemaining = function(pl
 	return specialTileCount > 1;
 };
 
-KeyPaiSho.TileManager.prototype.getCopy = function() {
-	var copy = new KeyPaiSho.TileManager();
+KeyPaiShoTileManager.prototype.getCopy = function() {
+	var copy = new KeyPaiShoTileManager();
 
 	// copy this.hostTiles and this.guestTiles
 	copy.hostTiles = copyArray(this.hostTiles);
