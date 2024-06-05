@@ -696,7 +696,7 @@ Ginseng.applyCaptureAndAbilityActivationRequirementRulesV2 = function(GinsengTil
 			targetTypes: [Trifle.TargetType.triggerTargetTiles],
 			inevitable: true
 		};
-		var protectFromAbilitiesWhileInTempleAbility = {
+		/* var protectFromAbilitiesWhileInTempleAbility = {
 			title: "Protect From Abilities While In Temple",
 			type: Trifle.AbilityName.cancelAbilitiesTargetingTiles,
 			triggers: [
@@ -707,7 +707,7 @@ Ginseng.applyCaptureAndAbilityActivationRequirementRulesV2 = function(GinsengTil
 			],
 			targetTypes: [Trifle.TargetType.triggerTargetTiles],
 			targetAbilityTypes: [Trifle.AbilityType.all]
-		};
+		}; */
 		/* var protectFromFriendlyPushAbilitiesWhileInTempleAbility = {
 			title: "Protect From Friendly Push Abilities While In Temple",
 			type: Trifle.AbilityName.cancelAbilitiesTargetingTiles,
@@ -748,7 +748,7 @@ Ginseng.applyCaptureAndAbilityActivationRequirementRulesV2 = function(GinsengTil
 			promptTargetTitle: "exchangedTile"
 		};
 		tileInfo.abilities.push(protectFromCaptureWhileInTempleAbility);
-		tileInfo.abilities.push(protectFromAbilitiesWhileInTempleAbility);
+		//tileInfo.abilities.push(protectFromAbilitiesWhileInTempleAbility);	// Removing 6/5/24 per Gyatso
 		// tileInfo.abilities.push(protectFromFriendlyPushAbilitiesWhileInTempleAbility);
 		if (key !== Ginseng.TileCodes.WhiteLotus) {
 			tileInfo.abilities.push(exchangeForCapturedTileIntempleAbility);
