@@ -15,6 +15,7 @@ import {
 	DIAGONAL_MOVEMENT,
 	DYNAMIC_GROUP_LIMIT,
 	EDGES_12x12_GAME,
+	EDGES_DICE_FOR_MOVEMENT,
 	EDGES_MOVE_4_2,
 	EIGHT_SIDED_BOARD,
 	ETHEREAL_ACCENT_TILES,
@@ -2853,7 +2854,8 @@ export var GameType = {
 		rulesUrl: "https://skudpaisho.com/site/games/beyond-the-edges-of-the-maps/",
 		gameOptions: [
 			EDGES_12x12_GAME,
-			EDGES_MOVE_4_2
+			EDGES_MOVE_4_2,
+			EDGES_DICE_FOR_MOVEMENT
 		]
 	},
 	Blooms: {
@@ -4752,6 +4754,56 @@ export function getGameOptionsMessageHtml(options) {
 	}
 
 	return msg;
+}
+
+export function getGameOptionsMessageElement(options) {
+	// Create the main container div
+    var container = document.createElement('span');
+    container.style.marginTop = '20px';
+
+    var optionsListed = false;
+
+    if (options && options.length > 0) {
+        // Create a strong element for the title
+        var strong = document.createElement('strong');
+        strong.textContent = 'Add Game Option:';
+        container.appendChild(strong);
+        container.appendChild(document.createElement('br'));
+
+        for (var i = 0; i < options.length; i++) {
+            if (!gameOptionEnabled(options[i])) {
+                if (!gameController.optionOkToShow
+                    || (gameController.optionOkToShow && gameController.optionOkToShow(options[i]))) {
+                    // Create a bullet point
+                    var bullet = document.createElement('span');
+                    bullet.innerHTML = '&bull;&nbsp;';
+                    
+                    // Create the clickable span
+                    var span = document.createElement('span');
+                    span.className = 'skipBonus';
+                    span.textContent = getGameOptionDescription(options[i]);
+                    span.onclick = (function(option) {
+                        return function() {
+                            addGameOption(option);
+                        };
+                    })(options[i]);
+                    
+                    bullet.appendChild(span);
+                    container.appendChild(bullet);
+                    container.appendChild(document.createElement('br'));
+                    
+                    optionsListed = true;
+                }
+            }
+        }
+    }
+
+    if (!optionsListed) {
+        container.innerHTML = '';
+        container.style.marginTop = '20px';
+    }
+
+    return container;
 }
 
 export function showBadMoveModal() {

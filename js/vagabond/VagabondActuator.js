@@ -97,10 +97,10 @@ export class VagabondActuator {
 
 		// Go through tile piles and display
 		tileManager.hostTiles.forEach(function(tile) {
-			self.addTile(tile, this.hostTilesContainer);
+			self.addTile(tile, self.hostTilesContainer);
 		});
 		tileManager.guestTiles.forEach(function(tile) {
-			self.addTile(tile, this.guestTilesContainer);
+			self.addTile(tile, self.guestTilesContainer);
 		});
 	}
 	clearContainer(container) {

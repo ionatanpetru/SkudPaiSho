@@ -12,12 +12,11 @@ import {
   finalizeMove,
   gameId,
   getCurrentPlayer,
-  getGameOptionsMessageHtml,
+  getGameOptionsMessageElement,
   iAmPlayerInCurrentOnlineGame,
   isAnimationsOn,
   myTurn,
   onlinePlayEnabled,
-  pieceAnimationLength,
   playingOnlineGame,
   refreshMessage,
   replayIntervalLength,
@@ -33,16 +32,17 @@ import {
 } from './BeyondTheMapsGameManager';
 import { BeyondTheMapsMctsGame, BtmAction, BtmGame } from './ai/BeyondTheMapsMctsGame';
 import { BtmMoveBuilder } from './BtmMoveBuilder';
-import { EDGES_MOVE_4_2, gameOptionEnabled } from '../GameOptions';
+import { EDGES_DICE_FOR_MOVEMENT, EDGES_MOVE_4_2, gameOptionEnabled } from '../GameOptions';
 import { GUEST, HOST, NotationPoint } from '../CommonNotationObjects';
 import { MCTS } from '../ai/MCTS';
+import { MCTSPlayer } from '../ai/jsmcts';
 import { POSSIBLE_MOVE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
 import { PlaygroundMoveType } from '../playground/PlaygroundGameNotation';
 import { PlaygroundTile } from '../playground/PlaygroundTile';
 import { TrifleGameNotation } from '../trifle/TrifleGameNotation';
 import { debug } from '../GameData';
+import { getRandomizer } from '../../js_util/MersenneTwisterRandom';
 import BeyondTheMapsTile, { BeyondTheMapsTileType } from './BeyondTheMapsTile';
-import { MCTSPlayer } from '../ai/jsmcts';
 
 export class BeyondTheMapsController {
 	constructor(gameContainer, isMobile) {
@@ -54,6 +54,8 @@ export class BeyondTheMapsController {
 		this.messageToPlayer = "";
 
 		showReplayControls();
+
+		this.randomSeed = getRandomizer().random() * 10000;
 	}
 
 	getGameTypeId() {
@@ -146,6 +148,11 @@ export class BeyondTheMapsController {
 	}
 
 	getAdditionalMessage() {
+		return '';
+	}
+
+	getAdditionalMessageElement() {
+		var msgContainer = document.createElement('span');
 		var msg = "";
 
 		if (this.gameNotation.moves.length === 0) {
@@ -155,22 +162,38 @@ export class BeyondTheMapsController {
 				msg += "Sign in to enable online gameplay. Or, start playing a local game by exploring by sea as Host (the light colored ship). <br />";
 			}
 
-			msg += getGameOptionsMessageHtml(GameType.BeyondTheMaps.gameOptions);
+			var msgP = document.createElement('p');
+			msgP.innerHTML = msg;
+
+			msgContainer.appendChild(msgP);
+
+			msgContainer.appendChild(getGameOptionsMessageElement(GameType.BeyondTheMaps.gameOptions));
 		} else if (!this.theGame.getWinner()) {
+			msg = "";
 			if (this.messageToPlayer) {
-				msg += "<br /><br />";
+				msg += "<br />";
 				msg += this.messageToPlayer;
 			}
-			msg += "<br /><br />";
-			msg += "Click your ship to explore by sea, click your land to explore by land.";
+			
+			if (gameOptionEnabled(EDGES_DICE_FOR_MOVEMENT)) {
+				var diceRolls = this.getDiceRolls();
+				msg += "This turn: Move " + diceRolls.high + " by sea and " + diceRolls.low + " by land.";
+			} else {
+				msg += "Click your ship to explore by sea, click your land to explore by land.";
+			}
 
-			msg += "<br /><br />";
+			msg += "<br />";
 			msg += "Host land: " + this.theGame.calculatePlayerScore(HOST);
 			msg += "<br />";
 			msg += "Guest land: " + this.theGame.calculatePlayerScore(GUEST);
+
+			var msgP = document.createElement('p');
+			msgP.innerHTML = msg;
+
+			msgContainer.appendChild(msgP);
 		}
 
-		return msg;
+		return msgContainer;
 	}
 
 	/* getAdditionalMessageElement() {
@@ -255,6 +278,7 @@ export class BeyondTheMapsController {
 	}
 
 	pointClicked(htmlPoint) {
+		this.getDiceRolls();
 		this.theGame.markingManager.clearMarkings();
 		this.callActuate();
 
@@ -288,6 +312,9 @@ export class BeyondTheMapsController {
 					var moveDistance = 6;
 					if (gameOptionEnabled(EDGES_MOVE_4_2)) {
 						moveDistance = 4;
+					} else if (gameOptionEnabled(EDGES_DICE_FOR_MOVEMENT)) {
+						var diceRolls = this.getDiceRolls();
+						moveDistance = diceRolls.high;
 					}
 
 					this.theGame.revealPossibleMovePoints(boardPoint, false, moveDistance);
@@ -353,6 +380,9 @@ export class BeyondTheMapsController {
 				var exploreLandNumber = 3;
 				if (gameOptionEnabled(EDGES_MOVE_4_2)) {
 					exploreLandNumber = 2;
+				} else if (gameOptionEnabled(EDGES_DICE_FOR_MOVEMENT)) {
+					var diceRolls = this.getDiceRolls();
+					exploreLandNumber = diceRolls.low;
 				}
 
 				if (this.moveBuilder.getCurrentPhase().landPoints.length < exploreLandNumber) {
@@ -376,6 +406,22 @@ export class BeyondTheMapsController {
 				this.completeMovePhase();
 			}
 		}
+	}
+
+	getDiceRolls() {
+		var randomizer = getRandomizer(this.randomSeed);
+
+		var roll1 = Math.floor(randomizer.random() * 6 + 1);
+		var roll2 = Math.floor(randomizer.random() * 6 + 1);
+
+		var diceRolls = {
+			high: roll1 > roll2 ? roll1 : roll2,
+			low: roll1 < roll2 ? roll1 : roll2
+		};
+
+		debug(diceRolls);
+
+		return diceRolls;
 	}
 
 	completeMove() {
@@ -541,6 +587,10 @@ export class BeyondTheMapsController {
 
 	isStillRunningMove() {
 		return this.currentlyRunningMove;
+	}
+
+	getMoveNumber() {
+		return this.gameNotation.moves.length;
 	}
 
 	RmbDown(htmlPoint) {

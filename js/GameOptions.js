@@ -210,6 +210,9 @@ gameOptionDescriptions[EDGES_12x12_GAME] = "Smaller game (12x12 board)";
 export var EDGES_MOVE_4_2 = "Move4_2";
 gameOptionDescriptions[EDGES_MOVE_4_2] = "Less movement (4 and 2)";
 
+export var EDGES_DICE_FOR_MOVEMENT = "EdgesRollForMovement";
+gameOptionDescriptions[EDGES_DICE_FOR_MOVEMENT] = "Roll dice for movement";
+
 
 /* -------- */
 
