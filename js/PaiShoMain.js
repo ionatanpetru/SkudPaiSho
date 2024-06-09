@@ -2930,6 +2930,19 @@ export var GameType = {
 		secretGameOptions: [
 			CRUMBLEWEED
 		]
+	},
+	WuxingPaiSho: {
+		id: 42069, // Funny random number hehe
+		name: "Wuxing Pai Sho",
+		desc: "Wuxing Pai Sho",
+		color: "var(--othercolor)",
+		description: "Capture your opponents elemental tiles while protecting your own",
+		coverImg: "lotus.png",
+		rulesUrl: "https://tinyurl.com/2pkdfmss",
+		gmaeOptions: [
+			WUXING_BOARD_ZONES,
+			WUXING_EMPTY_TILE,
+		]
 	}
 };
 
