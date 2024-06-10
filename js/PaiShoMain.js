@@ -108,6 +108,7 @@ import { TrifleController } from './trifle/TrifleController';
 import { TumbleweedController } from './tumbleweed/TumbleweedController';
 import { UndergrowthController } from './undergrowth/UndergrowthController';
 import { VagabondController } from "./vagabond/VagabondController";
+import { WuxingController } from './wuxing/WuxingController';
 import { addEventToElement, setupUiEvents } from './ui/UiSetup';
 import { applyBoardOptionToBgSvg, mobileAndTabletcheck } from "./ActuatorHelp";
 import {
@@ -3018,6 +3019,9 @@ export function getGameControllerForGameType(gameTypeId) {
 		case GameType.BeyondTheMaps.id:
 			controller = new BeyondTheMapsController(gameContainerDiv, isMobile);
 			break;
+		case GameType.WuxingPaiSho.id:
+			controller = new WuxingController(gameContainerDiv, isMobile)
+			break
 		default:
 			debug("Game Controller unavailable.");
 	}
