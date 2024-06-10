@@ -68,6 +68,8 @@ import {
 	UNDERGROWTH_SIMPLE,
 	VAGABOND_ROTATE,
 	VARIABLE_ACCENT_TILES,
+	WUXING_BOARD_ZONES,
+	WUXING_EMPTY_TILE,
 	gameOptionEnabled,
 	getGameOptionDescription
 } from './GameOptions';
