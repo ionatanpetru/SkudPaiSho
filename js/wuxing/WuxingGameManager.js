@@ -62,10 +62,10 @@ export class WuxingGameManager {
 
     // TODO: Implement winner logic
     getWinner() {
-        return "NO ONE WON :)"
+        return ""
     }
 
     getWinReason() {
-        return "idk lol :)"
+        return ""
     }
 }

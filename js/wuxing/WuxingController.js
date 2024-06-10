@@ -80,7 +80,9 @@ export class WuxingController {
      * Should return the default string of the html content to put in the Help tab.
      * @returns {string}
      */
-    getDefaultHelpMessageText() {}
+    getDefaultHelpMessageText() {
+        return "asasasa"
+    }
 
     getCurrentPlayer() {
         if (currentMoveIndex % 2 == 0) {
@@ -92,7 +94,7 @@ export class WuxingController {
     }
 
     getAdditionalMessage() {
-        return "asasasa"
+        return ""
     }
 
     /* STATIC METHODS */
