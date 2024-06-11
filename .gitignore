@@ -372,8 +372,6 @@ dist/
 node_modules/
 package-lock.json
 
-trifle
-
 other/printable
 other/rules
 
