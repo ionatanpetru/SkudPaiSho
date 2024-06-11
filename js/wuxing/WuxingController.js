@@ -1,7 +1,7 @@
 /* Wuxing Pai Sho */
 
 import { GUEST, HOST } from "../CommonNotationObjects.js";
-import { currentMoveIndex, GameType, isAnimationsOn } from "../PaiShoMain";
+import { BRAND_NEW, currentMoveIndex, GameType, isAnimationsOn, rerunAll } from "../PaiShoMain";
 import { WuxingActuator } from "./WuxingActuator.js";
 import { WuxingGameManager } from "./WuxingGameManager.js";
 import { WuxingGameNotation, WuxingNotationBuilder } from "./WuxingNotation.js";
@@ -46,6 +46,12 @@ export class WuxingController {
         return GameType.WuxingPaiSho.id
     }
 
+    completeSetup() {
+
+        rerunAll()
+        this.callActuate()
+    }
+
     /**
      * Called when rewinding moves.
      */
@@ -71,18 +77,33 @@ export class WuxingController {
     /**
      * Called when the game should re-render.
      */
-    callActuate() {}
+    callActuate() {
+        this.theGame.actuate()
+    }
 
     /**
      * Called when the user's move needs to be reset, from clicking the Undo Move link.
      */
-    resetMove() {}
+    resetMove() {
+        if (this.notationBuilder.status === BRAND_NEW) {
+            this.gameNotation.removeLastMove()
+        }
+
+        rerunAll()
+    }
 
     cleanup() {}
 
     isSolitaire() {
         return false
     }
+
+    getCurrentPlayer() {
+        if (currentMoveIndex % 2 == 0) return GUEST
+        return HOST
+    }
+
+    /* DISPLAY METHODS */
 
     /**
      * Should return the default string of the html content to put in the Help tab.
@@ -92,14 +113,7 @@ export class WuxingController {
         return "asasasa"
     }
 
-    getCurrentPlayer() {
-        if (currentMoveIndex % 2 == 0) {
-            return GUEST
-        }
-        else {
-            return HOST
-        }
-    }
+    
 
     getAdditionalMessage() {
         return ""
