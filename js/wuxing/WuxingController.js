@@ -4,6 +4,7 @@ import { GUEST, HOST } from "../CommonNotationObjects.js";
 import { currentMoveIndex, GameType, isAnimationsOn } from "../PaiShoMain";
 import { WuxingActuator } from "./WuxingActuator.js";
 import { WuxingGameManager } from "./WuxingGameManager.js";
+import { WuxingGameNotation, WuxingNotationBuilder } from "./WuxingNotation.js";
 
 export class WuxingController {
 
@@ -12,6 +13,14 @@ export class WuxingController {
 
     /** @type {WuxingGameManager} */
     theGame
+
+    /** @type {WuxingNotationBuilder} */
+    notationBuilder
+
+    /** @type {WuxingGameNotation} */
+    gameNotation
+
+    isPaiShoGame = true
 
     /**
      * NOTE: The parameter's documentation was taken from GameControllerInterfaceReadme.md
@@ -24,6 +33,9 @@ export class WuxingController {
         this.resetGameManager()
         this.resetNotationBuilder()
         this.resetGameNotation()
+
+        this.hostAccentTiles = []
+        this.guestAccentTiles = []
     }
 
     /**
@@ -44,21 +56,17 @@ export class WuxingController {
     /**
      * Called when rewinding moves.
      */
-    resetNotationBuilder() {}
+    resetNotationBuilder() {
+        this.notationBuilder = new WuxingNotationBuilder()
+    }
 
-    resetGameNotation() {}
+    resetGameNotation() {
+        this.gameNotation = this.getNewGameNotation()
+    }
 
-    /**
-     * Returns new game notation object for your game.
-     * 
-     * @typedef {{
-     *  moves: Array<any>
-     *  addMove: function(move: any): void
-     * }} GameNotation
-     * 
-     * @returns {GameNotation}
-     */
-    getNewGameNotation() {}
+    getNewGameNotation() {
+        return new WuxingGameNotation()
+    }
 
     /**
      * Called when the game should re-render.
