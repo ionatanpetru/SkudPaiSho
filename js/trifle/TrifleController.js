@@ -38,10 +38,10 @@ import { TrifleActuator } from './TrifleActuator';
 import { TrifleTileCodes, defineTrifleTiles } from './TrifleTiles';
 import { TrifleTileInfo, TrifleTiles } from './TrifleTileInfo';
 import { debug } from '../GameData';
-//import {
-//  setCurrentTileCodes,
-//  setCurrentTileMetadata
-//} from './PaiShoGamesTileMetadata';
+import {
+  setCurrentTileCodes,
+  setCurrentTileMetadata
+} from './PaiShoGamesTileMetadata';
 
 export function TrifleController(gameContainer, isMobile) {
 	this.actuator = new TrifleActuator(gameContainer, isMobile);

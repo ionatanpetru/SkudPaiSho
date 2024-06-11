@@ -26,7 +26,7 @@ import {
 import { TrifleTileType } from '../trifle/TrifleTiles';
 import { clearObject } from '../GameData';
 import { defineGinsengTilesV2 } from './GinsengTilesV2';
-//import { setCurrentTileNames } from '../trifle/PaiShoGamesTileMetadata';
+import { setCurrentTileNames } from '../trifle/PaiShoGamesTileMetadata';
 
 export var GinsengTileCodes = {
 	WhiteLotus: "L",
@@ -71,7 +71,7 @@ GinsengTileInfo.setTileNames = function() {
 	tileNames[GinsengTileCodes.Bison] = "Flying Bison";
 	tileNames[GinsengTileCodes.LionTurtle] = "Lion Turtle";
 
-	//setCurrentTileNames(tileNames);
+	setCurrentTileNames(tileNames);
 };
 
 GinsengTileInfo.defineGinsengTiles = function() {

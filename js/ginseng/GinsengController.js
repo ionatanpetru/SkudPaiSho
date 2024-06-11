@@ -66,7 +66,7 @@ import { TrifleTile } from '../trifle/TrifleTile';
 import { TrifleTileInfo } from '../trifle/TrifleTileInfo';
 import { debug, debugOn } from '../GameData';
 import { getPlayerCodeFromName } from '../pai-sho-common/PaiShoPlayerHelp';
-// import { setCurrentTileCodes, setCurrentTileMetadata } from '../trifle/PaiShoGamesTileMetadata';
+import { setCurrentTileCodes, setCurrentTileMetadata } from '../trifle/PaiShoGamesTileMetadata';
 
 export var GinsengConstants = {
 	preferencesKey: "GinsengPreferencesKey"
