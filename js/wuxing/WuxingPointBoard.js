@@ -70,6 +70,10 @@ export class WuxingBoardPoint {
         return false
     }
 
+    isType(type) {
+        return this.types.includes(type)
+    }
+
     /* POINT TYPES */
     static neutral() {
         let point = new WuxingBoardPoint()

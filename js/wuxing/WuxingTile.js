@@ -28,6 +28,8 @@ export class WuxingTile {
     /** @type {number} */
     id
 
+    selectedFromPile
+
     /**
      * 
      * @param {string} code Identifies the tile
@@ -51,7 +53,7 @@ export class WuxingTile {
     }
 
     getMoveDistance() {
-
+        return 3
     }
 
     getTileName(tileCode) {
@@ -76,7 +78,7 @@ export class WuxingTile {
     }
 
     getImageName() {
-        this.ownerCode + "" + this.code
+        return this.ownerCode + "" + this.code
     }
 
     getCopy() {
