@@ -1,9 +1,9 @@
 import { createBoardArrow, createBoardPointDiv, setupPaiShoBoard } from "../ActuatorHelp"
 import { PaiShoMarkingManager } from "../pai-sho-common/PaiShoMarkingManager"
-import { clearMessage, RmbDown, RmbUp, showTileMessage, unplayedTileClicked } from "../PaiShoMain"
+import { clearMessage, getUserGamePreference, RmbDown, RmbUp, showTileMessage, unplayedTileClicked } from "../PaiShoMain"
 import { MARKED, NON_PLAYABLE, POSSIBLE_MOVE } from "../skud-pai-sho/SkudPaiShoBoardPoint"
 import { WuxingBoard } from "./WuxingBoard"
-import { WuxingController } from "./WuxingController"
+import { WuxingController, WuxingPreferences } from "./WuxingController"
 import { WuxingBoardPoint } from "./WuxingPointBoard"
 import { WuxingTile } from "./WuxingTile"
 import { WuxingTileManager } from "./WuxingTileManager"
@@ -249,7 +249,7 @@ export class WuxingActuator {
     }
 
     getTileImageSourceDir() {
-        return ""
+        return "images/Wuxing/" + "original" + "/"
     }
 
 

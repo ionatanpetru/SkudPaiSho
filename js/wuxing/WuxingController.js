@@ -6,6 +6,13 @@ import { WuxingActuator } from "./WuxingActuator.js";
 import { WuxingGameManager } from "./WuxingGameManager.js";
 import { WuxingGameNotation, WuxingNotationBuilder } from "./WuxingNotation.js";
 
+export var WuxingPreferences = {
+    tileDesignKey: "TileDesigns",
+    tileDesignTypeValues: {
+        original: "Original"
+    }
+}
+
 export class WuxingController {
 
     /** @type {WuxingActuator} */
