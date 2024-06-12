@@ -112,8 +112,8 @@ export class WuxingActuator {
         let fullTileSet = new WuxingTileManager()
 
         // Go through tile piles and clear containers
-        for (const tile of fullTileSet.hostTiles) {
-            this.clearTileContainer(tile)
+        for (let i = 0; i < fullTileSet.hostTiles.length; i++) {
+            this.clearTileContainer(fullTileSet.hostTiles[i])
         }
         for (const tile of fullTileSet.guestTiles) {
             this.clearTileContainer(tile)
@@ -137,11 +137,15 @@ export class WuxingActuator {
 
     /**
      * Taken from CaptureActuator.js
+     * 
+     * Remember to add the correct div with its proper tile code in
+     * `Controller.getHostTilesContainerDivs()` / `Controller.getGuestTilesContainerDivs()` or else this breaks
      * @param {WuxingTile} tile
      */
     clearTileContainer(tile) {
-        let container = document.querySelector("." + tile.getImageName())
-        while (container.firstChild) {
+        let containerClass = "." + tile.getImageName()
+        let container = document.querySelector(containerClass)
+        while (container.firstChild != null) {
             container.removeChild(container.firstChild)
         }
     }

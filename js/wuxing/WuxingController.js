@@ -122,21 +122,37 @@ export class WuxingController {
     /* STATIC METHODS */
 
     /**
-     * Returns the html representation of the inital tiles found at the beginning of the game for host.
-     * Each tile is an empty div with a class that identifies them as the corresponding tile
+     * Returns the html representation of the tile containers for host. Each container may contain the tiles
+     * that the host currently has available to deploy or plant. Each cointainer must have a class name with
+     * the code of whatever tile it cointains
      * @returns {string}
      * */
     static getHostTilesContainerDivs() {
-        return ""
+        return '' +
+        '<div class="HWO"></div>' +
+        '<div class="HEA"></div>' +
+        '<div class="HWA"></div>' +
+        '<div class="HFI"></div>' +
+        '<div class="HME"></div>' +
+        '<br class="clear">' +
+        '<div class="HEM"></div>'
     }
 
     /**
-     * Returns the html representation of the inital tiles found at the beginning of the game for guest.
-     * Each tile is an empty div with a class that identifies them as the corresponding tile
+     * Returns the html representation of the tile containers for guest. Each container may contain the tiles
+     * that the host currently has available to deploy or plant. Each cointainer must have a class name with
+     * the code of whatever tile it cointains
      * @returns {string}
      * */
     /** @returns {string} */
     static getGuestTilesContainerDivs() {
-        return ""
+        return '' +
+        '<div class="GWO"></div>' +
+        '<div class="GEA"></div>' +
+        '<div class="GWA"></div>' +
+        '<div class="GFI"></div>' +
+        '<div class="GME"></div>' +
+        '<br class="clear">' +
+        '<div class="GEM"></div>'
     }
 }
