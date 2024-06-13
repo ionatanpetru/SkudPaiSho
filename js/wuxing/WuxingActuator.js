@@ -249,7 +249,7 @@ export class WuxingActuator {
     }
 
     getTileImageSourceDir() {
-        return "images/Wuxing/" + "original" + "/"
+        return "./images/Wuxing/" + "original" + "/"
     }
 
 
