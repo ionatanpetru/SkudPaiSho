@@ -1,10 +1,13 @@
 /* Wuxing Pai Sho */
 
-import { GUEST, HOST } from "../CommonNotationObjects.js";
-import { BRAND_NEW, currentMoveIndex, gameId, GameType, getGameOptionsMessageHtml, isAnimationsOn, myTurn, onlinePlayEnabled, rerunAll, userIsLoggedIn } from "../PaiShoMain";
+import { GUEST, HOST, NotationPoint } from "../CommonNotationObjects.js";
+import { gameOptionEnabled, WUXING_BOARD_ZONES } from "../GameOptions.js";
+import { BRAND_NEW, currentMoveIndex, gameId, GameType, getGameOptionsMessageHtml, isAnimationsOn, myTurn, onlinePlayEnabled, rerunAll, toBullets, userIsLoggedIn } from "../PaiShoMain";
+import { GATE, NEUTRAL } from "../skud-pai-sho/SkudPaiShoBoardPoint.js";
 import { WuxingActuator } from "./WuxingActuator.js";
 import { WuxingGameManager } from "./WuxingGameManager.js";
 import { WuxingGameNotation, WuxingNotationBuilder } from "./WuxingNotation.js";
+import { BLACK_GATE, GREEN_GATE, MOUNTAIN_ENTRANCE, MOUNTAIN_TILE, RED_GATE, RIVER_TILE, WHITE_GATE, WuxingBoardPoint, YELLOW_GATE } from "./WuxingPointBoard.js";
 import { WU_EARTH, WU_EMPTY, WU_FIRE, WU_METAL, WU_WATER, WU_WOOD, WuxingTile } from "./WuxingTile.js";
 
 export var WuxingPreferences = {
@@ -29,6 +32,12 @@ export class WuxingController {
     gameNotation
 
     isPaiShoGame = true
+
+    /**
+     * Used for remembering the BoardPoint which the player clicked on
+     * @type {WuxingBoardPoint | null}
+     */
+    mouseStartPoint
 
     /**
      * NOTE: The parameter's documentation was taken from GameControllerInterfaceReadme.md
@@ -111,7 +120,138 @@ export class WuxingController {
         return HOST
     }
 
+    /* EVENT METHODS */
+
+    /**
+     * Called whenever the player draws an arrow.
+     * 
+     * Taken from VagabondController.js
+     * @param {HTMLDivElement} htmlPoint 
+     */
+    RmbDown(htmlPoint) {
+        let npText = htmlPoint.getAttribute("name")
+        let notationPoint = new NotationPoint(npText)
+        let rowCol = notationPoint.rowAndColumn
+        this.mouseStartPoint = this.theGame.board.cells[rowCol.row][rowCol.col]
+    }
+
+    /**
+     * Called whenever the player draws an arrow.
+     * 
+     * Taken from VagabondController.js
+     * @param {HTMLDivElement} htmlPoint 
+     */
+    RmbUp(htmlPoint) {
+        let npText = htmlPoint.getAttribute("name")
+        let notationPoint = new NotationPoint(npText)
+        let rowCol = notationPoint.rowAndColumn
+        let mouseEndPoint = this.theGame.board.cells[rowCol.row][rowCol.col]
+
+        if (mouseEndPoint == this.mouseStartPoint) {
+            this.theGame.markingManager.toggleMarkedPoint(mouseEndPoint)
+        }
+        else if (this.mouseStartPoint) {
+            this.theGame.markingManager.toggleMarkedArrow(this.mouseStartPoint, mouseEndPoint)
+        }
+
+        this.mouseStartPoint = null
+        this.callActuate()
+    }
+
+    /**
+     * Called whenever the player clicks on a point
+     * 
+     * Taken from VagabondController.js
+     * @param {HTMLDivElement} htmlPoint 
+     */
+    pointClicked(htmlPoint) {
+        this.theGame.markingManager.clearMarkings()
+        this.callActuate()
+
+        // TODO: Do the rest of the stuff
+    }
+
     /* DISPLAY METHODS */
+
+    /**
+     * 
+     * Taken from VagabondController.js
+     * @param {HTMLDivElement} htmlPoint
+     * @returns {{heading: string, message: Array<string>} | null}
+     */
+    getPointMessage(htmlPoint) {
+        const messageInfo = {
+            heading: "",
+            message: [],
+        }
+
+        let npText = htmlPoint.getAttribute("name")
+        let notationPoint = new NotationPoint(npText)
+        let rowCol = notationPoint.rowAndColumn
+        let boardPoint = this.theGame.board.cells[rowCol.row][rowCol.col]
+
+        if (boardPoint.hasTile()) {
+            const tileInfo = this.getTheMessage(boardPoint.tile, boardPoint.tile.ownerName)
+            messageInfo.heading = tileInfo.heading
+            messageInfo.message.push( ...tileInfo.message )
+        }
+
+        // Add point data
+        if (boardPoint.isType(NEUTRAL)) {
+            messageInfo.heading = "Neutral Space"
+            messageInfo.message.push(this._getNeutralPointMessage())
+        }
+        if (boardPoint.isType(GATE)) {
+            messageInfo.heading = "Gate"
+            messageInfo.message.push(this._getGateMessage(boardPoint))
+        }
+        if ( gameOptionEnabled(WUXING_BOARD_ZONES) ) {
+            if (boardPoint.isType(MOUNTAIN_TILE)) {
+                messageInfo.heading = "Mountain Space"
+                messageInfo.message.push(this._getMountainMessage())
+            }
+            if (boardPoint.isType(MOUNTAIN_ENTRANCE)) {
+                messageInfo.heading = "Mountain Entrance"
+                messageInfo.message.push(this._getMountainEntranceMessage())
+            }
+            if (boardPoint.isType(RIVER_TILE)) {
+                messageInfo.heading = "River Space"
+                messageInfo.message.push(this._getRiverMessage(boardPoint))
+            }
+        }
+
+        return messageInfo
+    }
+
+    _getNeutralPointMessage() {
+        return ""
+    }
+
+    /** @param {WuxingBoardPoint} point */
+    _getGateMessage(point) {
+        let msg = "Gate."
+        if (point.isType(WHITE_GATE)) {
+            msg = "White or Western Gate. Metal tiles are deployed here."
+        } else if (point.isType(RED_GATE)) {
+            msg = "Red or South Gate. Fire tiles are deployed here."
+        } else if (point.isType(BLACK_GATE)) {
+            heading = BLACK_GATE
+            msg = "Black or North Gate. Water tiles are deployed here."
+        } else if (point.isType(GREEN_GATE)) {
+            msg = "Green or Eastern Gate. Wood tiles are deployed here."
+        } else if (point.isType(YELLOW_GATE)) {
+            msg = "Yellow or Center Gate. Earth tiles are deployed here."
+        }
+        return msg
+    }
+
+    _getMountainMessage() {
+        return ""
+    }
+
+    _getMountainEntranceMessage() {
+        return ""
+    }
 
     /**
      * Should return the default string of the html content to put in the Help tab.
@@ -119,6 +259,11 @@ export class WuxingController {
      */
     getDefaultHelpMessageText() {
         return "<h4>Wuxing Pai Sho</h4><p></p><p>The objective of Wuxing Pai Sho is to capture one of each of your opponent's tiles using your own tiles.</p>"
+    }
+
+    /** @param {WuxingBoardPoint} point */
+    _getRiverMessage(point) {
+        return ""
     }
 
     /**
@@ -212,7 +357,7 @@ export class WuxingController {
 
         return {
             heading: heading,
-            message: message
+            message: [ WuxingTile.getTileName(tileCode) + ' Tile:' + toBullets(message) ]
         }
     }
 
