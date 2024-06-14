@@ -2942,7 +2942,7 @@ export var GameType = {
 		description: "Capture your opponents elemental tiles while protecting your own",
 		coverImg: "lotus.png",
 		rulesUrl: "https://tinyurl.com/2pkdfmss",
-		gmaeOptions: [
+		gameOptions: [
 			WUXING_BOARD_ZONES,
 			WUXING_EMPTY_TILE,
 		]
