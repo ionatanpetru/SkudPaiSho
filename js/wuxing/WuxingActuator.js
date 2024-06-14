@@ -1,6 +1,6 @@
 import { createBoardArrow, createBoardPointDiv, setupPaiShoBoard } from "../ActuatorHelp"
 import { PaiShoMarkingManager } from "../pai-sho-common/PaiShoMarkingManager"
-import { clearMessage, getUserGamePreference, RmbDown, RmbUp, showTileMessage, unplayedTileClicked } from "../PaiShoMain"
+import { clearMessage, pointClicked, RmbDown, RmbUp, showPointMessage, showTileMessage, unplayedTileClicked } from "../PaiShoMain"
 import { MARKED, NON_PLAYABLE, POSSIBLE_MOVE } from "../skud-pai-sho/SkudPaiShoBoardPoint"
 import { WuxingBoard } from "./WuxingBoard"
 import { WuxingController, WuxingPreferences } from "./WuxingController"
@@ -214,8 +214,8 @@ export class WuxingActuator {
                 div.setAttribute("ontouchstart", "pointClicked(this); showPointMessage(this);");
             }
             else {
-                div.setAttribute("onclick", "pointClicked(this);");
-			    div.setAttribute("onmouseover", "showPointMessage(this); gameController.showCaptureHelpOnHover(this);");
+                div.addEventListener("click", () => pointClicked(div))
+                div.addEventListener('mouseover', () => showPointMessage(div))
 			    div.addEventListener('mouseout', clearMessage);
 			    div.addEventListener('mousedown', e => {
 			    	// Right Mouse Button
