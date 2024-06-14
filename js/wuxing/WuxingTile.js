@@ -56,7 +56,15 @@ export class WuxingTile {
         return 3
     }
 
-    getTileName(tileCode) {
+    getImageName() {
+        return this.ownerCode + "" + this.code
+    }
+
+    getCopy() {
+        return new WuxingTile(this.code, this.ownerCode)
+    }
+
+    static getTileName(tileCode) {
         let name = ""
 
         if (tileCode === WU_WOOD) {
@@ -72,16 +80,10 @@ export class WuxingTile {
         }
         else if (tileCode === WU_METAL) {
             name = "Metal"
+        } else if (tileCode === WU_EMPTY) {
+            name = "Empty"
         }
 
         return name
-    }
-
-    getImageName() {
-        return this.ownerCode + "" + this.code
-    }
-
-    getCopy() {
-        return new WuxingTile(this.code, this.ownerCode)
     }
 }
