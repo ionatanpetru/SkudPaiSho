@@ -7,7 +7,7 @@ import { GATE, NEUTRAL } from "../skud-pai-sho/SkudPaiShoBoardPoint.js";
 import { WuxingActuator } from "./WuxingActuator.js";
 import { WuxingGameManager } from "./WuxingGameManager.js";
 import { WuxingGameNotation, WuxingNotationBuilder } from "./WuxingNotation.js";
-import { BLACK_GATE, GREEN_GATE, MOUNTAIN_ENTRANCE, MOUNTAIN_TILE, RED_GATE, RIVER_TILE, WHITE_GATE, WuxingBoardPoint, YELLOW_GATE } from "./WuxingPointBoard.js";
+import { BLACK_GATE, GREEN_GATE, MOUNTAIN_ENTRANCE, MOUNTAIN_TILE, RED_GATE, RIVER_DL_TILE, RIVER_DR_TILE, RIVER_TILE, WHITE_GATE, WuxingBoardPoint, YELLOW_GATE } from "./WuxingPointBoard.js";
 import { WU_EARTH, WU_EMPTY, WU_FIRE, WU_METAL, WU_WATER, WU_WOOD, WuxingTile } from "./WuxingTile.js";
 
 export var WuxingPreferences = {
@@ -205,19 +205,17 @@ export class WuxingController {
             messageInfo.heading = "Gate"
             messageInfo.message.push(this._getGateMessage(boardPoint))
         }
-        if ( gameOptionEnabled(WUXING_BOARD_ZONES) ) {
-            if (boardPoint.isType(MOUNTAIN_TILE)) {
-                messageInfo.heading = "Mountain Space"
-                messageInfo.message.push(this._getMountainMessage())
-            }
-            if (boardPoint.isType(MOUNTAIN_ENTRANCE)) {
-                messageInfo.heading = "Mountain Entrance"
-                messageInfo.message.push(this._getMountainEntranceMessage())
-            }
-            if (boardPoint.isType(RIVER_TILE)) {
-                messageInfo.heading = "River Space"
-                messageInfo.message.push(this._getRiverMessage(boardPoint))
-            }
+        if (boardPoint.isType(MOUNTAIN_ENTRANCE)) {
+            messageInfo.heading = "Mountain Entrance"
+            messageInfo.message.push(this._getMountainEntranceMessage())
+        }
+        else if (boardPoint.isType(MOUNTAIN_TILE)) {
+            messageInfo.heading = "Mountain Space"
+            messageInfo.message.push(...this._getMountainMessage())
+        }
+        else if (boardPoint.isType(RIVER_TILE)) {
+            messageInfo.heading = "River Space"
+            messageInfo.message.push(...this._getRiverMessage(boardPoint))
         }
 
         return messageInfo
@@ -246,11 +244,15 @@ export class WuxingController {
     }
 
     _getMountainMessage() {
-        return ""
+        let msg = []
+        msg.push("Can only be entered from the mountain entrances located at the corners")
+        msg.push("Tiles located at a mountain space can go to a neutral space, as normal movement applies")
+        msg.push("If a tile located in a mountain space moves to a river, it will not be moved at the end of the turn")
+        return msg
     }
 
     _getMountainEntranceMessage() {
-        return ""
+        return "Entrance to mountain zones"
     }
 
     /**
@@ -263,7 +265,18 @@ export class WuxingController {
 
     /** @param {WuxingBoardPoint} point */
     _getRiverMessage(point) {
-        return ""
+        let msg = []
+        msg.push("Rivers start from the Blue Gate to the Red Gate")
+        msg.push("At the end of the turn they move tiles one space downstream in direction of the Red Gate")
+        msg.push("Earth tiles located in rivers will not be moved. Instead, they block the stream of river tiles downstream")
+        msg.push("Tiles are not moved by rivers on the turn they enter")
+        if (point.isType(RIVER_DL_TILE)) {
+            msg.push("This river space moves tiles to the South-West")
+        }
+        if (point.isType(RIVER_DR_TILE)) {
+            msg.push("This river space moves tiles to the South-East")
+        }
+        return msg
     }
 
     /**
