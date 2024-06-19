@@ -26,7 +26,7 @@ export class WuxingBoard {
             WuxingBoardPoint.mountain(),
             WuxingBoardPoint.mountain(),
             WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
+            WuxingBoardPoint.mountainEntrance(),
             WuxingBoardPoint.blackGate(),
             WuxingBoardPoint.neutral(),
             WuxingBoardPoint.neutral(),
@@ -143,7 +143,7 @@ export class WuxingBoard {
         ])
 
         cells[7] = this.newRow(17, [
-            WuxingBoardPoint.mountain(),
+            WuxingBoardPoint.mountainEntrance(),
             WuxingBoardPoint.mountain(),
             WuxingBoardPoint.riverDownLeft(),
             WuxingBoardPoint.neutral(),
@@ -184,7 +184,7 @@ export class WuxingBoard {
         ])
 
         cells[9] = this.newRow(17, [
-            WuxingBoardPoint.mountain(),
+            WuxingBoardPoint.mountainEntrance(),
             WuxingBoardPoint.mountain(),
             WuxingBoardPoint.riverDownRight(),
             WuxingBoardPoint.neutral(),
@@ -316,7 +316,7 @@ export class WuxingBoard {
             WuxingBoardPoint.mountain(),
             WuxingBoardPoint.mountain(),
             WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
+            WuxingBoardPoint.mountainEntrance(),
             WuxingBoardPoint.redGate(),
             WuxingBoardPoint.neutral(),
             WuxingBoardPoint.neutral(),
