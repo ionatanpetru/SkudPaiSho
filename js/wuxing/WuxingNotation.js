@@ -262,6 +262,9 @@ export class WuxingNotationBuilder {
 
     status = BRAND_NEW
 
+    moveType = ""
+    plantedlowerType = ""
+
     /**
      * TODO: DECIDE ON A NOTATION
      * 

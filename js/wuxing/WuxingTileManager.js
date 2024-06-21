@@ -1,3 +1,4 @@
+import { HOST } from "../CommonNotationObjects";
 import { gameOptionEnabled, WUXING_EMPTY_TILE } from "../GameOptions";
 import { WU_EARTH, WU_EMPTY, WU_FIRE, WU_METAL, WU_WATER, WU_WOOD, WuxingTile } from "./WuxingTile";
 
@@ -48,4 +49,27 @@ export class WuxingTileManager {
     }
 
     grabTile( player, tileCode ) {}
+
+    peekTile(player, tileCode, tileId) {
+        let tilePile = player === HOST ? this.hostTiles : this.guestTiles
+
+        if (tileId) {
+            for (let i = 0; i < tilePile.length; i++) {
+                if (tilePile[i].id === tileId) {
+                    return tilePile[i]
+                }
+            }
+        }
+
+        for (let i = 0; i < tilePile.length; i++) {
+            if (tilePile[i].code === tileCode) {
+                return tilePile[i]
+            }
+        }
+    }
+
+    removeSelectedTileFlags() {
+        this.hostTiles.forEach( tile => tile.selectedFromPile = false )
+        this.guestTiles.forEach( tile => tile.selectedFromPile = false )
+    }
 }

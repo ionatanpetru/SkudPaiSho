@@ -1,6 +1,7 @@
 import { RowAndColumn } from "../CommonNotationObjects"
-import { NON_PLAYABLE } from "../skud-pai-sho/SkudPaiShoBoardPoint"
-import { WuxingBoardPoint } from "./WuxingPointBoard"
+import { NON_PLAYABLE, POSSIBLE_MOVE } from "../skud-pai-sho/SkudPaiShoBoardPoint"
+import { BLACK_GATE, GREEN_GATE, RED_GATE, WHITE_GATE, WuxingBoardPoint, YELLOW_GATE } from "./WuxingPointBoard"
+import { WU_EARTH, WU_EMPTY, WU_FIRE, WU_METAL, WU_WATER, WU_WOOD } from "./WuxingTile"
 
 export class WuxingBoard {
 
@@ -362,6 +363,70 @@ export class WuxingBoard {
         }
 
         return cells
+    }
+
+    _getGatePoints() {
+        return [
+            this.cells[0][8],
+            this.cells[8][0],
+            this.cells[8][8],
+            this.cells[8][16],
+            this.cells[16][8],
+        ]
+    }
+
+    /**
+     * 
+     * @param {string} player HOST or GUEST
+     * @param {string} tileCode 
+     * @returns 
+     */
+    setDeployPointsPossibleMoves(player, tileCode) {
+
+        const gatePoints = this._getGatePoints()
+
+        // A player can only deploy if they don't have one deployed on a gate already
+        let playerHasTileInGate = false
+        for (const gate of gatePoints) {
+            if (gate.hasTile() && gate.tile.ownerName == player) {
+                playerHasTileInGate = true
+                break
+            }
+        }
+
+        if (playerHasTileInGate) return
+
+        for (const gate of gatePoints) {
+            if (!gate.hasTile()) {
+                if (tileCode == WU_EMPTY) {
+                    gate.addType(POSSIBLE_MOVE)
+                    continue
+                }
+
+                if (gate.isType(BLACK_GATE) && tileCode == WU_WATER) {
+                    gate.addType(POSSIBLE_MOVE)
+                }
+                else if (gate.isType(WHITE_GATE) && tileCode == WU_METAL) {
+                    gate.addType(POSSIBLE_MOVE)
+                }
+                else if (gate.isType(YELLOW_GATE) && tileCode == WU_EARTH) {
+                    gate.addType(POSSIBLE_MOVE)
+                }
+                else if (gate.isType(GREEN_GATE) && tileCode == WU_WOOD) {
+                    gate.addType(POSSIBLE_MOVE)
+                }
+                else if (gate.isType(RED_GATE) && tileCode == WU_FIRE) {
+                    gate.addType(POSSIBLE_MOVE)
+                }
+            }
+        }
+
+    }
+
+    removePossibleMovePoints() {
+        this.cells.forEach( row => {
+            row.forEach( bp => bp.removeType(POSSIBLE_MOVE) )
+        } )
     }
 
     placeTile(tile, notationPoint, extraBoatPoint) {

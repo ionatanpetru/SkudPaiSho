@@ -1,8 +1,9 @@
 /* Wuxing Pai Sho */
 
-import { GUEST, HOST, NotationPoint } from "../CommonNotationObjects.js";
+import { DEPLOY, GUEST, HOST, NotationPoint } from "../CommonNotationObjects.js";
+import { debug } from "../GameData.js";
 import { gameOptionEnabled, WUXING_BOARD_ZONES } from "../GameOptions.js";
-import { BRAND_NEW, currentMoveIndex, gameId, GameType, getGameOptionsMessageHtml, isAnimationsOn, myTurn, onlinePlayEnabled, rerunAll, toBullets, userIsLoggedIn } from "../PaiShoMain";
+import { BRAND_NEW, currentMoveIndex, gameId, GameType, getGameOptionsMessageHtml, isAnimationsOn, myTurn, onlinePlayEnabled, READY_FOR_BONUS, rerunAll, toBullets, userIsLoggedIn, WAITING_FOR_ENDPOINT } from "../PaiShoMain";
 import { GATE, NEUTRAL } from "../skud-pai-sho/SkudPaiShoBoardPoint.js";
 import { WuxingActuator } from "./WuxingActuator.js";
 import { WuxingGameManager } from "./WuxingGameManager.js";
@@ -109,7 +110,7 @@ export class WuxingController {
         rerunAll()
     }
 
-    cleanup() {}
+    cleanup() { }
 
     isSolitaire() {
         return false
@@ -121,6 +122,48 @@ export class WuxingController {
     }
 
     /* EVENT METHODS */
+    /**
+     * Called when the player clicks on an unplayed tile
+     * @param {HTMLDivElement} tileDiv 
+     */
+    unplayedTileClicked(tileDiv) {
+        this.theGame.markingManager.clearMarkings()
+        this.callActuate()
+
+        if (this.theGame.hasEnded() && this.notationBuilder.status !== READY_FOR_BONUS) {
+            return
+        }
+
+        if (!myTurn()) {
+            return
+        }
+
+        if (currentMoveIndex !== this.gameNotation.moves.length) {
+            debug("Can only interact if all moves are played")
+            return
+        }
+
+        let divName = tileDiv.getAttribute("name")
+        let tileId = parseInt(tileDiv.getAttribute("id"))
+        let playerCode = divName.charAt(0)
+        let tileCode = divName.substring(1)
+
+        let player = playerCode === 'H' ? HOST : GUEST
+        let tile = this.theGame.tileManager.peekTile(player, tileCode, tileId)
+
+        if (this.notationBuilder.status === BRAND_NEW) {
+            this.notationBuilder.moveType = DEPLOY
+            this.notationBuilder.tileType = tileCode
+            this.notationBuilder.status = WAITING_FOR_ENDPOINT
+
+            this.theGame.revealDeployPoints(tile.ownerCode, tileCode)
+        }
+        else {
+            this.theGame.hidePossibleMovePoints()
+            this.resetNotationBuilder()
+        }
+
+    }
 
     /**
      * Called whenever the player draws an arrow.
@@ -193,7 +236,7 @@ export class WuxingController {
         if (boardPoint.hasTile()) {
             const tileInfo = this.getTheMessage(boardPoint.tile, boardPoint.tile.ownerName)
             messageInfo.heading = tileInfo.heading
-            messageInfo.message.push( ...tileInfo.message )
+            messageInfo.message.push(...tileInfo.message)
         }
 
         // Add point data
@@ -370,7 +413,7 @@ export class WuxingController {
 
         return {
             heading: heading,
-            message: [ WuxingTile.getTileName(tileCode) + ' Tile:' + toBullets(message) ]
+            message: [WuxingTile.getTileName(tileCode) + ' Tile:' + toBullets(message)]
         }
     }
 
@@ -384,13 +427,13 @@ export class WuxingController {
      * */
     static getHostTilesContainerDivs() {
         return '' +
-        '<div class="HWO"></div>' +
-        '<div class="HEA"></div>' +
-        '<div class="HWA"></div>' +
-        '<div class="HFI"></div>' +
-        '<div class="HME"></div>' +
-        '<br class="clear">' +
-        '<div class="HEM"></div>'
+            '<div class="HWO"></div>' +
+            '<div class="HEA"></div>' +
+            '<div class="HWA"></div>' +
+            '<div class="HFI"></div>' +
+            '<div class="HME"></div>' +
+            '<br class="clear">' +
+            '<div class="HEM"></div>'
     }
 
     /**
@@ -402,12 +445,12 @@ export class WuxingController {
     /** @returns {string} */
     static getGuestTilesContainerDivs() {
         return '' +
-        '<div class="GWO"></div>' +
-        '<div class="GEA"></div>' +
-        '<div class="GWA"></div>' +
-        '<div class="GFI"></div>' +
-        '<div class="GME"></div>' +
-        '<br class="clear">' +
-        '<div class="GEM"></div>'
+            '<div class="GWO"></div>' +
+            '<div class="GEA"></div>' +
+            '<div class="GWA"></div>' +
+            '<div class="GFI"></div>' +
+            '<div class="GME"></div>' +
+            '<br class="clear">' +
+            '<div class="GEM"></div>'
     }
 }

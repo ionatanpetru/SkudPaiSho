@@ -57,7 +57,27 @@ export class WuxingGameManager {
         setGameLogText(this.gameLogText)
     }
 
+    revealDeployPoints(player, tileCode, ignoreActuate) {
+        this.board.setDeployPointsPossibleMoves(player, tileCode)
+
+        if (!ignoreActuate) {
+            this.actuate()
+        }
+    }
+
+    hidePossibleMovePoints(ignoreActuate) {
+        this.board.removePossibleMovePoints()
+        this.tileManager.removeSelectedTileFlags()
+        if (!ignoreActuate) {
+            this.actuate()
+        }
+    }
+
     cleanup() {
+    }
+
+    hasEnded() {
+        return false
     }
 
     // TODO: Implement winner logic
