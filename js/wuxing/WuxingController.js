@@ -1,10 +1,10 @@
 /* Wuxing Pai Sho */
 
-import { DEPLOY, GUEST, HOST, NotationPoint } from "../CommonNotationObjects.js";
+import { DEPLOY, GUEST, HOST, MOVE, NotationPoint } from "../CommonNotationObjects.js";
 import { debug } from "../GameData.js";
 import { gameOptionEnabled, WUXING_BOARD_ZONES } from "../GameOptions.js";
-import { BRAND_NEW, currentMoveIndex, gameId, GameType, getGameOptionsMessageHtml, isAnimationsOn, myTurn, onlinePlayEnabled, READY_FOR_BONUS, rerunAll, toBullets, userIsLoggedIn, WAITING_FOR_ENDPOINT } from "../PaiShoMain";
-import { GATE, NEUTRAL } from "../skud-pai-sho/SkudPaiShoBoardPoint.js";
+import { BRAND_NEW, callSubmitMove, createGameIfThatIsOk, currentMoveIndex, finalizeMove, gameId, GameType, getGameOptionsMessageHtml, isAnimationsOn, isInReplay, myTurn, onlinePlayEnabled, playingOnlineGame, READY_FOR_BONUS, rerunAll, toBullets, userIsLoggedIn, WAITING_FOR_ENDPOINT } from "../PaiShoMain";
+import { GATE, NEUTRAL, POSSIBLE_MOVE } from "../skud-pai-sho/SkudPaiShoBoardPoint.js";
 import { WuxingActuator } from "./WuxingActuator.js";
 import { WuxingGameManager } from "./WuxingGameManager.js";
 import { WuxingGameNotation, WuxingNotationBuilder } from "./WuxingNotation.js";
@@ -211,7 +211,69 @@ export class WuxingController {
         this.theGame.markingManager.clearMarkings()
         this.callActuate()
 
-        // TODO: Do the rest of the stuff
+        if (this.theGame.hasEnded()) return
+
+        if (!myTurn()) return
+
+        if (currentMoveIndex !== this.gameNotation.moves.length) {
+            debug("Can only interact if all moves are played")
+            return
+        }
+
+        // Get the board point
+        let npText = htmlPoint.getAttribute("name")
+        let notationPoint = new NotationPoint(npText)
+        let rowCol = notationPoint.rowAndColumn
+        let boardPoint = this.theGame.board.cells[rowCol.row][rowCol.col]
+
+        if (this.notationBuilder.status === BRAND_NEW) {
+            // NEW GAME
+            if (boardPoint.hasTile()) {
+                if (boardPoint.tile.ownerName !== this.getCurrentPlayer() || !myTurn()) {
+                    debug("Not your tile!")
+                    this.callActuate()
+                    return
+                }
+
+                this.notationBuilder.status = WAITING_FOR_ENDPOINT
+                this.notationBuilder.moveType = MOVE
+                this.notationBuilder.startPoint = new NotationPoint(npText)
+
+                this.theGame.revealPossibleMovePoints(boardPoint)
+            }
+        }
+        else if (this.notationBuilder.status === WAITING_FOR_ENDPOINT) {
+            if (boardPoint.isType(POSSIBLE_MOVE) && myTurn()) {
+                // They're trying to move there! And they can! Exciting!
+			    // Need the notation!
+                this.theGame.hidePossibleMovePoints()
+
+                if (!isInReplay) {
+                    this.theGame.endPoint = new NotationPoint(npText)
+                    let move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder)
+
+                    // Move all set. Add it to the notation and run it!
+                    this.gameNotation.addMove(move)
+                    this.theGame.runNotationMove(move)
+
+                    if (onlinePlayEnabled && this.gameNotation.moves.length === 1) {
+                        createGameIfThatIsOk(GameType.WuxingPaiSho.id)
+                    }
+                    else {
+                        if (playingOnlineGame()) {
+                            callSubmitMove()
+                        }
+                        else {
+                            finalizeMove()
+                        }
+                    }
+                }
+            }
+            else {
+                this.theGame.hidePossibleMovePoints()
+                this.resetNotationBuilder()
+            }
+        }
     }
 
     /* DISPLAY METHODS */

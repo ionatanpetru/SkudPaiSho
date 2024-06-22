@@ -1,7 +1,9 @@
+import { DEPLOY, MOVE } from "../CommonNotationObjects"
 import { PaiShoMarkingManager } from "../pai-sho-common/PaiShoMarkingManager"
 import { setGameLogText } from "../PaiShoMain"
 import { WuxingActuator } from "./WuxingActuator"
 import { WuxingBoard } from "./WuxingBoard"
+import { WuxingNotationMove } from "./WuxingNotation"
 import { WuxingTileManager } from "./WuxingTileManager"
 
 export class WuxingGameManager {
@@ -74,6 +76,28 @@ export class WuxingGameManager {
     }
 
     cleanup() {
+    }
+
+    /**
+     * 
+     * @param {WuxingNotationMove} move Move to play
+     */
+    runNotationMove(move, withActuate) {
+        debug("Running Move: " + move.fullMoveText);
+
+        //TODO: DO NOTATION MOVES
+        if (move.moveType == MOVE) {
+            
+        }
+        else if (move.moveType == DEPLOY) {
+            
+        }
+
+
+        if (withActuate) {
+            this.actuate()
+        }
+
     }
 
     hasEnded() {
