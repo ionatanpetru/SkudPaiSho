@@ -48,7 +48,27 @@ export class WuxingTileManager {
         return tiles
     }
 
-    grabTile( player, tileCode ) {}
+    /**
+     * Grabs a tile from the corresponding tile and returns it.
+     * @param {string} player HOST or GUEST
+     * @param {string} tileCode tilecode
+     * @returns {WuxingTile | null}
+     */
+    grabTile( player, tileCode ) {
+        let tilePile = player == HOST ? this.hostTiles : this.guestTiles
+
+        /** @type {WuxingTile} */
+        let tile
+        for (var i = 0; i < tilePile.length; i++) {
+            if (tilePile[i].code === tileCode) {
+                var newTileArr = tilePile.splice(i, 1);
+                tile = newTileArr[0];
+                break;
+            }
+        }
+
+        return tile
+    }
 
     peekTile(player, tileCode, tileId) {
         let tilePile = player === HOST ? this.hostTiles : this.guestTiles

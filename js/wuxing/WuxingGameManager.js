@@ -1,4 +1,5 @@
 import { DEPLOY, MOVE } from "../CommonNotationObjects"
+import { debug } from "../GameData"
 import { PaiShoMarkingManager } from "../pai-sho-common/PaiShoMarkingManager"
 import { setGameLogText } from "../PaiShoMain"
 import { WuxingActuator } from "./WuxingActuator"
@@ -90,7 +91,8 @@ export class WuxingGameManager {
             
         }
         else if (move.moveType == DEPLOY) {
-            
+            let tile = this.tileManager.grabTile(move.playerCode, move.tileType)
+            this.board.placeTile(tile, move.endPoint)
         }
 
 

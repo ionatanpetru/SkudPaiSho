@@ -1,7 +1,7 @@
-import { RowAndColumn } from "../CommonNotationObjects"
+import { NotationPoint, RowAndColumn } from "../CommonNotationObjects"
 import { NON_PLAYABLE, POSSIBLE_MOVE } from "../skud-pai-sho/SkudPaiShoBoardPoint"
 import { BLACK_GATE, GREEN_GATE, RED_GATE, WHITE_GATE, WuxingBoardPoint, YELLOW_GATE } from "./WuxingPointBoard"
-import { WU_EARTH, WU_EMPTY, WU_FIRE, WU_METAL, WU_WATER, WU_WOOD } from "./WuxingTile"
+import { WU_EARTH, WU_EMPTY, WU_FIRE, WU_METAL, WU_WATER, WU_WOOD, WuxingTile } from "./WuxingTile"
 
 export class WuxingBoard {
 
@@ -429,13 +429,23 @@ export class WuxingBoard {
         } )
     }
 
-    placeTile(tile, notationPoint, extraBoatPoint) {
-        //
+    /**
+     * 
+     * @param {WuxingTile} tile 
+     * @param {NotationPoint} notationPoint 
+     */
+    placeTile(tile, notationPoint) {
+        this.putTileOnPoint(tile, notationPoint);
+
+		// Things to do after a tile is placed
+
+        // Nothing :)
     }
 
     putTileOnPoint(tile, notationPoint) {
         let p = notationPoint.rowAndColumn
         let point = this.cells[p.row][p.col]
+        console.log(point)
         point.putTile(tile)
     }
 

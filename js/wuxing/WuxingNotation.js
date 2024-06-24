@@ -86,8 +86,8 @@ export class WuxingNotationMove {
 		    this.endPoint = new NotationPoint(parts[1].substring(0, parts[1].indexOf(')')));
         }
         else if (this.moveType === DEPLOY) {
-            // Get the tile deployed and its position: EA-(-8,0)
-            let parts = moveText.substring(2).split('-(')
+            // Get the tile deployed and its position: EA(-8,0)
+            let parts = moveText.split('(')
 
             if (parts.length != 2) {
                 this.isValid = false
@@ -265,8 +265,13 @@ export class WuxingNotationBuilder {
     moveType = ""
     plantedlowerType = ""
 
+    /** @type {NotationPoint} */
+    startPoint
+
+    /** @type {NotationPoint} */
+    endPoint
+
     /**
-     * TODO: DECIDE ON A NOTATION
      * 
      * Taken from CaptureGameNotation.js
      * @param {number} moveNum 
@@ -274,7 +279,14 @@ export class WuxingNotationBuilder {
      * @returns {WuxingNotationMove}
      */
     getNotationMove( moveNum, player ) {
-        let notationLine = ""
+        let notationLine = moveNum + player.charAt(0) + "."
+
+        if (this.moveType === MOVE) {
+            notationLine += `(${this.startPoint.pointText})-(${this.endPoint.pointText})`
+        }
+        else if (this.moveType === DEPLOY) {
+            notationLine += `${this.tileType}(${this.endPoint.pointText})`
+        }
 
         return new WuxingNotationMove(notationLine)
     }

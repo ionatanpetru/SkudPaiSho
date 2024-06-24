@@ -116,6 +116,10 @@ export class WuxingController {
         return false
     }
 
+    getAiList() {
+        return []
+    }
+
     getCurrentPlayer() {
         if (currentMoveIndex % 2 == 0) return GUEST
         return HOST
@@ -155,6 +159,8 @@ export class WuxingController {
             this.notationBuilder.moveType = DEPLOY
             this.notationBuilder.tileType = tileCode
             this.notationBuilder.status = WAITING_FOR_ENDPOINT
+
+            console.log("NotationBUilder", this.notationBuilder)
 
             this.theGame.revealDeployPoints(tile.ownerCode, tileCode)
         }
@@ -237,7 +243,7 @@ export class WuxingController {
 
                 this.notationBuilder.status = WAITING_FOR_ENDPOINT
                 this.notationBuilder.moveType = MOVE
-                this.notationBuilder.startPoint = new NotationPoint(npText)
+                this.notationBuilder.endPoint = new NotationPoint(npText)
 
                 this.theGame.revealPossibleMovePoints(boardPoint)
             }
@@ -249,7 +255,8 @@ export class WuxingController {
                 this.theGame.hidePossibleMovePoints()
 
                 if (!isInReplay) {
-                    this.theGame.endPoint = new NotationPoint(npText)
+                    this.notationBuilder.endPoint = new NotationPoint(npText)
+                    console.log(this.notationBuilder)
                     let move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder)
 
                     // Move all set. Add it to the notation and run it!
