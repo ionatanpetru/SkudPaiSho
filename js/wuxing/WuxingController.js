@@ -156,6 +156,7 @@ export class WuxingController {
         let tile = this.theGame.tileManager.peekTile(player, tileCode, tileId)
 
         if (this.notationBuilder.status === BRAND_NEW) {
+            tile.selectedFromPile = true
             this.notationBuilder.moveType = DEPLOY
             this.notationBuilder.tileType = tileCode
             this.notationBuilder.status = WAITING_FOR_ENDPOINT
@@ -256,9 +257,8 @@ export class WuxingController {
 
                 if (!isInReplay) {
                     this.notationBuilder.endPoint = new NotationPoint(npText)
-                    console.log(this.notationBuilder)
                     let move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder)
-
+                    console.log(move)
                     // Move all set. Add it to the notation and run it!
                     this.gameNotation.addMove(move)
                     this.theGame.runNotationMove(move)

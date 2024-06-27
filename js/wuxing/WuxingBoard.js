@@ -445,7 +445,6 @@ export class WuxingBoard {
     putTileOnPoint(tile, notationPoint) {
         let p = notationPoint.rowAndColumn
         let point = this.cells[p.row][p.col]
-        console.log(point)
         point.putTile(tile)
     }
 
