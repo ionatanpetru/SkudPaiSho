@@ -376,6 +376,16 @@ export class WuxingBoard {
     }
 
     /**
+     * TODO: Take it from anoter Board
+     * @param {WuxingBoardPoint} boardPointStart 
+     */
+    setPossibleMovePoints(boardPointStart) {
+        if (!boardPointStart.hasTile()) return
+
+        // POSSIBLE POINTS
+    }
+
+    /**
      * 
      * @param {string} player HOST or GUEST
      * @param {string} tileCode 

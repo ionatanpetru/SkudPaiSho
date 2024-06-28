@@ -138,6 +138,8 @@ export class WuxingController {
             return
         }
 
+        debug("My turn:", myTurn())
+
         if (!myTurn()) {
             return
         }
@@ -160,9 +162,6 @@ export class WuxingController {
             this.notationBuilder.moveType = DEPLOY
             this.notationBuilder.tileType = tileCode
             this.notationBuilder.status = WAITING_FOR_ENDPOINT
-
-            console.log("NotationBUilder", this.notationBuilder)
-
             this.theGame.revealDeployPoints(tile.ownerCode, tileCode)
         }
         else {
@@ -233,12 +232,13 @@ export class WuxingController {
         let rowCol = notationPoint.rowAndColumn
         let boardPoint = this.theGame.board.cells[rowCol.row][rowCol.col]
 
+        console.log("Point clicked recieved status", this.notationBuilder.status)
+
         if (this.notationBuilder.status === BRAND_NEW) {
             // NEW GAME
             if (boardPoint.hasTile()) {
                 if (boardPoint.tile.ownerName !== this.getCurrentPlayer() || !myTurn()) {
                     debug("Not your tile!")
-                    this.callActuate()
                     return
                 }
 
@@ -258,10 +258,9 @@ export class WuxingController {
                 if (!isInReplay) {
                     this.notationBuilder.endPoint = new NotationPoint(npText)
                     let move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder)
-                    console.log(move)
                     // Move all set. Add it to the notation and run it!
+                    this.theGame.runNotationMove(move, true)
                     this.gameNotation.addMove(move)
-                    this.theGame.runNotationMove(move)
 
                     if (onlinePlayEnabled && this.gameNotation.moves.length === 1) {
                         createGameIfThatIsOk(GameType.WuxingPaiSho.id)

@@ -5,6 +5,7 @@ import { setGameLogText } from "../PaiShoMain"
 import { WuxingActuator } from "./WuxingActuator"
 import { WuxingBoard } from "./WuxingBoard"
 import { WuxingNotationMove } from "./WuxingNotation"
+import { WuxingBoardPoint } from "./WuxingPointBoard.js"
 import { WuxingTileManager } from "./WuxingTileManager"
 
 export class WuxingGameManager {
@@ -29,6 +30,9 @@ export class WuxingGameManager {
 
     /** @type {PaiShoMarkingManager} */
     markingManager
+
+    /** @type {string} */
+    lastPlayerName
 
     constructor( actuator, ignoreActuate, isCopy ) {
         this.gameLogText = ''
@@ -60,6 +64,21 @@ export class WuxingGameManager {
         setGameLogText(this.gameLogText)
     }
 
+    /**
+     * 
+     * @param {WuxingBoardPoint} boardPoint 
+     * @param {boolean} ignoreActuate 
+     */
+    revealPossibleMovePoints(boardPoint, ignoreActuate) {
+        if (!boardPoint.hasTile()) return
+
+        this.board.setPossibleMovePoints(boardPoint)
+
+        if (!ignoreActuate) {
+            this.actuate()
+        }
+    }
+
     revealDeployPoints(player, tileCode, ignoreActuate) {
         this.board.setDeployPointsPossibleMoves(player, tileCode)
 
@@ -84,7 +103,8 @@ export class WuxingGameManager {
      * @param {WuxingNotationMove} move Move to play
      */
     runNotationMove(move, withActuate) {
-        debug("Running Move: " + move.fullMoveText);
+        debug("From WuxingGameManager.js")
+        debug("Running Move: " + move.fullMoveText + " Move type: " + move.moveType);
 
         //TODO: DO NOTATION MOVES
         if (move.moveType == MOVE) {
@@ -99,6 +119,8 @@ export class WuxingGameManager {
         if (withActuate) {
             this.actuate()
         }
+
+        this.lastPlayerName = move.player
 
     }
 

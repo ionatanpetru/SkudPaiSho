@@ -168,12 +168,15 @@ export class WuxingGameNotation {
      * @returns {WuxingNotationMove}
      */
     getNotationMoveFromBuilder(builder) {
-        let moveNum = 0
-        let player = HOST
+        let moveNum = 1
+        let player = GUEST
         let lastMove = this.moves[this.moves.length - 1]
 
         if (lastMove) {
             moveNum = lastMove.moveNum
+
+            console.log(moveNum)
+
             if (lastMove.player === GUEST) {
                 moveNum++
             } else {
