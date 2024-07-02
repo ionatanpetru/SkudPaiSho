@@ -142,6 +142,11 @@ export class WuxingGameNotation {
         if (this.notationText) {
             this.notationText += ";" + move.fullMoveText
         }
+        else {
+            this.notationText = move.fullMoveText
+        }
+
+        this.loadMoves()
     }
 
     removeLastMove() {
