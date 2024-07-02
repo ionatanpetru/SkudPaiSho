@@ -120,10 +120,10 @@ export class WuxingActuator {
         }
 
         // Go through tile piles and display
-        for (const tile of fullTileSet.hostTiles) {
+        for (const tile of tileManager.hostTiles) {
             this.addTile(tile, this.hostTilesContainer)
         }
-        for (const tile of fullTileSet.guestTiles) {
+        for (const tile of tileManager.guestTiles) {
             this.addTile(tile, this.guestTilesContainer)
         }
     }
