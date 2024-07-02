@@ -122,7 +122,7 @@ export class WuxingGameNotation {
     /** @type {string} */
     notationText = ""
 
-    /** @type {Array<WUxingNotationMove>} */
+    /** @type {Array<WuxingNotationMove>} */
     moves = []
 
     /** @param {string} text */
@@ -206,12 +206,12 @@ export class WuxingGameNotation {
         let lastPlayer = GUEST
         for (const line of lines) {
             let move = new WuxingNotationMove(line)
-            if (move.isValidNotation() && move.player !== lastPlayer) {
+            if (move.isValidNotation() && move.playerCode !== lastPlayer) {
                 this.moves.push(move)
                 lastPlayer = move.player
             }
             else {
-                debug("the player check is broken?")
+                debug("the player check is broken? got " + move.isValidNotation() + " && " + move.playerCode !== lastPlayer)
             }
         }
     }

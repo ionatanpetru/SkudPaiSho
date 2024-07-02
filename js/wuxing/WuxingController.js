@@ -121,6 +121,7 @@ export class WuxingController {
     }
 
     getCurrentPlayer() {
+        console.log("CUrrent move index:", currentMoveIndex)
         if (currentMoveIndex % 2 == 0) return GUEST
         return HOST
     }
@@ -138,8 +139,6 @@ export class WuxingController {
             return
         }
 
-        debug("My turn:", myTurn())
-
         if (!myTurn()) {
             return
         }
@@ -156,6 +155,11 @@ export class WuxingController {
 
         let player = playerCode === 'H' ? HOST : GUEST
         let tile = this.theGame.tileManager.peekTile(player, tileCode, tileId)
+
+        if (tile.ownerName !== this.getCurrentPlayer()) {
+            debug("That's not your tile")
+            return
+        }
 
         if (this.notationBuilder.status === BRAND_NEW) {
             tile.selectedFromPile = true
@@ -259,7 +263,7 @@ export class WuxingController {
                     this.notationBuilder.endPoint = new NotationPoint(npText)
                     let move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder)
                     // Move all set. Add it to the notation and run it!
-                    this.theGame.runNotationMove(move, true)
+                    this.theGame.runNotationMove(move)
                     this.gameNotation.addMove(move)
 
                     if (onlinePlayEnabled && this.gameNotation.moves.length === 1) {
