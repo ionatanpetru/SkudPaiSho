@@ -1,5 +1,5 @@
 import { NotationPoint, RowAndColumn } from "../CommonNotationObjects"
-import { NON_PLAYABLE, POSSIBLE_MOVE } from "../skud-pai-sho/SkudPaiShoBoardPoint"
+import { GATE, NON_PLAYABLE, POSSIBLE_MOVE } from "../skud-pai-sho/SkudPaiShoBoardPoint"
 import { BLACK_GATE, GREEN_GATE, RED_GATE, WHITE_GATE, WuxingBoardPoint, YELLOW_GATE } from "./WuxingPointBoard"
 import { WU_EARTH, WU_EMPTY, WU_FIRE, WU_METAL, WU_WATER, WU_WOOD, WuxingTile } from "./WuxingTile"
 
@@ -376,13 +376,195 @@ export class WuxingBoard {
     }
 
     /**
-     * TODO: Take it from anoter Board
+     * 
+     * @param {string} player GUEST or HOST
+     * @param {WuxingBoardPoint} bpStart 
+     * @param {WuxingBoardPoint} bpEnd 
+     * @returns {boolean}
+     */
+    _canMoveTileToPoint(player, bpStart, bpEnd) {
+        // Start point must have tile
+        if (!bpStart.hasTile()) {
+            return false
+        }
+
+        // Tile must belong to player
+        if (bpStart.tile.ownerName !== player) {
+            return false
+        }
+
+        // Can't capture tiles from gates
+        if (bpEnd.isType(GATE)) {
+            return false
+        }
+
+        let canCaptureEndTile = bpEnd.hasTile()
+            ? this._canTileStartCaptureEnd(bpStart, bpEnd)
+            : false
+
+        // Can only move if the endpoint has a capturable tile
+        if (bpEnd.hasTile() && !canCaptureEndTile) {
+            return false
+        }
+
+        // Movement
+        let numMoves = bpStart.tile.getMoveDistance()
+        if (Math.abs(bpStart.row - bpEnd.row) + Math.abs(bpStart.col - bpEnd.col) > numMoves) {
+            // That's too far!
+            return false
+        }
+        else {
+            // Move may be possible. But there may be tiles in the way
+            if (!this._verifyAbleToReach(bpStart, bpEnd, numMoves, bpStart.tile)) {
+                return false
+            }
+        }
+
+        // Suppose he can move
+        return true
+    }
+
+    /**
+     * Taken from VagabondBoard.js
+     * @param {WuxingBoardPoint} bpStart 
+     * @param {WuxingBoardPoint} bpEnd 
+     * @param {number} numMoves 
+     * @param {WuxingTile} movingTile 
+     */
+    _verifyAbleToReach(bpStart, bpEnd, numMoves, movingTile) {
+        // Recursion!
+        return this._pathFound(bpStart, bpEnd, numMoves, movingTile)
+    }
+
+    /**
+     * Taken from VagabondBoard.js
+     * @param {WuxingBoardPoint} bpStart 
+     * @param {WuxingBoardPoint} bpEnd 
+     * @param {number} numMoves 
+     * @param {WuxingTile} movingTile 
+     */
+    _pathFound(bpStart, bpEnd, numMoves, movingTile) {
+        if (!bpStart || !bpEnd) {
+            return false
+        }
+
+        if (bpStart.isType(NON_PLAYABLE) || bpEnd.isType(NON_PLAYABLE)) {
+            return false // Paths must be through playable points
+        }
+
+        if (bpStart.row === bpEnd.row && bpStart.col === bpEnd.col) {
+            return false // Moving to the same point, very funny
+        }
+
+        if (numMoves <= 0) {
+            return false // No more recursiveness
+        }
+
+        let minMoves = Math.abs(bpStart.row - bpEnd.row) + Math.abs(bpStart.col - bpEnd.col)
+        if (minMoves === 1) {
+            return true // Only one space away
+        }
+
+        // Check move UP
+        let nextRow = bpStart.row - 1
+        if (nextRow >= 0) {
+            let nextPoint = this.cells[nextRow][bpStart.col]
+            if (!nextPoint.hasTile() && this._pathFound(nextPoint, bpEnd, numMoves - 1, movingTile)) {
+                return true
+            }
+        }
+
+        // Check move DOWN
+        nextRow = bpStart.row + 1
+        if (nextRow < 17) {
+            let nextPoint = this.cells[nextRow][bpStart.col]
+            if (!nextPoint.hasTile() && this._pathFound(nextPoint, bpEnd, numMoves - 1, movingTile)) {
+                return true
+            }
+        }
+
+        // Check move LEFT
+        let nextCol = bpStart.col - 1
+        if (nextCol >= 0) {
+            let nextPoint = this.cells[bpStart.row][nextCol]
+            if (!nextPoint.hasTile() && this._pathFound(nextPoint, bpEnd, numMoves - 1, movingTile)) {
+                return true
+            }
+        }
+
+        // Check move LEFT
+        nextCol = bpStart.col + 1
+        if (nextCol < 17) {
+            let nextPoint = this.cells[bpStart.row][nextCol]
+            if (!nextPoint.hasTile() && this._pathFound(nextPoint, bpEnd, numMoves - 1, movingTile)) {
+                return true
+            }
+        }
+    }
+
+    /**
+     * 
+     * @param {WuxingBoardPoint} bpStart 
+     * @param {WuxingBoardPoint} bpEnd 
+     * @returns {boolean}
+     */
+    _canTileStartCaptureEnd(bpStart, bpEnd) {
+
+    }
+
+    /**
+     * 
+     * @param {string} playerCode GUEST or HOST
+     * @param {NotationPoint} notationPointStart 
+     * @param {NotationPoint} notationPointEnd 
+     */
+    moveTile( playerCode, notationPointStart, notationPointEnd ) {
+        let start = notationPointStart.rowAndColumn
+        let end = notationPointEnd.rowAndColumn
+
+        // Basic checks
+        if (start.row < 0 || start.row > 16 || end.row < 0 || end.row > 16) {
+            debug("That point does not exist. So it's not gonna happen.");
+			return false
+        }
+
+        let bpStart = this.cells[start.row][start.col]
+        let bpEnd = this.cells[end.row][end.col]
+
+        if (!this._canMoveTileToPoint(player, bpStart, bpEnd)) {
+            debug("Bad move bears");
+			showBadMoveModal();
+			return false;
+        }
+
+        let tile = bpStart.removeTile()
+
+        if (!tile) {
+			debug("Error: No tile to move!");
+		}
+
+        return true
+    }
+
+    /**
+     * Taken from VagabondBoard.js
      * @param {WuxingBoardPoint} boardPointStart 
      */
     setPossibleMovePoints(boardPointStart) {
         if (!boardPointStart.hasTile()) return
 
+        let player = boardPointStart.tile.ownerName
+
         // POSSIBLE POINTS
+        for (const row of this.cells) {
+            for (const bp of row) {
+                if (!bp.isType(NON_PLAYABLE)) {
+                    if (this._canMoveTileToPoint(player, boardPointStart, bp)) {
+                        bp.addType(POSSIBLE_MOVE)
+                    }
+                }
+            }
+        }
     }
 
     /**

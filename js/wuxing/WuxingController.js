@@ -247,7 +247,7 @@ export class WuxingController {
 
                 this.notationBuilder.status = WAITING_FOR_ENDPOINT
                 this.notationBuilder.moveType = MOVE
-                this.notationBuilder.endPoint = new NotationPoint(npText)
+                this.notationBuilder.startPoint = new NotationPoint(npText)
 
                 this.theGame.revealPossibleMovePoints(boardPoint)
             }

@@ -62,6 +62,12 @@ export class WuxingBoardPoint {
         this.tile = tile
     }
 
+    removeTile() {
+        let tile = this.tile
+        this.tile = null
+        return tile
+    }
+
     /**
      * Taken from SpiritBoardPoint.js
      */
