@@ -120,8 +120,7 @@ export class WuxingGameManager {
             this.actuate()
         }
 
-        this.lastPlayerName = move.player
-
+        this.lastPlayerName = move.playerCode
     }
 
     hasEnded() {
