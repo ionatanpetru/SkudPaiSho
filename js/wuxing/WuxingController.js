@@ -121,8 +121,7 @@ export class WuxingController {
     }
 
     getCurrentPlayer() {
-        console.log("CUrrent move index:", currentMoveIndex)
-        if (currentMoveIndex % 2 == 0) return GUEST
+        if (this.gameNotation.moves.length % 2 == 0) return GUEST
         return HOST
     }
 

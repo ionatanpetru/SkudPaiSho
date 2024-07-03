@@ -1,4 +1,5 @@
 import { HOST } from "../CommonNotationObjects";
+import { debug } from "../GameData";
 import { gameOptionEnabled, WUXING_EMPTY_TILE } from "../GameOptions";
 import { WU_EARTH, WU_EMPTY, WU_FIRE, WU_METAL, WU_WATER, WU_WOOD, WuxingTile } from "./WuxingTile";
 
@@ -65,6 +66,10 @@ export class WuxingTileManager {
                 tile = newTileArr[0];
                 break;
             }
+        }
+
+        if (!tile) {
+            debug("And we didn't get any tiles from params: " + player + " " + tileCode)
         }
 
         return tile

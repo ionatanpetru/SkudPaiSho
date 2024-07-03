@@ -155,12 +155,12 @@ export class WuxingGameNotation {
     }
 
     getPlayerMoveNum() {
-        let moveNum = 0
+        let moveNum = 1
         let lastMove = this.moves[this.moves.length - 1]
 
         if (lastMove) {
             moveNum = lastMove.moveNum
-            if (lastMove.player == GUEST) {
+            if (lastMove.playerCode == GUEST) {
                 moveNum++
             }
         }
@@ -180,12 +180,17 @@ export class WuxingGameNotation {
         if (lastMove) {
             moveNum = lastMove.moveNum
 
-            console.log(moveNum)
-
-            if (lastMove.player === GUEST) {
+            if (lastMove.moveNum === 0 && lastMove.playerCode === HOST) {
+                player = GUEST
+            }
+            else if (lastMove.moveNum === 0 && lastMove.playerCode === GUEST) {
+                moveNum++
+                player = GUEST
+            }
+            else if (lastMove.playerCode === HOST) {
                 moveNum++
             } else {
-                player = GUEST
+                player = HOST
             }
         }
 
@@ -208,7 +213,7 @@ export class WuxingGameNotation {
             }
         }
 
-        let lastPlayer = GUEST
+        let lastPlayer = HOST // Lets say the host started the game
         for (const line of lines) {
             let move = new WuxingNotationMove(line)
             if (move.isValidNotation() && move.playerCode !== lastPlayer) {
@@ -216,7 +221,7 @@ export class WuxingGameNotation {
                 lastPlayer = move.player
             }
             else {
-                debug("the player check is broken? got " + move.isValidNotation() + " && " + move.playerCode !== lastPlayer)
+                debug("the player check is broken?")
             }
         }
     }
