@@ -531,7 +531,7 @@ export class WuxingBoard {
         let bpStart = this.cells[start.row][start.col]
         let bpEnd = this.cells[end.row][end.col]
 
-        if (!this._canMoveTileToPoint(player, bpStart, bpEnd)) {
+        if (!this._canMoveTileToPoint(playerCode, bpStart, bpEnd)) {
             debug("Bad move bears");
 			showBadMoveModal();
 			return false;
@@ -542,6 +542,8 @@ export class WuxingBoard {
         if (!tile) {
 			debug("Error: No tile to move!");
 		}
+
+        bpEnd.putTile(tile)
 
         return true
     }
