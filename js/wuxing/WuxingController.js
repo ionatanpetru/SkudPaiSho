@@ -165,7 +165,7 @@ export class WuxingController {
             this.notationBuilder.moveType = DEPLOY
             this.notationBuilder.tileType = tileCode
             this.notationBuilder.status = WAITING_FOR_ENDPOINT
-            this.theGame.revealDeployPoints(tile.ownerCode, tileCode)
+            this.theGame.revealDeployPoints(tile.ownerName, tileCode)
         }
         else {
             this.theGame.hidePossibleMovePoints()
