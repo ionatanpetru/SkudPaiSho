@@ -393,7 +393,7 @@ export class WuxingBoard {
             return false
         }
 
-        // Can't capture tiles from gates
+        // Can't move tiles directly to gates
         if (bpEnd.isType(GATE)) {
             return false
         }
