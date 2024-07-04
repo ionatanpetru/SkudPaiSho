@@ -347,7 +347,6 @@ export class WuxingController {
         } else if (point.isType(RED_GATE)) {
             msg = "Red or South Gate. Fire tiles are deployed here."
         } else if (point.isType(BLACK_GATE)) {
-            heading = BLACK_GATE
             msg = "Black or North Gate. Water tiles are deployed here."
         } else if (point.isType(GREEN_GATE)) {
             msg = "Green or Eastern Gate. Wood tiles are deployed here."
