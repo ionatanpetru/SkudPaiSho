@@ -9,6 +9,33 @@ export const WU_FIRE = "FI"
 export const WU_METAL = "ME"
 export const WU_EMPTY = "EM"
 
+/**
+ * Util function that determines if a tile's element can capture another
+ * @param {string} element Element to check if it can capture
+ * @param {string} other Element we want to know if its capturable
+ */
+export function canElementCaptureOther(element, other) {
+    if (element == WU_EMPTY || other == WU_EMPTY) {
+        return true
+    }
+    else if (element == WU_WOOD && other == WU_EARTH) {
+        return true
+    }
+    else if (element == WU_EARTH && other == WU_WATER) {
+        return true
+    }
+    else if (element == WU_WATER && other == WU_FIRE) {
+        return true
+    }
+    else if (element == WU_FIRE && other == WU_METAL) {
+        return true
+    }
+    else if (element == WU_METAL && other == WU_WOOD) {
+        return true
+    }
+    else return false
+}
+
 export class WuxingTile {
 
     static baseMovement = 3

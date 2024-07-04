@@ -1,7 +1,7 @@
 import { NotationPoint, RowAndColumn } from "../CommonNotationObjects"
 import { GATE, NON_PLAYABLE, POSSIBLE_MOVE } from "../skud-pai-sho/SkudPaiShoBoardPoint"
 import { BLACK_GATE, GREEN_GATE, RED_GATE, WHITE_GATE, WuxingBoardPoint, YELLOW_GATE } from "./WuxingPointBoard"
-import { WU_EARTH, WU_EMPTY, WU_FIRE, WU_METAL, WU_WATER, WU_WOOD, WuxingTile } from "./WuxingTile"
+import { canElementCaptureOther, WU_EARTH, WU_EMPTY, WU_FIRE, WU_METAL, WU_WATER, WU_WOOD, WuxingTile } from "./WuxingTile"
 
 export class WuxingBoard {
 
@@ -503,13 +503,20 @@ export class WuxingBoard {
     }
 
     /**
-     * 
+     * Can the tile present in `bpStart` capture the one located in `bpEnd`?
      * @param {WuxingBoardPoint} bpStart 
      * @param {WuxingBoardPoint} bpEnd 
      * @returns {boolean}
      */
     _canTileStartCaptureEnd(bpStart, bpEnd) {
+        if (bpStart.tile == null || bpEnd.tile == null) {
+            return false // Can't capture a tile if there isn't one :)
+        }
 
+        let capturerTile = bpStart.tile
+        let capturedTile = bpEnd.tile
+
+        return canElementCaptureOther(capturerTile.code, capturedTile.code)
     }
 
     /**
