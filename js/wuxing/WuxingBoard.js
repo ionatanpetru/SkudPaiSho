@@ -408,7 +408,9 @@ export class WuxingBoard {
         }
 
         // Movement
-        let numMoves = bpStart.tile.getMoveDistance()
+        let sorroundingBPs = this.getSurroundingBoardPoints(bpStart)
+        let numMoves = bpStart.tile.getMoveDistance(sorroundingBPs, bpStart.isType(GATE))
+
         if (Math.abs(bpStart.row - bpEnd.row) + Math.abs(bpStart.col - bpEnd.col) > numMoves) {
             // That's too far!
             return false
@@ -669,4 +671,25 @@ export class WuxingBoard {
 	    }
 	    return rowAndCols;
     }
+
+    /**
+     * 
+     * @param {WuxingBoardPoint} initialBoardPoint 
+     * @returns {Array<WuxingBoardPoint>}
+     */
+    getSurroundingBoardPoints(initialBoardPoint) {
+		var surroundingPoints = [];
+		for (var row = initialBoardPoint.row - 1; row <= initialBoardPoint.row + 1; row++) {
+			for (var col = initialBoardPoint.col - 1; col <= initialBoardPoint.col + 1; col++) {
+				if ((row !== initialBoardPoint.row || col !== initialBoardPoint.col) // Not the center given point
+					&& (row >= 0 && col >= 0) && (row < 17 && col < 17)) { // Not outside range of the grid
+					var boardPoint = this.cells[row][col];
+					if (!boardPoint.isType(NON_PLAYABLE)) { // Not non-playable
+						surroundingPoints.push(boardPoint);
+					}
+				}
+			}
+		}
+		return surroundingPoints;
+	}
 }
