@@ -109,7 +109,12 @@ export class WuxingGameManager {
         //TODO: DO NOTATION MOVES
         if (move.moveType == MOVE) {
             let moveResults = this.board.moveTile(move.playerCode, move.startPoint, move.endPoint)
-            console.log(moveResults)
+
+            // Did we capture a tile?
+            if (moveResults && moveResults.capturedTile) {
+                let capturedTile = moveResults.capturedTile
+                this.tileManager.addToCapturedTiles( capturedTile, move.playerCode )
+            }
         }
         else if (move.moveType == DEPLOY) {
             let tile = this.tileManager.grabTile(move.playerCode, move.tileType)

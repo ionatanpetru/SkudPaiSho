@@ -51,9 +51,6 @@ export class WuxingController {
         this.resetGameManager()
         this.resetNotationBuilder()
         this.resetGameNotation()
-
-        this.hostAccentTiles = []
-        this.guestAccentTiles = []
     }
 
     /**
@@ -497,13 +494,18 @@ export class WuxingController {
      * */
     static getHostTilesContainerDivs() {
         return '' +
-            '<div class="HWO"></div>' +
-            '<div class="HEA"></div>' +
-            '<div class="HWA"></div>' +
-            '<div class="HFI"></div>' +
-            '<div class="HME"></div>' +
-            '<br class="clear">' +
-            '<div class="HEM"></div>'
+        '<span>~Host\'s Tile Library~</span>' +
+        '<br>' +
+        '<div class="HWO"></div>' +
+        '<div class="HEA"></div>' +
+        '<div class="HWA"></div>' +
+        '<div class="HFI"></div>' +
+        '<div class="HME"></div>' +
+        '<br class="clear">' +
+        '<div class="HEM"></div>' +
+        '<br class="clear">' +
+        '<span>~Host\'s Captured Tiles~</span>' +
+        '<span class="tileLibrary"></span>'
     }
 
     /**
@@ -515,12 +517,17 @@ export class WuxingController {
     /** @returns {string} */
     static getGuestTilesContainerDivs() {
         return '' +
-            '<div class="GWO"></div>' +
-            '<div class="GEA"></div>' +
-            '<div class="GWA"></div>' +
-            '<div class="GFI"></div>' +
-            '<div class="GME"></div>' +
-            '<br class="clear">' +
-            '<div class="GEM"></div>'
+        '<span>~Guest\'s Captured Tiles~</span>' +
+        '<br>' +
+        '<div class="GWO"></div>' +
+        '<div class="GEA"></div>' +
+        '<div class="GWA"></div>' +
+        '<div class="GFI"></div>' +
+        '<div class="GME"></div>' +
+        '<br class="clear">' +
+        '<div class="GEM"></div>' +
+        '<br class="clear">' +
+        '<span>~Guest\'s Captured Tiles~</span>' +
+        '<span class="tileLibrary"></span>'
     }
 }

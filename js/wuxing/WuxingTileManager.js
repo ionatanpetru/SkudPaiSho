@@ -1,4 +1,4 @@
-import { HOST } from "../CommonNotationObjects";
+import { GUEST, HOST } from "../CommonNotationObjects";
 import { debug } from "../GameData";
 import { gameOptionEnabled, WUXING_EMPTY_TILE } from "../GameOptions";
 import { WU_EARTH, WU_EMPTY, WU_FIRE, WU_METAL, WU_WATER, WU_WOOD, WuxingTile } from "./WuxingTile";
@@ -11,9 +11,18 @@ export class WuxingTileManager {
     /** @type {Array<WuxingTile>} */
     guestTiles
 
+    /** @type {Array<WuxingTile>} */
+    capturedHostTiles
+
+    /** @type {Array<WuxingTile} */
+    capturedGuestTiles
+
     constructor() {
         this.hostTiles = this.loadTileSet('H')
         this.guestTiles = this.loadTileSet('G')
+
+        this.capturedHostTiles = []
+        this.capturedGuestTiles = []
     }
 
     /**
@@ -90,6 +99,20 @@ export class WuxingTileManager {
             if (tilePile[i].code === tileCode) {
                 return tilePile[i]
             }
+        }
+    }
+
+    /**
+     * 
+     * @param {WuxingTile} tile 
+     * @param {string} playerCode GUEST or HOST
+     */
+    addToCapturedTiles(tile, playerCode) {
+        if (playerCode === GUEST) {
+            this.capturedGuestTiles.push(tile)
+        }
+        else if (playerCode === HOST) {
+            this.capturedHostTiles.push(tile)
         }
     }
 

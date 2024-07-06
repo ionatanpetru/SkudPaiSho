@@ -112,12 +112,15 @@ export class WuxingActuator {
         let fullTileSet = new WuxingTileManager()
 
         // Go through tile piles and clear containers
-        for (let i = 0; i < fullTileSet.hostTiles.length; i++) {
-            this.clearTileContainer(fullTileSet.hostTiles[i])
+        for (const tile of fullTileSet.hostTiles) {
+            this.clearTileContainer(tile)
         }
         for (const tile of fullTileSet.guestTiles) {
             this.clearTileContainer(tile)
         }
+        // Don't forget the deleted tiles!
+        this.clearContainer( this.hostTilesContainer.querySelector('span.tileLibrary') )
+        this.clearContainer( this.guestTilesContainer.querySelector('span.tileLibrary') )
 
         // Go through tile piles and display
         for (const tile of tileManager.hostTiles) {
@@ -125,6 +128,14 @@ export class WuxingActuator {
         }
         for (const tile of tileManager.guestTiles) {
             this.addTile(tile, this.guestTilesContainer)
+        }
+
+        // Add deleted tiles
+        for (const capturedTile of tileManager.capturedHostTiles) {
+            this._addCapturedTile(capturedTile, this.hostTilesContainer)
+        }
+        for (const capturedTile of tileManager.capturedGuestTiles) {
+            this._addCapturedTile(capturedTile, this.guestTilesContainer)
         }
     }
 
@@ -157,7 +168,7 @@ export class WuxingActuator {
      */
     addTile(tile, mainContainer) {
 
-        let container = document.querySelector("." + tile.getImageName())
+        let container = mainContainer.querySelector("." + tile.getImageName())
         let div = document.createElement("div")
 
         div.classList.add("point")
@@ -190,6 +201,41 @@ export class WuxingActuator {
         }
 
         container.appendChild(div)
+    }
+
+    /**
+     * 
+     * @param {WuxingTile} tile 
+     * @param {HTMLDivElement} mainContainer Container of tiles.
+     */
+    _addCapturedTile(tile, mainContainer) {
+        const capturedContainer = mainContainer.querySelector('span.tileLibrary')
+        const div = document.createElement("div")
+
+        div.classList.add('point')
+        div.classList.add('hasTile')
+
+        const img = document.createElement('img')
+        const srcValue = this.getTileImageSourceDir()
+
+        img.src = srcValue + tile.getImageName() + '.png'
+
+        div.appendChild(img)
+
+        div.setAttribute("name", tile.getImageName())
+        div.setAttribute("id", tile.id)
+
+        if (this.isMobile) {
+            div.addEventListener('click', () => {
+                showTileMessage(div)
+            })
+        }
+        else {
+            div.addEventListener('mouseover', () => showTileMessage(div))
+            div.addEventListener('mouseout', clearMessage)
+        }
+
+        capturedContainer.appendChild(div)
     }
 
     /**

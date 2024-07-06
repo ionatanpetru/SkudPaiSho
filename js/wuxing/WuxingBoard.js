@@ -552,9 +552,16 @@ export class WuxingBoard {
 			debug("Error: No tile to move!");
 		}
 
+        // Capture the tile (but save it for later)
+        let capturedTile = bpEnd.tile
         bpEnd.putTile(tile)
 
-        return true
+        return {
+			movedTile: tile,
+			startPoint: notationPointStart,
+			endPoint: notationPointEnd,
+			capturedTile: capturedTile
+		};
     }
 
     /**
@@ -649,6 +656,10 @@ export class WuxingBoard {
         let p = notationPoint.rowAndColumn
         let point = this.cells[p.row][p.col]
         point.putTile(tile)
+    }
+
+    checkForEndGame() {
+        
     }
 
     /**
