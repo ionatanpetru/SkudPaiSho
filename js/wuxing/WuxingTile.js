@@ -18,26 +18,30 @@ const WU_WU_CYCLE = "Wu Cycle"
 
 /**
  * Util function that determines if a tile's element can capture another
- * @param {string} element Element to check if it can capture
- * @param {string} other Element we want to know if its capturable
+ * @param {WuxingTile} tile Tile to check if it can capture
+ * @param {WuxingTile} other Tile we want to know if its capturable
  */
-export function canElementCaptureOther(element, other) {
-    if (element == WU_EMPTY || other == WU_EMPTY) {
+export function canTileCaptureOther(tile, other) {
+    if (tile.ownerCode == other.ownerCode) {
+        return false
+    }
+
+    if (tile.code == WU_EMPTY || other.code == WU_EMPTY) {
         return true
     }
-    else if (element == WU_WOOD && other == WU_EARTH) {
+    else if (tile.code == WU_WOOD && other.code == WU_EARTH) {
         return true
     }
-    else if (element == WU_EARTH && other == WU_WATER) {
+    else if (tile.code == WU_EARTH && other.code == WU_WATER) {
         return true
     }
-    else if (element == WU_WATER && other == WU_FIRE) {
+    else if (tile.code == WU_WATER && other.code == WU_FIRE) {
         return true
     }
-    else if (element == WU_FIRE && other == WU_METAL) {
+    else if (tile.code == WU_FIRE && other.code == WU_METAL) {
         return true
     }
-    else if (element == WU_METAL && other == WU_WOOD) {
+    else if (tile.code == WU_METAL && other.code == WU_WOOD) {
         return true
     }
     else return false

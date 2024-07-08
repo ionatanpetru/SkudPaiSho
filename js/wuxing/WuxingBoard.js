@@ -1,7 +1,7 @@
 import { NotationPoint, RowAndColumn } from "../CommonNotationObjects"
 import { GATE, NON_PLAYABLE, POSSIBLE_MOVE } from "../skud-pai-sho/SkudPaiShoBoardPoint"
 import { BLACK_GATE, GREEN_GATE, RED_GATE, WHITE_GATE, WuxingBoardPoint, YELLOW_GATE } from "./WuxingPointBoard"
-import { canElementCaptureOther, WU_EARTH, WU_EMPTY, WU_FIRE, WU_METAL, WU_WATER, WU_WOOD, WuxingTile } from "./WuxingTile"
+import { canTileCaptureOther, WU_EARTH, WU_EMPTY, WU_FIRE, WU_METAL, WU_WATER, WU_WOOD, WuxingTile } from "./WuxingTile"
 
 export class WuxingBoard {
 
@@ -518,7 +518,7 @@ export class WuxingBoard {
         let capturerTile = bpStart.tile
         let capturedTile = bpEnd.tile
 
-        return canElementCaptureOther(capturerTile.code, capturedTile.code)
+        return canTileCaptureOther(capturerTile, capturedTile)
     }
 
     /**
