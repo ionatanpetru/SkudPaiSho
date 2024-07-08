@@ -1,7 +1,61 @@
-import { NotationPoint, RowAndColumn } from "../CommonNotationObjects"
+import { GUEST, HOST, NotationPoint, RowAndColumn } from "../CommonNotationObjects"
 import { GATE, NON_PLAYABLE, POSSIBLE_MOVE } from "../skud-pai-sho/SkudPaiShoBoardPoint"
 import { BLACK_GATE, GREEN_GATE, RED_GATE, WHITE_GATE, WuxingBoardPoint, YELLOW_GATE } from "./WuxingPointBoard"
 import { canTileCaptureOther, WU_EARTH, WU_EMPTY, WU_FIRE, WU_METAL, WU_WATER, WU_WOOD, WuxingTile } from "./WuxingTile"
+import { WuxingTileManager } from "./WuxingTileManager"
+
+/**
+ * The main way a player can win is:
+ * 1. The player has captured one of each tile
+ * 2. If they have captured an untransformed empty tile,
+ * said tile replaces one of the tiles they need to win.
+ * 
+ * @param {Array<WuxingTile} tiles Array of captured tiles
+ * @returns {boolean} Whether the player won or not
+ */
+function hasPlayerWonFromMainCondition( tiles ) {
+    const setOfTileTypes = new Set([""])
+    for (const tile of tiles) {
+        setOfTileTypes.add(tile.code)
+    }
+
+    const hasWood = setOfTileTypes.has(WU_WOOD)
+    const hasEarth = setOfTileTypes.has(WU_EARTH)
+    const hasWater = setOfTileTypes.has(WU_WATER)
+    const hasFire = setOfTileTypes.has(WU_FIRE)
+    const hasMetal = setOfTileTypes.has(WU_METAL)
+    const hasEmpty = setOfTileTypes.has(WU_EMPTY)
+
+    if (hasWood && hasEarth && hasWater && hasFire && hasMetal) {
+        return true // Classic win
+    } else if (hasEmpty && hasEarth && hasWater && hasFire && hasMetal) {
+        return true // Empty tile replaced Wood tile
+    }
+    else if (hasWood && hasEmpty && hasWater && hasFire && hasMetal) {
+        return true // Empty tile replaced Earth tile
+    }
+    else if (hasWood && hasEarth && hasEmpty && hasFire && hasMetal) {
+        return true // Empty tile replaced Water tile
+    }
+    else if (hasWood && hasEarth && hasWater && hasEmpty && hasMetal) {
+        return true // Empty tile replaced Fire tile
+    }
+    else if (hasWood && hasEarth && hasWater && hasFire && hasEmpty) {
+        return true // Empty tile replaced Metal tile
+    }
+
+    return false
+}
+
+/**
+ * Checks if the `player` has won trough the alt condition
+ * @param {WuxingTileManager} tileManager 
+ * @param {string} player GUEST or HOST - which player to look for the win condition
+ * @returns {boolean} Whether the player won or not
+ */
+function hasPlayerWonFromAltCondition(tileManager, player) {
+    return false
+}
 
 export class WuxingBoard {
 
@@ -13,6 +67,9 @@ export class WuxingBoard {
 
     /** @type {Array<string>} */
     winners
+
+    /** @type {string} */
+    winnerReason = ""
 
     constructor() {
         this.size = new RowAndColumn(17, 17)
@@ -658,8 +715,31 @@ export class WuxingBoard {
         point.putTile(tile)
     }
 
-    checkForEndGame() {
-        
+    /**
+     * Checks whether a player has won, and adds it as a winner and the reason why.
+     * @param {WuxingTileManager} tileManager Contains all the tiles neccesary to check if a player has won
+     */
+    checkForEndGame(tileManager) {
+        if (this.winners.length > 0) {
+            return
+        }
+
+        if ( hasPlayerWonFromMainCondition(tileManager.capturedHostTiles) ) {
+            this.winners.push(HOST)
+            this.winnerReason = " has captured all captured one of each of the opponent's tiles!"
+        }
+        else if ( hasPlayerWonFromMainCondition(tileManager.capturedGuestTiles) ) {
+            this.winners.push(GUEST)
+            this.winnerReason = " has captured all captured one of each of the opponent's tiles!"
+        }
+        else if ( hasPlayerWonFromAltCondition(tileManager, HOST) ) {
+            this.winners.push(HOST)
+            this.winnerReason = " has prevented their opponent from winning!"
+        }
+        else if ( hasPlayerWonFromAltCondition(tileManager, GUEST) ) {
+            this.winners.push(GUEST)
+            this.winnerReason = " has prevented their opponent from winning!"
+        }
     }
 
     /**

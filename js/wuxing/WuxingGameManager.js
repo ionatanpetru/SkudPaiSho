@@ -115,6 +115,8 @@ export class WuxingGameManager {
                 let capturedTile = moveResults.capturedTile
                 this.tileManager.addToCapturedTiles( capturedTile, move.playerCode )
             }
+
+            this.board.checkForEndGame(this.tileManager)
         }
         else if (move.moveType == DEPLOY) {
             let tile = this.tileManager.grabTile(move.playerCode, move.tileType)
@@ -130,15 +132,18 @@ export class WuxingGameManager {
     }
 
     hasEnded() {
-        return false
+        return this.board.winners.length > 0
     }
 
-    // TODO: Implement winner logic
     getWinner() {
-        return ""
+        if (this.board.winners.length === 1) {
+            return this.board.winners[0];
+        } else if (this.board.winners.length > 1) {
+            return "BOTH players";
+        }
     }
 
     getWinReason() {
-        return ""
+        return this.board.winnerReason
     }
 }
