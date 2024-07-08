@@ -435,42 +435,52 @@ export class WuxingController {
         switch (tileCode) {
             case WU_WOOD:
                 message.push("Deployed on East or Green Gate")
-                message.push("Moves up to 3 spaces")
+                message.push("Moves up to " + WuxingTile.baseMovement + " spaces")
                 message.push("Captures Earth Tiles")
-                message.push("If it's <b>Shēng</b> with Water it can move up to 5 spaces")
-                message.push("If it's <b>Xiè</b> with Fire it can move up to 2 spaces")
+                message.push("If it's <b>Shēng</b> with Water it can move up to " + WuxingTile.shengMovement + " spaces")
+                message.push("If it's <b>Xiè</b> with Fire it can move up to " + WuxingTile.xieMovement + " spaces")
+                message.push("If it's <b>Kè</b> with Metal it can move up to " + WuxingTile.keMovement + " spaces")
+                message.push("If it's <b>Wǔ</b> with Wood it can move up to " + WuxingTile.wuMovement + " spaces")
                 break
             case WU_EARTH:
                 message.push("Deployed on Center or Yellow Gate")
-                message.push("Moves up to 3 spaces")
+                message.push("Moves up to " + WuxingTile.baseMovement + " spaces")
                 message.push("Captures Water Tiles")
-                message.push("If it's <b>Shēng</b> with Fire it can move up to 5 spaces")
-                message.push("If it's <b>Xiè</b> with Metal it can move up to 2 spaces")
+                message.push("If it's <b>Shēng</b> with Fire it can move up to " + WuxingTile.shengMovement + " spaces")
+                message.push("If it's <b>Xiè</b> with Metal it can move up to " + WuxingTile.xieMovement + " spaces")
+                message.push("If it's <b>Kè</b> with Wood it can move up to " + WuxingTile.keMovement + " spaces")
+                message.push("If it's <b>Wǔ</b> with Earth it can move up to " + WuxingTile.wuMovement + " spaces")
                 break
             case WU_WATER:
                 message.push("Deployed on North or Black Gate")
-                message.push("Moves up to 3 spaces")
+                message.push("Moves up to " + WuxingTile.baseMovement + " spaces")
                 message.push("Captures Fire Tiles")
-                message.push("If it's <b>Shēng</b> with Metal it can move up to 5 spaces")
-                message.push("If it's <b>Xiè</b> with Wood it can move up to 2 spaces")
+                message.push("If it's <b>Shēng</b> with Metal it can move up to " + WuxingTile.shengMovement + " spaces")
+                message.push("If it's <b>Xiè</b> with Wood it can move up to " + WuxingTile.xieMovement + " spaces")
+                message.push("If it's <b>Kè</b> with Earth it can move up to " + WuxingTile.keMovement + " spaces")
+                message.push("If it's <b>Wǔ</b> with Water it can move up to " + WuxingTile.wuMovement + " spaces")
                 break
             case WU_FIRE:
                 message.push("Deployed on South or Red Gate")
-                message.push("Moves up to 3 spaces")
+                message.push("Moves up to " + WuxingTile.baseMovement + " spaces")
                 message.push("Captures Metal Tiles")
-                message.push("If it's <b>Shēng</b> with Wood it can move up to 5 spaces")
-                message.push("If it's <b>Xiè</b> with Earth it can move up to 2 spaces")
+                message.push("If it's <b>Shēng</b> with Wood it can move up to " + WuxingTile.shengMovement + " spaces")
+                message.push("If it's <b>Xiè</b> with Earth it can move up to " + WuxingTile.xieMovement + " spaces")
+                message.push("If it's <b>Kè</b> with Water it can move up to " + WuxingTile.keMovement + " spaces")
+                message.push("If it's <b>Wǔ</b> with Fire it can move up to " + WuxingTile.wuMovement + " spaces")
                 break
             case WU_METAL:
                 message.push("Deployed on West or White Gate")
-                message.push("Moves up to 3 spaces")
+                message.push("Moves up to " + WuxingTile.baseMovement + " spaces")
                 message.push("Captures Wood Tiles")
-                message.push("If it's <b>Shēng</b> with Earth it can move up to 5 spaces")
-                message.push("If it's <b>Xiè</b> with Water it can move up to 2 spaces")
+                message.push("If it's <b>Shēng</b> with Earth it can move up to " + WuxingTile.shengMovement + " spaces")
+                message.push("If it's <b>Xiè</b> with Water it can move up to " + WuxingTile.xieMovement + " spaces")
+                message.push("If it's <b>Kè</b> with Fire it can move up to " + WuxingTile.keMovement + " spaces")
+                message.push("If it's <b>Wǔ</b> with Metal it can move up to " + WuxingTile.wuMovement + " spaces")
                 break
             case WU_EMPTY:
                 message.push("Deployed on any Gate")
-                message.push("Moves up to 4 spaces")
+                message.push("Moves up to " + WuxingTile.emptyTileMovement + " spaces")
                 message.push("Can capture and be captured by any tile")
                 message.push("Transforms into the first tile it captures")
                 message.push("When the Empty Tile is transformed, it acts as the tile it captured")
