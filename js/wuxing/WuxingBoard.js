@@ -1,8 +1,21 @@
 import { GUEST, HOST, NotationPoint, RowAndColumn } from "../CommonNotationObjects"
+import { debug } from "../GameData"
 import { GATE, NON_PLAYABLE, POSSIBLE_MOVE } from "../skud-pai-sho/SkudPaiShoBoardPoint"
 import { BLACK_GATE, GREEN_GATE, RED_GATE, WHITE_GATE, WuxingBoardPoint, YELLOW_GATE } from "./WuxingPointBoard"
 import { canTileCaptureOther, WU_EARTH, WU_EMPTY, WU_FIRE, WU_METAL, WU_WATER, WU_WOOD, WuxingTile } from "./WuxingTile"
 import { WuxingTileManager } from "./WuxingTileManager"
+
+/**
+ * Util function that gets a set of tile types
+ * @param {Array<WuxingTile>} tiles 
+ * @returns {Set<string>} Set of tile types
+ */
+function getSetOfTileTypes(tiles) {
+    let set = new Set([""])
+    set.delete("")
+    tiles.map(tile => tile.code).forEach( type => set.add(type) )
+    return set
+}
 
 /**
  * The main way a player can win is:
@@ -14,10 +27,7 @@ import { WuxingTileManager } from "./WuxingTileManager"
  * @returns {boolean} Whether the player won or not
  */
 function hasPlayerWonFromMainCondition( tiles ) {
-    const setOfTileTypes = new Set([""])
-    for (const tile of tiles) {
-        setOfTileTypes.add(tile.code)
-    }
+    const setOfTileTypes = getSetOfTileTypes( tiles )
 
     const hasWood = setOfTileTypes.has(WU_WOOD)
     const hasEarth = setOfTileTypes.has(WU_EARTH)
@@ -48,12 +58,54 @@ function hasPlayerWonFromMainCondition( tiles ) {
 }
 
 /**
- * Checks if the `player` has won trough the alt condition
+ * Checks if the `player` has won trough the alt condition.
+ * 
+ * @param {WuxingBoard} board board
  * @param {WuxingTileManager} tileManager 
  * @param {string} player GUEST or HOST - which player to look for the win condition
  * @returns {boolean} Whether the player won or not
  */
-function hasPlayerWonFromAltCondition(tileManager, player) {
+function hasPlayerWonFromAltCondition(board, tileManager, player) {
+
+    // Utils refs
+    const allTypeTypesSet = new Set([WU_EARTH, WU_FIRE, WU_METAL, WU_WOOD, WU_WATER])
+    const opponentLibrary = player == HOST ? tileManager.guestTiles : tileManager.hostTiles
+    const opponentCapturedTiles = player == HOST ? tileManager.capturedGuestTiles : tileManager.capturedHostTiles
+    const allOpponentTiles = opponentLibrary.concat(
+        board.getTilesOnBoard().filter( tile => tile.ownerName != player )
+    )
+
+    // Get the tile types the opponent needs to win (normally)
+    let opponentCapturedTypes = getSetOfTileTypes( opponentCapturedTiles )
+
+    let typesOpponentNeeds = new Set([""])
+    typesOpponentNeeds.delete("")
+    for (const type of allTypeTypesSet) {
+        if (!opponentCapturedTypes.has(type)) {
+            typesOpponentNeeds.add(type)
+        }
+    }
+
+
+    // Does the opponent have a playable tile that they can use to capture those types?
+    for (const type of typesOpponentNeeds) {
+        const utilTile = new WuxingTile(type, player != HOST ? "G" : "H")
+
+        let canCaptureThatType = false
+
+        for (const tile of allOpponentTiles) {
+            // This check also includes Empty Tiles, since if tile is Empty Tile,
+            // Then it returns true as it can capture it
+            if ( canTileCaptureOther(tile, utilTile) ) {
+                canCaptureThatType = true
+            }
+        }
+
+        if (!canCaptureThatType) {
+            return true // We locked them out! Player wins!
+        }
+    }
+
     return false
 }
 
@@ -732,11 +784,11 @@ export class WuxingBoard {
             this.winners.push(GUEST)
             this.winnerReason = " has captured all captured one of each of the opponent's tiles!"
         }
-        else if ( hasPlayerWonFromAltCondition(tileManager, HOST) ) {
+        else if ( hasPlayerWonFromAltCondition(this, tileManager, HOST) ) {
             this.winners.push(HOST)
             this.winnerReason = " has prevented their opponent from winning!"
         }
-        else if ( hasPlayerWonFromAltCondition(tileManager, GUEST) ) {
+        else if ( hasPlayerWonFromAltCondition(this, tileManager, GUEST) ) {
             this.winners.push(GUEST)
             this.winnerReason = " has prevented their opponent from winning!"
         }
@@ -783,4 +835,18 @@ export class WuxingBoard {
 		}
 		return surroundingPoints;
 	}
+
+    getTilesOnBoard() {
+        let tiles = []
+
+        for (const row of this.cells) {
+            for (const bp of row) {
+                if ( !bp.isType(NON_PLAYABLE) && bp.hasTile()) {
+                    tiles.push(bp.tile)
+                }
+            }
+        }
+
+        return tiles
+    }
 }

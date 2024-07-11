@@ -114,9 +114,9 @@ export class WuxingGameManager {
             if (moveResults && moveResults.capturedTile) {
                 let capturedTile = moveResults.capturedTile
                 this.tileManager.addToCapturedTiles( capturedTile, move.playerCode )
+                this.board.checkForEndGame(this.tileManager)
             }
 
-            this.board.checkForEndGame(this.tileManager)
         }
         else if (move.moveType == DEPLOY) {
             let tile = this.tileManager.grabTile(move.playerCode, move.tileType)
