@@ -232,8 +232,6 @@ export class WuxingController {
         let rowCol = notationPoint.rowAndColumn
         let boardPoint = this.theGame.board.cells[rowCol.row][rowCol.col]
 
-        console.log("Point clicked recieved status", this.notationBuilder.status)
-
         if (this.notationBuilder.status === BRAND_NEW) {
             // NEW GAME
             if (boardPoint.hasTile()) {
