@@ -415,7 +415,7 @@ export class WuxingBoard {
             WuxingBoardPoint.mountain(),
             WuxingBoardPoint.mountain(),
             WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.river(),
+            WuxingBoardPoint.mountainEntranceWithRiver(),
             WuxingBoardPoint.neutral(),
             WuxingBoardPoint.neutral(),
             WuxingBoardPoint.neutral(),

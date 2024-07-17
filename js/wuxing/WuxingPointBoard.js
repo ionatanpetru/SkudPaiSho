@@ -153,16 +153,20 @@ export class WuxingBoardPoint {
         return p
     }
 
-    static mountainEntranceWithRiverDL() {
+    static mountainEntranceWithRiver() {
         let p = WuxingBoardPoint.mountainEntrance()
         p.addType(RIVER_TILE)
+        return p
+    }
+
+    static mountainEntranceWithRiverDL() {
+        let p = WuxingBoardPoint.mountainEntranceWithRiver()
         p.addType(RIVER_DL_TILE)
         return p
     }
 
     static mountainEntranceWithRiverDR() {
-        let p = WuxingBoardPoint.mountainEntrance()
-        p.addType(RIVER_TILE)
+        let p = WuxingBoardPoint.mountainEntranceWithRiver()
         p.addType(RIVER_DR_TILE)
         return p
     }
