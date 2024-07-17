@@ -1,7 +1,8 @@
 import { GUEST, HOST, NotationPoint, RowAndColumn } from "../CommonNotationObjects"
 import { debug } from "../GameData"
-import { GATE, NON_PLAYABLE, POSSIBLE_MOVE } from "../skud-pai-sho/SkudPaiShoBoardPoint"
-import { BLACK_GATE, GREEN_GATE, RED_GATE, WHITE_GATE, WuxingBoardPoint, YELLOW_GATE } from "./WuxingPointBoard"
+import { gameOptionEnabled, WUXING_BOARD_ZONES } from "../GameOptions"
+import { GATE, NEUTRAL, NON_PLAYABLE, POSSIBLE_MOVE } from "../skud-pai-sho/SkudPaiShoBoardPoint"
+import { BLACK_GATE, GREEN_GATE, MOUNTAIN_ENTRANCE, MOUNTAIN_TILE, RED_GATE, RIVER_TILE, WHITE_GATE, WuxingBoardPoint, YELLOW_GATE } from "./WuxingPointBoard"
 import { canTileCaptureOther, WU_EARTH, WU_EMPTY, WU_FIRE, WU_METAL, WU_WATER, WU_WOOD, WuxingTile } from "./WuxingTile"
 import { WuxingTileManager } from "./WuxingTileManager"
 
@@ -573,14 +574,14 @@ export class WuxingBoard {
 
         let minMoves = Math.abs(bpStart.row - bpEnd.row) + Math.abs(bpStart.col - bpEnd.col)
         if (minMoves === 1) {
-            return true // Only one space away
+            return this._couldStepIntoNext(bpStart, bpEnd) // Only one space away
         }
 
         // Check move UP
         let nextRow = bpStart.row - 1
         if (nextRow >= 0) {
             let nextPoint = this.cells[nextRow][bpStart.col]
-            if (!nextPoint.hasTile() && this._pathFound(nextPoint, bpEnd, numMoves - 1, movingTile)) {
+            if (!nextPoint.hasTile() && this._couldStepIntoNext(bpStart, nextPoint) && this._pathFound(nextPoint, bpEnd, numMoves - 1, movingTile)) {
                 return true
             }
         }
@@ -589,7 +590,7 @@ export class WuxingBoard {
         nextRow = bpStart.row + 1
         if (nextRow < 17) {
             let nextPoint = this.cells[nextRow][bpStart.col]
-            if (!nextPoint.hasTile() && this._pathFound(nextPoint, bpEnd, numMoves - 1, movingTile)) {
+            if (!nextPoint.hasTile() && this._couldStepIntoNext(bpStart, nextPoint) && this._pathFound(nextPoint, bpEnd, numMoves - 1, movingTile)) {
                 return true
             }
         }
@@ -598,7 +599,7 @@ export class WuxingBoard {
         let nextCol = bpStart.col - 1
         if (nextCol >= 0) {
             let nextPoint = this.cells[bpStart.row][nextCol]
-            if (!nextPoint.hasTile() && this._pathFound(nextPoint, bpEnd, numMoves - 1, movingTile)) {
+            if (!nextPoint.hasTile() && this._couldStepIntoNext(bpStart, nextPoint) && this._pathFound(nextPoint, bpEnd, numMoves - 1, movingTile)) {
                 return true
             }
         }
@@ -607,10 +608,36 @@ export class WuxingBoard {
         nextCol = bpStart.col + 1
         if (nextCol < 17) {
             let nextPoint = this.cells[bpStart.row][nextCol]
-            if (!nextPoint.hasTile() && this._pathFound(nextPoint, bpEnd, numMoves - 1, movingTile)) {
+            if (!nextPoint.hasTile() && this._couldStepIntoNext(bpStart, nextPoint) && this._pathFound(nextPoint, bpEnd, numMoves - 1, movingTile)) {
                 return true
             }
         }
+    }
+
+    /**
+     * Util function that checks whether a tile starting from `bpStart` could directly into `nextPoint`
+     * if we only follow board point logic.
+     * @param {WuxingBoardPoint} startPoint 
+     * @param {WuxingBoardPoint} nextPoint Point that is next to `bpStart`
+     * @returns {boolean} Wheather a tile could step into `nextPoint` or not
+     */
+    _couldStepIntoNext(startPoint, nextPoint) {
+        if (nextPoint.isType(POSSIBLE_MOVE)) {
+            return true // We already went by this
+        }
+
+        // Board zone logic only applies if there are zones
+        if (gameOptionEnabled(WUXING_BOARD_ZONES)) {
+            console.log("Comparing %s and %s", startPoint.types, nextPoint.types)
+            if (startPoint.isType(RIVER_TILE) && !startPoint.isType(MOUNTAIN_ENTRANCE) && nextPoint.isType(MOUNTAIN_TILE)) {
+                return false // Can't do that
+            }
+            else if (startPoint.isType(NEUTRAL) && nextPoint.isType(MOUNTAIN_TILE)) {
+                return false // Nope can't do that
+            }
+        }
+
+        return true // Neutral board points duh
     }
 
     /**

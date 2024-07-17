@@ -148,7 +148,7 @@ export class WuxingBoardPoint {
     }
 
     static mountainEntrance() {
-        let p = WuxingBoardPoint.mountain()
+        let p = new WuxingBoardPoint()
         p.addType(MOUNTAIN_ENTRANCE)
         return p
     }
