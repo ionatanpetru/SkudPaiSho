@@ -527,7 +527,7 @@ export class WuxingBoard {
         }
         else {
             // Move may be possible. But there may be tiles in the way
-            if (!this._verifyAbleToReach(bpStart, bpEnd, numMoves, bpStart.tile)) {
+            if (!this._verifyAbleToReach(bpStart, bpEnd, numMoves)) {
                 return false
             }
         }
@@ -541,11 +541,10 @@ export class WuxingBoard {
      * @param {WuxingBoardPoint} bpStart 
      * @param {WuxingBoardPoint} bpEnd 
      * @param {number} numMoves 
-     * @param {WuxingTile} movingTile 
      */
-    _verifyAbleToReach(bpStart, bpEnd, numMoves, movingTile) {
+    _verifyAbleToReach(bpStart, bpEnd, numMoves) {
         // Recursion!
-        return this._pathFound(bpStart, bpEnd, numMoves, movingTile)
+        return this._pathFound(bpStart, bpEnd, numMoves, bpStart)
     }
 
     /**
@@ -553,9 +552,9 @@ export class WuxingBoard {
      * @param {WuxingBoardPoint} bpStart 
      * @param {WuxingBoardPoint} bpEnd 
      * @param {number} numMoves 
-     * @param {WuxingTile} movingTile 
+     * @param {WuxingBoardPoint} trueStartingBP In case we're using board zones, we'll need to check if the path they want is Mountain -> River -> Neutral 
      */
-    _pathFound(bpStart, bpEnd, numMoves, movingTile) {
+    _pathFound(bpStart, bpEnd, numMoves, trueStartingBP) {
         if (!bpStart || !bpEnd) {
             return false
         }
@@ -574,14 +573,16 @@ export class WuxingBoard {
 
         let minMoves = Math.abs(bpStart.row - bpEnd.row) + Math.abs(bpStart.col - bpEnd.col)
         if (minMoves === 1) {
-            return this._couldStepIntoNext(bpStart, bpEnd) // Only one space away
+            return this._couldStepIntoNext(bpStart, bpEnd, trueStartingBP) // Only one space away
         }
 
         // Check move UP
         let nextRow = bpStart.row - 1
         if (nextRow >= 0) {
             let nextPoint = this.cells[nextRow][bpStart.col]
-            if (!nextPoint.hasTile() && this._couldStepIntoNext(bpStart, nextPoint) && this._pathFound(nextPoint, bpEnd, numMoves - 1, movingTile)) {
+            if (!nextPoint.hasTile()
+                && this._couldStepIntoNext(bpStart, nextPoint, trueStartingBP)
+                && this._pathFound(nextPoint, bpEnd, numMoves - 1, trueStartingBP)) {
                 return true
             }
         }
@@ -590,7 +591,9 @@ export class WuxingBoard {
         nextRow = bpStart.row + 1
         if (nextRow < 17) {
             let nextPoint = this.cells[nextRow][bpStart.col]
-            if (!nextPoint.hasTile() && this._couldStepIntoNext(bpStart, nextPoint) && this._pathFound(nextPoint, bpEnd, numMoves - 1, movingTile)) {
+            if (!nextPoint.hasTile()
+                && this._couldStepIntoNext(bpStart, nextPoint, trueStartingBP)
+                && this._pathFound(nextPoint, bpEnd, numMoves - 1, trueStartingBP)) {
                 return true
             }
         }
@@ -599,7 +602,9 @@ export class WuxingBoard {
         let nextCol = bpStart.col - 1
         if (nextCol >= 0) {
             let nextPoint = this.cells[bpStart.row][nextCol]
-            if (!nextPoint.hasTile() && this._couldStepIntoNext(bpStart, nextPoint) && this._pathFound(nextPoint, bpEnd, numMoves - 1, movingTile)) {
+            if (!nextPoint.hasTile()
+                && this._couldStepIntoNext(bpStart, nextPoint, trueStartingBP)
+                && this._pathFound(nextPoint, bpEnd, numMoves - 1, trueStartingBP)) {
                 return true
             }
         }
@@ -608,7 +613,9 @@ export class WuxingBoard {
         nextCol = bpStart.col + 1
         if (nextCol < 17) {
             let nextPoint = this.cells[bpStart.row][nextCol]
-            if (!nextPoint.hasTile() && this._couldStepIntoNext(bpStart, nextPoint) && this._pathFound(nextPoint, bpEnd, numMoves - 1, movingTile)) {
+            if (!nextPoint.hasTile()
+                && this._couldStepIntoNext(bpStart, nextPoint, trueStartingBP)
+                && this._pathFound(nextPoint, bpEnd, numMoves - 1, trueStartingBP)) {
                 return true
             }
         }
@@ -619,21 +626,24 @@ export class WuxingBoard {
      * if we only follow board point logic.
      * @param {WuxingBoardPoint} startPoint 
      * @param {WuxingBoardPoint} nextPoint Point that is next to `bpStart`
+     * @param {WuxingBoardPoint} trueStartingPoint Only used if we need to check if we come from a mountain
      * @returns {boolean} Wheather a tile could step into `nextPoint` or not
      */
-    _couldStepIntoNext(startPoint, nextPoint) {
+    _couldStepIntoNext(startPoint, nextPoint, trueStartingPoint) {
         if (nextPoint.isType(POSSIBLE_MOVE)) {
             return true // We already went by this
         }
 
         // Board zone logic only applies if there are zones
         if (gameOptionEnabled(WUXING_BOARD_ZONES)) {
-            console.log("Comparing %s and %s", startPoint.types, nextPoint.types)
             if (startPoint.isType(RIVER_TILE) && !startPoint.isType(MOUNTAIN_ENTRANCE) && nextPoint.isType(MOUNTAIN_TILE)) {
                 return false // Can't do that
             }
             else if (startPoint.isType(NEUTRAL) && nextPoint.isType(MOUNTAIN_TILE)) {
                 return false // Nope can't do that
+            }
+            else if ( trueStartingPoint.isType(MOUNTAIN_TILE) && startPoint.isType(RIVER_TILE) && nextPoint.isType(NEUTRAL)) {
+                return false // You can't move Mountain -> River -> Neutral, you stay in the river
             }
         }
 
