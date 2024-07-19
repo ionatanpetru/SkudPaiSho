@@ -11,6 +11,8 @@ export let RIVER_DL_TILE = "River (Down-Left) Tile"
 export let RIVER_DR_TILE = "River (Down-Right) Tile"
 export let MOUNTAIN_TILE = "Mountain Tile"
 export let MOUNTAIN_ENTRANCE = "Mountain Entrance"
+export let WESTERN_RIVER = "Western River"
+export let EASTERN_RIVER  = "Eastern River"
 
 export class WuxingBoardPoint {
 
@@ -168,6 +170,26 @@ export class WuxingBoardPoint {
     static mountainEntranceWithRiverDR() {
         let p = WuxingBoardPoint.mountainEntranceWithRiver()
         p.addType(RIVER_DR_TILE)
+        return p
+    }
+
+    /**
+     * Adds the `WESTERN_RIVER` type to `p`
+     * @param {WuxingBoardPoint} p 
+     * @returns {WuxingBoardPoint}
+     */
+    static western(p) {
+        p.addType(WESTERN_RIVER)
+        return p
+    }
+
+    /**
+     * Adds the `EASTERN_RIVER` type to `p`
+     * @param {WuxingBoardPoint} p 
+     * @returns {WuxingBoardPoint}
+     */
+    static eastern(p) {
+        p.addType(EASTERN_RIVER)
         return p
     }
 }
