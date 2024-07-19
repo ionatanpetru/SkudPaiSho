@@ -117,6 +117,11 @@ export class WuxingGameManager {
                 this.board.checkForEndGame(this.tileManager)
             }
 
+            if (moveResults && moveResults.movedTile) {
+                let movedTile = moveResults.movedTile
+                movedTile.gotMoved = true
+            }
+
         }
         else if (move.moveType == DEPLOY) {
             let tile = this.tileManager.grabTile(move.playerCode, move.tileType)
@@ -129,6 +134,8 @@ export class WuxingGameManager {
             this.board.checkForEndGame(this.tileManager) // In case a river crash happens
         }
 
+        // None are moved now
+        this.board.getTilesOnBoard().forEach( tile => tile.gotMoved = false )
 
         if (withActuate) {
             this.actuate()

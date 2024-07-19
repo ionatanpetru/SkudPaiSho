@@ -114,7 +114,7 @@ function hasPlayerWonFromAltCondition(board, tileManager, player) {
  * @param {WuxingTile} tile 
  */
 function canTileBeMovedByRiver(tile) {
-    return [WU_WOOD, WU_WATER, WU_FIRE, WU_EMPTY].includes(tile.code)
+    return [WU_WOOD, WU_WATER, WU_FIRE, WU_EMPTY].includes(tile.code) && !tile.gotMoved
 }
 
 export class WuxingBoard {

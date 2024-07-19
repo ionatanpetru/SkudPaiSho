@@ -212,6 +212,9 @@ export class WuxingTile {
 
     selectedFromPile
 
+    /** @type {boolean} Used for rivers */
+    gotMoved = false
+
     /**
      * 
      * @param {string} code Identifies the tile
