@@ -237,7 +237,7 @@ export class WuxingBoard {
             WuxingBoardPoint.mountain(),
             WuxingBoardPoint.mountain(),
             WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.western(WuxingBoardPoint.riverDownLeft()),,
+            WuxingBoardPoint.western(WuxingBoardPoint.riverDownLeft()),
             WuxingBoardPoint.neutral(),
             WuxingBoardPoint.neutral(),
             WuxingBoardPoint.neutral(),
