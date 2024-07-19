@@ -13,6 +13,7 @@ export let MOUNTAIN_TILE = "Mountain Tile"
 export let MOUNTAIN_ENTRANCE = "Mountain Entrance"
 export let WESTERN_RIVER = "Western River"
 export let EASTERN_RIVER  = "Eastern River"
+export let IS_DAMMED_RIVER = "RIVER IS DAMMED"
 
 export class WuxingBoardPoint {
 

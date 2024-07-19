@@ -1,5 +1,6 @@
 import { DEPLOY, MOVE } from "../CommonNotationObjects"
 import { debug } from "../GameData"
+import { gameOptionEnabled, WUXING_BOARD_ZONES } from "../GameOptions.js"
 import { PaiShoMarkingManager } from "../pai-sho-common/PaiShoMarkingManager"
 import { setGameLogText } from "../PaiShoMain"
 import { WuxingActuator } from "./WuxingActuator"
@@ -106,7 +107,6 @@ export class WuxingGameManager {
         debug("From WuxingGameManager.js")
         debug("Running Move: " + move.fullMoveText + " Move type: " + move.moveType);
 
-        //TODO: DO NOTATION MOVES
         if (move.moveType == MOVE) {
             let moveResults = this.board.moveTile(move.playerCode, move.startPoint, move.endPoint)
 
@@ -121,6 +121,12 @@ export class WuxingGameManager {
         else if (move.moveType == DEPLOY) {
             let tile = this.tileManager.grabTile(move.playerCode, move.tileType)
             this.board.placeTile(tile, move.endPoint)
+        }
+
+        // River logic
+        if (gameOptionEnabled(WUXING_BOARD_ZONES)) {
+            this.board.updateRiverMoves(this.tileManager)
+            this.board.checkForEndGame(this.tileManager) // In case a river crash happens
         }
 
 

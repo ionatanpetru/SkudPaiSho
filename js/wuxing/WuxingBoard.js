@@ -2,7 +2,7 @@ import { GUEST, HOST, NotationPoint, RowAndColumn } from "../CommonNotationObjec
 import { debug } from "../GameData"
 import { gameOptionEnabled, WUXING_BOARD_ZONES } from "../GameOptions"
 import { GATE, NEUTRAL, NON_PLAYABLE, POSSIBLE_MOVE } from "../skud-pai-sho/SkudPaiShoBoardPoint"
-import { BLACK_GATE, GREEN_GATE, MOUNTAIN_ENTRANCE, MOUNTAIN_TILE, RED_GATE, RIVER_TILE, WHITE_GATE, WuxingBoardPoint, YELLOW_GATE } from "./WuxingPointBoard"
+import { BLACK_GATE, EASTERN_RIVER, GREEN_GATE, IS_DAMMED_RIVER, MOUNTAIN_ENTRANCE, MOUNTAIN_TILE, RED_GATE, RIVER_DL_TILE, RIVER_DR_TILE, RIVER_TILE, WESTERN_RIVER, WHITE_GATE, WuxingBoardPoint, YELLOW_GATE } from "./WuxingPointBoard"
 import { canTileCaptureOther, WU_EARTH, WU_EMPTY, WU_FIRE, WU_METAL, WU_WATER, WU_WOOD, WuxingTile } from "./WuxingTile"
 import { WuxingTileManager } from "./WuxingTileManager"
 
@@ -108,6 +108,13 @@ function hasPlayerWonFromAltCondition(board, tileManager, player) {
     }
 
     return false
+}
+
+/**
+ * @param {WuxingTile} tile 
+ */
+function canTileBeMovedByRiver(tile) {
+    return [WU_WOOD, WU_WATER, WU_FIRE, WU_EMPTY].includes(tile.code)
 }
 
 export class WuxingBoard {
@@ -804,6 +811,101 @@ export class WuxingBoard {
     }
 
     /**
+     * After a move is made, we need to update the tiles located in the rivers.
+     * 
+     * Here are the rules regarding rivers:
+     * 1. Rivers flow from the North Gate to the South Gate
+     * 2. Wood, Water, Fire & Empty Tiles flow one space in the river at the end of every turn;
+     * except the turn where they enter a river space.
+     * 3. Metal & Earth Tiles do not flow in the river spaces.
+     * 4. If an Earth Tile is located in a river, it dams its flow downstream.
+     * 5. If two tiles reach the end of the rivers and they occupy the same space, both tiles are captured.
+     * 6. If a tile that is supposed to move is blocked by a tile that is located in the space its supposed to be in, in doesn't move.
+     * 
+     * @param {WuxingTileManager} tileManager In case any tiles are captured
+     */
+    updateRiverMoves(tileManager) {
+        const rivers = this._getRiverBoardPoints().reverse()
+        const westernRiver = this._getSpecificRiverBoardPoints(WESTERN_RIVER)
+        const easternRiver = this._getSpecificRiverBoardPoints(EASTERN_RIVER)
+
+        // 1. Check if a river is blocked by an Earth Tile
+        // 2. Update that river and its subsecuent river spaces
+        for (const riverSpaces of [westernRiver, easternRiver]) {
+            let isRiverDammed = false
+            for (const bp of riverSpaces) {
+                if (isRiverDammed || (bp.hasTile() && bp.tile.code == WU_EARTH)) {
+                    isRiverDammed = true
+                    bp.addType(IS_DAMMED_RIVER)
+                }
+            }
+        }
+
+        // 3. Check for river crash
+        // REMEMBER TILES CAN ONLY CRASH IF THEY CAN BE MOVED BY RIVERS
+
+        // Get the three final river spaces to check River Crashes
+        const riverFinal = rivers[0]
+        const finalRight = rivers[1]
+        const finalLeft = rivers[2]
+
+        if (!riverFinal.hasTile()) {
+            console.log("We don't have a tile in the end:", riverFinal)
+            // They can only drown if they actually move
+            if ( !finalLeft.isType(IS_DAMMED_RIVER) && !finalRight.isType(IS_DAMMED_RIVER)
+                && finalLeft.hasTile() && finalRight.hasTile() ) {
+                let leftTile = finalLeft.removeTile()
+                let rightTile = finalRight.removeTile()
+
+                if ( canTileBeMovedByRiver(leftTile) && canTileBeMovedByRiver(rightTile) ) {
+                    for (const tile of [leftTile, rightTile]) {
+                        let capturee = tile.ownerName == HOST ? GUEST : HOST
+                        tileManager.addToCapturedTiles(tile, capturee)
+                    }
+                }
+            }
+        }
+
+        // 4. Finally, check every river space and move its tile, if any
+        rivers.forEach( bp => this._moveTileOfRiver(bp) )
+
+        // 5. Also reset any dammed rivers
+        rivers.forEach( bp => bp.removeType(IS_DAMMED_RIVER) )
+
+    }
+
+    /**
+     * Util function that will move the tile located in `bp` to its appropiate direction
+     * as long as it isn't blocked or anything weird happens
+     * @param {WuxingBoardPoint} bp WuxingBoardPoints that is garuanteed to be a river
+     */
+    _moveTileOfRiver(bp) {
+        if (!bp.hasTile()) return // Can't do nothing here
+
+        if (bp.isType(IS_DAMMED_RIVER)) return // No water to move tiles here
+
+        if ( !canTileBeMovedByRiver(bp.tile) ) return // That can't move anyway!
+
+        if ( bp.isType(RIVER_DL_TILE) ) {
+            // Down left movement
+            let tile = bp.removeTile()
+            let endPoint = this.cells[bp.row+1][bp.col-1]
+            if (!endPoint.hasTile()) {
+                endPoint.putTile(tile)
+            }
+        }
+        else if ( bp.isType(RIVER_DR_TILE) ) {
+            // Down right movement
+            let tile = bp.removeTile()
+            let endPoint = this.cells[bp.row+1][bp.col+1]
+
+            if (!endPoint.hasTile()) {
+                endPoint.putTile(tile)
+            }
+        }
+    }
+
+    /**
      * Checks whether a player has won, and adds it as a winner and the reason why.
      * @param {WuxingTileManager} tileManager Contains all the tiles neccesary to check if a player has won
      */
@@ -828,6 +930,43 @@ export class WuxingBoard {
             this.winners.push(GUEST)
             this.winnerReason = " has prevented their opponent from winning!"
         }
+    }
+
+    /**
+     * Gets the board points with the type `RIVER_TILE` that are located in the board.
+     * Starting from top to bottom, left to right
+     * @returns {Array<WuxingBoardPoint>} Array of river spaces
+     */
+    _getRiverBoardPoints() {
+        let boardPoints = []
+
+        for (const row of this.cells) {
+            for (const bp of row) {
+                if ( !bp.isType(NON_PLAYABLE) && bp.isType(RIVER_TILE)) {
+                    boardPoints.push(bp)
+                }
+            }
+        }
+
+        return boardPoints
+    }
+
+    /**
+     * @param {string} riverName WESTERN_RIVER or EASTERN_RIVER
+     * @returns {Array<WuxingBoardPoint>} Western or Eastern river spaces
+     */
+    _getSpecificRiverBoardPoints(riverName) {
+        let boardPoints = []
+
+        for (const row of this.cells) {
+            for (const bp of row) {
+                if ( !bp.isType(NON_PLAYABLE) && bp.isType(RIVER_TILE) && bp.isType(riverName)) {
+                    boardPoints.push(bp)
+                }
+            }
+        }
+
+        return boardPoints
     }
 
     /**
