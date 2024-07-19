@@ -276,7 +276,7 @@ export class WuxingBoard {
         // Horizontal midline
         cells[8] = this.newRow(17, [
             WuxingBoardPoint.whiteGate(),
-            WuxingBoardPoint.western(WuxingBoardPoint.mountainEntranceWithRiverDL()),
+            WuxingBoardPoint.western(WuxingBoardPoint.mountainEntranceWithRiverDR()),
             WuxingBoardPoint.neutral(),
             WuxingBoardPoint.neutral(),
             WuxingBoardPoint.neutral(),
@@ -290,7 +290,7 @@ export class WuxingBoard {
             WuxingBoardPoint.neutral(),
             WuxingBoardPoint.neutral(),
             WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.eastern(WuxingBoardPoint.mountainEntranceWithRiverDR()),
+            WuxingBoardPoint.eastern(WuxingBoardPoint.mountainEntranceWithRiverDL()),
             WuxingBoardPoint.greenGate(),
         ])
 
@@ -298,7 +298,6 @@ export class WuxingBoard {
             WuxingBoardPoint.mountainEntrance(),
             WuxingBoardPoint.mountain(),
             WuxingBoardPoint.western(WuxingBoardPoint.riverDownRight()),
-            WuxingBoardPoint.neutral(),
             WuxingBoardPoint.neutral(),
             WuxingBoardPoint.neutral(),
             WuxingBoardPoint.neutral(),
