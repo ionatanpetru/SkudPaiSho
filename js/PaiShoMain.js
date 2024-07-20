@@ -1764,6 +1764,8 @@ export function resetMove() {
 	// $('#contactform').addClass('gone');
 }
 
+window.resetMove = resetMove
+
 export function myTurn() {
 	var userEmail = localStorage.getItem(localEmailKey);
 	if (userEmail && userEmail.includes("@") && userEmail.includes(".")) {
@@ -4750,6 +4752,9 @@ export function addGameOption(option) {
 	addOption(option);
 	setGameController(gameController.getGameTypeId(), true);
 }
+
+// REMOVE THIS THIS IS ONLY FOR DEBUG
+window.addGameOption = addGameOption
 
 export function getGameOptionsMessageHtml(options) {
 	var msg = "<br /><br />";
