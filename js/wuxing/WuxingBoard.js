@@ -844,13 +844,11 @@ export class WuxingBoard {
         // 3. Check for river crash
         // REMEMBER TILES CAN ONLY CRASH IF THEY CAN BE MOVED BY RIVERS
 
-        // Get the three final river spaces to check River Crashes
-        const riverFinal = rivers[0]
-        const finalRight = rivers[1]
-        const finalLeft = rivers[2]
+        if (!rivers[0].hasTile()) {
+            // Get the three final river spaces to check River Crashes
+            const finalRight = rivers[1]
+            const finalLeft = rivers[2]
 
-        if (!riverFinal.hasTile()) {
-            console.log("We don't have a tile in the end:", riverFinal)
             // They can only drown if they actually move
             if ( !finalLeft.isType(IS_DAMMED_RIVER) && !finalRight.isType(IS_DAMMED_RIVER)
                 && finalLeft.hasTile() && finalRight.hasTile() ) {
@@ -888,18 +886,18 @@ export class WuxingBoard {
 
         if ( bp.isType(RIVER_DL_TILE) ) {
             // Down left movement
-            let tile = bp.removeTile()
             let endPoint = this.cells[bp.row+1][bp.col-1]
+            console.log(endPoint)
             if (!endPoint.hasTile()) {
+                let tile = bp.removeTile()
                 endPoint.putTile(tile)
             }
         }
         else if ( bp.isType(RIVER_DR_TILE) ) {
             // Down right movement
-            let tile = bp.removeTile()
             let endPoint = this.cells[bp.row+1][bp.col+1]
-
             if (!endPoint.hasTile()) {
+                let tile = bp.removeTile()
                 endPoint.putTile(tile)
             }
         }
