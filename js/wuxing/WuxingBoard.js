@@ -861,6 +861,11 @@ export class WuxingBoard {
                         tileManager.addToCapturedTiles(tile, capturee)
                     }
                 }
+                else {
+                    // Put them back!
+                    finalLeft.putTile(leftTile)
+                    finalRight.putTile(rightTile)
+                }
             }
         }
 
@@ -887,7 +892,6 @@ export class WuxingBoard {
         if ( bp.isType(RIVER_DL_TILE) ) {
             // Down left movement
             let endPoint = this.cells[bp.row+1][bp.col-1]
-            console.log(endPoint)
             if (!endPoint.hasTile()) {
                 let tile = bp.removeTile()
                 endPoint.putTile(tile)
