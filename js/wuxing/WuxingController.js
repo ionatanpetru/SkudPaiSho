@@ -525,7 +525,7 @@ export class WuxingController {
     /** @returns {string} */
     static getGuestTilesContainerDivs() {
         return '' +
-        '<span>~Guest\'s Captured Tiles~</span>' +
+        '<span>~Guest\'s Tile Library~</span>' +
         '<br>' +
         '<div class="GWO"></div>' +
         '<div class="GEA"></div>' +
