@@ -2,13 +2,13 @@
 
 import { DEPLOY, GUEST, HOST, MOVE, NotationPoint } from "../CommonNotationObjects.js";
 import { debug } from "../GameData.js";
-import { BRAND_NEW, callSubmitMove, createGameIfThatIsOk, currentMoveIndex, finalizeMove, gameId, GameType, getGameOptionsMessageHtml, isAnimationsOn, isInReplay, myTurn, onlinePlayEnabled, playingOnlineGame, READY_FOR_BONUS, rerunAll, toBullets, userIsLoggedIn, WAITING_FOR_ENDPOINT } from "../PaiShoMain";
+import { BRAND_NEW, callSubmitMove, createGameIfThatIsOk, currentMoveIndex, finalizeMove, gameId, GameType, getGameOptionsMessageHtml, isAnimationsOn, isInReplay, myTurn, onlinePlayEnabled, playingOnlineGame, READY_FOR_BONUS, rerunAll, toBullets, userIsLoggedIn, WAITING_FOR_ENDPOINT } from "../PaiShoMain.js";
 import { GATE, NEUTRAL, POSSIBLE_MOVE } from "../skud-pai-sho/SkudPaiShoBoardPoint.js";
-import { GodaiActuator } from "./WuxingActuator.js";
-import { GodaiGameManager } from "./WuxingGameManager.js";
-import { GodaiGameNotation, GodaiNotationBuilder } from "./WuxingNotation.js";
-import { BLACK_GATE, GREEN_GATE, MOUNTAIN_ENTRANCE, MOUNTAIN_TILE, RED_GATE, RIVER_DL_TILE, RIVER_DR_TILE, RIVER_TILE, WHITE_GATE, GodaiBoardPoint, YELLOW_GATE } from "./WuxingPointBoard.js";
-import { GO_EARTH, GO_EMPTY, GO_FIRE, GO_METAL, GO_WATER, GO_WOOD, GodaiTile } from "./WuxingTile.js";
+import { GodaiActuator } from "./GodaiActuator.js";
+import { GodaiGameManager } from "./GodaiGameManager.js";
+import { GodaiGameNotation, GodaiNotationBuilder } from "./GodaiNotation.js";
+import { BLACK_GATE, GREEN_GATE, MOUNTAIN_ENTRANCE, MOUNTAIN_TILE, RED_GATE, RIVER_DL_TILE, RIVER_DR_TILE, RIVER_TILE, WHITE_GATE, GodaiBoardPoint, YELLOW_GATE } from "./GodaiBoardPoint.js";
+import { GO_EARTH, GO_EMPTY, GO_FIRE, GO_METAL, GO_WATER, GO_WOOD, GodaiTile } from "./GodaiTile.js";
 
 export var GodaiPreferences = {
     tileDesignKey: "TileDesigns",

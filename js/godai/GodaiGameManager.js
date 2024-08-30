@@ -1,13 +1,13 @@
-import { DEPLOY, MOVE } from "../CommonNotationObjects"
-import { debug } from "../GameData"
+import { DEPLOY, MOVE } from "../CommonNotationObjects.js"
+import { debug } from "../GameData.js"
 import { gameOptionEnabled, GODAI_BOARD_ZONES } from "../GameOptions.js"
-import { PaiShoMarkingManager } from "../pai-sho-common/PaiShoMarkingManager"
-import { setGameLogText } from "../PaiShoMain"
-import { GodaiActuator } from "./WuxingActuator"
-import { GodaiBoard } from "./WuxingBoard"
-import { GodaiNotationMove } from "./WuxingNotation"
-import { GodaiBoardPoint } from "./WuxingPointBoard.js"
-import { GodaiTileManager } from "./WuxingTileManager"
+import { PaiShoMarkingManager } from "../pai-sho-common/PaiShoMarkingManager.js"
+import { setGameLogText } from "../PaiShoMain.js"
+import { GodaiActuator } from "./GodaiActuator.js"
+import { GodaiBoard } from "./GodaiBoard.js"
+import { GodaiNotationMove } from "./GodaiNotation.js"
+import { GodaiBoardPoint } from "./GodaiBoardPoint.js"
+import { GodaiTileManager } from "./GodaiTileManager.js"
 
 export class GodaiGameManager {
 

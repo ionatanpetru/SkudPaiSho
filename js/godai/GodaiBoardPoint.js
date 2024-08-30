@@ -1,5 +1,5 @@
 import { GATE, NEUTRAL } from "../skud-pai-sho/SkudPaiShoBoardPoint"
-import { GodaiTile } from "./WuxingTile"
+import { GodaiTile } from "./GodaiTile"
 
 export let BLACK_GATE = "Black Gate"
 export let GREEN_GATE = "Green Gate"

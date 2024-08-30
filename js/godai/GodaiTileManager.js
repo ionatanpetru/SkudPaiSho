@@ -1,7 +1,7 @@
 import { GUEST, HOST } from "../CommonNotationObjects";
 import { debug } from "../GameData";
 import { gameOptionEnabled, GODAI_EMPTY_TILE } from "../GameOptions";
-import { GO_EARTH, GO_EMPTY, GO_FIRE, GO_METAL, GO_WATER, GO_WOOD, GodaiTile } from "./WuxingTile";
+import { GO_EARTH, GO_EMPTY, GO_FIRE, GO_METAL, GO_WATER, GO_WOOD, GodaiTile } from "./GodaiTile";
 
 export class GodaiTileManager {
 

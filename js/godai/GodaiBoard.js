@@ -2,9 +2,9 @@ import { GUEST, HOST, NotationPoint, RowAndColumn } from "../CommonNotationObjec
 import { debug } from "../GameData"
 import { gameOptionEnabled, GODAI_BOARD_ZONES } from "../GameOptions"
 import { GATE, NEUTRAL, NON_PLAYABLE, POSSIBLE_MOVE } from "../skud-pai-sho/SkudPaiShoBoardPoint"
-import { BLACK_GATE, EASTERN_RIVER, GREEN_GATE, IS_DAMMED_RIVER, MOUNTAIN_ENTRANCE, MOUNTAIN_TILE, RED_GATE, RIVER_DL_TILE, RIVER_DR_TILE, RIVER_TILE, WESTERN_RIVER, WHITE_GATE, GodaiBoardPoint, YELLOW_GATE } from "./WuxingPointBoard"
-import { canTileCaptureOther, GO_EARTH, GO_EMPTY, GO_FIRE, GO_METAL, GO_WATER, GO_WOOD, GodaiTile } from "./WuxingTile"
-import { GodaiTileManager } from "./WuxingTileManager"
+import { BLACK_GATE, EASTERN_RIVER, GREEN_GATE, IS_DAMMED_RIVER, MOUNTAIN_ENTRANCE, MOUNTAIN_TILE, RED_GATE, RIVER_DL_TILE, RIVER_DR_TILE, RIVER_TILE, WESTERN_RIVER, WHITE_GATE, GodaiBoardPoint, YELLOW_GATE } from "./GodaiBoardPoint"
+import { canTileCaptureOther, GO_EARTH, GO_EMPTY, GO_FIRE, GO_METAL, GO_WATER, GO_WOOD, GodaiTile } from "./GodaiTile"
+import { GodaiTileManager } from "./GodaiTileManager"
 
 /**
  * Util function that gets a set of tile types

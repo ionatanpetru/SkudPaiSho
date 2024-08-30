@@ -2,7 +2,7 @@ import { GUEST, HOST } from "../CommonNotationObjects"
 import { debug } from "../GameData"
 import { GATE } from "../skud-pai-sho/SkudPaiShoBoardPoint"
 import { tileIdIncrement } from "../skud-pai-sho/SkudPaiShoTile"
-import { GodaiBoardPoint } from "./WuxingPointBoard"
+import { GodaiBoardPoint } from "./GodaiBoardPoint"
 
 export const GO_WOOD = "WO"
 export const GO_EARTH = "EA"

@@ -2,11 +2,11 @@ import { createBoardArrow, createBoardPointDiv, setupPaiShoBoard } from "../Actu
 import { PaiShoMarkingManager } from "../pai-sho-common/PaiShoMarkingManager"
 import { clearMessage, pointClicked, RmbDown, RmbUp, showPointMessage, showTileMessage, unplayedTileClicked } from "../PaiShoMain"
 import { MARKED, NON_PLAYABLE, POSSIBLE_MOVE } from "../skud-pai-sho/SkudPaiShoBoardPoint"
-import { GodaiBoard } from "./WuxingBoard"
-import { GodaiController } from "./WuxingController"
-import { GodaiBoardPoint } from "./WuxingPointBoard"
-import { GodaiTile } from "./WuxingTile"
-import { GodaiTileManager } from "./WuxingTileManager"
+import { GodaiBoard } from "./GodaiBoard"
+import { GodaiController } from "./GodaiController"
+import { GodaiBoardPoint } from "./GodaiBoardPoint"
+import { GodaiTile } from "./GodaiTile"
+import { GodaiTileManager } from "./GodaiTileManager"
 
 
 export class GodaiActuator {
@@ -295,7 +295,7 @@ export class GodaiActuator {
     }
 
     getTileImageSourceDir() {
-        return "./images/Wuxing/" + "original" + "/"
+        return "./images/Godai/" + "original" + "/"
     }
 
 

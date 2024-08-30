@@ -108,7 +108,7 @@ import { TrifleController } from './trifle/TrifleController';
 import { TumbleweedController } from './tumbleweed/TumbleweedController';
 import { UndergrowthController } from './undergrowth/UndergrowthController';
 import { VagabondController } from "./vagabond/VagabondController";
-import { GodaiController } from './wuxing/WuxingController';
+import { GodaiController } from './godai/GodaiController';
 import { addEventToElement, setupUiEvents } from './ui/UiSetup';
 import { applyBoardOptionToBgSvg, mobileAndTabletcheck } from "./ActuatorHelp";
 import {
