@@ -1,0 +1,10 @@
+{
+    extends: ["@parcel/config-default"],
+    reporters: ["...", "parcel-reporter-static-files-copy"],
+    packagers: {
+        // ".js": "@parcel/packager-raw-url"
+    },
+    transformers: {
+        "manifest.json": ["@parcel/transformer-webmanifest"]
+    },
+}
