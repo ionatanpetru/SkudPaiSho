@@ -1,5 +1,5 @@
 import { GATE, NEUTRAL } from "../skud-pai-sho/SkudPaiShoBoardPoint"
-import { WuxingTile } from "./WuxingTile"
+import { GodaiTile } from "./WuxingTile"
 
 export let BLACK_GATE = "Black Gate"
 export let GREEN_GATE = "Green Gate"
@@ -15,7 +15,7 @@ export let WESTERN_RIVER = "Western River"
 export let EASTERN_RIVER  = "Eastern River"
 export let IS_DAMMED_RIVER = "RIVER IS DAMMED"
 
-export class WuxingBoardPoint {
+export class GodaiBoardPoint {
 
     /** @type {Array<string>} */
     types
@@ -26,7 +26,7 @@ export class WuxingBoardPoint {
     /** @type {number} */
     col
 
-    /** @type {WuxingTile} */
+    /** @type {GodaiTile} */
     tile
 
     constructor() {
@@ -59,7 +59,7 @@ export class WuxingBoardPoint {
 
     /**
      * Taken from SpiritBoardPoint.js
-     * @param {WuxingTile} tile 
+     * @param {GodaiTile} tile 
      */
     putTile(tile) {
         this.tile = tile
@@ -85,99 +85,99 @@ export class WuxingBoardPoint {
 
     /* POINT TYPES */
     static neutral() {
-        let point = new WuxingBoardPoint()
+        let point = new GodaiBoardPoint()
         point.addType(NEUTRAL)
         return point
     }
 
     static gate() {
-        let point = new WuxingBoardPoint()
+        let point = new GodaiBoardPoint()
         point.addType(GATE)
         return point
     }
 
     static blackGate() {
-        let p = WuxingBoardPoint.gate()
+        let p = GodaiBoardPoint.gate()
         p.addType(BLACK_GATE)
         return p
     }
 
     static greenGate() {
-        let p = WuxingBoardPoint.gate()
+        let p = GodaiBoardPoint.gate()
         p.addType(GREEN_GATE)
         return p
     }
 
     static redGate() {
-        let p = WuxingBoardPoint.gate()
+        let p = GodaiBoardPoint.gate()
         p.addType(RED_GATE)
         return p
     }
 
     static whiteGate() {
-        let p = WuxingBoardPoint.gate()
+        let p = GodaiBoardPoint.gate()
         p.addType(WHITE_GATE)
         return p
     }
 
     static yellowGate() {
-        let p = WuxingBoardPoint.gate()
+        let p = GodaiBoardPoint.gate()
         p.addType(YELLOW_GATE)
         return p
     }
 
     static river() {
-        let p = new WuxingBoardPoint()
+        let p = new GodaiBoardPoint()
         p.addType(RIVER_TILE)
         return p
     }
 
     static riverDownLeft() {
-        let p = WuxingBoardPoint.river()
+        let p = GodaiBoardPoint.river()
         p.addType(RIVER_DL_TILE)
         return p
     }
 
     static riverDownRight() {
-        let p = WuxingBoardPoint.river()
+        let p = GodaiBoardPoint.river()
         p.addType(RIVER_DR_TILE)
         return p
     }
 
     static mountain() {
-        let p = new WuxingBoardPoint()
+        let p = new GodaiBoardPoint()
         p.addType(MOUNTAIN_TILE)
         return p
     }
 
     static mountainEntrance() {
-        let p = new WuxingBoardPoint()
+        let p = new GodaiBoardPoint()
         p.addType(MOUNTAIN_ENTRANCE)
         return p
     }
 
     static mountainEntranceWithRiver() {
-        let p = WuxingBoardPoint.mountainEntrance()
+        let p = GodaiBoardPoint.mountainEntrance()
         p.addType(RIVER_TILE)
         return p
     }
 
     static mountainEntranceWithRiverDL() {
-        let p = WuxingBoardPoint.mountainEntranceWithRiver()
+        let p = GodaiBoardPoint.mountainEntranceWithRiver()
         p.addType(RIVER_DL_TILE)
         return p
     }
 
     static mountainEntranceWithRiverDR() {
-        let p = WuxingBoardPoint.mountainEntranceWithRiver()
+        let p = GodaiBoardPoint.mountainEntranceWithRiver()
         p.addType(RIVER_DR_TILE)
         return p
     }
 
     /**
      * Adds the `WESTERN_RIVER` type to `p`
-     * @param {WuxingBoardPoint} p 
-     * @returns {WuxingBoardPoint}
+     * @param {GodaiBoardPoint} p 
+     * @returns {GodaiBoardPoint}
      */
     static western(p) {
         p.addType(WESTERN_RIVER)
@@ -186,8 +186,8 @@ export class WuxingBoardPoint {
 
     /**
      * Adds the `EASTERN_RIVER` type to `p`
-     * @param {WuxingBoardPoint} p 
-     * @returns {WuxingBoardPoint}
+     * @param {GodaiBoardPoint} p 
+     * @returns {GodaiBoardPoint}
      */
     static eastern(p) {
         p.addType(EASTERN_RIVER)

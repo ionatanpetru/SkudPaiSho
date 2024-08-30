@@ -2,14 +2,14 @@ import { createBoardArrow, createBoardPointDiv, setupPaiShoBoard } from "../Actu
 import { PaiShoMarkingManager } from "../pai-sho-common/PaiShoMarkingManager"
 import { clearMessage, pointClicked, RmbDown, RmbUp, showPointMessage, showTileMessage, unplayedTileClicked } from "../PaiShoMain"
 import { MARKED, NON_PLAYABLE, POSSIBLE_MOVE } from "../skud-pai-sho/SkudPaiShoBoardPoint"
-import { WuxingBoard } from "./WuxingBoard"
-import { WuxingController, WuxingPreferences } from "./WuxingController"
-import { WuxingBoardPoint } from "./WuxingPointBoard"
-import { WuxingTile } from "./WuxingTile"
-import { WuxingTileManager } from "./WuxingTileManager"
+import { GodaiBoard } from "./WuxingBoard"
+import { GodaiController } from "./WuxingController"
+import { GodaiBoardPoint } from "./WuxingPointBoard"
+import { GodaiTile } from "./WuxingTile"
+import { GodaiTileManager } from "./WuxingTileManager"
 
 
-export class WuxingActuator {
+export class GodaiActuator {
 
     /** @type {HTMLDivElement} */
     gameContainer
@@ -42,8 +42,8 @@ export class WuxingActuator {
 
         let containers = setupPaiShoBoard(
             this.gameContainer,
-            WuxingController.getHostTilesContainerDivs(),
-            WuxingController.getGuestTilesContainerDivs(),
+            GodaiController.getHostTilesContainerDivs(),
+            GodaiController.getGuestTilesContainerDivs(),
             false
         )
 
@@ -59,8 +59,8 @@ export class WuxingActuator {
 
     /**
      * Calls forth `this.htmlify()`
-     * @param {WuxingBoard} board 
-     * @param {WuxingTileManager} tileManager 
+     * @param {GodaiBoard} board 
+     * @param {GodaiTileManager} tileManager 
      * @param {PaiShoMarkingManager} markingManager 
      * @param {*} moveToAnimate 
      * @param {number} moveAnimationBeginStep 
@@ -79,8 +79,8 @@ export class WuxingActuator {
     /**
      * Creates the html grid found on the board
      * 
-     * @param {WuxingBoard} board 
-     * @param {WuxingTileManager} tileManager 
+     * @param {GodaiBoard} board 
+     * @param {GodaiTileManager} tileManager 
      * @param {PaiShoMarkingManager} markingManager 
      * @param {number} moveToAnimate 
      * @param {number} moveAnimationBeginStep 
@@ -109,7 +109,7 @@ export class WuxingActuator {
             this.arrowContainer.appendChild(createBoardArrow(arrow[0], arrow[1]))
         }
 
-        let fullTileSet = new WuxingTileManager()
+        let fullTileSet = new GodaiTileManager()
 
         // Go through tile piles and clear containers
         for (const tile of fullTileSet.hostTiles) {
@@ -151,7 +151,7 @@ export class WuxingActuator {
      * 
      * Remember to add the correct div with its proper tile code in
      * `Controller.getHostTilesContainerDivs()` / `Controller.getGuestTilesContainerDivs()` or else this breaks
-     * @param {WuxingTile} tile
+     * @param {GodaiTile} tile
      */
     clearTileContainer(tile) {
         let containerClass = "." + tile.getImageName()
@@ -163,7 +163,7 @@ export class WuxingActuator {
 
     /**
      * Taken from CaptureActuator.js
-     * @param {WuxingTile} tile 
+     * @param {GodaiTile} tile 
      * @param {HTMLDivElement} mainContainer Seems to be unused, but I'll keep it just in case :) 
      */
     addTile(tile, mainContainer) {
@@ -205,7 +205,7 @@ export class WuxingActuator {
 
     /**
      * 
-     * @param {WuxingTile} tile 
+     * @param {GodaiTile} tile 
      * @param {HTMLDivElement} mainContainer Container of tiles.
      */
     _addCapturedTile(tile, mainContainer) {
@@ -240,7 +240,7 @@ export class WuxingActuator {
 
     /**
      * Taken from CaptureActuator.js
-     * @param {WuxingBoardPoint} bp 
+     * @param {GodaiBoardPoint} bp 
      */
     addBoardPoint(bp) {
         let div = createBoardPointDiv(bp)

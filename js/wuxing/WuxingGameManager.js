@@ -1,15 +1,15 @@
 import { DEPLOY, MOVE } from "../CommonNotationObjects"
 import { debug } from "../GameData"
-import { gameOptionEnabled, WUXING_BOARD_ZONES } from "../GameOptions.js"
+import { gameOptionEnabled, GODAI_BOARD_ZONES } from "../GameOptions.js"
 import { PaiShoMarkingManager } from "../pai-sho-common/PaiShoMarkingManager"
 import { setGameLogText } from "../PaiShoMain"
-import { WuxingActuator } from "./WuxingActuator"
-import { WuxingBoard } from "./WuxingBoard"
-import { WuxingNotationMove } from "./WuxingNotation"
-import { WuxingBoardPoint } from "./WuxingPointBoard.js"
-import { WuxingTileManager } from "./WuxingTileManager"
+import { GodaiActuator } from "./WuxingActuator"
+import { GodaiBoard } from "./WuxingBoard"
+import { GodaiNotationMove } from "./WuxingNotation"
+import { GodaiBoardPoint } from "./WuxingPointBoard.js"
+import { GodaiTileManager } from "./WuxingTileManager"
 
-export class WuxingGameManager {
+export class GodaiGameManager {
 
     /** @type {string} */
     gameLogText
@@ -17,16 +17,16 @@ export class WuxingGameManager {
     /** @type {boolean} */
     isCopy
 
-    /** @type {WuxingActuator} */
+    /** @type {GodaiActuator} */
     actuator
 
-    /** @type {WuxingTileManager} */
+    /** @type {GodaiTileManager} */
     tileManager
 
-    /** @type {WuxingBoard} */
+    /** @type {GodaiBoard} */
     board
 
-    /** @type {WuxingTileManager} */
+    /** @type {GodaiTileManager} */
     tileManager
 
     /** @type {PaiShoMarkingManager} */
@@ -40,7 +40,7 @@ export class WuxingGameManager {
         this.isCopy = isCopy
         this.actuator = actuator
 
-        this.tileManager = new WuxingTileManager()
+        this.tileManager = new GodaiTileManager()
         this.markingManager = new PaiShoMarkingManager()
 
         this.setup(ignoreActuate)
@@ -48,7 +48,7 @@ export class WuxingGameManager {
 
     /** Set up the game */
     setup(ignoreActuate) {
-        this.board = new WuxingBoard()
+        this.board = new GodaiBoard()
 
         if (!ignoreActuate) {
             this.actuate()
@@ -67,7 +67,7 @@ export class WuxingGameManager {
 
     /**
      * 
-     * @param {WuxingBoardPoint} boardPoint 
+     * @param {GodaiBoardPoint} boardPoint 
      * @param {boolean} ignoreActuate 
      */
     revealPossibleMovePoints(boardPoint, ignoreActuate) {
@@ -101,7 +101,7 @@ export class WuxingGameManager {
 
     /**
      * 
-     * @param {WuxingNotationMove} move Move to play
+     * @param {GodaiNotationMove} move Move to play
      */
     runNotationMove(move, withActuate) {
         debug("From WuxingGameManager.js")
@@ -129,7 +129,7 @@ export class WuxingGameManager {
         }
 
         // River logic
-        if (gameOptionEnabled(WUXING_BOARD_ZONES)) {
+        if (gameOptionEnabled(GODAI_BOARD_ZONES)) {
             this.board.updateRiverMoves(this.tileManager)
             this.board.checkForEndGame(this.tileManager) // In case a river crash happens
         }

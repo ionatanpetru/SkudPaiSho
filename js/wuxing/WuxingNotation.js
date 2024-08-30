@@ -1,7 +1,7 @@
 import { DEPLOY, GUEST, HOST, MOVE, NotationPoint } from "../CommonNotationObjects"
 import { debug } from "../GameData"
 import { BRAND_NEW } from "../PaiShoMain"
-import { WU_EARTH, WU_EMPTY, WU_FIRE, WU_METAL, WU_WATER, WU_WOOD } from "./WuxingTile"
+import { GO_EARTH, GO_EMPTY, GO_FIRE, GO_METAL, GO_WATER, GO_WOOD } from "./WuxingTile"
 
 /**
  * MOVE NOTATION:
@@ -20,7 +20,7 @@ import { WU_EARTH, WU_EMPTY, WU_FIRE, WU_METAL, WU_WATER, WU_WOOD } from "./Wuxi
  * 
  */
 
-export class WuxingNotationMove {
+export class GodaiNotationMove {
 
     fullMoveText = ""
     isValid = false
@@ -103,9 +103,9 @@ export class WuxingNotationMove {
     /** @param {string} text */
     _strStartsWithTileID(text) {
         let firstTwo = text.slice(0, 2)
-        return firstTwo === WU_EARTH || firstTwo === WU_METAL
-            || firstTwo === WU_WOOD  || firstTwo === WU_FIRE
-            || firstTwo === WU_WATER || firstTwo === WU_EMPTY
+        return firstTwo === GO_EARTH || firstTwo === GO_METAL
+            || firstTwo === GO_WOOD  || firstTwo === GO_FIRE
+            || firstTwo === GO_WATER || firstTwo === GO_EMPTY
     }
 
     isValidNotation() {
@@ -113,16 +113,16 @@ export class WuxingNotationMove {
     }
 }
 
-WuxingNotationMove.prototype.equals = function (other) {
+GodaiNotationMove.prototype.equals = function (other) {
     return this.fullMoveText === other.fullMoveText
 }
 
-export class WuxingGameNotation {
+export class GodaiGameNotation {
 
     /** @type {string} */
     notationText = ""
 
-    /** @type {Array<WuxingNotationMove>} */
+    /** @type {Array<GodaiNotationMove>} */
     moves = []
 
     /** @param {string} text */
@@ -137,7 +137,7 @@ export class WuxingGameNotation {
         this.loadMoves()
     }
 
-    /** @param {WuxingNotationMove} move  */
+    /** @param {GodaiNotationMove} move  */
     addMove(move) {
         if (this.notationText) {
             this.notationText += ";" + move.fullMoveText
@@ -169,8 +169,8 @@ export class WuxingGameNotation {
     }
 
     /**
-     * @param {WuxingNotationBuilder} builder
-     * @returns {WuxingNotationMove}
+     * @param {GodaiNotationBuilder} builder
+     * @returns {GodaiNotationMove}
      */
     getNotationMoveFromBuilder(builder) {
         let moveNum = 1
@@ -215,7 +215,7 @@ export class WuxingGameNotation {
 
         let lastPlayer = HOST // Lets say the host started the game
         for (const line of lines) {
-            let move = new WuxingNotationMove(line)
+            let move = new GodaiNotationMove(line)
             if (move.isValidNotation() && move.playerCode !== lastPlayer) {
                 this.moves.push(move)
                 lastPlayer = move.player
@@ -271,7 +271,7 @@ export class WuxingGameNotation {
     }
 }
 
-export class WuxingNotationBuilder {
+export class GodaiNotationBuilder {
 
     status = BRAND_NEW
 
@@ -289,7 +289,7 @@ export class WuxingNotationBuilder {
      * Taken from CaptureGameNotation.js
      * @param {number} moveNum 
      * @param {string} player 
-     * @returns {WuxingNotationMove}
+     * @returns {GodaiNotationMove}
      */
     getNotationMove( moveNum, player ) {
         let notationLine = moveNum + player.charAt(0) + "."
@@ -301,6 +301,6 @@ export class WuxingNotationBuilder {
             notationLine += `${this.tileType}(${this.endPoint.pointText})`
         }
 
-        return new WuxingNotationMove(notationLine)
+        return new GodaiNotationMove(notationLine)
     }
 }

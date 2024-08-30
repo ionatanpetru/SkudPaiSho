@@ -1,42 +1,41 @@
-/* Wuxing Pai Sho */
+/* Godai Pai Sho */
 
 import { DEPLOY, GUEST, HOST, MOVE, NotationPoint } from "../CommonNotationObjects.js";
 import { debug } from "../GameData.js";
-import { gameOptionEnabled, WUXING_BOARD_ZONES } from "../GameOptions.js";
 import { BRAND_NEW, callSubmitMove, createGameIfThatIsOk, currentMoveIndex, finalizeMove, gameId, GameType, getGameOptionsMessageHtml, isAnimationsOn, isInReplay, myTurn, onlinePlayEnabled, playingOnlineGame, READY_FOR_BONUS, rerunAll, toBullets, userIsLoggedIn, WAITING_FOR_ENDPOINT } from "../PaiShoMain";
 import { GATE, NEUTRAL, POSSIBLE_MOVE } from "../skud-pai-sho/SkudPaiShoBoardPoint.js";
-import { WuxingActuator } from "./WuxingActuator.js";
-import { WuxingGameManager } from "./WuxingGameManager.js";
-import { WuxingGameNotation, WuxingNotationBuilder } from "./WuxingNotation.js";
-import { BLACK_GATE, GREEN_GATE, MOUNTAIN_ENTRANCE, MOUNTAIN_TILE, RED_GATE, RIVER_DL_TILE, RIVER_DR_TILE, RIVER_TILE, WHITE_GATE, WuxingBoardPoint, YELLOW_GATE } from "./WuxingPointBoard.js";
-import { WU_EARTH, WU_EMPTY, WU_FIRE, WU_METAL, WU_WATER, WU_WOOD, WuxingTile } from "./WuxingTile.js";
+import { GodaiActuator } from "./WuxingActuator.js";
+import { GodaiGameManager } from "./WuxingGameManager.js";
+import { GodaiGameNotation, GodaiNotationBuilder } from "./WuxingNotation.js";
+import { BLACK_GATE, GREEN_GATE, MOUNTAIN_ENTRANCE, MOUNTAIN_TILE, RED_GATE, RIVER_DL_TILE, RIVER_DR_TILE, RIVER_TILE, WHITE_GATE, GodaiBoardPoint, YELLOW_GATE } from "./WuxingPointBoard.js";
+import { GO_EARTH, GO_EMPTY, GO_FIRE, GO_METAL, GO_WATER, GO_WOOD, GodaiTile } from "./WuxingTile.js";
 
-export var WuxingPreferences = {
+export var GodaiPreferences = {
     tileDesignKey: "TileDesigns",
     tileDesignTypeValues: {
         original: "Original"
     }
 }
 
-export class WuxingController {
+export class GodaiController {
 
-    /** @type {WuxingActuator} */
+    /** @type {GodaiActuator} */
     actuator
 
-    /** @type {WuxingGameManager} */
+    /** @type {GodaiGameManager} */
     theGame
 
-    /** @type {WuxingNotationBuilder} */
+    /** @type {GodaiNotationBuilder} */
     notationBuilder
 
-    /** @type {WuxingGameNotation} */
+    /** @type {GodaiGameNotation} */
     gameNotation
 
     isPaiShoGame = true
 
     /**
      * Used for remembering the BoardPoint which the player clicked on
-     * @type {WuxingBoardPoint | null}
+     * @type {GodaiBoardPoint | null}
      */
     mouseStartPoint
 
@@ -46,7 +45,7 @@ export class WuxingController {
      * @param {boolean} isMobile Boolean flag for if running on mobile device
      */
     constructor(gameContainer, isMobile) {
-        this.actuator = new WuxingActuator(gameContainer, isMobile, isAnimationsOn())
+        this.actuator = new GodaiActuator(gameContainer, isMobile, isAnimationsOn())
 
         this.resetGameManager()
         this.resetNotationBuilder()
@@ -58,7 +57,7 @@ export class WuxingController {
      * Add your game to GameType in PaiShoMain.js.
      */
     getGameTypeId() {
-        return GameType.WuxingPaiSho.id
+        return GameType.GodaiPaiSho.id
     }
 
     completeSetup() {
@@ -71,14 +70,14 @@ export class WuxingController {
      * Called when rewinding moves.
      */
     resetGameManager() {
-        this.theGame = new WuxingGameManager(this.actuator)
+        this.theGame = new GodaiGameManager(this.actuator)
     }
 
     /**
      * Called when rewinding moves.
      */
     resetNotationBuilder() {
-        this.notationBuilder = new WuxingNotationBuilder()
+        this.notationBuilder = new GodaiNotationBuilder()
     }
 
     resetGameNotation() {
@@ -86,7 +85,7 @@ export class WuxingController {
     }
 
     getNewGameNotation() {
-        return new WuxingGameNotation()
+        return new GodaiGameNotation()
     }
 
     /**
@@ -261,7 +260,7 @@ export class WuxingController {
                     this.gameNotation.addMove(move)
 
                     if (onlinePlayEnabled && this.gameNotation.moves.length === 1) {
-                        createGameIfThatIsOk(GameType.WuxingPaiSho.id)
+                        createGameIfThatIsOk(GameType.GodaiPaiSho.id)
                     }
                     else {
                         if (playingOnlineGame()) {
@@ -334,7 +333,7 @@ export class WuxingController {
         return ""
     }
 
-    /** @param {WuxingBoardPoint} point */
+    /** @param {GodaiBoardPoint} point */
     _getGateMessage(point) {
         let msg = "Gate."
         if (point.isType(WHITE_GATE)) {
@@ -368,10 +367,10 @@ export class WuxingController {
      * @returns {string}
      */
     getDefaultHelpMessageText() {
-        return "<h4>Wuxing Pai Sho</h4><p></p><p>The objective of Wuxing Pai Sho is to capture one of each of your opponent's tiles using your own tiles.</p>"
+        return "<h4>Godai Pai Sho</h4><p></p><p>The objective of Godai Pai Sho is to capture one of each of your opponent's tiles using your own tiles.</p>"
     }
 
-    /** @param {WuxingBoardPoint} point */
+    /** @param {GodaiBoardPoint} point */
     _getRiverMessage(point) {
         let msg = []
         msg.push("Rivers start from the Blue Gate to the Red Gate")
@@ -402,7 +401,7 @@ export class WuxingController {
                 msg += "Sign in to enable online gameplay. Or, start playing a local game by making a move."
             }
 
-            msg += getGameOptionsMessageHtml(GameType.WuxingPaiSho.gameOptions)
+            msg += getGameOptionsMessageHtml(GameType.GodaiPaiSho.gameOptions)
         }
 
         return msg
@@ -415,70 +414,70 @@ export class WuxingController {
      */
     getTileMessage(tileDiv) {
         let divName = tileDiv.getAttribute("name")
-        let tile = new WuxingTile(divName.substring(1), divName.charAt(0))
+        let tile = new GodaiTile(divName.substring(1), divName.charAt(0))
         let ownerName = divName.startsWith('G') ? GUEST : HOST
         return this.getTheMessage(tile, ownerName)
     }
 
     /**
      * Get the information of a especific tile.
-     * @param {WuxingTile} tile 
+     * @param {GodaiTile} tile 
      * @param {string} ownerName 
      * @returns {{heading: string, message: Array<string>}} Information to display
      */
     getTheMessage(tile, ownerName) {
         let tileCode = tile.code
         let message = []
-        let heading = ownerName + "'s " + WuxingTile.getTileName(tileCode) + ' Tile'
+        let heading = ownerName + "'s " + GodaiTile.getTileName(tileCode) + ' Tile'
         switch (tileCode) {
-            case WU_WOOD:
+            case GO_WOOD:
                 message.push("Deployed on East or Green Gate")
-                message.push("Moves up to " + WuxingTile.baseMovement + " spaces")
+                message.push("Moves up to " + GodaiTile.baseMovement + " spaces")
                 message.push("Captures Earth Tiles")
-                message.push("If it's <b>Shēng</b> with Water it can move up to " + WuxingTile.shengMovement + " spaces")
-                message.push("If it's <b>Xiè</b> with Fire it can move up to " + WuxingTile.xieMovement + " spaces")
-                message.push("If it's <b>Kè</b> with Metal it can move up to " + WuxingTile.keMovement + " spaces")
-                message.push("If it's <b>Wǔ</b> with Wood it can move up to " + WuxingTile.wuMovement + " spaces")
+                message.push("If it's <b>Shēng</b> with Water it can move up to " + GodaiTile.shengMovement + " spaces")
+                message.push("If it's <b>Xiè</b> with Fire it can move up to " + GodaiTile.xieMovement + " spaces")
+                message.push("If it's <b>Kè</b> with Metal it can move up to " + GodaiTile.keMovement + " spaces")
+                message.push("If it's <b>Wǔ</b> with Wood it can move up to " + GodaiTile.wuMovement + " spaces")
                 break
-            case WU_EARTH:
+            case GO_EARTH:
                 message.push("Deployed on Center or Yellow Gate")
-                message.push("Moves up to " + WuxingTile.baseMovement + " spaces")
+                message.push("Moves up to " + GodaiTile.baseMovement + " spaces")
                 message.push("Captures Water Tiles")
-                message.push("If it's <b>Shēng</b> with Fire it can move up to " + WuxingTile.shengMovement + " spaces")
-                message.push("If it's <b>Xiè</b> with Metal it can move up to " + WuxingTile.xieMovement + " spaces")
-                message.push("If it's <b>Kè</b> with Wood it can move up to " + WuxingTile.keMovement + " spaces")
-                message.push("If it's <b>Wǔ</b> with Earth it can move up to " + WuxingTile.wuMovement + " spaces")
+                message.push("If it's <b>Shēng</b> with Fire it can move up to " + GodaiTile.shengMovement + " spaces")
+                message.push("If it's <b>Xiè</b> with Metal it can move up to " + GodaiTile.xieMovement + " spaces")
+                message.push("If it's <b>Kè</b> with Wood it can move up to " + GodaiTile.keMovement + " spaces")
+                message.push("If it's <b>Wǔ</b> with Earth it can move up to " + GodaiTile.wuMovement + " spaces")
                 break
-            case WU_WATER:
+            case GO_WATER:
                 message.push("Deployed on North or Black Gate")
-                message.push("Moves up to " + WuxingTile.baseMovement + " spaces")
+                message.push("Moves up to " + GodaiTile.baseMovement + " spaces")
                 message.push("Captures Fire Tiles")
-                message.push("If it's <b>Shēng</b> with Metal it can move up to " + WuxingTile.shengMovement + " spaces")
-                message.push("If it's <b>Xiè</b> with Wood it can move up to " + WuxingTile.xieMovement + " spaces")
-                message.push("If it's <b>Kè</b> with Earth it can move up to " + WuxingTile.keMovement + " spaces")
-                message.push("If it's <b>Wǔ</b> with Water it can move up to " + WuxingTile.wuMovement + " spaces")
+                message.push("If it's <b>Shēng</b> with Metal it can move up to " + GodaiTile.shengMovement + " spaces")
+                message.push("If it's <b>Xiè</b> with Wood it can move up to " + GodaiTile.xieMovement + " spaces")
+                message.push("If it's <b>Kè</b> with Earth it can move up to " + GodaiTile.keMovement + " spaces")
+                message.push("If it's <b>Wǔ</b> with Water it can move up to " + GodaiTile.wuMovement + " spaces")
                 break
-            case WU_FIRE:
+            case GO_FIRE:
                 message.push("Deployed on South or Red Gate")
-                message.push("Moves up to " + WuxingTile.baseMovement + " spaces")
+                message.push("Moves up to " + GodaiTile.baseMovement + " spaces")
                 message.push("Captures Metal Tiles")
-                message.push("If it's <b>Shēng</b> with Wood it can move up to " + WuxingTile.shengMovement + " spaces")
-                message.push("If it's <b>Xiè</b> with Earth it can move up to " + WuxingTile.xieMovement + " spaces")
-                message.push("If it's <b>Kè</b> with Water it can move up to " + WuxingTile.keMovement + " spaces")
-                message.push("If it's <b>Wǔ</b> with Fire it can move up to " + WuxingTile.wuMovement + " spaces")
+                message.push("If it's <b>Shēng</b> with Wood it can move up to " + GodaiTile.shengMovement + " spaces")
+                message.push("If it's <b>Xiè</b> with Earth it can move up to " + GodaiTile.xieMovement + " spaces")
+                message.push("If it's <b>Kè</b> with Water it can move up to " + GodaiTile.keMovement + " spaces")
+                message.push("If it's <b>Wǔ</b> with Fire it can move up to " + GodaiTile.wuMovement + " spaces")
                 break
-            case WU_METAL:
+            case GO_METAL:
                 message.push("Deployed on West or White Gate")
-                message.push("Moves up to " + WuxingTile.baseMovement + " spaces")
+                message.push("Moves up to " + GodaiTile.baseMovement + " spaces")
                 message.push("Captures Wood Tiles")
-                message.push("If it's <b>Shēng</b> with Earth it can move up to " + WuxingTile.shengMovement + " spaces")
-                message.push("If it's <b>Xiè</b> with Water it can move up to " + WuxingTile.xieMovement + " spaces")
-                message.push("If it's <b>Kè</b> with Fire it can move up to " + WuxingTile.keMovement + " spaces")
-                message.push("If it's <b>Wǔ</b> with Metal it can move up to " + WuxingTile.wuMovement + " spaces")
+                message.push("If it's <b>Shēng</b> with Earth it can move up to " + GodaiTile.shengMovement + " spaces")
+                message.push("If it's <b>Xiè</b> with Water it can move up to " + GodaiTile.xieMovement + " spaces")
+                message.push("If it's <b>Kè</b> with Fire it can move up to " + GodaiTile.keMovement + " spaces")
+                message.push("If it's <b>Wǔ</b> with Metal it can move up to " + GodaiTile.wuMovement + " spaces")
                 break
-            case WU_EMPTY:
+            case GO_EMPTY:
                 message.push("Deployed on any Gate")
-                message.push("Moves up to " + WuxingTile.emptyTileMovement + " spaces")
+                message.push("Moves up to " + GodaiTile.emptyTileMovement + " spaces")
                 message.push("Can capture and be captured by any tile")
                 message.push("Transforms into the first tile it captures")
                 message.push("When the Empty Tile is transformed, it acts as the tile it captured")
@@ -488,7 +487,7 @@ export class WuxingController {
 
         return {
             heading: heading,
-            message: [WuxingTile.getTileName(tileCode) + ' Tile:' + toBullets(message)]
+            message: [GodaiTile.getTileName(tileCode) + ' Tile:' + toBullets(message)]
         }
     }
 

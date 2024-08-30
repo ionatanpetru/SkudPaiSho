@@ -1,20 +1,20 @@
 import { GUEST, HOST } from "../CommonNotationObjects";
 import { debug } from "../GameData";
-import { gameOptionEnabled, WUXING_EMPTY_TILE } from "../GameOptions";
-import { WU_EARTH, WU_EMPTY, WU_FIRE, WU_METAL, WU_WATER, WU_WOOD, WuxingTile } from "./WuxingTile";
+import { gameOptionEnabled, GODAI_EMPTY_TILE } from "../GameOptions";
+import { GO_EARTH, GO_EMPTY, GO_FIRE, GO_METAL, GO_WATER, GO_WOOD, GodaiTile } from "./WuxingTile";
 
-export class WuxingTileManager {
+export class GodaiTileManager {
 
-    /** @type {Array<WuxingTile>} */
+    /** @type {Array<GodaiTile>} */
     hostTiles
 
-    /** @type {Array<WuxingTile>} */
+    /** @type {Array<GodaiTile>} */
     guestTiles
 
-    /** @type {Array<WuxingTile>} */
+    /** @type {Array<GodaiTile>} */
     capturedHostTiles
 
-    /** @type {Array<WuxingTile} */
+    /** @type {Array<GodaiTile} */
     capturedGuestTiles
 
     constructor() {
@@ -28,31 +28,31 @@ export class WuxingTileManager {
     /**
      * 
      * @param {'G' | 'H'} tileCode
-     * @returns {Array<WuxingTile>} array of tiles
+     * @returns {Array<GodaiTile>} array of tiles
      */
     loadTileSet(ownerCode) {
         let tiles = []
 
         tiles.push(
-            new WuxingTile(WU_WOOD, ownerCode),
-            new WuxingTile(WU_WOOD, ownerCode),
-            new WuxingTile(WU_WOOD, ownerCode),
-            new WuxingTile(WU_EARTH, ownerCode),
-            new WuxingTile(WU_EARTH, ownerCode),
-            new WuxingTile(WU_EARTH, ownerCode),
-            new WuxingTile(WU_WATER, ownerCode),
-            new WuxingTile(WU_WATER, ownerCode),
-            new WuxingTile(WU_WATER, ownerCode),
-            new WuxingTile(WU_FIRE, ownerCode),
-            new WuxingTile(WU_FIRE, ownerCode),
-            new WuxingTile(WU_FIRE, ownerCode),
-            new WuxingTile(WU_METAL, ownerCode),
-            new WuxingTile(WU_METAL, ownerCode),
-            new WuxingTile(WU_METAL, ownerCode),
+            new GodaiTile(GO_WOOD, ownerCode),
+            new GodaiTile(GO_WOOD, ownerCode),
+            new GodaiTile(GO_WOOD, ownerCode),
+            new GodaiTile(GO_EARTH, ownerCode),
+            new GodaiTile(GO_EARTH, ownerCode),
+            new GodaiTile(GO_EARTH, ownerCode),
+            new GodaiTile(GO_WATER, ownerCode),
+            new GodaiTile(GO_WATER, ownerCode),
+            new GodaiTile(GO_WATER, ownerCode),
+            new GodaiTile(GO_FIRE, ownerCode),
+            new GodaiTile(GO_FIRE, ownerCode),
+            new GodaiTile(GO_FIRE, ownerCode),
+            new GodaiTile(GO_METAL, ownerCode),
+            new GodaiTile(GO_METAL, ownerCode),
+            new GodaiTile(GO_METAL, ownerCode),
         )
 
-        if (gameOptionEnabled(WUXING_EMPTY_TILE) ) {
-            tiles.push( new WuxingTile(WU_EMPTY, ownerCode) )
+        if (gameOptionEnabled(GODAI_EMPTY_TILE) ) {
+            tiles.push( new GodaiTile(GO_EMPTY, ownerCode) )
         }
 
         return tiles
@@ -62,12 +62,12 @@ export class WuxingTileManager {
      * Grabs a tile from the corresponding tile and returns it.
      * @param {string} player HOST or GUEST
      * @param {string} tileCode tilecode
-     * @returns {WuxingTile | null}
+     * @returns {GodaiTile | null}
      */
     grabTile( player, tileCode ) {
         let tilePile = player == HOST ? this.hostTiles : this.guestTiles
 
-        /** @type {WuxingTile} */
+        /** @type {GodaiTile} */
         let tile
         for (var i = 0; i < tilePile.length; i++) {
             if (tilePile[i].code === tileCode) {
@@ -104,7 +104,7 @@ export class WuxingTileManager {
 
     /**
      * 
-     * @param {WuxingTile} tile 
+     * @param {GodaiTile} tile 
      * @param {string} playerCode GUEST or HOST
      */
     addToCapturedTiles(tile, playerCode) {

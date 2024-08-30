@@ -1,14 +1,14 @@
 import { GUEST, HOST, NotationPoint, RowAndColumn } from "../CommonNotationObjects"
 import { debug } from "../GameData"
-import { gameOptionEnabled, WUXING_BOARD_ZONES } from "../GameOptions"
+import { gameOptionEnabled, GODAI_BOARD_ZONES } from "../GameOptions"
 import { GATE, NEUTRAL, NON_PLAYABLE, POSSIBLE_MOVE } from "../skud-pai-sho/SkudPaiShoBoardPoint"
-import { BLACK_GATE, EASTERN_RIVER, GREEN_GATE, IS_DAMMED_RIVER, MOUNTAIN_ENTRANCE, MOUNTAIN_TILE, RED_GATE, RIVER_DL_TILE, RIVER_DR_TILE, RIVER_TILE, WESTERN_RIVER, WHITE_GATE, WuxingBoardPoint, YELLOW_GATE } from "./WuxingPointBoard"
-import { canTileCaptureOther, WU_EARTH, WU_EMPTY, WU_FIRE, WU_METAL, WU_WATER, WU_WOOD, WuxingTile } from "./WuxingTile"
-import { WuxingTileManager } from "./WuxingTileManager"
+import { BLACK_GATE, EASTERN_RIVER, GREEN_GATE, IS_DAMMED_RIVER, MOUNTAIN_ENTRANCE, MOUNTAIN_TILE, RED_GATE, RIVER_DL_TILE, RIVER_DR_TILE, RIVER_TILE, WESTERN_RIVER, WHITE_GATE, GodaiBoardPoint, YELLOW_GATE } from "./WuxingPointBoard"
+import { canTileCaptureOther, GO_EARTH, GO_EMPTY, GO_FIRE, GO_METAL, GO_WATER, GO_WOOD, GodaiTile } from "./WuxingTile"
+import { GodaiTileManager } from "./WuxingTileManager"
 
 /**
  * Util function that gets a set of tile types
- * @param {Array<WuxingTile>} tiles 
+ * @param {Array<GodaiTile>} tiles 
  * @returns {Set<string>} Set of tile types
  */
 function getSetOfTileTypes(tiles) {
@@ -24,18 +24,18 @@ function getSetOfTileTypes(tiles) {
  * 2. If they have captured an untransformed empty tile,
  * said tile replaces one of the tiles they need to win.
  * 
- * @param {Array<WuxingTile} tiles Array of captured tiles
+ * @param {Array<GodaiTile} tiles Array of captured tiles
  * @returns {boolean} Whether the player won or not
  */
 function hasPlayerWonFromMainCondition( tiles ) {
     const setOfTileTypes = getSetOfTileTypes( tiles )
 
-    const hasWood = setOfTileTypes.has(WU_WOOD)
-    const hasEarth = setOfTileTypes.has(WU_EARTH)
-    const hasWater = setOfTileTypes.has(WU_WATER)
-    const hasFire = setOfTileTypes.has(WU_FIRE)
-    const hasMetal = setOfTileTypes.has(WU_METAL)
-    const hasEmpty = setOfTileTypes.has(WU_EMPTY)
+    const hasWood = setOfTileTypes.has(GO_WOOD)
+    const hasEarth = setOfTileTypes.has(GO_EARTH)
+    const hasWater = setOfTileTypes.has(GO_WATER)
+    const hasFire = setOfTileTypes.has(GO_FIRE)
+    const hasMetal = setOfTileTypes.has(GO_METAL)
+    const hasEmpty = setOfTileTypes.has(GO_EMPTY)
 
     if (hasWood && hasEarth && hasWater && hasFire && hasMetal) {
         return true // Classic win
@@ -61,15 +61,15 @@ function hasPlayerWonFromMainCondition( tiles ) {
 /**
  * Checks if the `player` has won trough the alt condition.
  * 
- * @param {WuxingBoard} board board
- * @param {WuxingTileManager} tileManager 
+ * @param {GodaiBoard} board board
+ * @param {GodaiTileManager} tileManager 
  * @param {string} player GUEST or HOST - which player to look for the win condition
  * @returns {boolean} Whether the player won or not
  */
 function hasPlayerWonFromAltCondition(board, tileManager, player) {
 
     // Utils refs
-    const allTypeTypesSet = new Set([WU_EARTH, WU_FIRE, WU_METAL, WU_WOOD, WU_WATER])
+    const allTypeTypesSet = new Set([GO_EARTH, GO_FIRE, GO_METAL, GO_WOOD, GO_WATER])
     const opponentLibrary = player == HOST ? tileManager.guestTiles : tileManager.hostTiles
     const opponentCapturedTiles = player == HOST ? tileManager.capturedGuestTiles : tileManager.capturedHostTiles
     const allOpponentTiles = opponentLibrary.concat(
@@ -90,7 +90,7 @@ function hasPlayerWonFromAltCondition(board, tileManager, player) {
 
     // Does the opponent have a playable tile that they can use to capture those types?
     for (const type of typesOpponentNeeds) {
-        const utilTile = new WuxingTile(type, player != HOST ? "G" : "H")
+        const utilTile = new GodaiTile(type, player != HOST ? "G" : "H")
 
         let canCaptureThatType = false
 
@@ -111,18 +111,18 @@ function hasPlayerWonFromAltCondition(board, tileManager, player) {
 }
 
 /**
- * @param {WuxingTile} tile 
+ * @param {GodaiTile} tile 
  */
 function canTileBeMovedByRiver(tile) {
-    return [WU_WOOD, WU_WATER, WU_FIRE, WU_EMPTY].includes(tile.code) && !tile.gotMoved
+    return [GO_WOOD, GO_WATER, GO_FIRE, GO_EMPTY].includes(tile.code) && !tile.gotMoved
 }
 
-export class WuxingBoard {
+export class GodaiBoard {
 
     /** @type {RowAndColumn} */
     size
 
-    /** @type {Array<Array<WuxingBoardPoint>>} */
+    /** @type {Array<Array<GodaiBoardPoint>>} */
     cells
 
     /** @type {Array<string>} */
@@ -141,304 +141,304 @@ export class WuxingBoard {
         let cells = []
 
         cells[0] = this.newRow(9, [
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountainEntrance(),
-            WuxingBoardPoint.blackGate(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountainEntrance(),
+            GodaiBoardPoint.blackGate(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
         ])
 
         cells[1] = this.newRow(11, [
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.western( WuxingBoardPoint.eastern( WuxingBoardPoint.mountainEntranceWithRiver() ) ),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.western( GodaiBoardPoint.eastern( GodaiBoardPoint.mountainEntranceWithRiver() ) ),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
         ])
 
         cells[2] = this.newRow(13, [
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.western(WuxingBoardPoint.riverDownLeft()),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.eastern(WuxingBoardPoint.riverDownRight()),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.western(GodaiBoardPoint.riverDownLeft()),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.eastern(GodaiBoardPoint.riverDownRight()),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
         ])
 
         cells[3] = this.newRow(15, [
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.western(WuxingBoardPoint.riverDownLeft()),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.eastern(WuxingBoardPoint.riverDownRight()),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.western(GodaiBoardPoint.riverDownLeft()),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.eastern(GodaiBoardPoint.riverDownRight()),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
         ])
 
         cells[4] = this.newRow(17, [
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.western(WuxingBoardPoint.riverDownLeft()),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.eastern(WuxingBoardPoint.riverDownRight()),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.western(GodaiBoardPoint.riverDownLeft()),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.eastern(GodaiBoardPoint.riverDownRight()),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
         ])
 
         cells[5] = this.newRow(17, [
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.western(WuxingBoardPoint.riverDownLeft()),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.eastern(WuxingBoardPoint.riverDownRight()),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.western(GodaiBoardPoint.riverDownLeft()),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.eastern(GodaiBoardPoint.riverDownRight()),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
         ])
 
         cells[6] = this.newRow(17, [
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.western(WuxingBoardPoint.riverDownLeft()),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.eastern(WuxingBoardPoint.riverDownRight()),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.western(GodaiBoardPoint.riverDownLeft()),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.eastern(GodaiBoardPoint.riverDownRight()),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
         ])
 
         cells[7] = this.newRow(17, [
-            WuxingBoardPoint.mountainEntrance(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.western(WuxingBoardPoint.riverDownLeft()),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.eastern(WuxingBoardPoint.riverDownRight()),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
+            GodaiBoardPoint.mountainEntrance(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.western(GodaiBoardPoint.riverDownLeft()),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.eastern(GodaiBoardPoint.riverDownRight()),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
         ])
 
         // Horizontal midline
         cells[8] = this.newRow(17, [
-            WuxingBoardPoint.whiteGate(),
-            WuxingBoardPoint.western(WuxingBoardPoint.mountainEntranceWithRiverDR()),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.yellowGate(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.eastern(WuxingBoardPoint.mountainEntranceWithRiverDL()),
-            WuxingBoardPoint.greenGate(),
+            GodaiBoardPoint.whiteGate(),
+            GodaiBoardPoint.western(GodaiBoardPoint.mountainEntranceWithRiverDR()),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.yellowGate(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.eastern(GodaiBoardPoint.mountainEntranceWithRiverDL()),
+            GodaiBoardPoint.greenGate(),
         ])
 
         cells[9] = this.newRow(17, [
-            WuxingBoardPoint.mountainEntrance(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.western(WuxingBoardPoint.riverDownRight()),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.eastern(WuxingBoardPoint.riverDownLeft()),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
+            GodaiBoardPoint.mountainEntrance(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.western(GodaiBoardPoint.riverDownRight()),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.eastern(GodaiBoardPoint.riverDownLeft()),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
         ])
 
         cells[10] = this.newRow(17, [
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.western(WuxingBoardPoint.riverDownRight()),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.eastern(WuxingBoardPoint.riverDownLeft()),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.western(GodaiBoardPoint.riverDownRight()),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.eastern(GodaiBoardPoint.riverDownLeft()),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
         ])
 
         cells[11] = this.newRow(17, [
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.western(WuxingBoardPoint.riverDownRight()),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.eastern(WuxingBoardPoint.riverDownLeft()),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.western(GodaiBoardPoint.riverDownRight()),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.eastern(GodaiBoardPoint.riverDownLeft()),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
         ])
 
         cells[12] = this.newRow(17, [
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.western(WuxingBoardPoint.riverDownRight()),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.eastern(WuxingBoardPoint.riverDownLeft()),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.western(GodaiBoardPoint.riverDownRight()),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.eastern(GodaiBoardPoint.riverDownLeft()),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
         ])
 
         cells[13] = this.newRow(15, [
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.western(WuxingBoardPoint.riverDownRight()),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.eastern(WuxingBoardPoint.riverDownLeft()),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.western(GodaiBoardPoint.riverDownRight()),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.eastern(GodaiBoardPoint.riverDownLeft()),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
         ])
 
         cells[14] = this.newRow(13, [
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.western(WuxingBoardPoint.riverDownRight()),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.eastern(WuxingBoardPoint.riverDownLeft()),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.western(GodaiBoardPoint.riverDownRight()),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.eastern(GodaiBoardPoint.riverDownLeft()),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
         ])
 
         cells[15] = this.newRow(11, [
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.western(WuxingBoardPoint.eastern(WuxingBoardPoint.mountainEntranceWithRiver())),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.western(GodaiBoardPoint.eastern(GodaiBoardPoint.mountainEntranceWithRiver())),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
         ])
 
         cells[16] = this.newRow(9, [
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountain(),
-            WuxingBoardPoint.mountainEntrance(),
-            WuxingBoardPoint.redGate(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
-            WuxingBoardPoint.neutral(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountain(),
+            GodaiBoardPoint.mountainEntrance(),
+            GodaiBoardPoint.redGate(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
+            GodaiBoardPoint.neutral(),
         ])
 
         for (let row = 0; row < cells.length; row++) {
@@ -454,14 +454,14 @@ export class WuxingBoard {
     /**
      * Taken from SpiritBoard.js
      * @param {number} numColumns Number of Columns to add. They're added from the center
-     * @param {Array<WuxingBoardPoint>} points points to add, from left to right
+     * @param {Array<GodaiBoardPoint>} points points to add, from left to right
      * @returns {}
      */
     newRow(numColumns, points) {
         let cells = []
         let numBlanksOnSides = (this.size.row - numColumns) / 2
 
-        let nonPoint = new WuxingBoardPoint()
+        let nonPoint = new GodaiBoardPoint()
         nonPoint.addType(NON_PLAYABLE)
 
         for (var i = 0; i < this.size.row; i++) {
@@ -494,8 +494,8 @@ export class WuxingBoard {
     /**
      * 
      * @param {string} player GUEST or HOST
-     * @param {WuxingBoardPoint} bpStart 
-     * @param {WuxingBoardPoint} bpEnd 
+     * @param {GodaiBoardPoint} bpStart 
+     * @param {GodaiBoardPoint} bpEnd 
      * @returns {boolean}
      */
     _canMoveTileToPoint(player, bpStart, bpEnd) {
@@ -544,8 +544,8 @@ export class WuxingBoard {
 
     /**
      * Taken from VagabondBoard.js
-     * @param {WuxingBoardPoint} bpStart 
-     * @param {WuxingBoardPoint} bpEnd 
+     * @param {GodaiBoardPoint} bpStart 
+     * @param {GodaiBoardPoint} bpEnd 
      * @param {number} numMoves 
      */
     _verifyAbleToReach(bpStart, bpEnd, numMoves) {
@@ -555,10 +555,10 @@ export class WuxingBoard {
 
     /**
      * Taken from VagabondBoard.js
-     * @param {WuxingBoardPoint} bpStart 
-     * @param {WuxingBoardPoint} bpEnd 
+     * @param {GodaiBoardPoint} bpStart 
+     * @param {GodaiBoardPoint} bpEnd 
      * @param {number} numMoves 
-     * @param {WuxingBoardPoint} trueStartingBP In case we're using board zones, we'll need to check if the path they want is Mountain -> River -> Neutral 
+     * @param {GodaiBoardPoint} trueStartingBP In case we're using board zones, we'll need to check if the path they want is Mountain -> River -> Neutral 
      */
     _pathFound(bpStart, bpEnd, numMoves, trueStartingBP) {
         if (!bpStart || !bpEnd) {
@@ -630,9 +630,9 @@ export class WuxingBoard {
     /**
      * Util function that checks whether a tile starting from `bpStart` could directly into `nextPoint`
      * if we only follow board point logic.
-     * @param {WuxingBoardPoint} startPoint 
-     * @param {WuxingBoardPoint} nextPoint Point that is next to `bpStart`
-     * @param {WuxingBoardPoint} trueStartingPoint Only used if we need to check if we come from a mountain
+     * @param {GodaiBoardPoint} startPoint 
+     * @param {GodaiBoardPoint} nextPoint Point that is next to `bpStart`
+     * @param {GodaiBoardPoint} trueStartingPoint Only used if we need to check if we come from a mountain
      * @returns {boolean} Wheather a tile could step into `nextPoint` or not
      */
     _couldStepIntoNext(startPoint, nextPoint, trueStartingPoint) {
@@ -641,7 +641,7 @@ export class WuxingBoard {
         }
 
         // Board zone logic only applies if there are zones
-        if (gameOptionEnabled(WUXING_BOARD_ZONES)) {
+        if (gameOptionEnabled(GODAI_BOARD_ZONES)) {
             if (startPoint.isType(RIVER_TILE) && !startPoint.isType(MOUNTAIN_ENTRANCE) && nextPoint.isType(MOUNTAIN_TILE)) {
                 return false // Can't do that
             }
@@ -658,8 +658,8 @@ export class WuxingBoard {
 
     /**
      * Can the tile present in `bpStart` capture the one located in `bpEnd`?
-     * @param {WuxingBoardPoint} bpStart 
-     * @param {WuxingBoardPoint} bpEnd 
+     * @param {GodaiBoardPoint} bpStart 
+     * @param {GodaiBoardPoint} bpEnd 
      * @returns {boolean}
      */
     _canTileStartCaptureEnd(bpStart, bpEnd) {
@@ -718,7 +718,7 @@ export class WuxingBoard {
 
     /**
      * Taken from VagabondBoard.js
-     * @param {WuxingBoardPoint} boardPointStart 
+     * @param {GodaiBoardPoint} boardPointStart 
      */
     setPossibleMovePoints(boardPointStart) {
         if (!boardPointStart.hasTile()) return
@@ -760,24 +760,24 @@ export class WuxingBoard {
 
         for (const gate of gatePoints) {
             if (!gate.hasTile()) {
-                if (tileCode == WU_EMPTY) {
+                if (tileCode == GO_EMPTY) {
                     gate.addType(POSSIBLE_MOVE)
                     continue
                 }
 
-                if (gate.isType(BLACK_GATE) && tileCode == WU_WATER) {
+                if (gate.isType(BLACK_GATE) && tileCode == GO_WATER) {
                     gate.addType(POSSIBLE_MOVE)
                 }
-                else if (gate.isType(WHITE_GATE) && tileCode == WU_METAL) {
+                else if (gate.isType(WHITE_GATE) && tileCode == GO_METAL) {
                     gate.addType(POSSIBLE_MOVE)
                 }
-                else if (gate.isType(YELLOW_GATE) && tileCode == WU_EARTH) {
+                else if (gate.isType(YELLOW_GATE) && tileCode == GO_EARTH) {
                     gate.addType(POSSIBLE_MOVE)
                 }
-                else if (gate.isType(GREEN_GATE) && tileCode == WU_WOOD) {
+                else if (gate.isType(GREEN_GATE) && tileCode == GO_WOOD) {
                     gate.addType(POSSIBLE_MOVE)
                 }
-                else if (gate.isType(RED_GATE) && tileCode == WU_FIRE) {
+                else if (gate.isType(RED_GATE) && tileCode == GO_FIRE) {
                     gate.addType(POSSIBLE_MOVE)
                 }
             }
@@ -793,7 +793,7 @@ export class WuxingBoard {
 
     /**
      * 
-     * @param {WuxingTile} tile 
+     * @param {GodaiTile} tile 
      * @param {NotationPoint} notationPoint 
      */
     placeTile(tile, notationPoint) {
@@ -822,7 +822,7 @@ export class WuxingBoard {
      * 5. If two tiles reach the end of the rivers and they occupy the same space, both tiles are captured.
      * 6. If a tile that is supposed to move is blocked by a tile that is located in the space its supposed to be in, in doesn't move.
      * 
-     * @param {WuxingTileManager} tileManager In case any tiles are captured
+     * @param {GodaiTileManager} tileManager In case any tiles are captured
      */
     updateRiverMoves(tileManager) {
         const rivers = this._getRiverBoardPoints().reverse()
@@ -834,7 +834,7 @@ export class WuxingBoard {
         for (const riverSpaces of [westernRiver, easternRiver]) {
             let isRiverDammed = false
             for (const bp of riverSpaces) {
-                if (isRiverDammed || (bp.hasTile() && bp.tile.code == WU_EARTH)) {
+                if (isRiverDammed || (bp.hasTile() && bp.tile.code == GO_EARTH)) {
                     isRiverDammed = true
                     bp.addType(IS_DAMMED_RIVER)
                 }
@@ -880,7 +880,7 @@ export class WuxingBoard {
     /**
      * Util function that will move the tile located in `bp` to its appropiate direction
      * as long as it isn't blocked or anything weird happens
-     * @param {WuxingBoardPoint} bp WuxingBoardPoints that is garuanteed to be a river
+     * @param {GodaiBoardPoint} bp WuxingBoardPoints that is garuanteed to be a river
      */
     _moveTileOfRiver(bp) {
         if (!bp.hasTile()) return // Can't do nothing here
@@ -909,7 +909,7 @@ export class WuxingBoard {
 
     /**
      * Checks whether a player has won, and adds it as a winner and the reason why.
-     * @param {WuxingTileManager} tileManager Contains all the tiles neccesary to check if a player has won
+     * @param {GodaiTileManager} tileManager Contains all the tiles neccesary to check if a player has won
      */
     checkForEndGame(tileManager) {
         if (this.winners.length > 0) {
@@ -937,7 +937,7 @@ export class WuxingBoard {
     /**
      * Gets the board points with the type `RIVER_TILE` that are located in the board.
      * Starting from top to bottom, left to right
-     * @returns {Array<WuxingBoardPoint>} Array of river spaces
+     * @returns {Array<GodaiBoardPoint>} Array of river spaces
      */
     _getRiverBoardPoints() {
         let boardPoints = []
@@ -955,7 +955,7 @@ export class WuxingBoard {
 
     /**
      * @param {string} riverName WESTERN_RIVER or EASTERN_RIVER
-     * @returns {Array<WuxingBoardPoint>} Western or Eastern river spaces
+     * @returns {Array<GodaiBoardPoint>} Western or Eastern river spaces
      */
     _getSpecificRiverBoardPoints(riverName) {
         let boardPoints = []
@@ -994,8 +994,8 @@ export class WuxingBoard {
 
     /**
      * 
-     * @param {WuxingBoardPoint} initialBoardPoint 
-     * @returns {Array<WuxingBoardPoint>}
+     * @param {GodaiBoardPoint} initialBoardPoint 
+     * @returns {Array<GodaiBoardPoint>}
      */
     getSurroundingBoardPoints(initialBoardPoint) {
 		var surroundingPoints = [];

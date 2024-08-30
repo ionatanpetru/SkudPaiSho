@@ -68,8 +68,8 @@ import {
 	UNDERGROWTH_SIMPLE,
 	VAGABOND_ROTATE,
 	VARIABLE_ACCENT_TILES,
-	WUXING_BOARD_ZONES,
-	WUXING_EMPTY_TILE,
+	GODAI_BOARD_ZONES,
+	GODAI_EMPTY_TILE,
 	gameOptionEnabled,
 	getGameOptionDescription
 } from './GameOptions';
@@ -108,7 +108,7 @@ import { TrifleController } from './trifle/TrifleController';
 import { TumbleweedController } from './tumbleweed/TumbleweedController';
 import { UndergrowthController } from './undergrowth/UndergrowthController';
 import { VagabondController } from "./vagabond/VagabondController";
-import { WuxingController } from './wuxing/WuxingController';
+import { GodaiController } from './wuxing/WuxingController';
 import { addEventToElement, setupUiEvents } from './ui/UiSetup';
 import { applyBoardOptionToBgSvg, mobileAndTabletcheck } from "./ActuatorHelp";
 import {
@@ -2936,17 +2936,17 @@ export var GameType = {
 			CRUMBLEWEED
 		]
 	},
-	WuxingPaiSho: {
+	GodaiPaiSho: {
 		id: 42069, // Funny random number hehe
-		name: "Wuxing Pai Sho",
-		desc: "Wuxing Pai Sho",
+		name: "Godai Pai Sho",
+		desc: "Godai Pai Sho",
 		color: "var(--othercolor)",
 		description: "Capture your opponents elemental tiles while protecting your own",
 		coverImg: "lotus.png",
-		rulesUrl: "https://tinyurl.com/2pkdfmss",
+		rulesUrl: "https://tinyurl.com/65frxu6h",
 		gameOptions: [
-			WUXING_BOARD_ZONES,
-			WUXING_EMPTY_TILE,
+			GODAI_BOARD_ZONES,
+			GODAI_EMPTY_TILE,
 		]
 	}
 };
@@ -3021,8 +3021,8 @@ export function getGameControllerForGameType(gameTypeId) {
 		case GameType.BeyondTheMaps.id:
 			controller = new BeyondTheMapsController(gameContainerDiv, isMobile);
 			break;
-		case GameType.WuxingPaiSho.id:
-			controller = new WuxingController(gameContainerDiv, isMobile)
+		case GameType.GodaiPaiSho.id:
+			controller = new GodaiController(gameContainerDiv, isMobile)
 			break
 		default:
 			debug("Game Controller unavailable.");

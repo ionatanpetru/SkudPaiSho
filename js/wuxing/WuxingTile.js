@@ -2,46 +2,46 @@ import { GUEST, HOST } from "../CommonNotationObjects"
 import { debug } from "../GameData"
 import { GATE } from "../skud-pai-sho/SkudPaiShoBoardPoint"
 import { tileIdIncrement } from "../skud-pai-sho/SkudPaiShoTile"
-import { WuxingBoardPoint } from "./WuxingPointBoard"
+import { GodaiBoardPoint } from "./WuxingPointBoard"
 
-export const WU_WOOD = "WO"
-export const WU_EARTH = "EA"
-export const WU_WATER = "WA"
-export const WU_FIRE = "FI"
-export const WU_METAL = "ME"
-export const WU_EMPTY = "EM"
+export const GO_WOOD = "WO"
+export const GO_EARTH = "EA"
+export const GO_WATER = "WA"
+export const GO_FIRE = "FI"
+export const GO_METAL = "ME"
+export const GO_EMPTY = "EM"
 
-const WU_SHENG_CYCLE = "Sheng Cycle"
-const WU_XIE_CYCLE = "Xie Cycle"
-const WU_KE_CYCLE = "Ke Cycle"
-const WU_WU_CYCLE = "Wu Cycle"
+const GO_SHENG_CYCLE = "Sheng Cycle"
+const GO_XIE_CYCLE = "Xie Cycle"
+const GO_KE_CYCLE = "Ke Cycle"
+const GO_WU_CYCLE = "Wu Cycle"
 
 /**
  * Util function that determines if a tile's element can capture another
- * @param {WuxingTile} tile Tile to check if it can capture
- * @param {WuxingTile} other Tile we want to know if its capturable
+ * @param {GodaiTile} tile Tile to check if it can capture
+ * @param {GodaiTile} other Tile we want to know if its capturable
  */
 export function canTileCaptureOther(tile, other) {
     if (tile.ownerCode == other.ownerCode) {
         return false
     }
 
-    if (tile.code == WU_EMPTY || other.code == WU_EMPTY) {
+    if (tile.code == GO_EMPTY || other.code == GO_EMPTY) {
         return true
     }
-    else if (tile.code == WU_WOOD && other.code == WU_EARTH) {
+    else if (tile.code == GO_WOOD && other.code == GO_EARTH) {
         return true
     }
-    else if (tile.code == WU_EARTH && other.code == WU_WATER) {
+    else if (tile.code == GO_EARTH && other.code == GO_WATER) {
         return true
     }
-    else if (tile.code == WU_WATER && other.code == WU_FIRE) {
+    else if (tile.code == GO_WATER && other.code == GO_FIRE) {
         return true
     }
-    else if (tile.code == WU_FIRE && other.code == WU_METAL) {
+    else if (tile.code == GO_FIRE && other.code == GO_METAL) {
         return true
     }
-    else if (tile.code == WU_METAL && other.code == WU_WOOD) {
+    else if (tile.code == GO_METAL && other.code == GO_WOOD) {
         return true
     }
     else return false
@@ -58,23 +58,23 @@ export function canTileCaptureOther(tile, other) {
  *  // To detect if there is a Sheng relationship, do:
  *  isTileInShengWithOther(fireTile, otherTile)
  * 
- * @param {WuxingTile} tile reciever of the relationship
- * @param {WuxingTile} other tile that causes cycle interaction
+ * @param {GodaiTile} tile reciever of the relationship
+ * @param {GodaiTile} other tile that causes cycle interaction
  */
 export function isTileInShengWithOther(tile, other) {
-    if (other.code === WU_WOOD && tile.code === WU_FIRE) {
+    if (other.code === GO_WOOD && tile.code === GO_FIRE) {
         return true
     }
-    else if (other.code === WU_FIRE && tile.code === WU_EARTH) {
+    else if (other.code === GO_FIRE && tile.code === GO_EARTH) {
         return true
     }
-    else if (other.code === WU_EARTH && tile.code === WU_METAL) {
+    else if (other.code === GO_EARTH && tile.code === GO_METAL) {
         return true
     }
-    else if (other.code === WU_METAL && tile.code === WU_WATER) {
+    else if (other.code === GO_METAL && tile.code === GO_WATER) {
         return true
     }
-    else if (other.code === WU_WATER && tile.code === WU_WOOD) {
+    else if (other.code === GO_WATER && tile.code === GO_WOOD) {
         return true
     }
     else return false
@@ -92,23 +92,23 @@ export function isTileInShengWithOther(tile, other) {
  *  // To detect if there is a Xie relationship, do:
  *  isTileInXieWithOrder(fireTile, otherTile)
  * 
- * @param {WuxingTile} tile reciever of the relationship
- * @param {WuxingTile} other tile that causes cycle interaction
+ * @param {GodaiTile} tile reciever of the relationship
+ * @param {GodaiTile} other tile that causes cycle interaction
  */
 export function isTileInXieWithOrder(tile, other) {
-    if (other.code === WU_WOOD && tile.code === WU_WATER) {
+    if (other.code === GO_WOOD && tile.code === GO_WATER) {
         return true
     }
-    else if (other.code === WU_WATER && tile.code === WU_METAL) {
+    else if (other.code === GO_WATER && tile.code === GO_METAL) {
         return true
     }
-    else if (other.code === WU_METAL && tile.code === WU_EARTH) {
+    else if (other.code === GO_METAL && tile.code === GO_EARTH) {
         return true
     }
-    else if (other.code === WU_EARTH && tile.code === WU_FIRE) {
+    else if (other.code === GO_EARTH && tile.code === GO_FIRE) {
         return true
     }
-    else if (other.code === WU_FIRE && tile.code === WU_WOOD) {
+    else if (other.code === GO_FIRE && tile.code === GO_WOOD) {
         return true
     }
     else return false
@@ -124,23 +124,23 @@ export function isTileInXieWithOrder(tile, other) {
  *  // To detect if there is a Ke relationship, do:
  *  isTileInKeWithOrder(fireTile, otherTile)
  * 
- * @param {WuxingTile} tile reciever of the relationship
- * @param {WuxingTile} other tile that causes cycle interaction
+ * @param {GodaiTile} tile reciever of the relationship
+ * @param {GodaiTile} other tile that causes cycle interaction
  */
 export function isTileInKeWithOther(tile, other) {
-    if (other.code === WU_WOOD && tile.code === WU_EARTH) {
+    if (other.code === GO_WOOD && tile.code === GO_EARTH) {
         return true
     }
-    else if (other.code === WU_EARTH && tile.code === WU_WATER) {
+    else if (other.code === GO_EARTH && tile.code === GO_WATER) {
         return true
     }
-    else if (other.code === WU_WATER && tile.code === WU_FIRE) {
+    else if (other.code === GO_WATER && tile.code === GO_FIRE) {
         return true
     }
-    else if (other.code === WU_FIRE && tile.code === WU_METAL) {
+    else if (other.code === GO_FIRE && tile.code === GO_METAL) {
         return true
     }
-    else if (other.code === WU_METAL && tile.code === WU_WOOD) {
+    else if (other.code === GO_METAL && tile.code === GO_WOOD) {
         return true
     }
     else return false
@@ -156,12 +156,12 @@ export function isTileInKeWithOther(tile, other) {
  *  // To detect if there is a Wu relationship, do:
  *  isTileInWuWithOrder(fireTile, otherTile)
  * 
- * @param {WuxingTile} tile reciever of the relationship
- * @param {WuxingTile} other tile that causes cycle interaction
+ * @param {GodaiTile} tile reciever of the relationship
+ * @param {GodaiTile} other tile that causes cycle interaction
  */
 
 export function isTileInWuWithOther(tile, other) {
-    return tile.code === other.code && tile !== WU_EMPTY
+    return tile.code === other.code && tile !== GO_EMPTY
 }
 
 /**
@@ -170,27 +170,27 @@ export function isTileInWuWithOther(tile, other) {
  * @returns {number} Correct movement based on the cycles given
  */
 function resolvedMovementFromCycles(cycles) {
-    const hasSheng = cycles.has(WU_SHENG_CYCLE)
-    const hasXie = cycles.has(WU_XIE_CYCLE)
-    const hasKe = cycles.has(WU_KE_CYCLE)
-    const hasWu = cycles.has(WU_WU_CYCLE)
+    const hasSheng = cycles.has(GO_SHENG_CYCLE)
+    const hasXie = cycles.has(GO_XIE_CYCLE)
+    const hasKe = cycles.has(GO_KE_CYCLE)
+    const hasWu = cycles.has(GO_WU_CYCLE)
     const hasExtremeCycles = hasSheng || hasXie
     const hasNormalCycles = hasKe || hasWu
 
     if (hasSheng && hasXie) { // Extreme cycles cancel out
-        if (hasKe) return WuxingTile.keMovement
-        if (hasWu) return WuxingTile.wuMovement
-        return WuxingTile.baseMovement
+        if (hasKe) return GodaiTile.keMovement
+        if (hasWu) return GodaiTile.wuMovement
+        return GodaiTile.baseMovement
     }
     else if (hasExtremeCycles && hasNormalCycles) {
-        if (hasSheng) return WuxingTile.shengMovement
-        if (hasWu) return WuxingTile.xieMovement
+        if (hasSheng) return GodaiTile.shengMovement
+        if (hasWu) return GodaiTile.xieMovement
     }
 
-    return WuxingTile.baseMovement // IDK Man
+    return GodaiTile.baseMovement // IDK Man
 }
 
-export class WuxingTile {
+export class GodaiTile {
 
     static baseMovement = 3
     static shengMovement = 5
@@ -239,18 +239,18 @@ export class WuxingTile {
 
     /**
      * Calculates the moving distance of a tile based on the sorrounding board points.
-     * @param {Array<WuxingBoardPoint>} sorroundingBPs Sorrounding board points around the tile
+     * @param {Array<GodaiBoardPoint>} sorroundingBPs Sorrounding board points around the tile
      * @param {boolean} isInGate If the current tile is in a gate
      * @returns {number} Moving distance based on its sorrounding conditions
      */
     getMoveDistance( sorroundingBPs, isInGate ) {
 
-        if (this.code === WU_EMPTY) {
-            return WuxingTile.emptyTileMovement // Not affected by cycles
+        if (this.code === GO_EMPTY) {
+            return GodaiTile.emptyTileMovement // Not affected by cycles
         }
 
         if (!sorroundingBPs || isInGate) {
-            return WuxingTile.baseMovement
+            return GodaiTile.baseMovement
         }
 
         const sorroundingTiles = sorroundingBPs
@@ -259,39 +259,39 @@ export class WuxingTile {
             .filter( tile => tile != null ) // Remove empty spaces
 
         if (sorroundingTiles.length === 0) {
-            return WuxingTile.baseMovement // No cycles to identify lol
+            return GodaiTile.baseMovement // No cycles to identify lol
         }
 
         let cycles = new Set([""]) // We're gonna check every tile and see if it causes a cycle interaction
         for (const otherTile of sorroundingTiles) {
             if ( isTileInShengWithOther(this, otherTile) ) {
-                cycles.add(WU_SHENG_CYCLE)
+                cycles.add(GO_SHENG_CYCLE)
             }
             if ( isTileInXieWithOrder(this, otherTile) ) {
-                cycles.add(WU_XIE_CYCLE)
+                cycles.add(GO_XIE_CYCLE)
             }
             if ( isTileInKeWithOther(this, otherTile) ) {
-                cycles.add(WU_KE_CYCLE)
+                cycles.add(GO_KE_CYCLE)
             }
             if ( isTileInWuWithOther(this, otherTile) ) {
-                cycles.add(WU_WU_CYCLE)
+                cycles.add(GO_WU_CYCLE)
             }
         }
 
         cycles.delete("")
 
         if (cycles.size === 1) {
-            if (cycles.has(WU_SHENG_CYCLE)) {
-                return WuxingTile.shengMovement
+            if (cycles.has(GO_SHENG_CYCLE)) {
+                return GodaiTile.shengMovement
             }
-            else if (cycles.has(WU_XIE_CYCLE)) {
-                return WuxingTile.xieMovement
+            else if (cycles.has(GO_XIE_CYCLE)) {
+                return GodaiTile.xieMovement
             }
-            else if (cycles.has(WU_KE_CYCLE)) {
-                return WuxingTile.keMovement
+            else if (cycles.has(GO_KE_CYCLE)) {
+                return GodaiTile.keMovement
             }
-            else if (cycles.has(WU_WU_CYCLE)) {
-                return WuxingTile.wuMovement
+            else if (cycles.has(GO_WU_CYCLE)) {
+                return GodaiTile.wuMovement
             }
         }
         else {
@@ -299,7 +299,7 @@ export class WuxingTile {
             return resolvedMovementFromCycles(cycles)
         }
 
-        return WuxingTile.baseMovement // IDK what happened here
+        return GodaiTile.baseMovement // IDK what happened here
     }
 
     getImageName() {
@@ -307,26 +307,26 @@ export class WuxingTile {
     }
 
     getCopy() {
-        return new WuxingTile(this.code, this.ownerCode)
+        return new GodaiTile(this.code, this.ownerCode)
     }
 
     static getTileName(tileCode) {
         let name = ""
 
-        if (tileCode === WU_WOOD) {
+        if (tileCode === GO_WOOD) {
             name = "Wood"
-        } else if (tileCode === WU_EARTH) {
+        } else if (tileCode === GO_EARTH) {
             name = "Earth"
         }
-        else if (tileCode === WU_WATER) {
+        else if (tileCode === GO_WATER) {
             name = "Water"
         }
-        else if (tileCode === WU_FIRE) {
+        else if (tileCode === GO_FIRE) {
             name = "Fire"
         }
-        else if (tileCode === WU_METAL) {
+        else if (tileCode === GO_METAL) {
             name = "Metal"
-        } else if (tileCode === WU_EMPTY) {
+        } else if (tileCode === GO_EMPTY) {
             name = "Empty"
         }
 
