@@ -403,8 +403,8 @@ export var codeToVerify = 0;
 export var tempUserId;
 export var myGamesList = [];
 export var gameSeekList = [];
-export var userOnlineIcon = "<span title='Online' style='color:#35ac19;'><i class='fa fa-user-circle-o' aria-hidden='true'></i></span>";
-export var userOfflineIcon = "<span title='Offline' style='color:gray;'><i class='fa fa-user-circle-o' aria-hidden='true'></i></span>";
+export var userOnlineIcon = "<span title='Online' style='color:#35ac19;'><i class='fa-regular fa-circle-user' aria-hidden='true'></i></span>";
+export var userOfflineIcon = "<span title='Offline' style='color:gray;'><i class='fa-regular fa-circle-user' aria-hidden='true'></i></span>";
 export var logOnlineStatusIntervalValue;
 export var userTurnCountInterval;
 
