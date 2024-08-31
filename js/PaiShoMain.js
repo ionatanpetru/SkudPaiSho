@@ -272,8 +272,8 @@ var codeToVerify = 0;
 var tempUserId;
 var myGamesList = [];
 var gameSeekList = [];
-var userOnlineIcon = "<span title='Online' style='color:#35ac19;'><i class='fa fa-user-circle-o' aria-hidden='true'></i></span>";
-var userOfflineIcon = "<span title='Offline' style='color:gray;'><i class='fa fa-user-circle-o' aria-hidden='true'></i></span>";
+var userOnlineIcon = "<span title='Online' style='color:#35ac19;'><i class='fa-regular fa-circle-user' aria-hidden='true'></i></span>";
+var userOfflineIcon = "<span title='Offline' style='color:gray;'><i class='fa-regular fa-circle-user' aria-hidden='true'></i></span>";
 var logOnlineStatusIntervalValue;
 var userTurnCountInterval;
 
