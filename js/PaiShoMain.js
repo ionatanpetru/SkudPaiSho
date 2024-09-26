@@ -68,6 +68,8 @@ import {
 	UNDERGROWTH_SIMPLE,
 	VAGABOND_ROTATE,
 	VARIABLE_ACCENT_TILES,
+	GODAI_BOARD_ZONES,
+	GODAI_EMPTY_TILE,
 	gameOptionEnabled,
 	getGameOptionDescription
 } from './GameOptions';
@@ -106,6 +108,7 @@ import { TrifleController } from './trifle/TrifleController';
 import { TumbleweedController } from './tumbleweed/TumbleweedController';
 import { UndergrowthController } from './undergrowth/UndergrowthController';
 import { VagabondController } from "./vagabond/VagabondController";
+import { GodaiController } from './godai/GodaiController';
 import { addEventToElement, setupUiEvents } from './ui/UiSetup';
 import { applyBoardOptionToBgSvg, mobileAndTabletcheck } from "./ActuatorHelp";
 import {
@@ -1761,6 +1764,8 @@ export function resetMove() {
 	// $('#contactform').addClass('gone');
 }
 
+window.resetMove = resetMove
+
 export function myTurn() {
 	var userEmail = localStorage.getItem(localEmailKey);
 	if (userEmail && userEmail.includes("@") && userEmail.includes(".")) {
@@ -2930,6 +2935,19 @@ export var GameType = {
 		secretGameOptions: [
 			CRUMBLEWEED
 		]
+	},
+	GodaiPaiSho: {
+		id: 42069, // Funny random number hehe
+		name: "Godai Pai Sho",
+		desc: "Godai Pai Sho",
+		color: "var(--othercolor)",
+		description: "Capture your opponents elemental tiles while protecting your own",
+		coverImg: "lotus.png",
+		rulesUrl: "https://tinyurl.com/65frxu6h",
+		gameOptions: [
+			GODAI_BOARD_ZONES,
+			GODAI_EMPTY_TILE,
+		]
 	}
 };
 
@@ -3003,6 +3021,9 @@ export function getGameControllerForGameType(gameTypeId) {
 		case GameType.BeyondTheMaps.id:
 			controller = new BeyondTheMapsController(gameContainerDiv, isMobile);
 			break;
+		case GameType.GodaiPaiSho.id:
+			controller = new GodaiController(gameContainerDiv, isMobile)
+			break
 		default:
 			debug("Game Controller unavailable.");
 	}
@@ -4731,6 +4752,9 @@ export function addGameOption(option) {
 	addOption(option);
 	setGameController(gameController.getGameTypeId(), true);
 }
+
+// REMOVE THIS THIS IS ONLY FOR DEBUG
+window.addGameOption = addGameOption
 
 export function getGameOptionsMessageHtml(options) {
 	var msg = "<br /><br />";

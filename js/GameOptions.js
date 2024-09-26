@@ -213,6 +213,12 @@ gameOptionDescriptions[EDGES_MOVE_4_2] = "Less movement (4 and 2)";
 export var EDGES_DICE_FOR_MOVEMENT = "EdgesRollForMovement";
 gameOptionDescriptions[EDGES_DICE_FOR_MOVEMENT] = "Roll dice for movement";
 
+/* Godai */
+export var GODAI_BOARD_ZONES = "GodaiBoardZones";
+gameOptionDescriptions[GODAI_BOARD_ZONES] = "Board Zones: Rivers & Mountains";
+
+export var GODAI_EMPTY_TILE = "GodaiEmptyTile";
+gameOptionDescriptions[GODAI_EMPTY_TILE] = "Play with Empty tile";
 
 /* -------- */
 
