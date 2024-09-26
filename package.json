@@ -35,6 +35,20 @@
 			"env": {
 				"NODE_ENV": "development"
 			}
+		},
+		{
+			"staticPath": "style",
+			"staticOutPath": "style",
+			"env": {
+				"NODE_ENV": "production"
+			}
+		},
+		{
+			"staticPath": "style",
+			"staticOutPath": "style",
+			"env": {
+				"NODE_ENV": "development"
+			}
 		}
 	],
 	"repository": {
