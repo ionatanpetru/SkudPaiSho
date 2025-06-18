@@ -9,6 +9,7 @@ import {
   openTab,
   sendChat,
   sendGlobalChat,
+  signUpClicked,
   viewGameSeeksClicked
 } from '../PaiShoMain';
 
