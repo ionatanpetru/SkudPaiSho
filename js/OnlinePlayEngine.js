@@ -120,6 +120,22 @@ OnlinePlayEngine.prototype.updateUserPassword = function(userId, existingPasswor
     );
 };
 
+OnlinePlayEngine.prototype.removeUserPassword = function(loginToken, callback) {
+	$.post("backend/removeUserPassword.php",
+		{
+			userId: loginToken.userId,
+			username: loginToken.username,
+			userEmail: loginToken.userEmail, 
+			deviceId: loginToken.deviceId
+		},
+		function(data, status) {
+			if (status === 'success') {
+				callback(data.trim());
+			}
+		}
+	);
+}
+
 OnlinePlayEngine.prototype.createDeviceIdForUser = function(userId, callback) {
     $.post("backend/createDeviceIdForUser.php",
         {

@@ -2258,7 +2258,7 @@ function forgetPasswordClicked() {
 		var yesNoOptions = {};
 		yesNoOptions.yesText = "Yes - Remove my password";
 		yesNoOptions.yesFunction = function() {
-			onlinePlayEngine.removeUserPassword();
+			onlinePlayEngine.removeUserPassword(getLoginToken(), removePasswordCallback);
 		};
 		yesNoOptions.noText = "Close";
 		showModal(
@@ -2315,6 +2315,17 @@ var updatePasswordCallback = function updatePasswordCallback(data) {
 	}
 
 	showModal("Update Password", msg);
+};
+
+var removePasswordCallback = function removePasswordCallback(data) {
+	var msg = "";
+	if (data === 'Password removed.') {
+		msg = "Password removed. You will be able to sign in using email verification, or set a password from the bottom of the My Games list.";
+	} else {
+		msg = "Password update failed.";
+	}
+
+	showModal("Remove Password", msg);
 };
 
 function updatePasswordClicked() {
