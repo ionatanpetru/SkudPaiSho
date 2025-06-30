@@ -269,7 +269,7 @@ Ads.showRandomChatTabAd = function() {
 Ads.showSponsorMessagesTeaserPopup = function() {
 	showModal(
 		"Sponsored Messages",
-		"Would you like to support The Garden Gate and sponsor a message that could show here? <br /><br />Contact @SkudPaiSho on <a href='https://skudpaisho.com/discord' target='_blank'>The Garden Gate Discord</a> and consider supporting The Garden Gate on <a href='https://ko-fi.com/thegardengategames' target='_blank'>Ko-fi</a>."
+		"Would you like to support The Garden Gate and sponsor a message that could show here? <br /><br />Contact @SkudPaiSho on <a href='https://skudpaisho.com/discord' target='_blank'>The Garden Gate Discord</a> and consider supporting The Garden Gate on <a href='https://buymeacoffee.com/skudpaisho' target='_blank'>Buy Me A Coffee</a>."
 	);
 };
 
