@@ -1666,6 +1666,25 @@ PaiShoGames.Board.prototype.getManipulatedMovementInfo = function(boardPointStar
 				movementInfo.type = Trifle.MovementType.orthAndDiag;
 			}
 		}
+		var newMovementAbilities = manipulateAbility.abilityInfo.newMovementAbilities;
+			if (newMovementAbilities && newMovementAbilities.length) {
+				// Does it target the movementInfo?
+				if (!manipulateAbility.abilityInfo.maniputlateMovementType
+					|| (manipulateAbility.abilityInfo.manipulateMovementType
+					&& manipulateAbility.abilityInfo.manipulateMovementType == movementInfo.type)) 
+				{
+					movementInfo.abilities = movementInfo.abilities || [];
+					newMovementAbilities.forEach(newMovementAbility => {
+						if (!movementInfo.abilities) {
+							movementInfo.abilities = [];
+						}
+						// If the ability is not already in the list, add it
+						if (!movementInfo.abilities.includes(newMovementAbility)) {
+							movementInfo.abilities.push(newMovementAbility);
+						}
+					});
+				}
+			}
 	});
 	return movementInfo;
 };

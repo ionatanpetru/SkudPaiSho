@@ -2474,7 +2474,8 @@ var GameType = {
 		coverImg: "ginseng.png",
 		rulesUrl: "https://skudpaisho.com/site/games/ginseng-pai-sho/",
 		gameOptions: [
-			GINSENG_GINSENG_5
+			GINSENG_GINSENG_5,
+			BISON_GRANTS_FLYING
 		],
 		secretGameOptions: [
 			LION_TURTLE_ABILITY_ANYWHERE,

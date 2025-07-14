@@ -404,6 +404,31 @@ Ginseng.TileInfo.defineGinsengTilesV2 = function() {
 						],
 						targetTypes: [Trifle.TargetType.triggerTargetTiles],
 						targetTeams: [Trifle.TileTeam.friendly]
+					}, 
+					gameOptionEnabled(BISON_GRANTS_FLYING) && {
+						type: Trifle.AbilityName.manipulateExistingMovement,
+						manipulateMovementType: Trifle.MovementType.standard,
+						newMovementAbilities: [
+							{
+								type: Trifle.MovementAbility.jumpOver
+							}
+						],
+						triggers: [
+							{
+								triggerType: Trifle.AbilityTriggerType.whileTargetTileIsSurrounding,
+								targetTeams: [Trifle.TileTeam.friendly],
+								activationRequirements: [
+									{
+										type: Trifle.ActivationRequirement.tileIsOnPointOfType,
+										targetTileTypes: [Trifle.TileCategory.thisTile],
+										targetPointTypes: [RED]
+									}
+								]
+							}
+						],
+						targetTypes: [Trifle.TargetType.triggerTargetTiles],
+						targetTeams: [Trifle.TileTeam.friendly],
+						excludeTileCodes: [Ginseng.TileCodes.Wheel]
 					}
 			],
 			textLines: [

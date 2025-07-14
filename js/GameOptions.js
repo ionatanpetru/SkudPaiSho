@@ -201,6 +201,9 @@ gameOptionDescriptions[DIAGONAL_BISON_ABILITY_TESTING] = "Bison gives Diagonal m
 var GINSENG_GINSENG_5 = "GinsengLimit5";
 gameOptionDescriptions[GINSENG_GINSENG_5] = "Ginseng protect up to 5 spaces";
 
+var BISON_GRANTS_FLYING = "BisonGrantsFlying";
+gameOptionDescriptions[BISON_GRANTS_FLYING] = "Bison grants flying movement";
+
 /* Key Pai Sho */
 var NO_EFFECT_TILES = "NoEffectTiles";
 gameOptionDescriptions[NO_EFFECT_TILES] = "No Effect Tiles";
