@@ -9,7 +9,7 @@
 		"package.json": "^2.0.1"
 	},
 	"name": "skud-pai-sho",
-	"description": "Skud Pai Sho is the most accessible, playable, and complete ruleset for Pai Sho. Play online and learn more at [The Garden Gate - SkudPaiSho.com](https://skudpaisho.com).",
+	"description": "The Garden Gate - the home of Pai Sho. Play online and learn more at [The Garden Gate - SkudPaiSho.com](https://skudpaisho.com).",
 	"version": "1.0.0",
 	"type": "module",
 	"source": "index.html",
