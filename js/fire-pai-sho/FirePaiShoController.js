@@ -1,5 +1,61 @@
 /* Skud Pai Sho specific UI interaction logic */
 
+import { FirePaiShoActuator } from './FirePaiShoActuator';
+import { FirePaiShoGameManager } from './FirePaiShoGameManager';
+import { FirePaiShoGameNotation, FirePaiShoNotationBuilder } from './FirePaiShoGameNotation';
+import { FirePaiShoTile } from './FirePaiShoTile';
+import {
+	ACCENT_TILE,
+	ARRANGING,
+	BRAND_NEW,
+	GATE,
+	GUEST,
+	HOST,
+	MOVE_DONE,
+	NEUTRAL,
+	NotationPoint,
+	PLANTING,
+	POSSIBLE_MOVE,
+	RED,
+	READY_FOR_BONUS,
+	WAITING_FOR_BOAT_BONUS_POINT,
+	WAITING_FOR_BONUS_ENDPOINT,
+	WAITING_FOR_ENDPOINT,
+	WHITE,
+	boatOnlyMoves,
+	debug,
+} from '../CommonNotationObjects';
+import {
+	GameType,
+	activeAi,
+	activeAi2,
+	buildDropdownDiv,
+	callSubmitMove,
+	clearMessage,
+	createGameIfThatIsOk,
+	currentMoveIndex,
+	finalizeMove,
+	gameId,
+	getCurrentPlayer,
+	getGameOptionsMessageHtml,
+	getResetMoveElement,
+	getUserGamePreference,
+	isAnimationsOn,
+	myTurn,
+	onlinePlayEnabled,
+	playingOnlineGame,
+	rerunAll,
+	setUserGamePreference,
+} from '../PaiShoMain';
+import {
+	getNeutralPointMessage,
+	getRedPointMessage,
+	getRedWhitePointMessage,
+	getWhitePointMessage,
+	toBullets,
+} from '../PaiShoMain';
+import { NO_HARMONY_VISUAL_AIDS, gameOptionEnabled } from '../GameOptions';
+
 export function FirePaiShoController(gameContainer, isMobile) {
 	this.actuator = new FirePaiShoActuator(gameContainer, isMobile, isAnimationsOn());
 	this.gameContainer = gameContainer;
@@ -843,7 +899,7 @@ FirePaiShoController.prototype.buildToggleHarmonyAidsDiv = function() {
 	var toggleSpan = document.createElement("span");
 	toggleSpan.className = "skipBonus";
 	toggleSpan.textContent = "toggle";
-	toggleSpan.onclick = function() { gameController.toggleHarmonyAids(); };
+	toggleSpan.onclick = () => this.toggleHarmonyAids();
 	div.appendChild(toggleSpan);
 	
 	if (gameOptionEnabled(NO_HARMONY_VISUAL_AIDS)) {
@@ -866,7 +922,7 @@ FirePaiShoController.prototype.buildBoardRotateDiv = function() {
 	var toggleSpan = document.createElement("span");
 	toggleSpan.className = "skipBonus";
 	toggleSpan.textContent = "toggle";
-	toggleSpan.onclick = function() { gameController.toggleBoardRotation(); };
+	toggleSpan.onclick = () => this.toggleBoardRotation();
 	div.appendChild(toggleSpan);
 	
 	return div;

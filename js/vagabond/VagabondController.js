@@ -639,8 +639,8 @@ export class VagabondController {
 		var movePeekingToggleSpan = document.createElement("span");
 		movePeekingToggleSpan.innerText = "Toggle";
 		movePeekingToggleSpan.classList.add("skipBonus");
-		movePeekingToggleSpan.onclick = function() {
-			gameController.togglePeekAtOpponentMoves();
+		movePeekingToggleSpan.onclick = () => {
+			this.togglePeekAtOpponentMoves();
 		};
 
 		movePeekingDiv.appendChild(movePeekingToggleSpan);
@@ -668,7 +668,7 @@ export class VagabondController {
 		var toggleSpan = document.createElement("span");
 		toggleSpan.className = "skipBonus";
 		toggleSpan.textContent = "toggle";
-		toggleSpan.onclick = () => gameController.toggleAnimations();
+	toggleSpan.onclick = () => this.toggleAnimations();
 		div.appendChild(toggleSpan);
 		
 		return div;

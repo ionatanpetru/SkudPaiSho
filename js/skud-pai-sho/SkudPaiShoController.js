@@ -308,12 +308,10 @@ SkudPaiShoController.prototype.showHarmonyBonusMessage = function() {
 	mainMessage.textContent = "Harmony Bonus! Select a tile to play or ";
 	
 	// Create the skip link
-	var skipSpan = document.createElement("span");
-	skipSpan.className = "skipBonus";
-	skipSpan.textContent = "skip";
-	skipSpan.onclick = () => gameController.skipHarmonyBonus();
-	
-	mainMessage.appendChild(skipSpan);
+		var skipSpan = document.createElement("span");
+		skipSpan.className = "skipBonus";
+		skipSpan.textContent = "skip";
+		skipSpan.onclick = () => this.skipHarmonyBonus();	mainMessage.appendChild(skipSpan);
 	mainMessage.appendChild(document.createTextNode("."));
 	
 	messageDiv.appendChild(mainMessage);
@@ -978,7 +976,7 @@ SkudPaiShoController.prototype.buildToggleHarmonyAidsDiv = function() {
 	var toggleSpan = document.createElement("span");
 	toggleSpan.className = "skipBonus";
 	toggleSpan.textContent = "toggle";
-	toggleSpan.onclick = function() { gameController.toggleHarmonyAids(); };
+	toggleSpan.onclick = () => this.toggleHarmonyAids();
 	div.appendChild(toggleSpan);
 	
 	if (gameOptionEnabled(NO_HARMONY_VISUAL_AIDS)) {

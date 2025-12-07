@@ -736,7 +736,7 @@ export class KeyPaiShoController {
 		var toggleSpan = document.createElement("span");
 		toggleSpan.className = "skipBonus";
 		toggleSpan.textContent = "toggle";
-		toggleSpan.onclick = () => gameController.toggleHarmonyAids();
+		toggleSpan.onclick = () => this.toggleHarmonyAids();
 		div.appendChild(toggleSpan);
 		
 		if (gameOptionEnabled(NO_HARMONY_VISUAL_AIDS)) {
