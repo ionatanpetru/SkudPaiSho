@@ -67,7 +67,7 @@ export function buildSignUpModalContentElement() {
 	// Add the response div
 	const verificationCodeSendResponse = document.createElement('div');
 	verificationCodeSendResponse.id = 'verificationCodeSendResponse';
-	verificationCodeSendResponse.innerHTML = '&nbsp;';
+	verificationCodeSendResponse.textContent = '\u00A0';
 	verificationCodeButtonContainer.appendChild(verificationCodeSendResponse);
 
 	centerContainer.appendChild(verificationCodeButtonContainer);

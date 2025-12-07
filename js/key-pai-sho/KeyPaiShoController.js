@@ -38,7 +38,7 @@ import {
   gameId,
   getCurrentPlayer,
   getGameOptionsMessageHtml,
-  getResetMoveText,
+  getResetMoveElement,
   getUserGamePreference,
   isAnimationsOn,
   myTurn,
@@ -175,22 +175,54 @@ export class KeyPaiShoController {
 		return msg;
 	}
 	getExtraHarmonyBonusHelpText() {
+		var container = document.createElement("span");
+		container.appendChild(document.createElement("br"));
+		
+		var text = document.createElement("span");
 		if (!limitedGatesRule) {
 			if (this.theGame.playerCanBonusPlant(getCurrentPlayer())) {
-				return " <br />You can choose an Accent Tile, Special Flower Tile, or, since you have less than two Growing Flowers, a Basic Flower Tile.";
+				text.textContent = "You can choose an Accent Tile, Special Flower Tile, or, since you have less than two Growing Flowers, a Basic Flower Tile.";
+			} else {
+				text.textContent = "You can choose an Accent Tile or a Special Flower Tile. You cannot choose a Basic Flower Tile because you have two or more Growing Flowers.";
 			}
-			return " <br />You can choose an Accent Tile or a Special Flower Tile. You cannot choose a Basic Flower Tile because you have two or more Growing Flowers.";
 		} else {
 			if (this.theGame.playerCanBonusPlant(getCurrentPlayer())) {
-				return " <br />You can choose an Accent Tile or, since you have no Growing Flowers, a Basic or Special Flower Tile.";
+				text.textContent = "You can choose an Accent Tile or, since you have no Growing Flowers, a Basic or Special Flower Tile.";
+			} else {
+				text.textContent = "You can choose an Accent Tile or a Special Flower Tile. You cannot choose a Basic Flower Tile because you have at least one Growing Flower.";
 			}
-			return " <br />You can choose an Accent Tile or a Special Flower Tile. You cannot choose a Basic Flower Tile because you have at least one Growing Flower.";
 		}
+		container.appendChild(text);
+		return container;
 	}
 	showHarmonyBonusMessage() {
-		document.querySelector(".gameMessage").innerHTML = "Harmony Bonus! Select a tile to play or <span class='skipBonus' onclick='gameController.skipHarmonyBonus();'>skip</span>."
-			+ this.getExtraHarmonyBonusHelpText()
-			+ getResetMoveText();
+		var messageDiv = document.createElement("div");
+		
+		// Create the main message text
+		var mainMessage = document.createElement("span");
+		mainMessage.textContent = "Harmony Bonus! Select a tile to play or ";
+		
+		// Create the skip link
+		var skipSpan = document.createElement("span");
+		skipSpan.className = "skipBonus";
+		skipSpan.textContent = "skip";
+		skipSpan.onclick = () => this.skipHarmonyBonus();
+		
+		mainMessage.appendChild(skipSpan);
+		mainMessage.appendChild(document.createTextNode("."));
+		
+		messageDiv.appendChild(mainMessage);
+		messageDiv.appendChild(document.createElement("br"));
+		
+		// Add the extra help text
+		messageDiv.appendChild(this.getExtraHarmonyBonusHelpText());
+		
+		// Add the reset move element
+		messageDiv.appendChild(getResetMoveElement());
+		
+		// Set it in the game message container
+		document.querySelector(".gameMessage").innerHTML = "";
+		document.querySelector(".gameMessage").appendChild(messageDiv);
 	}
 	unplayedTileClicked(tileDiv) {
 		this.theGame.markingManager.clearMarkings();
@@ -696,10 +728,23 @@ export class KeyPaiShoController {
 	buildToggleHarmonyAidsDiv() {
 		var div = document.createElement("div");
 		var onOrOff = getUserGamePreference(KeyPaiShoController.hideHarmonyAidsKey) !== "true" ? "on" : "off";
-		div.innerHTML = "Harmony aids are " + onOrOff + ": <span class='skipBonus' onclick='gameController.toggleHarmonyAids();'>toggle</span>";
+		
+		var textSpan = document.createElement("span");
+		textSpan.textContent = "Harmony aids are " + onOrOff + ": ";
+		div.appendChild(textSpan);
+		
+		var toggleSpan = document.createElement("span");
+		toggleSpan.className = "skipBonus";
+		toggleSpan.textContent = "toggle";
+		toggleSpan.onclick = () => gameController.toggleHarmonyAids();
+		div.appendChild(toggleSpan);
+		
 		if (gameOptionEnabled(NO_HARMONY_VISUAL_AIDS)) {
-			div.innerHTML += " (Will not affect games with " + NO_HARMONY_VISUAL_AIDS + " game option)";
+			var warningSpan = document.createElement("span");
+			warningSpan.textContent = " (Will not affect games with " + NO_HARMONY_VISUAL_AIDS + " game option)";
+			div.appendChild(warningSpan);
 		}
+		
 		return div;
 	}
 	toggleHarmonyAids() {

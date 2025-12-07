@@ -14,8 +14,8 @@ import {
   currentMoveIndex,
   finalizeMove,
   getCurrentPlayer,
-  getGameOptionsMessageHtml,
-  getResetMoveText,
+  getGameOptionsMessageElement,
+  getResetMoveElement,
   myTurn,
   onlinePlayEnabled,
   playingOnlineGame,
@@ -133,19 +133,30 @@ MeadowController.prototype.getDefaultHelpMessageText = function() {
 
 /* Required by Main */
 MeadowController.prototype.getAdditionalMessage = function() {
-	var msg = "";
+    var msgElement = document.createElement("div");
 
-	if (this.gameNotation.moves.length === 0) {
-		msg += "To begin a game, the Host places one stone.";
-		msg += getGameOptionsMessageHtml(GameType.Meadow.gameOptions);
-	}
+    if (this.gameNotation.moves.length === 0) {
+        var startText = document.createElement("span");
+        startText.textContent = "To begin a game, the Host places one stone.";
+        msgElement.appendChild(startText);
+        msgElement.appendChild(getGameOptionsMessageElement(GameType.Meadow.gameOptions));
+    }
 
-	if (this.notationBuilder.selectedPiece) {
-		msg += "<br />Place second stone or <span class='clickableText' onclick='gameController.skipSecondPiece();'>skip</span>";
-		msg += getResetMoveText();
-	}
+    if (this.notationBuilder.selectedPiece) {
+        var br = document.createElement("br");
+        msgElement.appendChild(br);
+        var container = document.createElement("span");
+        container.appendChild(document.createTextNode("Place second stone or "));
+        var skipSpan = document.createElement("span");
+        skipSpan.className = 'clickableText';
+        skipSpan.textContent = 'skip';
+        skipSpan.onclick = () => this.skipSecondPiece();
+        container.appendChild(skipSpan);
+        msgElement.appendChild(container);
+        msgElement.appendChild(getResetMoveElement());
+    }
 
-	return msg;
+    return msgElement.innerHTML;
 };
 
 /* Using my own version of this, called directly instead of from Main */

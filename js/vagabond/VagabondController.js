@@ -660,7 +660,17 @@ export class VagabondController {
 	buildToggleAnimationsDiv() {
 		var div = document.createElement("div");
 		var onOrOff = this.isAnimationsEnabled() ? "on" : "off";
-		div.innerHTML = "Move animations are " + onOrOff + ": <span class='skipBonus' onclick='gameController.toggleAnimations();'>toggle</span>";
+		
+		var textSpan = document.createElement("span");
+		textSpan.textContent = "Move animations are " + onOrOff + ": ";
+		div.appendChild(textSpan);
+		
+		var toggleSpan = document.createElement("span");
+		toggleSpan.className = "skipBonus";
+		toggleSpan.textContent = "toggle";
+		toggleSpan.onclick = () => gameController.toggleAnimations();
+		div.appendChild(toggleSpan);
+		
 		return div;
 	}
 	toggleAnimations() {

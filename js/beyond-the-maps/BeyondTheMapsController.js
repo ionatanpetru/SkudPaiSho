@@ -153,42 +153,44 @@ export class BeyondTheMapsController {
 
 	getAdditionalMessageElement() {
 		var msgContainer = document.createElement('span');
-		var msg = "";
 
 		if (this.gameNotation.moves.length === 0) {
-			if (onlinePlayEnabled && gameId < 0 && userIsLoggedIn()) {
-				msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by exploring by sea as Host (the light colored ship). <br />";
-			} else {
-				msg += "Sign in to enable online gameplay. Or, start playing a local game by exploring by sea as Host (the light colored ship). <br />";
-			}
-
 			var msgP = document.createElement('p');
-			msgP.innerHTML = msg;
+			
+			if (onlinePlayEnabled && gameId < 0 && userIsLoggedIn()) {
+				msgP.appendChild(document.createTextNode("Click "));
+				var em1 = document.createElement("em");
+				em1.textContent = "Join Game";
+				msgP.appendChild(em1);
+				msgP.appendChild(document.createTextNode(" above to join another player's game. Or, you can start a game that other players can join by exploring by sea as Host (the light colored ship). "));
+				msgP.appendChild(document.createElement("br"));
+			} else {
+				msgP.textContent = "Sign in to enable online gameplay. Or, start playing a local game by exploring by sea as Host (the light colored ship). ";
+				msgP.appendChild(document.createElement("br"));
+			}
 
 			msgContainer.appendChild(msgP);
 
 			msgContainer.appendChild(getGameOptionsMessageElement(GameType.BeyondTheMaps.gameOptions));
 		} else if (!this.theGame.getWinner()) {
-			msg = "";
+			var msgP = document.createElement('p');
+			
 			if (this.messageToPlayer) {
-				msg += "<br />";
-				msg += this.messageToPlayer;
+				msgP.appendChild(document.createElement("br"));
+				msgP.appendChild(document.createTextNode(this.messageToPlayer));
 			}
 			
 			if (gameOptionEnabled(EDGES_DICE_FOR_MOVEMENT)) {
 				var diceRolls = this.getDiceRolls();
-				msg += "This turn: Move " + diceRolls.high + " by sea and " + diceRolls.low + " by land.";
+				msgP.appendChild(document.createTextNode("This turn: Move " + diceRolls.high + " by sea and " + diceRolls.low + " by land."));
 			} else {
-				msg += "Click your ship to explore by sea, click your land to explore by land.";
+				msgP.appendChild(document.createTextNode("Click your ship to explore by sea, click your land to explore by land."));
 			}
 
-			msg += "<br />";
-			msg += "Host land: " + this.theGame.calculatePlayerScore(HOST);
-			msg += "<br />";
-			msg += "Guest land: " + this.theGame.calculatePlayerScore(GUEST);
-
-			var msgP = document.createElement('p');
-			msgP.innerHTML = msg;
+			msgP.appendChild(document.createElement("br"));
+			msgP.appendChild(document.createTextNode("Host land: " + this.theGame.calculatePlayerScore(HOST)));
+			msgP.appendChild(document.createElement("br"));
+			msgP.appendChild(document.createTextNode("Guest land: " + this.theGame.calculatePlayerScore(GUEST)));
 
 			msgContainer.appendChild(msgP);
 		}

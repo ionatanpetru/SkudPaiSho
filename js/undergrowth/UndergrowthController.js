@@ -10,11 +10,11 @@ import {
   currentMoveIndex,
   finalizeMove,
   getCurrentPlayer,
-  getGameOptionsMessageHtml,
+  getGameOptionsMessageElement,
   getNeutralPointMessage,
   getRedPointMessage,
   getRedWhitePointMessage,
-  getResetMoveText,
+  getResetMoveElement,
   getWhitePointMessage,
   isAnimationsOn,
   myTurn,
@@ -110,37 +110,74 @@ UndergrowthController.prototype.getDefaultHelpMessageText = function() {
 };
 
 UndergrowthController.prototype.getAdditionalMessage = function() {
-	var msg = "";
-	if (this.gameNotation.moves.length === 0) {
-		msg += getGameOptionsMessageHtml(GameType.Undergrowth.gameOptions);
-	}
+    var msgElement = document.createElement("div");
+    
+    if (this.gameNotation.moves.length === 0) {
+        msgElement.appendChild(getGameOptionsMessageElement(GameType.Undergrowth.gameOptions));
+    }
 
-	if (gameOptionEnabled(UNDERGROWTH_SIMPLE)) {
-		msg += "<br />Simplicity Rules: Your pieces form harmony with each other and disharmony with opponent's pieces.<br />";
-	}
+    if (gameOptionEnabled(UNDERGROWTH_SIMPLE)) {
+        var simpleBr = document.createElement("br");
+        msgElement.appendChild(simpleBr);
+        var simpleText = document.createElement("span");
+        simpleText.textContent = "Simplicity Rules: Your pieces form harmony with each other and disharmony with opponent's pieces.";
+        msgElement.appendChild(simpleText);
+        var simpleBr2 = document.createElement("br");
+        msgElement.appendChild(simpleBr2);
+    }
 
-	if (!this.theGame.getWinner()) {
-		msg += "<strong>" + this.theGame.getScoreSummary() + "</strong>";
-	}
+    if (!this.theGame.getWinner()) {
+        var scoreBr = document.createElement("br");
+        msgElement.appendChild(scoreBr);
+        var scoreSpan = document.createElement("strong");
+        scoreSpan.textContent = this.theGame.getScoreSummary();
+        msgElement.appendChild(scoreSpan);
+    }
 
-	if (this.notationBuilder.status === UndergrowthNotationBuilder.WAITING_FOR_SECOND_MOVE
-			|| this.notationBuilder.status === UndergrowthNotationBuilder.WAITING_FOR_SECOND_ENDPOINT) {
-		if (this.theGame.tileManager.playerIsOutOfTiles(getCurrentPlayer())) {
-			msg += "<br />Place second tile or <span class='clickableText' onclick='gameController.skipSecondTile();'>skip</span>";
-		} else {
-			msg += "<br />Place second tile";
-		}
-		msg += getResetMoveText();
-	} else {
-		if (this.theGame.passInSuccessionCount === 1) {
-			msg += "<br />" + getOpponentName(this.getCurrentPlayer()) + " has passed. Passing now will end the game.";
-		}
-		if (this.gameNotation.moves.length > 2 && myTurn() && !this.theGame.getWinner()) {
-			msg += "<br /><span class='skipBonus' onclick='gameController.passTurn();'>Pass turn</span><br />";
-		}
-	}
+    if (this.notationBuilder.status === UndergrowthNotationBuilder.WAITING_FOR_SECOND_MOVE
+            || this.notationBuilder.status === UndergrowthNotationBuilder.WAITING_FOR_SECOND_ENDPOINT) {
+        var secondBr = document.createElement("br");
+        msgElement.appendChild(secondBr);
+        
+        if (this.theGame.tileManager.playerIsOutOfTiles(getCurrentPlayer())) {
+            var skipContainer = document.createElement("span");
+            skipContainer.appendChild(document.createTextNode("Place second tile or "));
+            var skipSpan = document.createElement("span");
+            skipSpan.className = 'clickableText';
+            skipSpan.textContent = "skip";
+            skipSpan.onclick = () => this.skipSecondTile();
+            skipContainer.appendChild(skipSpan);
+            msgElement.appendChild(skipContainer);
+        } else {
+            var placeText = document.createElement("span");
+            placeText.textContent = "Place second tile";
+            msgElement.appendChild(placeText);
+        }
+        
+        msgElement.appendChild(getResetMoveElement());
+    } else {
+        if (this.theGame.passInSuccessionCount === 1) {
+            var passBr = document.createElement("br");
+            msgElement.appendChild(passBr);
+            var passText = document.createElement("span");
+            passText.textContent = getOpponentName(this.getCurrentPlayer()) + " has passed. Passing now will end the game.";
+            msgElement.appendChild(passText);
+        }
+        if (this.gameNotation.moves.length > 2 && myTurn() && !this.theGame.getWinner()) {
+            var turnBr = document.createElement("br");
+            msgElement.appendChild(turnBr);
+            var passContainer = document.createElement("span");
+            var passSpan = document.createElement("span");
+            passSpan.className = 'skipBonus';
+            passSpan.textContent = 'Pass turn';
+            passSpan.onclick = () => this.passTurn();
+            passContainer.appendChild(passSpan);
+            passContainer.appendChild(document.createElement("br"));
+            msgElement.appendChild(passContainer);
+        }
+    }
 
-	return msg;
+    return msgElement.innerHTML;
 };
 
 UndergrowthController.prototype.passTurn = function() {

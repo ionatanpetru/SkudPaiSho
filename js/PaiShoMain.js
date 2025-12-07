@@ -1096,20 +1096,73 @@ export function setPaiShoBoardOption(newPaiShoBoardKey, isTemporary) {
 }
 
 export function promptCustomBoardURL() {
-	if (localStorage.getItem(customBoardUrlKey)) {
-		setCustomBoardUrl(localStorage.getItem(customBoardUrlKey));
-	} else {
-		setCustomBoardUrl("https://skudpaisho.com/style/board_tgg.png");
-	}
-	localStorage.setItem(customBoardUrlKey, customBoardUrl);
+    if (localStorage.getItem(customBoardUrlKey)) {
+        setCustomBoardUrl(localStorage.getItem(customBoardUrlKey));
+    } else {
+        setCustomBoardUrl("https://skudpaisho.com/style/board_tgg.png");
+    }
+    localStorage.setItem(customBoardUrlKey, customBoardUrl);
 
-	var message = "<p>You can use one of many fan-created board designs. See the boards in the #board-design channel in The Garden Gate Discord. Copy and paste the link to a board image to use here:</p>";
-	message += "<br />Name: <input type='text' id='customBoardNameInput' name='customBoardNameInput' /><br />";
-	message += "<br />URL: <input type='text' id='customBoardInput' name='customBoardInput' /><br />";
-	message += "<br /><div class='clickableText' onclick='setCustomBoardFromInput()'>Apply Custom Board</div>";
-	message += "<br /><br /><div class='clickableText' onclick='clearCustomBoardEntries()'>Clear Custom Boards</div>";
+    // Create the main container
+    var container = document.createElement("div");
 
-	showModal("Use Custom Board URL", message);
+    // Create paragraph
+    var paragraph = document.createElement("p");
+    paragraph.textContent = "You can use one of many fan-created board designs. See the boards in the #board-design channel in The Garden Gate Discord. Copy and paste the link to a board image to use here:";
+    container.appendChild(paragraph);
+
+    container.appendChild(document.createElement("br"));
+
+    // Name input section
+    var nameLabel = document.createElement("span");
+    nameLabel.textContent = "Name: ";
+    container.appendChild(nameLabel);
+
+    var nameInput = document.createElement("input");
+    nameInput.type = "text";
+    nameInput.id = "customBoardNameInput";
+    nameInput.name = "customBoardNameInput";
+    container.appendChild(nameInput);
+
+    container.appendChild(document.createElement("br"));
+    container.appendChild(document.createElement("br"));
+
+    // URL input section
+    var urlLabel = document.createElement("span");
+    urlLabel.textContent = "URL: ";
+    container.appendChild(urlLabel);
+
+    var urlInput = document.createElement("input");
+    urlInput.type = "text";
+    urlInput.id = "customBoardInput";
+    urlInput.name = "customBoardInput";
+    container.appendChild(urlInput);
+
+    container.appendChild(document.createElement("br"));
+    container.appendChild(document.createElement("br"));
+
+    // Apply button
+    var applyButton = document.createElement("div");
+    applyButton.className = "clickableText";
+    applyButton.textContent = "Apply Custom Board";
+    applyButton.onclick = function() {
+        setCustomBoardFromInput();
+    };
+    container.appendChild(applyButton);
+
+    container.appendChild(document.createElement("br"));
+    container.appendChild(document.createElement("br"));
+
+    // Clear button
+    var clearButton = document.createElement("div");
+    clearButton.className = "clickableText";
+    clearButton.textContent = "Clear Custom Boards";
+    clearButton.onclick = function() {
+        clearCustomBoardEntries();
+    };
+    container.appendChild(clearButton);
+
+    showModalElem("Use Custom Board URL", container);
 }
 
 export function clearCustomBoardEntries() {
@@ -1342,7 +1395,12 @@ export function playPause() {
 	}
 	if (interval === 0) {
 		// Play
-		document.querySelector(".playPauseButton").innerHTML = "<i class='fa fa-pause' aria-hidden='true'></i>";
+		var playButton = document.querySelector(".playPauseButton");
+		playButton.innerHTML = "";
+		var pauseIcon = document.createElement("i");
+		pauseIcon.className = "fa fa-pause";
+		pauseIcon.setAttribute("aria-hidden", "true");
+		playButton.appendChild(pauseIcon);
 		if (playNextMove(true)) {
 			interval = setInterval(function() {
 				if (!playNextMove(true)) {
@@ -1362,7 +1420,12 @@ export function playPause() {
 export function pauseRun() {
 	clearInterval(interval);
 	interval = 0;
-	document.querySelector(".playPauseButton").innerHTML = "<i class='fa fa-play' aria-hidden='true'></i>";
+	var playButton = document.querySelector(".playPauseButton");
+	playButton.innerHTML = "";
+	var playIcon = document.createElement("i");
+	playIcon.className = "fa fa-play";
+	playIcon.setAttribute("aria-hidden", "true");
+	playButton.appendChild(playIcon);
 }
 
 export function getAdditionalMessage() {
@@ -1395,28 +1458,44 @@ export function getGameMessageElement() {
 	var gameMessage2 = document.querySelector(".gameMessage2");
 
 	if (gameController.showGameMessageUnderneath) {
-		gameMessage.innerHTML = "";
+		while (gameMessage.firstChild) {
+			gameMessage.removeChild(gameMessage.firstChild);
+		}
 		return gameMessage2;
 	} else {
 		if (gameMessage2) {
-			gameMessage2.innerHTML = "";
+			while (gameMessage2.firstChild) {
+				gameMessage2.removeChild(gameMessage2.firstChild);
+			}
 		}
 		return gameMessage;
 	}
 }
 
 export function refreshMessage() {
-	var message = "";
-	if (!playingOnlineGame()) {
-		message += "Current Player: " + getCurrentPlayer() + "<br />";
+	var messageElement = getGameMessageElement();
+	// Clear the message element
+	while (messageElement.firstChild) {
+		messageElement.removeChild(messageElement.firstChild);
 	}
-	message += getAdditionalMessage();
 
-	getGameMessageElement().innerHTML = message;
+	if (!playingOnlineGame()) {
+		var playerText = document.createElement("span");
+		playerText.textContent = "Current Player: " + getCurrentPlayer();
+		messageElement.appendChild(playerText);
+		messageElement.appendChild(document.createElement("br"));
+	}
+
+	var additionalMsg = getAdditionalMessage();
+	if (additionalMsg) {
+		var msgSpan = document.createElement("span");
+		msgSpan.innerHTML = additionalMsg;
+		messageElement.appendChild(msgSpan);
+	}
 
 	if (gameController && gameController.getAdditionalMessageElement) {
-		getGameMessageElement().appendChild(gameController.getAdditionalMessageElement());
-		getGameMessageElement().appendChild(document.createElement("br"));
+		messageElement.appendChild(gameController.getAdditionalMessageElement());
+		messageElement.appendChild(document.createElement("br"));
 	}
 
 	if ((playingOnlineGame() && iAmPlayerInCurrentOnlineGame() && !myTurn() && !getGameWinner())
@@ -1666,7 +1745,7 @@ export function linkShortenCallback(shortUrl, ignoreNoEmail, okToUpdateWinInfo) 
         }
 
         if (gameController.isSolitaire) {
-            messageText.appendChild(document.createTextNode(getResetMoveText()));
+            messageText.appendChild(getResetMoveElement());
         }
     } else if (gameController.gameHasEndedInDraw && gameController.gameHasEndedInDraw()) {
         if (okToUpdateWinInfo && playingOnlineGame()) {
@@ -1675,18 +1754,22 @@ export function linkShortenCallback(shortUrl, ignoreNoEmail, okToUpdateWinInfo) 
         messageText.appendChild(document.createTextNode("Game has ended in a draw."));
 
         if (gameController.isSolitaire) {
-            messageText.appendChild(document.createTextNode(getResetMoveText()));
+            messageText.appendChild(getResetMoveElement());
         }
     } else {
         if (!playingOnlineGame()) {
             messageText.appendChild(document.createTextNode("Current Player: " + getCurrentPlayer()));
             messageText.appendChild(document.createElement("br"));
         }
-        messageText.appendChild(document.createTextNode(gameController.getAdditionalMessage() + getResetMoveText()));
+        messageText.appendChild(document.createTextNode(gameController.getAdditionalMessage()));
+        messageText.appendChild(getResetMoveElement());
     }
 
-    getGameMessageElement().innerHTML = "";
-    getGameMessageElement().appendChild(messageText);
+    var gameMessageElement = getGameMessageElement();
+    while (gameMessageElement.firstChild) {
+        gameMessageElement.removeChild(gameMessageElement.firstChild);
+    }
+    gameMessageElement.appendChild(messageText);
 
     if (gameController && gameController.getAdditionalMessageElement) {
         getGameMessageElement().appendChild(document.createElement("br"));
@@ -1746,15 +1829,38 @@ export function getCurrentPlayerForReal() {
 	return gameController.getCurrentPlayer();
 }
 
-export function getResetMoveText() {
-	if (activeAi) {
-		return "";	// Hide "Undo" if playing against an AI
-	}
-	if (!gameController.undoMoveAllowed || gameController.undoMoveAllowed()) {
-		return "<br /><span class='skipBonus' onclick='resetMove();'>Undo move</span>";
-	} else {
-		return "";
-	}
+// export function getResetMoveText() {
+// 	if (activeAi) {
+// 		return "";	// Hide "Undo" if playing against an AI
+// 	}
+// 	if (!gameController.undoMoveAllowed || gameController.undoMoveAllowed()) {
+// 		return "<br /><span class='skipBonus' onclick='resetMove();'>Undo move</span>";
+// 	} else {
+// 		return "";
+// 	}
+// }
+
+export function getResetMoveElement() {
+    if (activeAi) {
+        return document.createElement("span");	// Return empty span if playing against an AI
+    }
+    
+    var container = document.createElement("div");
+    
+    if (!gameController.undoMoveAllowed || gameController.undoMoveAllowed()) {
+        container.appendChild(document.createElement("br"));
+        
+        var span = document.createElement("span");
+        span.className = "skipBonus";
+        span.textContent = "Undo move";
+        span.onclick = function() {
+            resetMove();
+        };
+        
+        container.appendChild(span);
+    }
+    
+    return container;
 }
 
 export function skipClicked() {
@@ -1771,12 +1877,32 @@ export function getSkipButtonHtmlText(overrideText) {
 	return "<br /><button onclick='skipClicked()' style='font-size:medium'>" + text + "</button>";
 }
 
+export function getSkipButtonElement(overrideText) {
+    var text = "Skip";
+    if (overrideText) {
+        text = overrideText;
+    }
+    
+    var container = document.createElement("div");
+    container.appendChild(document.createElement("br"));
+    
+    var button = document.createElement("button");
+    button.style.fontSize = "medium";
+    button.textContent = text;
+    button.onclick = function() {
+        skipClicked();
+    };
+    
+    container.appendChild(button);
+    return container;
+}
+
 export function showSkipButtonMessage(overrideText) {
-	getGameMessageElement().innerHTML += getSkipButtonHtmlText(overrideText);
+    getGameMessageElement().appendChild(getSkipButtonElement(overrideText));
 }
 
 export function showResetMoveMessage() {
-	getGameMessageElement().innerHTML += getResetMoveText();
+    getGameMessageElement().appendChild(getResetMoveElement());
 }
 
 export function resetMove() {
@@ -1928,15 +2054,25 @@ var submitMoveCallback = function submitMoveCallback(resultData, move) {
 export function clearMessage() {
 	var helpTabContentDiv = document.getElementById("helpTextContent");
 
+	// Clear the div
+	while (helpTabContentDiv.firstChild) {
+		helpTabContentDiv.removeChild(helpTabContentDiv.firstChild);
+	}
+
 	// if (!defaultHelpMessageText) {	// Load help message every time
 	defaultHelpMessageText = gameController.getDefaultHelpMessageText();
 	// }
-	helpTabContentDiv.innerHTML = defaultHelpMessageText;
+	
+	var helpSpan = document.createElement("span");
+	helpSpan.innerHTML = defaultHelpMessageText;
+	helpTabContentDiv.appendChild(helpSpan);
 
-	var message = getTournamentText() +
-		helpTabContentDiv.innerHTML;
-
-	helpTabContentDiv.innerHTML = message;
+	var tournamentText = getTournamentText();
+	if (tournamentText) {
+		var tourSpan = document.createElement("span");
+		tourSpan.innerHTML = tournamentText;
+		helpTabContentDiv.insertBefore(tourSpan, helpTabContentDiv.firstChild);
+	}
 
 	if (gameController.getAdditionalHelpTabDiv) {
 		var additionalDiv = gameController.getAdditionalHelpTabDiv();
@@ -2388,6 +2524,7 @@ export function callSubmitMove(moveAnimationBeginStep, moveIsConfirmed, move) {
 }
 
 var sendVerificationCodeCallback = function sendVerificationCodeCallback(response) {
+	var messageElement = document.getElementById('verificationCodeSendResponse');
 	var message;
 	if (response.includes('has been sent')) {
 		message = "Verification code sent to " + emailBeingVerified + ". Be sure to check your spam or junk mail for the email.";
@@ -2395,7 +2532,11 @@ var sendVerificationCodeCallback = function sendVerificationCodeCallback(respons
 	} else {
 		message = "Failed to send verification code, please try again. Join the Discord for help, or try another email address.";
 	}
-	document.getElementById('verificationCodeSendResponse').innerHTML = message;
+	
+	var span = document.createElement("span");
+	span.innerHTML = message;
+	messageElement.innerHTML = "";
+	messageElement.appendChild(span);
 };
 
 var isUserInfoAvailableCallback = function isUserInfoAvailableCallback(data) {
@@ -2404,7 +2545,14 @@ var isUserInfoAvailableCallback = function isUserInfoAvailableCallback(data) {
 		showModal("Sign In", "Username or email unavailable.<br /><br /><span class='skipBonus' onclick='loginClicked();'>Back</span>");
 	} else {
 		document.getElementById("verificationCodeInput").disabled = false;
-		document.getElementById('verificationCodeSendResponse').innerHTML = "Sending code... <i class='fa fa-circle-o-notch fa-spin fa-fw'></i>";
+		var responseElement = document.getElementById('verificationCodeSendResponse');
+		responseElement.innerHTML = "";
+		var textSpan = document.createElement("span");
+		textSpan.textContent = "Sending code... ";
+		responseElement.appendChild(textSpan);
+		var icon = document.createElement("i");
+		icon.className = "fa fa-circle-o-notch fa-spin fa-fw";
+		responseElement.appendChild(icon);
 		onlinePlayEngine.sendVerificationCode(usernameBeingVerified, emailBeingVerified, sendVerificationCodeCallback);
 	}
 };
@@ -3891,7 +4039,11 @@ var getCurrentGameSeeksHostedByUserCallback = function getCurrentGameSeeksHosted
 					if (timeControlsDiv) {
 						timeControlsDiv.appendChild(GameClock.getTimeControlsDropdown());
 						var timeControlsLinkSpan = document.createElement("span");
-						timeControlsLinkSpan.innerHTML = "<a href='https://forum.skudpaisho.com/showthread.php?tid=158' target='_blank'>Read about the Game Clock feature.</a>";
+						var link = document.createElement("a");
+						link.href = "https://forum.skudpaisho.com/showthread.php?tid=158";
+						link.target = "_blank";
+						link.textContent = "Read about the Game Clock feature.";
+						timeControlsLinkSpan.appendChild(link);
 						timeControlsDiv.appendChild(timeControlsLinkSpan);
 					}
 				}, 50);
@@ -4011,8 +4163,19 @@ var getInitialGlobalChatsCallback = function getInitialGlobalChatsCallback(resul
 /* This is AKA Display Links tab content */
 export function resetGlobalChats() {
 	// Clear all global chats..
-	//   document.getElementById('globalChatMessagesDisplay').innerHTML = "<strong>SkudPaiSho: </strong> Hi everybody! To chat with everyone, ask questions, or get help, join The Garden Gate <a href='https://skudpaisho.com/discord' target='_blank'>Discord server</a>.<hr />";
-	document.getElementById('globalChatMessagesDisplay').innerHTML = "<strong>SkudPaiSho: </strong> Welcome! Discord is the best way to chat and get help, but feel free to say hello here in the global chat.<hr />";
+	var chatDisplay = document.getElementById('globalChatMessagesDisplay');
+	while (chatDisplay.firstChild) {
+		chatDisplay.removeChild(chatDisplay.firstChild);
+	}
+	
+	var div = document.createElement("div");
+	var strong = document.createElement("strong");
+	strong.textContent = "SkudPaiSho: ";
+	div.appendChild(strong);
+	div.appendChild(document.createTextNode(" Welcome! Discord is the best way to chat and get help, but feel free to say hello here in the global chat."));
+	var hr = document.createElement("hr");
+	div.appendChild(hr);
+	chatDisplay.appendChild(div);
 }
 
 export function fetchInitialGlobalChats() {
@@ -4200,7 +4363,7 @@ export function startWatchingNumberOfGamesWhereUserTurn() {
 }
 
 var sendChatCallback = function sendChatCallback(result) {
-	document.getElementById('sendChatMessageButton').innerHTML = "Send";
+	document.getElementById('sendChatMessageButton').textContent = "Send";
 	var chatMsg = document.getElementById('chatMessageInput').value;
 	document.getElementById('chatMessageInput').value = "";
 
@@ -4220,7 +4383,11 @@ export var sendChat = function(chatMessageIfDifferentFromInput) {
 	if (chatMessage) {
 		var chatCommandsProcessed = processChatCommands(chatMessage);
 		if (!chatCommandsProcessed) {
-			document.getElementById('sendChatMessageButton').innerHTML = "<i class='fa fa-circle-o-notch fa-spin fa-fw'>";
+			var sendButton = document.getElementById('sendChatMessageButton');
+		sendButton.innerHTML = "";
+		var icon = document.createElement("i");
+		icon.className = "fa fa-circle-o-notch fa-spin fa-fw";
+		sendButton.appendChild(icon);
 			if (playingOnlineGame()) {
 				onlinePlayEngine.sendChat(gameId, getLoginToken(), chatMessage, sendChatCallback);
 			} else {
@@ -4297,7 +4464,7 @@ export function submitHumanAge() {
 // };
 
 var sendGlobalChatCallback = function sendGlobalChatCallback(result) {
-	document.getElementById('sendGlobalChatMessageButton').innerHTML = "Send";
+	document.getElementById('sendGlobalChatMessageButton').textContent = "Send";
 	document.getElementById('globalChatMessageInput').value = "";
 };
 
@@ -4305,7 +4472,11 @@ export var sendGlobalChat = function() {
 	var chatMessage = htmlEscape(document.getElementById('globalChatMessageInput').value).trim();
 	chatMessage = chatMessage.replace(/\n/g, ' ');	// Convert newlines to spaces.
 	if (chatMessage) {
-		document.getElementById('sendGlobalChatMessageButton').innerHTML = "<i class='fa fa-circle-o-notch fa-spin fa-fw'>";
+		var sendButton = document.getElementById('sendGlobalChatMessageButton');
+		sendButton.innerHTML = "";
+		var icon = document.createElement("i");
+		icon.className = "fa fa-circle-o-notch fa-spin fa-fw";
+		sendButton.appendChild(icon);
 		onlinePlayEngine.sendChat(0, getLoginToken(), chatMessage, sendGlobalChatCallback);
 	}
 };
@@ -4664,15 +4835,48 @@ export function continueTutorial() {
 
 	if (tutContent) {
 		var div1 = document.createElement("div");
-		div1.innerHTML = "<p>Welcome to <em>The Garden Gate</em>, a place to play a variety of Pai Sho games and more against other players online.</p>";
-		div1.innerHTML += "<p>You can sign in (or sign up) by entering your username and verifying your email address.</p>";
-		div1.innerHTML += "<p>Use options in the <strong class='stretchText'>&nbsp;&#8801&nbsp;</strong>side menu to create a new game, join another player's game, or to view your games that are in progress. You can have any number of online games in progress at once.</p>";
-		div1.innerHTML += "<p>See the <i class='fa fa-plus-circle' aria-hidden='true'></i> New Game menu to try and learn more about any of the games you can play here.</p>";
+		
+		var p1 = document.createElement("p");
+		p1.appendChild(document.createTextNode("Welcome to "));
+		var em = document.createElement("em");
+		em.textContent = "The Garden Gate";
+		p1.appendChild(em);
+		p1.appendChild(document.createTextNode(", a place to play a variety of Pai Sho games and more against other players online."));
+		div1.appendChild(p1);
+		
+		var p2 = document.createElement("p");
+		p2.textContent = "You can sign in (or sign up) by entering your username and verifying your email address.";
+		div1.appendChild(p2);
+		
+		var p3 = document.createElement("p");
+		p3.appendChild(document.createTextNode("Use options in the "));
+		var strong = document.createElement("strong");
+		strong.className = "stretchText";
+		strong.textContent = "\u00A0\u2261\u00A0";
+		p3.appendChild(strong);
+		p3.appendChild(document.createTextNode("side menu to create a new game, join another player's game, or to view your games that are in progress. You can have any number of online games in progress at once."));
+		div1.appendChild(p3);
+		
+		var p4 = document.createElement("p");
+		p4.appendChild(document.createTextNode("See the "));
+		var icon = document.createElement("i");
+		icon.className = "fa fa-plus-circle";
+		icon.setAttribute("aria-hidden", "true");
+		p4.appendChild(icon);
+		p4.appendChild(document.createTextNode(" New Game menu to try and learn more about any of the games you can play here."));
+		div1.appendChild(p4);
 
 		if (!userIsLoggedIn()) {
-			div1.innerHTML += "<p><span class='skipBonus' onclick='loginClicked();'>Sign in</span> now to get started.</p>";
+			var p5 = document.createElement("p");
+			var skipSpan = document.createElement("span");
+			skipSpan.className = "skipBonus";
+			skipSpan.textContent = "Sign in";
+			skipSpan.onclick = function() { loginClicked(); };
+			p5.appendChild(skipSpan);
+			p5.appendChild(document.createTextNode(" now to get started."));
+			div1.appendChild(p5);
 		}
-		// div1.classList.add('tutContentMessage');
+		
 		div1.classList.add('tutContentFadeIn');
 		tutContent.appendChild(div1);
 
@@ -4862,8 +5066,13 @@ export function showBadMoveModal() {
 var tournamentToManage = 0;
 
 export function getLoadingModalText() {
-	var html = "Loading&nbsp;<i class='fa fa-circle-o-notch fa-spin fa-fw'></i>&nbsp;";
-	return html;
+	var span = document.createElement("span");
+	span.appendChild(document.createTextNode("Loading\u00A0"));
+	var icon = document.createElement("i");
+	icon.className = "fa fa-circle-o-notch fa-spin fa-fw";
+	span.appendChild(icon);
+	span.appendChild(document.createTextNode("\u00A0"));
+	return span;
 }
 
 export function showPastTournamentsClicked() {

@@ -43,11 +43,12 @@ import {
   gameId,
   getCurrentPlayer,
   getGameOptionsMessageHtml,
+  getGameOptionsMessageElement,
   getGatePointMessage,
   getNeutralPointMessage,
   getRedPointMessage,
   getRedWhitePointMessage,
-  getResetMoveText,
+  getResetMoveElement,
   getUserGamePreference,
   getWhitePointMessage,
   isAnimationsOn,
@@ -197,49 +198,60 @@ SkudPaiShoController.prototype.getDefaultHelpMessageText = function() {
 };
 
 SkudPaiShoController.prototype.getAdditionalMessage = function() {
-	var msg = "";
+    var msgElement = document.createElement("div");
 
-	if (this.gameNotation.moves.length === 0) {
-		if (onlinePlayEnabled && gameId < 0 && userIsLoggedIn()) {
-			if (gameOptionEnabled(OPTION_ALL_ACCENT_TILES)) {
-				msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by selecting ALL of your Accent Tiles. <br />";
-			} else if (gameOptionEnabled(OPTION_DOUBLE_ACCENT_TILES)) {
-				msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by selecting 8 of your Accent Tiles. <br />";
-			} else {
-				msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by selecting your 4 Accent Tiles. <br />";
-			}
-		} else {
-			if (gameOptionEnabled(OPTION_ALL_ACCENT_TILES)) {
-				msg += "Select ALL Accent Tiles to begin the game.";
-			} else if (gameOptionEnabled(OPTION_DOUBLE_ACCENT_TILES)) {
-				msg += "Select 8 Accent Tiles to play with.";
-			} else {
-				msg += "Select 4 Accent Tiles to play with.";
-			}
-		}
+    if (this.gameNotation.moves.length === 0) {
+        if (onlinePlayEnabled && gameId < 0 && userIsLoggedIn()) {
+            var onlineText = document.createElement("span");
+            if (gameOptionEnabled(OPTION_ALL_ACCENT_TILES)) {
+                onlineText.textContent = "Click Join Game above to join another player's game. Or, you can start a game that other players can join by selecting ALL of your Accent Tiles.";
+            } else if (gameOptionEnabled(OPTION_DOUBLE_ACCENT_TILES)) {
+                onlineText.textContent = "Click Join Game above to join another player's game. Or, you can start a game that other players can join by selecting 8 of your Accent Tiles.";
+            } else {
+                onlineText.textContent = "Click Join Game above to join another player's game. Or, you can start a game that other players can join by selecting your 4 Accent Tiles.";
+            }
+            msgElement.appendChild(onlineText);
+        } else {
+            var startText = document.createElement("span");
+            if (gameOptionEnabled(OPTION_ALL_ACCENT_TILES)) {
+                startText.textContent = "Select ALL Accent Tiles to begin the game.";
+            } else if (gameOptionEnabled(OPTION_DOUBLE_ACCENT_TILES)) {
+                startText.textContent = "Select 8 Accent Tiles to play with.";
+            } else {
+                startText.textContent = "Select 4 Accent Tiles to play with.";
+            }
+            msgElement.appendChild(startText);
+        }
 
-		if (!playingOnlineGame()) {
-			msg += getGameOptionsMessageHtml(GameType.SkudPaiSho.gameOptions);
-		}
-	} else if (this.gameNotation.moves.length === 1) {
-		if (gameOptionEnabled(OPTION_ALL_ACCENT_TILES)) {
-			msg += "Select ALL Accent Tiles to play with,";
-		} else if (gameOptionEnabled(OPTION_DOUBLE_ACCENT_TILES)) {
-			msg += "Select 8 Accent Tiles to play with,";
-		} else {
-			msg += "Select 4 Accent Tiles to play with,";
-		}
-		msg += " then Plant a Basic Flower Tile."
-	} else if (this.gameNotation.moves.length === 2) {
-		msg += "Plant a Basic Flower Tile.";
-	} else if (!gameOptionEnabled(OPTION_INFORMAL_START) && this.gameNotation.moves.length === 4) {
-		msg += "Now, make the first move of the game.";
-	} else if (this.gameNotation.moves.length > 2
-			&& (gameOptionEnabled(DIAGONAL_MOVEMENT) || gameOptionEnabled(EVERYTHING_CAPTURE))) {
-		msg += "<em>April Fools! I hope you get some entertainment out of the Diagonal Movement and Everything Captures Everything game options today :)&nbsp;</em>";
-	}
+        if (!playingOnlineGame()) {
+            msgElement.appendChild(getGameOptionsMessageElement(GameType.SkudPaiSho.gameOptions));
+        }
+    } else if (this.gameNotation.moves.length === 1) {
+        var move1Text = document.createElement("span");
+        if (gameOptionEnabled(OPTION_ALL_ACCENT_TILES)) {
+            move1Text.textContent = "Select ALL Accent Tiles to play with, then Plant a Basic Flower Tile.";
+        } else if (gameOptionEnabled(OPTION_DOUBLE_ACCENT_TILES)) {
+            move1Text.textContent = "Select 8 Accent Tiles to play with, then Plant a Basic Flower Tile.";
+        } else {
+            move1Text.textContent = "Select 4 Accent Tiles to play with, then Plant a Basic Flower Tile.";
+        }
+        msgElement.appendChild(move1Text);
+    } else if (this.gameNotation.moves.length === 2) {
+        var move2Text = document.createElement("span");
+        move2Text.textContent = "Plant a Basic Flower Tile.";
+        msgElement.appendChild(move2Text);
+    } else if (!gameOptionEnabled(OPTION_INFORMAL_START) && this.gameNotation.moves.length === 4) {
+        var move4Text = document.createElement("span");
+        move4Text.textContent = "Now, make the first move of the game.";
+        msgElement.appendChild(move4Text);
+    } else if (this.gameNotation.moves.length > 2
+            && (gameOptionEnabled(DIAGONAL_MOVEMENT) || gameOptionEnabled(EVERYTHING_CAPTURE))) {
+        var aprilFoolsText = document.createElement("em");
+        aprilFoolsText.textContent = "April Fools! I hope you get some entertainment out of the Diagonal Movement and Everything Captures Everything game options today :)\u00A0";
+        msgElement.appendChild(aprilFoolsText);
+    }
 
-	return msg;
+    return msgElement.innerHTML;
 };
 
 
@@ -267,23 +279,55 @@ SkudPaiShoController.prototype.playMctsMove = async function() {
 };
 
 SkudPaiShoController.prototype.getExtraHarmonyBonusHelpText = function() {
+	var container = document.createElement("span");
+	container.appendChild(document.createElement("br"));
+	
+	var text = document.createElement("span");
 	if (!limitedGatesRule) {
 		if (this.theGame.playerCanBonusPlant(getCurrentPlayer())) {
-			return " <br />You can choose an Accent Tile, Special Flower Tile, or, since you have less than two Growing Flowers, a Basic Flower Tile.";
+			text.textContent = "You can choose an Accent Tile, Special Flower Tile, or, since you have less than two Growing Flowers, a Basic Flower Tile.";
+		} else {
+			text.textContent = "You can choose an Accent Tile or a Special Flower Tile. You cannot choose a Basic Flower Tile because you have two or more Growing Flowers.";
 		}
-		return " <br />You can choose an Accent Tile or a Special Flower Tile. You cannot choose a Basic Flower Tile because you have two or more Growing Flowers.";
 	} else {
 		if (this.theGame.playerCanBonusPlant(getCurrentPlayer())) {
-			return " <br />You can choose an Accent Tile or, since you have no Growing Flowers, a Basic or Special Flower Tile.";
+			text.textContent = "You can choose an Accent Tile or, since you have no Growing Flowers, a Basic or Special Flower Tile.";
+		} else {
+			text.textContent = "You can choose an Accent Tile or a Special Flower Tile. You cannot choose a Basic Flower Tile because you have at least one Growing Flower.";
 		}
-		return " <br />You can choose an Accent Tile or a Special Flower Tile. You cannot choose a Basic Flower Tile because you have at least one Growing Flower.";
 	}
+	container.appendChild(text);
+	return container;
 };
 
 SkudPaiShoController.prototype.showHarmonyBonusMessage = function() {
-	document.querySelector(".gameMessage").innerHTML = "Harmony Bonus! Select a tile to play or <span class='skipBonus' onclick='gameController.skipHarmonyBonus();'>skip</span>."
-	+ this.getExtraHarmonyBonusHelpText()
-	+ getResetMoveText();
+	var messageDiv = document.createElement("div");
+	
+	// Create the main message text
+	var mainMessage = document.createElement("span");
+	mainMessage.textContent = "Harmony Bonus! Select a tile to play or ";
+	
+	// Create the skip link
+	var skipSpan = document.createElement("span");
+	skipSpan.className = "skipBonus";
+	skipSpan.textContent = "skip";
+	skipSpan.onclick = () => gameController.skipHarmonyBonus();
+	
+	mainMessage.appendChild(skipSpan);
+	mainMessage.appendChild(document.createTextNode("."));
+	
+	messageDiv.appendChild(mainMessage);
+	messageDiv.appendChild(document.createElement("br"));
+	
+	// Add the extra help text
+	messageDiv.appendChild(this.getExtraHarmonyBonusHelpText());
+	
+	// Add the reset move element
+	messageDiv.appendChild(getResetMoveElement());
+	
+	// Set it in the game message container
+	document.querySelector(".gameMessage").innerHTML = "";
+	document.querySelector(".gameMessage").appendChild(messageDiv);
 };
 
 SkudPaiShoController.prototype.unplayedTileClicked = function(tileDiv) {
@@ -926,10 +970,23 @@ SkudPaiShoController.buildTileDesignDropdownDiv = function(alternateLabelText) {
 SkudPaiShoController.prototype.buildToggleHarmonyAidsDiv = function() {
 	var div = document.createElement("div");
 	var onOrOff = getUserGamePreference(SkudPaiShoController.hideHarmonyAidsKey) !== "true" ? "on" : "off";
-	div.innerHTML = "Harmony aids are " + onOrOff + ": <span class='skipBonus' onclick='gameController.toggleHarmonyAids();'>toggle</span>";
+	
+	var textSpan = document.createElement("span");
+	textSpan.textContent = "Harmony aids are " + onOrOff + ": ";
+	div.appendChild(textSpan);
+	
+	var toggleSpan = document.createElement("span");
+	toggleSpan.className = "skipBonus";
+	toggleSpan.textContent = "toggle";
+	toggleSpan.onclick = function() { gameController.toggleHarmonyAids(); };
+	div.appendChild(toggleSpan);
+	
 	if (gameOptionEnabled(NO_HARMONY_VISUAL_AIDS)) {
-		div.innerHTML += " (Will not affect games with " + NO_HARMONY_VISUAL_AIDS + " game option)";
+		var warningSpan = document.createElement("span");
+		warningSpan.textContent = " (Will not affect games with " + NO_HARMONY_VISUAL_AIDS + " game option)";
+		div.appendChild(warningSpan);
 	}
+	
 	return div;
 };
 

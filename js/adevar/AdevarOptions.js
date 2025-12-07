@@ -71,7 +71,17 @@ AdevarOptions.buildToggleViewAsGuestDiv = function() {
 		message = "Viewing board as Guest";
 		linkText = "View as Host";
 	}
-	div.innerHTML = message + ": <span class='skipBonus' onclick='gameController.toggleViewAsGuest();'>" + linkText + "</span>";
+	
+	var textSpan = document.createElement("span");
+	textSpan.textContent = message + ": ";
+	div.appendChild(textSpan);
+	
+	var toggleSpan = document.createElement("span");
+	toggleSpan.className = "skipBonus";
+	toggleSpan.textContent = linkText;
+	toggleSpan.onclick = function() { gameController.toggleViewAsGuest(); };
+	div.appendChild(toggleSpan);
+	
 	return div;
 };
 

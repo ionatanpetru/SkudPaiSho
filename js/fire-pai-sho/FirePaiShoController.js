@@ -199,16 +199,32 @@ FirePaiShoController.getFireGatePointMessage = function() {
 }
 
 FirePaiShoController.prototype.getExtraHarmonyBonusHelpText = function() {
-
-	var retstring = " <br /> Your bonus tile is: ";
-	retstring += FirePaiShoController.getTileNameFromCode(this.notationBuilder.bonusTileCode);
-	return retstring; 
+	var container = document.createElement("span");
+	container.appendChild(document.createElement("br"));
+	
+	var text = document.createElement("span");
+	text.textContent = " Your bonus tile is: " + FirePaiShoController.getTileNameFromCode(this.notationBuilder.bonusTileCode);
+	container.appendChild(text);
+	return container; 
 };
 
 FirePaiShoController.prototype.showHarmonyBonusMessage = function() {
-	document.querySelector(".gameMessage").innerHTML = "Harmony Bonus! Play a random tile from your reserve!"
-	+ this.getExtraHarmonyBonusHelpText()
-	+ getResetMoveText();
+	var messageDiv = document.createElement("div");
+	
+	// Create the main message text
+	var mainMessage = document.createElement("span");
+	mainMessage.textContent = "Harmony Bonus! Play a random tile from your reserve!";
+	messageDiv.appendChild(mainMessage);
+	
+	// Add the extra help text
+	messageDiv.appendChild(this.getExtraHarmonyBonusHelpText());
+	
+	// Add the reset move element
+	messageDiv.appendChild(getResetMoveElement());
+	
+	// Set it in the game message container
+	document.querySelector(".gameMessage").innerHTML = "";
+	document.querySelector(".gameMessage").appendChild(messageDiv);
 };
 
 FirePaiShoController.prototype.unplayedTileClicked = function(tileDiv) {
@@ -819,17 +835,40 @@ FirePaiShoController.buildTileDesignDropdownDiv = function(alternateLabelText) {
 FirePaiShoController.prototype.buildToggleHarmonyAidsDiv = function() {
 	var div = document.createElement("div");
 	var onOrOff = getUserGamePreference(FirePaiShoController.hideHarmonyAidsKey) !== "true" ? "on" : "off";
-	div.innerHTML = "Harmony aids are " + onOrOff + ": <span class='skipBonus' onclick='gameController.toggleHarmonyAids();'>toggle</span>";
+	
+	var textSpan = document.createElement("span");
+	textSpan.textContent = "Harmony aids are " + onOrOff + ": ";
+	div.appendChild(textSpan);
+	
+	var toggleSpan = document.createElement("span");
+	toggleSpan.className = "skipBonus";
+	toggleSpan.textContent = "toggle";
+	toggleSpan.onclick = function() { gameController.toggleHarmonyAids(); };
+	div.appendChild(toggleSpan);
+	
 	if (gameOptionEnabled(NO_HARMONY_VISUAL_AIDS)) {
-		div.innerHTML += " (Will not affect games with " + NO_HARMONY_VISUAL_AIDS + " game option)";
+		var warningSpan = document.createElement("span");
+		warningSpan.textContent = " (Will not affect games with " + NO_HARMONY_VISUAL_AIDS + " game option)";
+		div.appendChild(warningSpan);
 	}
+	
 	return div;
 };
 
 FirePaiShoController.prototype.buildBoardRotateDiv = function() {
 	var div = document.createElement("div");
 	var orientation = getUserGamePreference(FirePaiShoController.boardRotationKey) !== "true" ? "Desert" : "Skud";
-	div.innerHTML = "Board orientation: " + orientation + ": <span class='skipBonus' onclick='gameController.toggleBoardRotation();'>toggle</span>";
+	
+	var textSpan = document.createElement("span");
+	textSpan.textContent = "Board orientation: " + orientation + ": ";
+	div.appendChild(textSpan);
+	
+	var toggleSpan = document.createElement("span");
+	toggleSpan.className = "skipBonus";
+	toggleSpan.textContent = "toggle";
+	toggleSpan.onclick = function() { gameController.toggleBoardRotation(); };
+	div.appendChild(toggleSpan);
+	
 	return div;
 };
 
