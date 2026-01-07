@@ -2,7 +2,7 @@
 Nick.Options = function() {
 	if (!localStorage.getItem(Nick.Options.tileDesignTypeKey)
 		|| !Nick.Options.tileDesignTypeValues[localStorage.getItem(Nick.Options.tileDesignTypeKey)]) {
-		Nick.Options.setTileDesignsPreference("standard", true);
+		Nick.Options.setTileDesignsPreference("siyuan", true);
 	}
 
 	Nick.Options.viewAsGuest = false || Nick.Options.viewAsGuest;
@@ -17,7 +17,10 @@ Nick.Options = function() {
 Nick.Options.tileDesignTypeKey = "nickTileDesignTypeKey";
 
 Nick.Options.tileDesignTypeValues = {
-	standard: "Standard",
+	siyuan: "Sì Yuán",
+	fournations: "Four Nations",
+	siyuangaoling: "Sì Yuán Gāolíng",
+	fournationsgaoling: "Four Nations Gāolíng",
 	custom: "Custom"
 };
 
@@ -29,6 +32,10 @@ Nick.Options.setTileDesignsPreference = function(tileDesignKey, ignoreActuate) {
 		if (gameController && gameController.callActuate && !ignoreActuate) {
 			gameController.callActuate();
 		}
+		// Add this line to refresh the help message and update the image
+        if (typeof refreshMessage === "function") {
+            clearMessage();
+        }
 	}
 };
 
