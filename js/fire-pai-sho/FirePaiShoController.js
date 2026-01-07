@@ -5,28 +5,20 @@ import { FirePaiShoGameManager } from './FirePaiShoGameManager';
 import { FirePaiShoGameNotation, FirePaiShoNotationBuilder } from './FirePaiShoGameNotation';
 import { FirePaiShoTile } from './FirePaiShoTile';
 import {
-	ACCENT_TILE,
 	ARRANGING,
-	BRAND_NEW,
-	GATE,
 	GUEST,
 	HOST,
-	MOVE_DONE,
-	NEUTRAL,
 	NotationPoint,
 	PLANTING,
-	POSSIBLE_MOVE,
-	RED,
+} from '../CommonNotationObjects';
+import {
+	BRAND_NEW,
+	GameType,
+	MOVE_DONE,
 	READY_FOR_BONUS,
 	WAITING_FOR_BOAT_BONUS_POINT,
 	WAITING_FOR_BONUS_ENDPOINT,
 	WAITING_FOR_ENDPOINT,
-	WHITE,
-	boatOnlyMoves,
-	debug,
-} from '../CommonNotationObjects';
-import {
-	GameType,
 	activeAi,
 	activeAi2,
 	buildDropdownDiv,
@@ -44,8 +36,13 @@ import {
 	myTurn,
 	onlinePlayEnabled,
 	playingOnlineGame,
+	refreshMessage,
 	rerunAll,
+	setSkudTilesOption,
 	setUserGamePreference,
+	tileDesignTypeKey,
+	tileDesignTypeValues,
+	userIsLoggedIn,
 } from '../PaiShoMain';
 import {
 	getNeutralPointMessage,
@@ -55,6 +52,9 @@ import {
 	toBullets,
 } from '../PaiShoMain';
 import { NO_HARMONY_VISUAL_AIDS, gameOptionEnabled } from '../GameOptions';
+import { GATE, NEUTRAL, POSSIBLE_MOVE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import { ACCENT_TILE, boatOnlyMoves, debugOn, newKnotweedRules, rocksUnwheelable, simpleRocks, simplest, debug } from '../GameData';
+import { RED, WHITE } from '../skud-pai-sho/SkudPaiShoTile';
 
 export function FirePaiShoController(gameContainer, isMobile) {
 	this.actuator = new FirePaiShoActuator(gameContainer, isMobile, isAnimationsOn());
@@ -316,6 +316,8 @@ FirePaiShoController.prototype.unplayedTileClicked = function(tileDiv) {
 		bonus = true;
 	}
 
+	var correctPile = null;
+
 	if (bonus){
 		if (player === HOST){
 			correctPile = this.theGame.tileManager.hostReserveTiles;
@@ -363,7 +365,7 @@ FirePaiShoController.prototype.unplayedTileClicked = function(tileDiv) {
 		}
 
 	} else if (this.notationBuilder.status === READY_FOR_BONUS) {
-
+		// empty
 	} else if (this.notationBuilder.status === WAITING_FOR_BONUS_ENDPOINT
 			|| this.notationBuilder.status === WAITING_FOR_BOAT_BONUS_POINT) {
 			//this.notationBuilder.status = READY_FOR_BONUS;
