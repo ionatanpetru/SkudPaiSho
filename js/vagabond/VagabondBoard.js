@@ -644,14 +644,15 @@ VagabondBoard.prototype.canMoveTileToPoint = function(player, boardPointStart, b
 		for (var i = 0; i < fireLilyPoints.length; i++) {
 			var fp = fireLilyPoints[i];
 			var dist = Math.abs(fp.row - boardPointStart.row) + Math.abs(fp.col - boardPointStart.col);
-			if (dist <= 5) {
+			if (dist <= 5 || (gameOptionEnabled(V_DOUBLE_MOVE_DISTANCE) && dist <= 10)) {
 				closeFireLilyPoints.push(fp);
 			}
 		}
 
 		for (var i = 0; i < closeFireLilyPoints.length; i++) {
 			var fireLilyPoint = closeFireLilyPoints[i];
-			if (Math.abs(fireLilyPoint.row - boardPointEnd.row) + Math.abs(fireLilyPoint.col - boardPointEnd.col) <= 5) {
+			var dist =  Math.abs(fireLilyPoint.row - boardPointEnd.row) + Math.abs(fireLilyPoint.col - boardPointEnd.col);
+			if (dist <= 5 || (gameOptionEnabled(V_DOUBLE_MOVE_DISTANCE) && dist <= 10)) {
 				// Point inside Fire Lily range
 				return true;
 			}

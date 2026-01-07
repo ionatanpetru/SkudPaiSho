@@ -365,26 +365,71 @@ Ginseng.TileInfo.defineGinsengTilesV2 = function() {
 				}
 			],
 			abilities: [
-				{
-					type: Trifle.AbilityName.extendMovement,
-					extendMovementType: Trifle.MovementType.standard,
-					extendDistance: 1,
-					triggers: [
-						{
-							triggerType: Trifle.AbilityTriggerType.whileTargetTileIsSurrounding,
-							targetTeams: [Trifle.TileTeam.friendly],
-							activationRequirements: [
-								{
-									type: Trifle.ActivationRequirement.tileIsOnPointOfType,
-									targetTileTypes: [Trifle.TileCategory.thisTile],
-									targetPointTypes: [RED]
-								}
-							]
-						}
-					],
-					targetTypes: [Trifle.TargetType.triggerTargetTiles],
-					targetTeams: [Trifle.TileTeam.friendly]
-				}
+				gameOptionEnabled(DIAGONAL_BISON_ABILITY_TESTING)
+					? {
+						type: Trifle.AbilityName.manipulateExistingMovement,
+						newMovementType: Trifle.MovementType.diagonal,
+						triggers: [
+							{
+								triggerType: Trifle.AbilityTriggerType.whileTargetTileIsSurrounding,
+								targetTeams: [Trifle.TileTeam.friendly],
+								activationRequirements: [
+									{
+										type: Trifle.ActivationRequirement.tileIsOnPointOfType,
+										targetTileTypes: [Trifle.TileCategory.thisTile],
+										targetPointTypes: [RED]
+									}
+								]
+							}
+						],
+						targetTypes: [Trifle.TargetType.triggerTargetTiles],
+						targetTeams: [Trifle.TileTeam.friendly]
+					}
+					: {
+						type: Trifle.AbilityName.extendMovement,
+						extendMovementType: Trifle.MovementType.standard,
+						extendDistance: 1,
+						triggers: [
+							{
+								triggerType: Trifle.AbilityTriggerType.whileTargetTileIsSurrounding,
+								targetTeams: [Trifle.TileTeam.friendly],
+								activationRequirements: [
+									{
+										type: Trifle.ActivationRequirement.tileIsOnPointOfType,
+										targetTileTypes: [Trifle.TileCategory.thisTile],
+										targetPointTypes: [RED]
+									}
+								]
+							}
+						],
+						targetTypes: [Trifle.TargetType.triggerTargetTiles],
+						targetTeams: [Trifle.TileTeam.friendly]
+					}, 
+					gameOptionEnabled(BISON_GRANTS_FLYING) && {
+						type: Trifle.AbilityName.manipulateExistingMovement,
+						manipulateMovementType: Trifle.MovementType.standard,
+						newMovementAbilities: [
+							{
+								type: Trifle.MovementAbility.jumpOver
+							}
+						],
+						triggers: [
+							{
+								triggerType: Trifle.AbilityTriggerType.whileTargetTileIsSurrounding,
+								targetTeams: [Trifle.TileTeam.friendly],
+								activationRequirements: [
+									{
+										type: Trifle.ActivationRequirement.tileIsOnPointOfType,
+										targetTileTypes: [Trifle.TileCategory.thisTile],
+										targetPointTypes: [RED]
+									}
+								]
+							}
+						],
+						targetTypes: [Trifle.TargetType.triggerTargetTiles],
+						targetTeams: [Trifle.TileTeam.friendly],
+						excludeTileCodes: [Ginseng.TileCodes.Wheel]
+					}
 			],
 			textLines: [
 				"<strong>Movement Phase</strong>",
@@ -560,7 +605,8 @@ Ginseng.TileInfo.defineGinsengTilesV2 = function() {
 				triggers: [
 					{
 						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsInLineOfSight,
-						targetTeams: [Trifle.TileTeam.friendly]
+						targetTeams: [Trifle.TileTeam.friendly],
+						sightDistance: gameOptionEnabled(GINSENG_GINSENG_5) ? 5 : 99
 					}
 				],
 				targetTypes: [Trifle.TargetType.triggerTargetTiles]
@@ -675,7 +721,7 @@ Ginseng.applyCaptureAndAbilityActivationRequirementRulesV2 = function(GinsengTil
 			targetTypes: [Trifle.TargetType.triggerTargetTiles],
 			inevitable: true
 		};
-		var protectFromAbilitiesWhileInTempleAbility = {
+		/* var protectFromAbilitiesWhileInTempleAbility = {
 			title: "Protect From Abilities While In Temple",
 			type: Trifle.AbilityName.cancelAbilitiesTargetingTiles,
 			triggers: [
@@ -686,7 +732,7 @@ Ginseng.applyCaptureAndAbilityActivationRequirementRulesV2 = function(GinsengTil
 			],
 			targetTypes: [Trifle.TargetType.triggerTargetTiles],
 			targetAbilityTypes: [Trifle.AbilityType.all]
-		};
+		}; */
 		/* var protectFromFriendlyPushAbilitiesWhileInTempleAbility = {
 			title: "Protect From Friendly Push Abilities While In Temple",
 			type: Trifle.AbilityName.cancelAbilitiesTargetingTiles,
@@ -727,7 +773,7 @@ Ginseng.applyCaptureAndAbilityActivationRequirementRulesV2 = function(GinsengTil
 			promptTargetTitle: "exchangedTile"
 		};
 		tileInfo.abilities.push(protectFromCaptureWhileInTempleAbility);
-		tileInfo.abilities.push(protectFromAbilitiesWhileInTempleAbility);
+		//tileInfo.abilities.push(protectFromAbilitiesWhileInTempleAbility);	// Removing 6/5/24 per Gyatso
 		// tileInfo.abilities.push(protectFromFriendlyPushAbilitiesWhileInTempleAbility);
 		if (key !== Ginseng.TileCodes.WhiteLotus) {
 			tileInfo.abilities.push(exchangeForCapturedTileIntempleAbility);

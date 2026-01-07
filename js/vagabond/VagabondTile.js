@@ -34,15 +34,20 @@ VagabondTile.prototype.canMove = function(first_argument) {
 };
 
 VagabondTile.prototype.getMoveDistance = function() {
+	var distance = 0;
 	if (this.code === 'L' || this.code === 'B') {
-		return 1;
+		distance = 1;
 	} else if (this.code === 'S') {
-		return 6;
+		distance = 6;
 	} else if (this.code === VagabondTileCodes.FlyingLemur) {
-		return 5;
+		distance = 5;
 	}
 
-	return 0;
+	if (gameOptionEnabled(V_DOUBLE_MOVE_DISTANCE)) {
+		return distance * 2;
+	}
+
+	return distance;
 };
 
 VagabondTile.prototype.isFlowerTile = function() {

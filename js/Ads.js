@@ -5,7 +5,8 @@ function Ads() {
 }
 
 Ads.Options = {
-	showAds: false
+	showAds: false,
+	minimalAds: false
 };
 
 Ads.AdsList = [
@@ -14,88 +15,88 @@ Ads.AdsList = [
 		imageUrl: "https://media.discordapp.net/attachments/951554343356731492/951565458350424164/image832.png",
 		linkUrl: "https://skudpaisho.com/site/about/contact-skudpaisho/"
 	}, */
-	{
-		key: "wanted_tall",
-		imageUrl: "https://media.discordapp.net/attachments/951554343356731492/953949889627320330/image832.png",
-		linkUrl: "https://skudpaisho.com/site/about/contact-skudpaisho/",
-		shape: "tall"
-	},
+	// {
+	// 	key: "wanted_tall",
+	// 	imageUrl: "https://skudpaisho.com/images/aprilfools/image832.png",
+	// 	linkUrl: "https://skudpaisho.com/site/about/contact-skudpaisho/",
+	// 	shape: "tall"
+	// },
 	{
 		key: "free_scroll",
-		imageUrl: "https://cdn.discordapp.com/attachments/951554343356731492/951564698023784528/waterbendingscroll.png",
+		imageUrl: "https://skudpaisho.com/images/aprilfools/waterbendingscroll.png",
 		linkUrl: "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/50113a70-066b-4192-beef-50c1ba1ba9ff/d5y1hnx-8d0aeae8-eee8-4bc0-b26b-fccd15f08398.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzUwMTEzYTcwLTA2NmItNDE5Mi1iZWVmLTUwYzFiYTFiYTlmZlwvZDV5MWhueC04ZDBhZWFlOC1lZWU4LTRiYzAtYjI2Yi1mY2NkMTVmMDgzOTguanBnIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.RFfTZIk6o6UHt17L4GFajHi_DE0jXmSFBTTda46FatY",
 		shape: "wide"
 	},
 	{
 		key: "cute_lemurs",
-		imageUrl: "https://cdn.discordapp.com/attachments/951554343356731492/951570753810227210/lemurs.png",
+		imageUrl: "https://skudpaisho.com/images/aprilfools/lemurs.png",
 		linkUrl: "https://youtu.be/ncY7oQKBQmk",
 		shape: "tall"
 	},
 	{
 		key: "cannoli_classes",
-		imageUrl: "https://cdn.discordapp.com/attachments/951554343356731492/951575242134925332/classes.png",
+		imageUrl: "https://skudpaisho.com/images/aprilfools/classes.png",
 		linkUrl: "https://www.youtube.com/watch?v=ovlLnRsLoZI",
 		shape: "box"
 	},
 	{
 		key: "buy_honor",
-		imageUrl: "https://cdn.discordapp.com/attachments/951554343356731492/951575412633399317/image8042.png",
+		imageUrl: "https://skudpaisho.com/images/aprilfools/BuyHonor.png",
 		linkUrl: "https://www.youtube.com/watch?v=UjUGQNLZtQ8",
 		shape: "wide"
 	},
 	{
 		key: "aunt_wu",
-		imageUrl: "https://cdn.discordapp.com/attachments/951554343356731492/951579883933405194/auntwu.png",
+		imageUrl: "https://skudpaisho.com/images/aprilfools/auntwu.png",
 		linkUrl: "https://avatar.fandom.com/wiki/Makapu_Village",
 		shape: "box"
 	},
 	{
 		key: "free_tiles",
-		imageUrl: "https://cdn.discordapp.com/attachments/951554343356731492/951582332815552572/image8142.png",
+		imageUrl: "https://skudpaisho.com/images/aprilfools/FreeTiles.png",
 		linkUrl: "https://skudpaisho.com/other/printable/TheGardenGate_PrintAndPlay.pdf",
 		shape: "wide"
 	},
 	{
 		key: "cactus_juice_artsoblique",
-		imageUrl: "https://cdn.discordapp.com/attachments/951554343356731492/951960135624962059/ArtsoBliqueCactusjuice.png",
+		imageUrl: "https://skudpaisho.com/images/aprilfools/ArtsoBliqueCactusjuice.png",
 		linkUrl: "https://www.etsy.com/listing/728880890/drink-cactus-juice-its-the-quenchiest",
 		shape: "box"
 	},
 	{
 		key: "cabbage_insurance_wide",
-		imageUrl: "https://cdn.discordapp.com/attachments/951554343356731492/952022803371163669/cabbageinsurance-01.png",
+		imageUrl: "https://skudpaisho.com/images/aprilfools/cabbageinsurance-01.png",
 		linkUrl: "https://youtu.be/Em3IveMo3T0",
 		shape: "wide"
 	},
 	{
 		key: "cabbage_insurance_tall",
-		imageUrl: "https://cdn.discordapp.com/attachments/951554343356731492/952023741695672350/cabbageinsurance-02.png",
+		imageUrl: "https://skudpaisho.com/images/aprilfools/cabbageinsurance-02.png",
 		linkUrl: "https://youtu.be/Em3IveMo3T0",
 		shape: "tall"
 	},
 	{
 		key: "skud_this_trick",
-		imageUrl: "https://cdn.discordapp.com/attachments/951554343356731492/952038964041232424/ThisOneTrick-01.jpg",
+		imageUrl: "https://skudpaisho.com/images/aprilfools/ThisOneTrick-01.jpg",
 		linkUrl: "https://www.youtube.com/watch?v=F9_oBuYWiQo",
 		shape: "box"
 	},
 	{
 		key: "field_trips",
-		imageUrl: "https://cdn.discordapp.com/attachments/951554343356731492/953932426814586890/image8142.png",
+		imageUrl: "https://skudpaisho.com/images/aprilfools/FieldTrips.png",
 		linkUrl: "https://www.redbubble.com/i/sticker/That-s-rough-buddy-by-maddieshields/86656766.EJUG5",
 		shape: "box"
 	},
 	{
 		key: "zuko_costumes",
-		imageUrl: "https://cdn.discordapp.com/attachments/951554343356731492/953946271612289054/image81342.png",
+		imageUrl: "https://skudpaisho.com/images/aprilfools/ZukoCostumes.png",
 		linkUrl: "https://www.youtube.com/watch?v=SSq31Z1nYq4",
 		shape: "tall"
 	},
 	{
 		key: "learn_from_gyatso",
-		imageUrl: "https://cdn.discordapp.com/attachments/951554343356731492/953954606499655720/image815542.png",
-		linkUrl: "https://www.youtube.com/watch?v=nDmi5ZrIVhM",
+		imageUrl: "https://skudpaisho.com/images/aprilfools/LearnFromGyatso.png",
+		linkUrl: "https://www.youtube.com/watch?v=zKUEECnDHjc&t=150s",
 		shape: "box"
 	}
 ];
@@ -105,7 +106,7 @@ Ads.enableAds = function(shouldShowAds) {
 
 	if (shouldShowAds) {
 		document.documentElement.addEventListener('mouseleave', () => {
-			if (Math.random() > 0.5) {
+			if (Math.random() > 0.7 && !Ads.Options.minimalAds) {
 				Ads.showRandomPopupAd();
 			}
 		});
@@ -144,14 +145,16 @@ Ads.enableAds = function(shouldShowAds) {
 };
 
 Ads.minimalAdsEnabled = function() {
+	Ads.Options.minimalAds = true;
+
 	var topAvContainerDiv = document.getElementById("topAvContainer");
-		topAvContainerDiv.classList.add("gone");
+	topAvContainerDiv.classList.add("gone");
 
-		var footerAvContainerDiv = document.getElementById("footerAvContainer");
-		footerAvContainerDiv.classList.add("gone");
+	var footerAvContainerDiv = document.getElementById("footerAvContainer");
+	footerAvContainerDiv.classList.add("gone");
 
-		var sideMenuAvContainerDiv = document.getElementById("sideMenuAvContainer");
-		sideMenuAvContainerDiv.classList.add("gone");
+	var sideMenuAvContainerDiv = document.getElementById("sideMenuAvContainer");
+	sideMenuAvContainerDiv.classList.add("gone");
 };
 
 Ads.getAdInfo = function(adKey) {
@@ -186,7 +189,7 @@ Ads.showAdPopup = function(adKey) {
 		showModal(
 			"A Message From Our Sponsors",
 			Ads.getAdDiv(adInfo, 98, 75)
-			+ "<br /><br />Thanks to our sponsors that support The Garden Gate! Be sure to join <a href='https://skudpaisho.com/discord' target='_blank'>The Garden Gate Discord</a> to get more involved in all things Pai Sho. Hide some ads from Device Preferences (My Games list or Side menu).<br /><br />Have a great day ;)"
+			+ "<br /><br />Thanks to our sponsors that support The Garden Gate! Be sure to join <a href='https://skudpaisho.com/discord' target='_blank'>The Garden Gate Discord</a> to get more involved in all things Pai Sho. <br /><br />Click <span class='clickableText' onclick='Ads.minimalAdsEnabled();closeModal()'>here to hide some of the ads</span>.<br /><br />Have a great day ;)"
 		);
 	}
 };
@@ -266,7 +269,7 @@ Ads.showRandomChatTabAd = function() {
 Ads.showSponsorMessagesTeaserPopup = function() {
 	showModal(
 		"Sponsored Messages",
-		"Would you like to support The Garden Gate and sponsor a message that could show here? <br /><br />Contact @SkudPaiSho on <a href='https://skudpaisho.com/discord' target='_blank'>The Garden Gate Discord</a> and consider supporting The Garden Gate on <a href='https://www.patreon.com/SkudPaiSho' target='_blank'>Patreon</a>."
+		"Would you like to support The Garden Gate and sponsor a message that could show here? <br /><br />Contact @SkudPaiSho on <a href='https://skudpaisho.com/discord' target='_blank'>The Garden Gate Discord</a> and consider supporting The Garden Gate on <a href='https://buymeacoffee.com/skudpaisho' target='_blank'>Buy Me A Coffee</a>."
 	);
 };
 

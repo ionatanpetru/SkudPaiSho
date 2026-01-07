@@ -120,6 +120,9 @@ SkudPaiShoController.prototype.getAdditionalMessage = function() {
 		}
 
 		if (!playingOnlineGame()) {
+			if (dateIsAprilFools()) {
+				msg += '<br /><br /><strong>Try the Diagonal Movement and Everything Captures Everything game options, it\'s more fun!<br /><img src="https://skudpaisho.com/images/aprilfools/irohwink.png" width=160px></strong>';
+			}
 			msg += getGameOptionsMessageHtml(GameType.SkudPaiSho.gameOptions);
 		}
 	} else if (this.gameNotation.moves.length === 1) {
