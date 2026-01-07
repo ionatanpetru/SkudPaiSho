@@ -140,7 +140,7 @@ Nick.Controller.prototype.getDefaultHelpMessageText = function() {
 };
 
 Nick.Controller.prototype.getNickCycleImageTag = function() {
-	return "<img src='images/Nick/CaptureCycle.png' style='width:60%;' />";
+	return "<img src='images/Nick/" + localStorage.getItem(Nick.Options.tileDesignTypeKey) + ".png' style='width:60%;' />";
 };
 
 Nick.Controller.prototype.gameNotBegun = function() {

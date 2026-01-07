@@ -30,6 +30,10 @@ Nick.Options.setTileDesignsPreference = function(tileDesignKey, ignoreActuate) {
 		if (gameController && gameController.callActuate && !ignoreActuate) {
 			gameController.callActuate();
 		}
+		// Add this line to refresh the help message and update the image
+        if (typeof refreshMessage === "function") {
+            clearMessage();
+        }
 	}
 };
 
