@@ -16,7 +16,7 @@ Nick.TileManager.prototype.loadTileSet = function(ownerCode) {
 	tiles.push(new Trifle.Tile(Nick.TileCodes.WhiteLotus, ownerCode));
 	tiles.push(new Trifle.Tile(Nick.TileCodes.Avatar, ownerCode));
 	
-	for (var i = 0; i < 2; i++) {
+	for (var i = 0; i < 3; i++) {
 		tiles.push(new Trifle.Tile(Nick.TileCodes.Air, ownerCode));
 		tiles.push(new Trifle.Tile(Nick.TileCodes.Water, ownerCode));
 		tiles.push(new Trifle.Tile(Nick.TileCodes.Earth, ownerCode));

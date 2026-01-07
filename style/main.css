@@ -738,6 +738,12 @@ figure > div {
   box-shadow: 0px 0px 4px 4px #c6c;
 }
 
+/* Nick: White Lotus in-check highlight */
+.nick_lotus_in_check {
+  box-shadow: 0 0 8px 4px rgba(220,20,60,0.85);
+  transition: box-shadow 0.5s;
+}
+
 .GUESTharmony {
   box-shadow: 0px 0px 8px 4px #87f;
 }

@@ -621,10 +621,15 @@ PaiShoGames.Board.prototype.getAdjacentDiagonalPointsPotentialPossibleMoves = fu
 };
 
 PaiShoGames.Board.prototype.calculateSlopeBetweenPoints = function(p1, p2) {
-	var rise = p2.row - p1.row;
-	var run = p2.col - p1.col;
-	var slope = run === 0 ? 0 : rise / run;
-	return slope;
+    var rise = p2.row - p1.row;
+    var run = p2.col - p1.col;
+    if (run === 0) {
+        if (rise === 0) {
+            return 0; // same point
+        }
+        return (rise > 0) ? Infinity : -Infinity; // vertical line
+    }
+    return rise / run;
 };
 
 PaiShoGames.Board.prototype.getNextPointsForTravelShapeMovement = function(movementInfo, moveStepNumber, originPoint, pointAlongTheWay, currentMovementPath, mustPreserveDirection) {

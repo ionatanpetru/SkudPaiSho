@@ -222,6 +222,11 @@ Nick.Actuator.prototype.addBoardPoint = function(boardPoint, board, moveToAnimat
 
 	var theDiv = createBoardPointDiv(boardPoint, null, Nick.NotationAdjustmentFunction);
 
+	// Visual: highlight White Lotus when it's in check (only if this point currently has a White Lotus)
+	if (boardPoint.hasTile() && boardPoint.tile.code === Nick.TileCodes.WhiteLotus && boardPoint.lotusInCheck) {
+    	theDiv.classList.add("nick_lotus_in_check");
+	}
+
 	if (!boardPoint.isType(NON_PLAYABLE)) {
 		theDiv.classList.add("activePoint");
 		if (boardPoint.isType(MARKED)) {
@@ -277,7 +282,7 @@ Nick.Actuator.prototype.addBoardPoint = function(boardPoint, board, moveToAnimat
 		var theImg = document.createElement("img");
 		theImg.elementStyleTransform = new ElementStyleTransform(theImg);
 
-		theImg.elementStyleTransform.setValue("rotate", 270, "deg");
+		theImg.elementStyleTransform.setValue("rotate", 225, "deg");
 		if (Nick.Options.viewAsGuest) {
 			theImg.elementStyleTransform.adjustValue("rotate", 180, "deg");
 		}
@@ -319,7 +324,7 @@ Nick.Actuator.prototype.addBoardPoint = function(boardPoint, board, moveToAnimat
 			theImgCaptured.src = srcValue + capturedTile.getImageName() + ".png";
 			theImgCaptured.classList.add("underneath");
 
-			theImgCaptured.elementStyleTransform.setValue("rotate", 270, "deg");
+			theImgCaptured.elementStyleTransform.setValue("rotate", 225, "deg");
 			if (Nick.Options.viewAsGuest) {
 				theImgCaptured.elementStyleTransform.adjustValue("rotate", 180, "deg");
 			}

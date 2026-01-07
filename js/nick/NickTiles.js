@@ -20,7 +20,7 @@ Nick.NickTiles = {};
 Nick.TileInfo = {};
 
 Nick.TileInfo.initializeTrifleData = function() {
-	Nick.TileInfo.setTileNames();
+	//Nick.TileInfo.setTileNames();
 
 	Trifle.TileInfo.initializeTrifleData();
 		Nick.TileInfo.defineNickTiles();
@@ -35,7 +35,7 @@ Nick.TileInfo.defineNickTiles = function() {
 		types: [Nick.TileCodes.WhiteLotus],
 		movements: [
     		{
-        		type: Trifle.MovementType.standard,
+        		type: Trifle.MovementType.orthAndDiag,
         		distance: 1,
         		targetTeams: [Trifle.TileTeam.friendly, Trifle.TileTeam.enemy],
         		restrictions: [
@@ -68,7 +68,7 @@ Nick.TileInfo.defineNickTiles = function() {
 		types: [Nick.TileCodes.Avatar],
 		movements: [
     		{
-        		type: Trifle.MovementType.standard,
+        		type: Trifle.MovementType.orthAndDiag,
         		distance: 1,
         		targetTeams: [Trifle.TileTeam.friendly, Trifle.TileTeam.enemy],
         		restrictions: [
@@ -115,7 +115,7 @@ Nick.TileInfo.defineNickTiles = function() {
 					{
 						triggerType: Trifle.AbilityTriggerType.whenLandsSurroundingTargetTile,
 						targetTeams: [Trifle.TileTeam.enemy],
-						targetTileTypes: [Trifle.TileCategory.allTileTypes],
+						targetTileTypes: [Nick.TileCodes.Water,Nick.TileCodes.Avatar,Nick.TileCodes.Air,Nick.TileCodes.Earth,Nick.TileCodes.Fire],
 					},
 					{
 						triggerType: Trifle.AbilityTriggerType.whenActiveMovement,
@@ -145,7 +145,7 @@ Nick.TileInfo.defineNickTiles = function() {
 		types: [Nick.TileCodes.Air],
 		movements: [
     		{
-        		type: Trifle.MovementType.standard,
+        		type: Trifle.MovementType.orthAndDiag,
         		distance: 1,
         		targetTeams: [Trifle.TileTeam.friendly, Trifle.TileTeam.enemy],
         		restrictions: [
@@ -179,7 +179,7 @@ Nick.TileInfo.defineNickTiles = function() {
 					{
 						triggerType: Trifle.AbilityTriggerType.whenLandsSurroundingTargetTile,
 						targetTeams: [Trifle.TileTeam.enemy],
-						targetTileTypes: [Nick.TileCodes.Water,Nick.TileCodes.Avatar,Nick.TileCodes.WhiteLotus],
+						targetTileTypes: [Nick.TileCodes.Water,Nick.TileCodes.Avatar],
 					},
 					{
 						triggerType: Trifle.AbilityTriggerType.whenActiveMovement,
@@ -188,6 +188,18 @@ Nick.TileInfo.defineNickTiles = function() {
 				],
 				targetTypes: [Trifle.TargetType.triggerTargetTiles],
 				triggerTypeToTarget: Trifle.AbilityTriggerType.whenLandsSurroundingTargetTile
+			},
+			{// Passive Ability: Capture Tiles That Move Into Its Range
+				type: Trifle.AbilityName.captureTargetTiles,
+				triggers: [
+					{
+					triggerType: Trifle.AbilityTriggerType.whenTargetTileLandsSurrounding,
+					targetTeams: [Trifle.TileTeam.enemy],
+					targetTileTypes: [Nick.TileCodes.Water],
+					}
+				],
+				targetTypes: [Trifle.TargetType.triggerTargetTiles],
+				triggerTypeToTarget: Trifle.AbilityTriggerType.whenTargetTileLandsSurrounding
 			}
 		],
 		textLines: [
@@ -206,7 +218,7 @@ Nick.TileInfo.defineNickTiles = function() {
 		types: [Nick.TileCodes.Water],
 		movements: [
     		{
-        		type: Trifle.MovementType.standard,
+        		type: Trifle.MovementType.orthAndDiag,
         		distance: 1,
         		targetTeams: [Trifle.TileTeam.friendly, Trifle.TileTeam.enemy],
         		restrictions: [
@@ -240,7 +252,7 @@ Nick.TileInfo.defineNickTiles = function() {
 					{
 						triggerType: Trifle.AbilityTriggerType.whenLandsSurroundingTargetTile,
 						targetTeams: [Trifle.TileTeam.enemy],
-						targetTileTypes: [Nick.TileCodes.Air,Nick.TileCodes.Avatar,Nick.TileCodes.WhiteLotus],
+						targetTileTypes: [Nick.TileCodes.Earth,Nick.TileCodes.Avatar],
 					},
 					{
 						triggerType: Trifle.AbilityTriggerType.whenActiveMovement,
@@ -249,6 +261,18 @@ Nick.TileInfo.defineNickTiles = function() {
 				],
 				targetTypes: [Trifle.TargetType.triggerTargetTiles],
 				triggerTypeToTarget: Trifle.AbilityTriggerType.whenLandsSurroundingTargetTile
+			},
+			{// Passive Ability: Capture Tiles That Move Into Its Range
+				type: Trifle.AbilityName.captureTargetTiles,
+				triggers: [
+					{
+					triggerType: Trifle.AbilityTriggerType.whenTargetTileLandsSurrounding,
+					targetTeams: [Trifle.TileTeam.enemy],
+					targetTileTypes: [Nick.TileCodes.Earth],
+					}
+				],
+				targetTypes: [Trifle.TargetType.triggerTargetTiles],
+				triggerTypeToTarget: Trifle.AbilityTriggerType.whenTargetTileLandsSurrounding
 			}
 		],
 		textLines: [
@@ -267,7 +291,7 @@ Nick.TileInfo.defineNickTiles = function() {
 		types: [Nick.TileCodes.Earth],
 		movements: [
     		{
-        		type: Trifle.MovementType.standard,
+        		type: Trifle.MovementType.orthAndDiag,
         		distance: 1,
         		targetTeams: [Trifle.TileTeam.friendly, Trifle.TileTeam.enemy],
         		restrictions: [
@@ -301,7 +325,7 @@ Nick.TileInfo.defineNickTiles = function() {
 					{
 						triggerType: Trifle.AbilityTriggerType.whenLandsSurroundingTargetTile,
 						targetTeams: [Trifle.TileTeam.enemy],
-						targetTileTypes: [Nick.TileCodes.Fire,Nick.TileCodes.Avatar,Nick.TileCodes.WhiteLotus],
+						targetTileTypes: [Nick.TileCodes.Fire,Nick.TileCodes.Avatar],
 					},
 					{
 						triggerType: Trifle.AbilityTriggerType.whenActiveMovement,
@@ -310,6 +334,18 @@ Nick.TileInfo.defineNickTiles = function() {
 				],
 				targetTypes: [Trifle.TargetType.triggerTargetTiles],
 				triggerTypeToTarget: Trifle.AbilityTriggerType.whenLandsSurroundingTargetTile
+			},
+			{// Passive Ability: Capture Tiles That Move Into Its Range
+				type: Trifle.AbilityName.captureTargetTiles,
+				triggers: [
+					{
+					triggerType: Trifle.AbilityTriggerType.whenTargetTileLandsSurrounding,
+					targetTeams: [Trifle.TileTeam.enemy],
+					targetTileTypes: [Nick.TileCodes.Fire],
+					}
+				],
+				targetTypes: [Trifle.TargetType.triggerTargetTiles],
+				triggerTypeToTarget: Trifle.AbilityTriggerType.whenTargetTileLandsSurrounding
 			}
 		],
 		textLines: [
@@ -328,7 +364,7 @@ Nick.TileInfo.defineNickTiles = function() {
 		types: [Nick.TileCodes.Fire],
 		movements: [
     		{
-        		type: Trifle.MovementType.standard,
+        		type: Trifle.MovementType.orthAndDiag,
         		distance: 1,
         		targetTeams: [Trifle.TileTeam.friendly, Trifle.TileTeam.enemy],
         		restrictions: [
@@ -362,7 +398,7 @@ Nick.TileInfo.defineNickTiles = function() {
 					{
 						triggerType: Trifle.AbilityTriggerType.whenLandsSurroundingTargetTile,
 						targetTeams: [Trifle.TileTeam.enemy],
-						targetTileTypes: [Nick.TileCodes.Air,Nick.TileCodes.Avatar,Nick.TileCodes.WhiteLotus],
+						targetTileTypes: [Nick.TileCodes.Air,Nick.TileCodes.Avatar],
 					},
 					{
 						triggerType: Trifle.AbilityTriggerType.whenActiveMovement,
@@ -371,6 +407,18 @@ Nick.TileInfo.defineNickTiles = function() {
 				],
 				targetTypes: [Trifle.TargetType.triggerTargetTiles],
 				triggerTypeToTarget: Trifle.AbilityTriggerType.whenLandsSurroundingTargetTile
+			},
+			{// Passive Ability: Capture Tiles That Move Into Its Range
+				type: Trifle.AbilityName.captureTargetTiles,
+				triggers: [
+					{
+					triggerType: Trifle.AbilityTriggerType.whenTargetTileLandsSurrounding,
+					targetTeams: [Trifle.TileTeam.enemy],
+					targetTileTypes: [Nick.TileCodes.Air],
+					}
+				],
+				targetTypes: [Trifle.TargetType.triggerTargetTiles],
+				triggerTypeToTarget: Trifle.AbilityTriggerType.whenTargetTileLandsSurrounding
 			}
 		],
 		textLines: [
@@ -397,21 +445,21 @@ Nick.applyCaptureAndAbilityActivationRequirementRules = function(NickTiles) {
         }
 
         var returnFriendlyAvatarOnEnemyAvatarCapturedAbility = {
-            title: "Return Friendly Avatar When Enemy Avatar Captured",
-            type: Trifle.AbilityName.moveTileToRecordedPoint,
-            priority: 1,
-            triggers: [
-                {
-                    triggerType: Trifle.AbilityTriggerType.whenCapturingTargetTile,
-                    targetTeams: [Trifle.TileTeam.enemy],
-                    targetTileCodes: [Nick.TileCodes.Avatar],
-                    targetTileTypes: [Trifle.TileCategory.thisTile]
-                }
-            ],
-            targetTypes: [Trifle.TargetType.chosenCapturedTile],
-            targetTileCodes: [Nick.TileCodes.Avatar],
-            targetTeams: [Trifle.TileTeam.friendly]
-        };
+    		title: "Return Friendly Avatar When Enemy Avatar Captured",
+    		type: Trifle.AbilityName.moveTileToRecordedPoint,
+    		priority: 1,
+    		triggers: [
+        		{
+            		triggerType: Trifle.AbilityTriggerType.whenCapturingTargetTile,
+            		targetTeams: [Trifle.TileTeam.enemy],
+            		targetTileCodes: [Nick.TileCodes.Avatar]
+        		}
+    		],
+    		targetTypes: [Trifle.TargetType.chosenCapturedTile],
+    		targetTileCodes: [Nick.TileCodes.Avatar],
+    		targetTeams: [Trifle.TileTeam.friendly],
+    		recordedPointType: Trifle.RecordTilePointType.startPoint
+		};
 
         tileInfo.abilities.push(returnFriendlyAvatarOnEnemyAvatarCapturedAbility);
     });
