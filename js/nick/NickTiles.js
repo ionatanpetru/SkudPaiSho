@@ -9,7 +9,8 @@ Nick.TileCodes = {
 };
 
 Nick.TileType = {
-	standard: "standard"
+	siyuan: "siyuan",
+	fournations: "fournations"
 };
 
 Nick.TilePileNames = {
@@ -462,5 +463,30 @@ Nick.applyCaptureAndAbilityActivationRequirementRules = function(NickTiles) {
 		};
 
         tileInfo.abilities.push(returnFriendlyAvatarOnEnemyAvatarCapturedAbility);
+
+		// Sort abilities so whenLandsSurroundingTargetTile comes before whenTargetTileLandsSurrounding
+        tileInfo.abilities.sort(function(a, b) {
+            // Helper to find the first triggerType in triggers array
+            function getFirstTriggerType(ability) {
+                if (!ability.triggers || !ability.triggers.length) return '';
+                return ability.triggers[0].triggerType;
+            }
+            const order = [
+                Trifle.AbilityTriggerType.whenLandsSurroundingTargetTile,
+                Trifle.AbilityTriggerType.whenTargetTileLandsSurrounding
+            ];
+            const aType = getFirstTriggerType(a);
+            const bType = getFirstTriggerType(b);
+            const aIdx = order.indexOf(aType);
+            const bIdx = order.indexOf(bType);
+            // If both are in the order array, sort by their order
+            if (aIdx !== -1 && bIdx !== -1) return aIdx - bIdx;
+            // If only a is in the order, it comes first
+            if (aIdx !== -1) return -1;
+            // If only b is in the order, it comes first
+            if (bIdx !== -1) return 1;
+            // Otherwise, keep original order
+            return 0;
+        });
     });
 };

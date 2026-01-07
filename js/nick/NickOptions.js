@@ -2,7 +2,7 @@
 Nick.Options = function() {
 	if (!localStorage.getItem(Nick.Options.tileDesignTypeKey)
 		|| !Nick.Options.tileDesignTypeValues[localStorage.getItem(Nick.Options.tileDesignTypeKey)]) {
-		Nick.Options.setTileDesignsPreference("standard", true);
+		Nick.Options.setTileDesignsPreference("siyuan", true);
 	}
 
 	Nick.Options.viewAsGuest = false || Nick.Options.viewAsGuest;
@@ -17,7 +17,8 @@ Nick.Options = function() {
 Nick.Options.tileDesignTypeKey = "nickTileDesignTypeKey";
 
 Nick.Options.tileDesignTypeValues = {
-	standard: "Standard",
+	siyuan: "Sì Yuán",
+	fournations: "Four Nations",
 	custom: "Custom"
 };
 
