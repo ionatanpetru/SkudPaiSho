@@ -512,6 +512,9 @@ var createNonRankedGamePreferredKey = "createNonRankedGamePreferred";
         case "Street Pai Sho":
             return "var(--streetcolor)";
             break;
+		 case "Nick Pai Sho":
+            return "var(--nickcolor)";
+            break;
         case "Blooms":
             return "var(--bloomscolor)";
         case "Meadow":
@@ -2516,6 +2519,17 @@ var GameType = {
 			NO_EFFECT_TILES
 		]
 	},
+	Nick: {
+		id: 21,
+		name: "Nick Pai Sho",
+		desc: "Nick Pai Sho",
+		color: "var(--nickcolor)",
+		description: "Advance your lotus to the center of the board and protect it using the four elements and the Avatar.",
+		coverImg: "nick.png",
+		rulesUrl: "https://skudpaisho.com/site/games/nick-pai-sho/",
+		gameOptions: [],
+		noRankedGames: true
+	},
 	SolitairePaiSho: {
 		id: 4,
 		name: "Nature's Grove: Respite",
@@ -2769,6 +2783,9 @@ function getGameControllerForGameType(gameTypeId) {
 			break;
 		case GameType.StreetPaiSho.id:
 			controller = new StreetController(gameContainerDiv, isMobile);
+			break;
+		case GameType.Nick.id:
+			controller = new Nick.Controller(gameContainerDiv, isMobile);
 			break;
 		case GameType.CoopSolitaire.id:
 			controller = new CoopSolitaireController(gameContainerDiv, isMobile);

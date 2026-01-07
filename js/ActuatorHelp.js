@@ -145,6 +145,7 @@ function setupPaiShoBoard(gameContainer,
 	var addAdevarGuestBoardRotate = false;
 	var addGinsengBoardRotate = false;
 	var addGinsengGuestBoardRotate = false;
+
 	// Check for existing class on board...
 	if (document.querySelector(".vagabondBoardRotate")) {
 		addVagabondBoardRotate = true;
@@ -229,6 +230,7 @@ function setupPaiShoBoard(gameContainer,
 		} else if (rotateType === GINSENG_GUEST_ROTATE) {
 			rotateClass = "ginsengGuestBoardRotate";
 		}
+
 		// Set Timeout to get animated board rotation
 		setTimeout(function () {
 			svgContainer.classList.remove("vagabondBoardRotate");
