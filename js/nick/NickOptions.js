@@ -19,6 +19,8 @@ Nick.Options.tileDesignTypeKey = "nickTileDesignTypeKey";
 Nick.Options.tileDesignTypeValues = {
 	siyuan: "Sì Yuán",
 	fournations: "Four Nations",
+	siyuangaoling: "Sì Yuán Gāolíng",
+	fournationsgaoling: "Four Nations Gāolíng",
 	custom: "Custom"
 };
 

@@ -10,7 +10,10 @@ Nick.TileCodes = {
 
 Nick.TileType = {
 	siyuan: "siyuan",
-	fournations: "fournations"
+	fournations: "fournations",
+	siyuangaoling: "siyuangaoling",
+	fournationsgaoling: "fournationsgaoling",
+	custom: "custom"
 };
 
 Nick.TilePileNames = {
