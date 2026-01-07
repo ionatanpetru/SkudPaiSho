@@ -27,6 +27,8 @@ Ginseng.Controller = function(gameContainer, isMobile) {
 
 	this.showDebugInfo = false;
 
+	this.supportsMoveLogMessages = true;
+
 	if (gameOptionEnabled(GINSENG_1_POINT_0)) {
 		this.isInviteOnly = true;
 	}
@@ -112,28 +114,42 @@ Ginseng.Controller.prototype.resetMove = function(skipAnimation) {
 Ginseng.Controller.prototype.getDefaultHelpMessageText = function() {
 	if (gameOptionEnabled(GINSENG_2_POINT_0) || !gameOptionEnabled(GINSENG_1_POINT_0)) {
 		return '<h4>Ginseng Pai Sho</h4>'
-			+ '<p><strong>Objective</strong></p>'
+			+ '<p><strong><center>How to win</center></strong></p>'
+			// + '<ul>'
+			+ '<p>To win a game of Ginseng Pai Sho, you must be the first player to move your White Lotus from its starting point to the other side of the Border (or midline) and into your opponent´s territory.<p>'
+			// + '</ul>'
+			+ '<p><strong><center>Taking a turn</center></strong></p>'
+			// + '<ul>'
+			+ '<p>Players take alternating turns. When it is your turn, select and move a tile according to its specified movement and apply any triggered abilities.</p>'
+			// + '</ul>'
+			+ '<p><strong><center>Draw</center></strong></p>'
+			// + '<ul>'
+			+ '<p>If a player reaches a point where no moves are possible, the game results in a draw.</p>'
+			// + '</ul>'
+			+ '<p><strong><center>General rules</center></strong></p>'
+			+ '<p>Here are the four fundamental rules that apply to most of the tiles in Ginseng Pai Sho, distilled for easy understanding. However, it is worth noticing that there are exceptions to this simplicity. The White Lotus, Ginseng, and Wheel do not adhere strictly to these rules. Hover over any tile to see where they might differ from the general rules.</p>'
 			+ '<ul>'
-			+ '<li>Be the first player to move beyond the Border with your White Lotus tile to win the game. The Border is the midline between Host and Guest</li>'
+			+ '<p><strong>1: Movement</strong></p>'
+			+ '<ul>'
+			+ '<li>Each tile is allowed to move within a range of up to 5 spaces.</li>'
+			+ '<li>Tiles are played on the intersections, and may be moved along the horizontal and vertical lines; no diagonal movement allowed.</li>'
+			+ '<li>Furthermore, a tile cannot pass through another; it must navigate around obstructing tiles.</li>'
 			+ '</ul>'
-			+ '<p><strong>Taking a turn</strong></p>'
+			+ '<p><strong>2: Capturing</strong></p>'
 			+ '<ul>'
-			+ '<li>A turn consists of two phases: Movement Phase and Effect Phase. Hover over the different tiles to learn what they can do in these phases.</li>'
+			+ '<li>Tiles may capture opponent´s tiles when BOTH White Lotuses are outside Temples.</li>'
+			+ '<li>You capture your opponent´s tiles by moving your tile onto theirs. Captured tiles are taken off the board and placed in the captured tiles pile.</li>'
 			+ '</ul>'
-			+ '<p><strong>Important rules</strong></p>'
-			+ '<p>White Lotus</p>'
+			+ '<p><strong>3: Temples</strong></p>'
 			+ '<ul>'
-			+ '<li>Capturing is only allowed when BOTH White Lotus tiles are outside Temples.</li>'
+			+ '<li>The Northern and Southern Temples may only be used by the White Lotus that started there.</li>'
+			+ '<li>Each tile may enter the Eastern and Western Temples.</li>'
+			+ '<li>Tiles inside Temples are protected from being captured..</li>'
+			+ '<li>When moving a tile into the Eastern or Western Temple, you may exchange it for one of your captured tiles.</li>'
 			+ '</ul>'
-			+ '<p>The Temples</p>'
+			+ '<p><strong>4: Abilities</strong></p>'
 			+ '<ul>'
-			+ '<li>Tiles inside Eastern and Western Temples are Ascended. Ascended tiles cannot be captured, trapped or moved by other tiles. A tile inside a Temple can still use its ability.</li>'
-			+ '<li>Captured tiles can be retrieved at the Eastern or Western Temples by exchanging any tile for the retrieved tile.</li>'
-			+ '</ul>'
-			+ '<p>Dynamic or Static Abilities</p>'
-			+ '<ul>'
-			+ '<li>Dynamic Abilities are triggered by movement of the specific tile and only occur during the following Effect Phase.</li>'
-			+ '<li>Static Abilities begin in the Effect Phase and continue until they are interrupted.</li>'
+			+ '<li>Each tile possesses a unique ability that influences other tiles on the board. Hover over the tiles to see their abilities.</li>'
 			+ '</ul>'
 			+ '<p>For additional info, view the rule book <a href="https://skudpaisho.com/site/games/ginseng-pai-sho/" target="_blank">here</a>.</p>';
 	} else {
@@ -294,7 +310,7 @@ Ginseng.Controller.prototype.confirmAcceptDraw = function() {
 		this.gameNotation.addMove(move);
 
 		if (playingOnlineGame()) {
-			callSubmitMove();
+			callSubmitMove(null, null, { fullMoveText: this.theGame.gameLogText });
 		} else {
 			finalizeMove();
 		}
@@ -479,7 +495,7 @@ Ginseng.Controller.prototype.completeMove = function() {
 	} else {
 		this.gameNotation.addMove(move);
 		if (playingOnlineGame()) {
-			callSubmitMove();
+			callSubmitMove(null, null, { fullMoveText: this.theGame.gameLogText });
 		} else {
 			// finalizeMove();
 			quickFinalizeMove();
@@ -491,7 +507,7 @@ Ginseng.Controller.prototype.skipHarmonyBonus = function() {
 	var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
 	this.gameNotation.addMove(move);
 	if (playingOnlineGame()) {
-		callSubmitMove();
+		callSubmitMove(null, null, { fullMoveText: this.theGame.gameLogText });
 	} else {
 		finalizeMove();
 	}

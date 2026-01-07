@@ -25,7 +25,8 @@ Trifle.TargetHelper.prototype.tileIsTargeted = function() {
 			&& this.targetTeamsCheck()
 			&& this.targetTileTypesCheck()
 			&& this.targetTileIdentifiersCheck()
-			&& this.targetTileNamesCheck();
+			&& this.targetTileNamesCheck()
+			&& this.targetTileIsNotExcludedCheck();
 };
 
 Trifle.TargetHelper.prototype.targetingIsNotCanceledCheck = function() {
@@ -78,6 +79,18 @@ Trifle.TargetHelper.prototype.targetTileNamesCheck = function() {
 		return arrayIncludesOneOf(this.abilityInfo.targetTileCodes, [this.possibleTargetTile.code])
 			|| (this.abilityInfo.targetTileCodes.includes(Trifle.TileCategory.allButThisTile)
 				&& this.possibleTargetTile.code !== this.abilityObject.sourceTile.code);
+	} else {
+		return true;
+	}
+};
+
+Trifle.TargetHelper.prototype.targetTileIsNotExcludedCheck = function() {
+	if (this.abilityInfo.excludeTileCodes) {
+		var excluded = this.abilityInfo.excludeTileCodes.includes(this.possibleTargetTile.code);
+		if (excluded) {
+			debug("Target tile " + this.possibleTargetTile.code + " is excluded by ability: " + this.abilityInfo.type);
+		}
+		return !excluded;
 	} else {
 		return true;
 	}
