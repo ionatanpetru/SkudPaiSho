@@ -464,6 +464,12 @@ window.requestAnimationFrame(function() {
 
 	buildBoardDesignsValues();
 
+	  if (dateIsAprilFools()) {
+		  Ads.enableAds(true);
+		  GameType.SkudPaiSho.gameOptions.push(DIAGONAL_MOVEMENT, EVERYTHING_CAPTURE);
+		  GameType.VagabondPaiSho.gameOptions.push(V_DOUBLE_MOVE_DISTANCE);
+	  }
+
 	if (QueryString.game && !QueryString.gameType) {
 		QueryString.gameType = "1";
 	}
@@ -636,6 +642,9 @@ export function getGameColor(gameMode) {
 		return "var(--undergrowthcolor)";
 	case "Street Pai Sho":
 		return "var(--streetcolor)";
+		 case "Nick Pai Sho":
+            return "var(--nickcolor)";
+            break;
 	case "Blooms":
 		return "var(--bloomscolor)";
 	case "Meadow":
@@ -2640,7 +2649,7 @@ export function forgetPasswordClicked() {
 		var yesNoOptions = {};
 		yesNoOptions.yesText = "Yes - Remove my password";
 		yesNoOptions.yesFunction = function() {
-			onlinePlayEngine.removeUserPassword();
+			onlinePlayEngine.removeUserPassword(getLoginToken(), removePasswordCallback);
 		};
 		yesNoOptions.noText = "Close";
 		showModal(
@@ -2697,6 +2706,28 @@ var updatePasswordCallback = function updatePasswordCallback(data) {
 	}
 
 	showModal("Update Password", msg);
+};
+
+var removePasswordCallback = function removePasswordCallback(data) {
+	var msg = "";
+	if (data === 'Password removed.') {
+		msg = "Password removed. You will be able to sign in using email verification, or set a password from the bottom of the My Games list.";
+	} else {
+		msg = "Password update failed.";
+	}
+
+	showModal("Remove Password", msg);
+};
+
+var removePasswordCallback = function removePasswordCallback(data) {
+	var msg = "";
+	if (data === 'Password removed.') {
+		msg = "Password removed. You will be able to sign in using email verification, or set a password from the bottom of the My Games list.";
+	} else {
+		msg = "Password update failed.";
+	}
+
+	showModal("Remove Password", msg);
 };
 
 export function updatePasswordClicked() {
@@ -2818,6 +2849,9 @@ export var GameType = {
 		gameOptions: [
 			OPTION_DOUBLE_TILES,
 			SWAP_BISON_WITH_LEMUR
+		],
+		secretGameOptions: [
+			V_DOUBLE_MOVE_DISTANCE
 		]
 	},
 	Adevar: {
@@ -2842,13 +2876,15 @@ export var GameType = {
 		coverImg: "ginseng.png",
 		rulesUrl: "https://skudpaisho.com/site/games/ginseng-pai-sho/",
 		gameOptions: [
-			DIAGONAL_BISON_ABILITY_TESTING
+			GINSENG_GINSENG_5,
+			BISON_GRANTS_FLYING
 		],
 		secretGameOptions: [
 			LION_TURTLE_ABILITY_ANYWHERE,
 			SWAP_BISON_AND_DRAGON,
 			SWAP_BISON_AND_DRAGON_ABILITIES,
-			GINSENG_1_POINT_0
+			GINSENG_1_POINT_0,
+			DIAGONAL_BISON_ABILITY_TESTING
 		]
 	},
 	FirePaiSho: {
@@ -2881,6 +2917,17 @@ export var GameType = {
 		gameOptions: [
 			NO_EFFECT_TILES
 		]
+	},
+	Nick: {
+		id: 21,
+		name: "Nick Pai Sho",
+		desc: "Nick Pai Sho",
+		color: "var(--nickcolor)",
+		description: "Advance your lotus to the center of the board and protect it using the four elements and the Avatar.",
+		coverImg: "nick.png",
+		rulesUrl: "https://skudpaisho.com/site/games/nick-pai-sho/",
+		gameOptions: [],
+		noRankedGames: true
 	},
 	SolitairePaiSho: {
 		id: 4,
@@ -3044,7 +3091,8 @@ export var GameType = {
 		color: "var(--bloomscolor)",
 		description: "A territory battle on a hexagonal board.",
 		coverImg: "hexagon.png",
-		// rulesUrl: "https://www.nickbentley.games/blooms-rules/",
+		// // rulesUrl: "https://www.nickbentley.games/blooms-rules/",
+		rulesUrl: "https://boardgamegeek.com/boardgame/249095/blooms",
 		rulesUrl: "https://boardgamegeek.com/boardgame/249095/blooms",
 		gameOptions: [
 			SHORTER_GAME,
@@ -3148,6 +3196,9 @@ export function getGameControllerForGameType(gameTypeId) {
 			break;
 		case GameType.StreetPaiSho.id:
 			controller = new StreetController(gameContainerDiv, isMobile);
+			break;
+		case GameType.Nick.id:
+			controller = new Nick.Controller(gameContainerDiv, isMobile);
 			break;
 		case GameType.CoopSolitaire.id:
 			controller = new CoopSolitaireController(gameContainerDiv, isMobile);

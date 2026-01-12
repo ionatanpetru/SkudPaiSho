@@ -434,6 +434,31 @@ export function defineGinsengTilesV2() {
 						],
 						targetTypes: [TrifleTargetType.triggerTargetTiles],
 						targetTeams: [TrifleTileTeam.friendly]
+					}, 
+					gameOptionEnabled(BISON_GRANTS_FLYING) && {
+						type: Trifle.AbilityName.manipulateExistingMovement,
+						manipulateMovementType: Trifle.MovementType.standard,
+						newMovementAbilities: [
+							{
+								type: Trifle.MovementAbility.jumpOver
+							}
+						],
+						triggers: [
+							{
+								triggerType: Trifle.AbilityTriggerType.whileTargetTileIsSurrounding,
+								targetTeams: [Trifle.TileTeam.friendly],
+								activationRequirements: [
+									{
+										type: Trifle.ActivationRequirement.tileIsOnPointOfType,
+										targetTileTypes: [Trifle.TileCategory.thisTile],
+										targetPointTypes: [RED]
+									}
+								]
+							}
+						],
+						targetTypes: [Trifle.TargetType.triggerTargetTiles],
+						targetTeams: [Trifle.TileTeam.friendly],
+						excludeTileCodes: [Ginseng.TileCodes.Wheel]
 					}
 			],
 			textLines: [
@@ -610,7 +635,8 @@ export function defineGinsengTilesV2() {
 				triggers: [
 					{
 						triggerType: TrifleAbilityTriggerType.whileTargetTileIsInLineOfSight,
-						targetTeams: [TrifleTileTeam.friendly]
+						targetTeams: [TrifleTileTeam.friendly],
+						sightDistance: gameOptionEnabled(GINSENG_GINSENG_5) ? 5 : 99
 					}
 				],
 				targetTypes: [TrifleTargetType.triggerTargetTiles]
@@ -723,7 +749,7 @@ function applyCaptureAndAbilityActivationRequirementRulesV2(GinsengTiles) {
 			targetTypes: [TrifleTargetType.triggerTargetTiles],
 			inevitable: true
 		};
-		var protectFromAbilitiesWhileInTempleAbility = {
+		/* var protectFromAbilitiesWhileInTempleAbility = {
 			title: "Protect From Abilities While In Temple",
 			type: TrifleAbilityName.cancelAbilitiesTargetingTiles,
 			triggers: [
@@ -734,7 +760,7 @@ function applyCaptureAndAbilityActivationRequirementRulesV2(GinsengTiles) {
 			],
 			targetTypes: [TrifleTargetType.triggerTargetTiles],
 			targetAbilityTypes: [TrifleAbilityType.all]
-		};
+		}; */
 		/* var protectFromFriendlyPushAbilitiesWhileInTempleAbility = {
 			title: "Protect From Friendly Push Abilities While In Temple",
 			type: TrifleAbilityName.cancelAbilitiesTargetingTiles,
@@ -775,7 +801,7 @@ function applyCaptureAndAbilityActivationRequirementRulesV2(GinsengTiles) {
 			promptTargetTitle: "exchangedTile"
 		};
 		tileInfo.abilities.push(protectFromCaptureWhileInTempleAbility);
-		tileInfo.abilities.push(protectFromAbilitiesWhileInTempleAbility);
+		//tileInfo.abilities.push(protectFromAbilitiesWhileInTempleAbility);	// Removing 6/5/24 per Gyatso
 		// tileInfo.abilities.push(protectFromFriendlyPushAbilitiesWhileInTempleAbility);
 		if (key !== GinsengTileCodes.WhiteLotus) {
 			tileInfo.abilities.push(exchangeForCapturedTileIntempleAbility);

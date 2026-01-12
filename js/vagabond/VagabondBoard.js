@@ -635,25 +635,26 @@ export class VagabondBoard {
 				return false;
 			}
 
-			var closeFireLilyPoints = [];
-			for (var i = 0; i < fireLilyPoints.length; i++) {
-				var fp = fireLilyPoints[i];
-				var dist = Math.abs(fp.row - boardPointStart.row) + Math.abs(fp.col - boardPointStart.col);
-				if (dist <= 5) {
-					closeFireLilyPoints.push(fp);
-				}
+		var closeFireLilyPoints = [];
+		for (var i = 0; i < fireLilyPoints.length; i++) {
+			var fp = fireLilyPoints[i];
+			var dist = Math.abs(fp.row - boardPointStart.row) + Math.abs(fp.col - boardPointStart.col);
+			if (dist <= 5 || (gameOptionEnabled(V_DOUBLE_MOVE_DISTANCE) && dist <= 10)) {
+				closeFireLilyPoints.push(fp);
 			}
-
-			for (var i = 0; i < closeFireLilyPoints.length; i++) {
-				var fireLilyPoint = closeFireLilyPoints[i];
-				if (Math.abs(fireLilyPoint.row - boardPointEnd.row) + Math.abs(fireLilyPoint.col - boardPointEnd.col) <= 5) {
-					// Point inside Fire Lily range
-					return true;
-				}
-			}
-			// If we haven't returned true, we need to return false here
-			return false;
 		}
+
+		for (var i = 0; i < closeFireLilyPoints.length; i++) {
+			var fireLilyPoint = closeFireLilyPoints[i];
+			var dist =  Math.abs(fireLilyPoint.row - boardPointEnd.row) + Math.abs(fireLilyPoint.col - boardPointEnd.col);
+			if (dist <= 5 || (gameOptionEnabled(V_DOUBLE_MOVE_DISTANCE) && dist <= 10)) {
+				// Point inside Fire Lily range
+				return true;
+			}
+		}
+		// If we haven't returned true, we need to return false here
+		return false;
+	}
 
 		// Wheel
 		if (boardPointStart.tile.code === 'W') {

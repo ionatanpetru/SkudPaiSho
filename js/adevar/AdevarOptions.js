@@ -17,9 +17,10 @@ export function AdevarOptions() {
 		AdevarOptions.enableChristmasTiles();
 	}
 
+	/* Set default tile designs */
 	if (!localStorage.getItem(AdevarOptions.tileDesignTypeKey)
 		|| !AdevarOptions.tileDesignTypeValues[localStorage.getItem(AdevarOptions.tileDesignTypeKey)]) {
-		AdevarOptions.setTileDesignsPreference("classic", true);
+		AdevarOptions.setTileDesignsPreference("frumos", true);
 	}
 
 	AdevarOptions.viewAsGuest = false || AdevarOptions.viewAsGuest;
@@ -86,11 +87,11 @@ AdevarOptions.buildToggleViewAsGuestDiv = function() {
 };
 
 AdevarOptions.enableSpoopyTiles = function() {
-	AdevarOptions.tileDesignTypeValues['spoopy'] = "Adevar Spoopy";
+	AdevarOptions.tileDesignTypeValues['spoopy'] = "Spoopy";
 };
 
 AdevarOptions.enableChristmasTiles = function() {
-	AdevarOptions.tileDesignTypeValues['christmas'] = "Adevar Christmas";
+	AdevarOptions.tileDesignTypeValues['christmas'] = "Christmas";
 };
 
 AdevarOptions.commenceSpoopy = function() {

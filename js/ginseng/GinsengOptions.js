@@ -28,17 +28,16 @@ GinsengOptions.tileDesignTypeKey = "ginsengTileDesignTypeKey";
 
 GinsengOptions.tileDesignTypeValues = {
 	gaoling: "Gaoling",
+	taihua: "Taihua",
 	gaipan: "Gaipan",
-	omashu: "Omashu",
-	basingse: "Ba Sing Se",
-	zaofu: "Zaofu",
-	northern: "Agna Qel'a",
-	patola: "Patola Mountain Range",
-	hirokucanyon: "Hiroku Canyon",
-	spiritworld: "Spirit World",
 	shujing: "Shu Jing",
-	shujingpiandao: "Shu Jing Piandao",
+	hirokucanyon: "Hiroku Canyon",
+	zaofu: "Zaofu",
+	agnaqela: "Agna Qel'a",
+	westernairtemple: "Western Air Temple",
+	patola: "Patola Mountain Range",
 	xaibausgrove: "Xai Bau's Grove",
+	spiritworld: "Spirit World",
 	chuji: "Chu Ji Red",
 	custom: "Use Custom Designs"
 };

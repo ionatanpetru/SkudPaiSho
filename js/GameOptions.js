@@ -19,6 +19,7 @@ export var FULL_POINTS_SCORING = "FullPointsScoring";
 
 /* Vagabond */
 export var SWAP_BISON_WITH_LEMUR = "SwapBisonWithLemur";
+export var V_DOUBLE_MOVE_DISTANCE = "VDoubleMoveDistance";
 
 /* Blooms */
 export var FOUR_SIDED_BOARD = "BoardSize4";	// It's funny because the name is all wrong, but I always think of it in those words
@@ -92,6 +93,7 @@ legacyGameOptionsMap[ADEVAR_LITE] = "Lite - Beginner Game";
 export var gameOptionDescriptions = copyObject(legacyGameOptionsMap);
 gameOptionDescriptions[SPECTATORS_CAN_PLAY] = "Allow Spectators to make moves";
 gameOptionDescriptions[SWAP_BISON_WITH_LEMUR] = "Trifle Preview: Lemur instead of Bison";
+gameOptionDescriptions[V_DOUBLE_MOVE_DISTANCE] = "Double Movement Distance";
 
 /* Tumbleweed */
 export var HEXHEX_11 = "hexhex11";
@@ -198,6 +200,12 @@ gameOptionDescriptions[GINSENG_1_POINT_0] = "Ginseng 1.0";
 
 export var DIAGONAL_BISON_ABILITY_TESTING = "DiaBisonTesting";
 gameOptionDescriptions[DIAGONAL_BISON_ABILITY_TESTING] = "Bison gives Diagonal movement (testing)";
+
+var GINSENG_GINSENG_5 = "GinsengLimit5";
+gameOptionDescriptions[GINSENG_GINSENG_5] = "Ginseng protect up to 5 spaces";
+
+var BISON_GRANTS_FLYING = "BisonGrantsFlying";
+gameOptionDescriptions[BISON_GRANTS_FLYING] = "Bison grants flying movement";
 
 /* Key Pai Sho */
 export var NO_EFFECT_TILES = "NoEffectTiles";

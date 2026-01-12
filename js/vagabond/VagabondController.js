@@ -224,12 +224,16 @@ export class VagabondController {
 	getAdditionalMessage() {
 		var msg = "";
 
-		if (this.gameNotation.moves.length === 0) {
-			if (onlinePlayEnabled && gameId < 0 && userIsLoggedIn()) {
-				msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by making a move. <br />";
-			} else {
-				msg += "Sign in to enable online gameplay. Or, start playing a local game by making a move.";
-			}
+	if (this.gameNotation.moves.length === 0) {
+		if (onlinePlayEnabled && gameId < 0 && userIsLoggedIn()) {
+			msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by making a move. <br />";
+		} else {
+			msg += "Sign in to enable online gameplay. Or, start playing a local game by making a move.";
+		}
+
+		if (dateIsAprilFools()) {
+			msg += '<br /><br /><strong>Try the Double Movement Distance game option, it\'s more fun!<br /><img src="https://skudpaisho.com/images/aprilfools/irohwink.png" width=160px></strong>';
+		}
 
 			msg += getGameOptionsMessageHtml(GameType.VagabondPaiSho.gameOptions);
 		} else if (!this.theGame.hasEnded() && myTurn()) {

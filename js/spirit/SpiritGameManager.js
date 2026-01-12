@@ -101,7 +101,7 @@ SpiritGameManager.prototype.getWinner = function() {
 };
 
 SpiritGameManager.prototype.getWinReason = function() {
-	return " has more tiles remaining and won the game!";
+	return " achieved two immortal tiles and won the game!";
 };
 
 SpiritGameManager.prototype.getWinResultTypeCode = function() {

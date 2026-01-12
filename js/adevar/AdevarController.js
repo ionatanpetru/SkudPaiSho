@@ -510,7 +510,7 @@ AdevarController.prototype.buildHiddenTileObjectiveMessage = function(hiddenTile
 	this.showLilyHelp = false;
 	switch(hiddenTile.code) {
 		case AdevarTileCode.iris:
-			objective = "Have 2 Basic tiles in each Red Plot, and 3 Basic tiles in each White Plot";
+			objective = "Have 2 Basic tiles in each Red and White Plot";
 			break;
 		case AdevarTileCode.orientalLily:
 			objective = "Create one of the three Oriental Lily Garden formations with Basic tiles on your side of the board (see rules, or board highlights for Garden diagrams).";
@@ -526,7 +526,7 @@ AdevarController.prototype.buildHiddenTileObjectiveMessage = function(hiddenTile
 			objective = "Capture at least 2 of each of your opponent’s Basic tile types, and have at least 1 of each of your Basic tile types be captured";
 			break;
 		case AdevarTileCode.whiteRose:
-			objective = "Call a Gate completely in your opponent's starting Open Plot";
+			objective = "Call a Gate touching your opponent's Home Plot";
 			break;
 		case AdevarTileCode.whiteLotus:
 			objective = "Form a \"Harmony Ring\" similar to Skud Pai Sho using Basic tiles (Lilac - Zinnia - Foxglove order for Harmony Circle)";

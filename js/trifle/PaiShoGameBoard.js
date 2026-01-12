@@ -663,10 +663,15 @@ PaiShoGameBoard.prototype.getAdjacentDiagonalPointsPotentialPossibleMoves = func
 };
 
 PaiShoGameBoard.prototype.calculateSlopeBetweenPoints = function(p1, p2) {
-	var rise = p2.row - p1.row;
-	var run = p2.col - p1.col;
-	var slope = run === 0 ? 0 : rise / run;
-	return slope;
+    var rise = p2.row - p1.row;
+    var run = p2.col - p1.col;
+    if (run === 0) {
+        if (rise === 0) {
+            return 0; // same point
+        }
+        return (rise > 0) ? Infinity : -Infinity; // vertical line
+    }
+    return rise / run;
 };
 
 PaiShoGameBoard.prototype.getNextPointsForTravelShapeMovement = function(movementInfo, moveStepNumber, originPoint, pointAlongTheWay, currentMovementPath, mustPreserveDirection) {
@@ -1021,12 +1026,15 @@ PaiShoGameBoard.prototype.getPointsNextToTilesInLineOfSight = function(movementI
 	return jumpPoints;
 };
 
-PaiShoGameBoard.prototype.getPointsForTilesInLineOfSight = function(originPoint) {
+PaiShoGameBoard.prototype.getPointsForTilesInLineOfSight = function(originPoint, distance) {
 	var lineOfSightPoints = [];
+	if (!distance) {
+		distance = 99;
+	}
 	
 	/* Scan in all directions, if a tile found, add to list */
 	var tileFound = false;
-	for (var row = originPoint.row + 1; row <= paiShoBoardMaxRowOrCol && !tileFound; row++) {
+	for (var row = originPoint.row + 1; row <= paiShoBoardMaxRowOrCol && !tileFound && row <= originPoint.row + distance; row++) {
 		var checkPoint = this.cells[row][originPoint.col];
 		if (checkPoint.hasTile()) {
 			tileFound = true;
@@ -1035,7 +1043,7 @@ PaiShoGameBoard.prototype.getPointsForTilesInLineOfSight = function(originPoint)
 	}
 
 	tileFound = false;
-	for (var row = originPoint.row - 1; row >= 0 && !tileFound; row--) {
+	for (var row = originPoint.row - 1; row >= 0 && !tileFound && row >= originPoint.row - distance; row--) {
 		var checkPoint = this.cells[row][originPoint.col];
 		if (checkPoint.hasTile()) {
 			tileFound = true;
@@ -1044,7 +1052,7 @@ PaiShoGameBoard.prototype.getPointsForTilesInLineOfSight = function(originPoint)
 	}
 
 	tileFound = false;
-	for (var col = originPoint.col + 1; col <= paiShoBoardMaxRowOrCol && !tileFound; col++) {
+	for (var col = originPoint.col + 1; col <= paiShoBoardMaxRowOrCol && !tileFound && col <= originPoint.col + distance; col++) {
 		var checkPoint = this.cells[originPoint.row][col];
 		if (checkPoint.hasTile()) {
 			tileFound = true;
@@ -1053,7 +1061,7 @@ PaiShoGameBoard.prototype.getPointsForTilesInLineOfSight = function(originPoint)
 	}
 
 	tileFound = false;
-	for (var col = originPoint.col - 1; col >= 0 && !tileFound; col--) {
+	for (var col = originPoint.col - 1; col >= 0 && !tileFound && col >= originPoint.col - distance; col--) {
 		var checkPoint = this.cells[originPoint.row][col];
 		if (checkPoint.hasTile()) {
 			tileFound = true;
@@ -1703,6 +1711,25 @@ PaiShoGameBoard.prototype.getManipulatedMovementInfo = function(boardPointStart,
 				movementInfo.type = TrifleMovementType.orthAndDiag;
 			}
 		}
+		var newMovementAbilities = manipulateAbility.abilityInfo.newMovementAbilities;
+			if (newMovementAbilities && newMovementAbilities.length) {
+				// Does it target the movementInfo?
+				if (!manipulateAbility.abilityInfo.maniputlateMovementType
+					|| (manipulateAbility.abilityInfo.manipulateMovementType
+					&& manipulateAbility.abilityInfo.manipulateMovementType == movementInfo.type)) 
+				{
+					movementInfo.abilities = movementInfo.abilities || [];
+					newMovementAbilities.forEach(newMovementAbility => {
+						if (!movementInfo.abilities) {
+							movementInfo.abilities = [];
+						}
+						// If the ability is not already in the list, add it
+						if (!movementInfo.abilities.includes(newMovementAbility)) {
+							movementInfo.abilities.push(newMovementAbility);
+						}
+					});
+				}
+			}
 	});
 	return movementInfo;
 };

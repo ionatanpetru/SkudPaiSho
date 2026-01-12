@@ -9,12 +9,13 @@ export function TrifleWhileTargetTileIsInLineOfSightTriggerBrain(triggerContext)
 	this.thisTile = triggerContext.tile;
 	this.thisTileInfo = triggerContext.tileInfo;
 	this.thisTilePoint = triggerContext.pointWithTile;
+	this.sightDistance = triggerContext.currentTrigger.sightDistance;
 }
 
 TrifleWhileTargetTileIsInLineOfSightTriggerBrain.prototype.isTriggerMet = function() {
 	this.targetTiles = [];
 
-	var sightTilePoints = this.board.getPointsForTilesInLineOfSight(this.thisTilePoint);
+	var sightTilePoints = this.board.getPointsForTilesInLineOfSight(this.thisTilePoint, this.sightDistance);
 
 	var self = this;
 

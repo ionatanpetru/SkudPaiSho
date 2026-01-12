@@ -779,7 +779,18 @@ AdevarBoard.prototype.playerHasGateInOpponentNeutralPlot = function(player) {
 	var targetPlot = player === HOST ? AdevarBoardPointType.NORTH_NEUTRAL_PLOT : AdevarBoardPointType.SOUTH_NEUTRAL_PLOT;
 	this.forEachBoardPointWithTile(function(boardPoint) {
 		if (boardPoint.tile.type === AdevarTileType.gate && boardPoint.tile.ownerName === player
-				&& boardPoint.isType(targetPlot) && boardPoint.plotTypes.length === 1) {
+			&& boardPoint.isType(targetPlot) && boardPoint.plotTypes.length === 1) {
+			hasGateInOpponentNeutralPlot = true;
+		}
+	});
+	return hasGateInOpponentNeutralPlot;
+};
+
+AdevarBoard.prototype.playerHasGateTouchingOpponentNeutralPlot = function(player) {
+	var hasGateInOpponentNeutralPlot = false;
+	var targetPlot = player === HOST ? AdevarBoardPointType.NORTH_NEUTRAL_PLOT : AdevarBoardPointType.SOUTH_NEUTRAL_PLOT;
+	this.forEachBoardPointWithTile(function(boardPoint) {
+		if (boardPoint.tile.type === AdevarTileType.gate && boardPoint.tile.ownerName === player && boardPoint.isType(targetPlot)) {
 			hasGateInOpponentNeutralPlot = true;
 		}
 	});
@@ -1124,7 +1135,21 @@ AdevarBoard.prototype.playerHasFullRedAndWhitePlots = function(player) {
 	return this.basicTilePlotCounts[AdevarBoardPointType.NORTH_RED_PLOT][player] === 2
 		&& this.basicTilePlotCounts[AdevarBoardPointType.SOUTH_RED_PLOT][player] === 2
 		&& this.basicTilePlotCounts[AdevarBoardPointType.EAST_WHITE_PLOT][player] === 3
-		&& this.basicTilePlotCounts[AdevarBoardPointType.WEST_WHITE_PLOT][player] === 3
+		&& this.basicTilePlotCounts[AdevarBoardPointType.WEST_WHITE_PLOT][player] === 3;
+};
+
+AdevarBoard.prototype.playerHasFullRedAndOneWhitePlots = function(player) {
+	return this.basicTilePlotCounts[AdevarBoardPointType.NORTH_RED_PLOT][player] === 2
+		&& this.basicTilePlotCounts[AdevarBoardPointType.SOUTH_RED_PLOT][player] === 2
+		&& (this.basicTilePlotCounts[AdevarBoardPointType.EAST_WHITE_PLOT][player] === 3
+		|| this.basicTilePlotCounts[AdevarBoardPointType.WEST_WHITE_PLOT][player] === 3);
+};
+
+AdevarBoard.prototype.playerHasAtLeastTwoTilesInEachRedAndWhitePlot = function(player) {
+	return this.basicTilePlotCounts[AdevarBoardPointType.NORTH_RED_PLOT][player] >= 2
+		&& this.basicTilePlotCounts[AdevarBoardPointType.SOUTH_RED_PLOT][player] >= 2
+		&& this.basicTilePlotCounts[AdevarBoardPointType.EAST_WHITE_PLOT][player] >= 2
+		&& this.basicTilePlotCounts[AdevarBoardPointType.WEST_WHITE_PLOT][player] >= 2;
 };
 
 AdevarBoard.prototype.playerHasMoreBasicTilesInEachNonOwnedPlot = function(player) {
