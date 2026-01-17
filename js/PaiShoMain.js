@@ -71,7 +71,10 @@ import {
 	GODAI_BOARD_ZONES,
 	GODAI_EMPTY_TILE,
 	gameOptionEnabled,
-	getGameOptionDescription
+	getGameOptionDescription,
+	V_DOUBLE_MOVE_DISTANCE,
+	GINSENG_GINSENG_5,
+	BISON_GRANTS_FLYING
 } from './GameOptions';
 import { AdevarController } from "./adevar/AdevarController";
 import { AdevarOptions } from './adevar/AdevarOptions';
@@ -118,6 +121,7 @@ import {
 	copyObject,
 	copyTextToClipboard,
 	customBoardUrl,
+	dateIsAprilFools,
 	dateIsBetween,
 	debug,
 	debugOn,
@@ -129,6 +133,7 @@ import {
 	setCustomBoardUrl
 } from './GameData';
 import { buildLoginModalContentElement } from './ui/LoginModal';
+import NickController from './nick/NickController';
 
 
 export var QueryString = function() {
@@ -3093,7 +3098,6 @@ export var GameType = {
 		coverImg: "hexagon.png",
 		// // rulesUrl: "https://www.nickbentley.games/blooms-rules/",
 		rulesUrl: "https://boardgamegeek.com/boardgame/249095/blooms",
-		rulesUrl: "https://boardgamegeek.com/boardgame/249095/blooms",
 		gameOptions: [
 			SHORTER_GAME,
 			FOUR_SIDED_BOARD,
@@ -3198,7 +3202,7 @@ export function getGameControllerForGameType(gameTypeId) {
 			controller = new StreetController(gameContainerDiv, isMobile);
 			break;
 		case GameType.Nick.id:
-			controller = new Nick.Controller(gameContainerDiv, isMobile);
+			controller = new NickController(gameContainerDiv, isMobile);
 			break;
 		case GameType.CoopSolitaire.id:
 			controller = new CoopSolitaireController(gameContainerDiv, isMobile);

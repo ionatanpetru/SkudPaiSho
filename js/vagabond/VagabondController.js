@@ -52,7 +52,7 @@ import {
 import { VagabondMctsGame, VagabondNotationBgIoGame } from './VagabondNotationBgIoGame';
 import { VagabondRandomAIv1 } from './ai/VagabondRandomAIv1';
 import { VagabondTile, VagabondTileCodes } from './VagabondTile';
-import { debug } from "../GameData";
+import { dateIsAprilFools, debug } from "../GameData";
 import { MCTS } from '../ai/MCTS';
 
 export var VagabondConstants = {

@@ -5,6 +5,7 @@ import {
   BASIC_FLOWER,
   SPECIAL_FLOWER,
   boatOnlyMoves,
+  dateIsAprilFools,
   debug,
   limitedGatesRule,
   lotusNoCapture,
@@ -225,7 +226,9 @@ SkudPaiShoController.prototype.getAdditionalMessage = function() {
 
         if (!playingOnlineGame()) {
 			if (dateIsAprilFools()) {
-				msg += '<br /><br /><strong>Try the Diagonal Movement and Everything Captures Everything game options, it\'s more fun!<br /><img src="https://skudpaisho.com/images/aprilfools/irohwink.png" width=160px></strong>';
+				var aprilFoolsDiv = document.createElement("div");
+				aprilFoolsDiv.innerHTML = '<br /><br /><strong>Try the Diagonal Movement and Everything Captures Everything game options, it\'s more fun!<br /><img src="https://skudpaisho.com/images/aprilfools/irohwink.png" width="160px"></strong>';
+				msgElement.appendChild(aprilFoolsDiv);
 			}
             msgElement.appendChild(getGameOptionsMessageElement(GameType.SkudPaiSho.gameOptions));
         }

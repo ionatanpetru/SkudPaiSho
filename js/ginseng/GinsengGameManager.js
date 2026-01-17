@@ -26,6 +26,7 @@ import {
   getPlayerCodeFromName,
 } from '../pai-sho-common/PaiShoPlayerHelp';
 import { setGameLogText } from '../PaiShoMain';
+import { PaiShoGameBoard } from '../trifle/PaiShoGameBoard';
 
 export var GinsengGameManager = function(actuator, ignoreActuate, isCopy) {
 	this.gameLogText = '';
@@ -47,7 +48,7 @@ GinsengGameManager.prototype.updateActuator = function(newActuator) {
 
 // Set up the game
 GinsengGameManager.prototype.setup = function (ignoreActuate) {
-	this.board = new PaiShoGames.Board(this.tileManager, this.buildAbilityActivationOrder());
+	this.board = new PaiShoGameBoard(this.tileManager, this.buildAbilityActivationOrder());
 	this.board.useBannerCaptureSystem = false;
 	this.winners = [];
 	this.hostBannerPlayed = false;

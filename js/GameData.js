@@ -399,7 +399,7 @@ export function dateIsBetween(date1MMSlashDDSlashYYYY, date2MMSlashDDSlashYYYY) 
 	return currentDate >= dateRangeBegin && currentDate <= dateRangeEnd;
 }
 
-function dateIsAprilFools() {
+export function dateIsAprilFools() {
   var date = new Date();
   return date.getMonth() === 3 && date.getDate() === 1;
 }

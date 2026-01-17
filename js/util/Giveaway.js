@@ -1,3 +1,5 @@
+import { debug, peekRandomFromArray, shuffleArray } from "../GameData";
+import { GameClock } from "./GameClock";
 
 export function Giveaway() {}
 

@@ -1,6 +1,8 @@
 /* Ginseng 2.0 Tiles */
 import {
+	BISON_GRANTS_FLYING,
   DIAGONAL_BISON_ABILITY_TESTING,
+  GINSENG_GINSENG_5,
   SWAP_BISON_AND_DRAGON_ABILITIES,
   gameOptionEnabled,
 } from '../GameOptions';
@@ -16,6 +18,7 @@ import {
   TrifleAbilityType,
   TrifleActivationRequirement,
   TrifleCaptureType,
+  TrifleMovementAbility,
   TrifleMovementDirection,
   TrifleMovementRestriction,
   TrifleMovementType,
@@ -436,29 +439,29 @@ export function defineGinsengTilesV2() {
 						targetTeams: [TrifleTileTeam.friendly]
 					}, 
 					gameOptionEnabled(BISON_GRANTS_FLYING) && {
-						type: Trifle.AbilityName.manipulateExistingMovement,
-						manipulateMovementType: Trifle.MovementType.standard,
+						type: TrifleAbilityName.manipulateExistingMovement,
+						manipulateMovementType: TrifleMovementType.standard,
 						newMovementAbilities: [
 							{
-								type: Trifle.MovementAbility.jumpOver
+								type: TrifleMovementAbility.jumpOver
 							}
 						],
 						triggers: [
 							{
-								triggerType: Trifle.AbilityTriggerType.whileTargetTileIsSurrounding,
-								targetTeams: [Trifle.TileTeam.friendly],
+								triggerType: TrifleAbilityTriggerType.whileTargetTileIsSurrounding,
+								targetTeams: [TrifleTileTeam.friendly],
 								activationRequirements: [
 									{
-										type: Trifle.ActivationRequirement.tileIsOnPointOfType,
-										targetTileTypes: [Trifle.TileCategory.thisTile],
+										type: TrifleActivationRequirement.tileIsOnPointOfType,
+										targetTileTypes: [TrifleTileCategory.thisTile],
 										targetPointTypes: [RED]
 									}
 								]
 							}
 						],
-						targetTypes: [Trifle.TargetType.triggerTargetTiles],
-						targetTeams: [Trifle.TileTeam.friendly],
-						excludeTileCodes: [Ginseng.TileCodes.Wheel]
+						targetTypes: [TrifleTargetType.triggerTargetTiles],
+						targetTeams: [TrifleTileTeam.friendly],
+						excludeTileCodes: [GinsengTileCodes.Wheel]
 					}
 			],
 			textLines: [

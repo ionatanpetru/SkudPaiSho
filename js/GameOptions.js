@@ -201,10 +201,10 @@ gameOptionDescriptions[GINSENG_1_POINT_0] = "Ginseng 1.0";
 export var DIAGONAL_BISON_ABILITY_TESTING = "DiaBisonTesting";
 gameOptionDescriptions[DIAGONAL_BISON_ABILITY_TESTING] = "Bison gives Diagonal movement (testing)";
 
-var GINSENG_GINSENG_5 = "GinsengLimit5";
+export var GINSENG_GINSENG_5 = "GinsengLimit5";
 gameOptionDescriptions[GINSENG_GINSENG_5] = "Ginseng protect up to 5 spaces";
 
-var BISON_GRANTS_FLYING = "BisonGrantsFlying";
+export var BISON_GRANTS_FLYING = "BisonGrantsFlying";
 gameOptionDescriptions[BISON_GRANTS_FLYING] = "Bison grants flying movement";
 
 /* Key Pai Sho */
