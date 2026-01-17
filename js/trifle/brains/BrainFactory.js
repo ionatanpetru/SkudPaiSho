@@ -4,6 +4,37 @@ import {
   TrifleTargetType,
 } from '../TrifleTileInfo';
 import { debug } from '../../GameData';
+import { TrifleWhileInsideTempleTriggerBrain } from './triggerBrains/WhileInsideTempleTriggerBrain';
+import { TrifleWhileOutsideTempleTriggerBrain } from './triggerBrains/WhileOutsideTempleTriggerBrain';
+import { TrifleWhileTargetTileIsOnBoardTriggerBrain } from './triggerBrains/WhileTargetTileIsOnBoardTriggerBrain';
+import { TrifleWhileTargetTileIsAdjacentTriggerBrain } from './triggerBrains/WhileTargetTileIsAdjacentTriggerBrain';
+import { TrifleWhileTargetTileIsSurroundingTriggerBrain } from './triggerBrains/WhileTargetTileIsSurroundingTriggerBrain';
+import { TrifleWhileTargetTileIsInZoneTriggerBrain } from './triggerBrains/WhileTargetTileIsInZoneTriggerBrain';
+import { TrifleWhileTargetTileIsInLineOfSightTriggerBrain } from './triggerBrains/WhileTargetTileIsInLineOfSightTriggerBrain';
+import { TrifleWhenTargetTileLandsInZoneTriggerBrain } from './triggerBrains/WhenTargetTileLandsInZoneTriggerBrain';
+import { TrifleWhenTargetTileMovesFromWithinZoneTriggerBrain } from './triggerBrains/WhenTargetTileMovesFromWithinZoneTriggerBrain';
+import { TrifleWhenCapturedByTargetTileTriggerBrain } from './triggerBrains/WhenCapturedByTargetTileTriggerBrain';
+import { TrifleWhenCapturingTargetTileTriggerBrain } from './triggerBrains/WhenCapturingTargetTileTriggerBrain';
+import { TrifleWhenLandsAdjacentToTargetTileTriggerBrain } from './triggerBrains/WhenLandsAdjacentToTargetTileTriggerBrain';
+import { TrifleWhenLandsSurroundingTargetTileTriggerBrain } from './triggerBrains/WhenLandsSurroundingTargetTileTriggerBrain';
+import { TrifleWhenTargetTileLandsAdjacentTriggerBrain } from './triggerBrains/WhenTargetTileLandsAdjacentTriggerBrain';
+import { TrifleWhenTargetTileLandsSurroundingTriggerBrain } from './triggerBrains/WhenTargetTileLandsSurroundingTriggerBrain';
+import { TrifleWhenDeployedTriggerBrain } from './triggerBrains/WhenDeployedTriggerBrain';
+import { TrifleWhenActiveMovementTriggerBrain } from './triggerBrains/WhenActiveMovementTriggerBrain';
+import { TrifleWhenTargetTileLandsInTempleTriggerBrain } from './triggerBrains/WhenTargetTileLandsInTempleTriggerBrain';
+import { TrifleTriggerTargetTilesTargetBrain } from './targetBrains/TriggerTargetTilesTargetBrain';
+import { TrifleAllTilesTargetBrain } from './targetBrains/AllTilesTargetBrain';
+import { TrifleSurroundingTilesTargetBrain } from './targetBrains/SurroundingTilesTargetBrain';
+import { TrifleThisTileTargetBrain } from './targetBrains/ThisTileTargetBrain';
+import { TrifleChosenCapturedTileTargetBrain } from './targetBrains/ChosenCapturedTileTargetBrain';
+import { TrifleCaptureTargetTilesAbilityBrain } from './abilityBrains/CaptureTargetTilesAbilityBrain';
+import { TrifleGrowGiganticAbilityBrain } from './abilityBrains/GrowGiganticAbilityBrain';
+import { TrifleRecordTilePointAbilityBrain } from './abilityBrains/RecordTilePointAbilityBrain';
+import { TrifleMoveTileToRecordedPointAbilityBrain } from './abilityBrains/MoveTileToRecordedPointAbilityBrain';
+import { TrifleMoveTargetTileAbilityBrain } from './abilityBrains/MoveTargetTileAbilityBrain';
+import { TrifleMoveTargetTileToPileAbilityBrain } from './abilityBrains/MoveTargetTileToPileAbilityBrain';
+import { TrifleExchangeWithCapturedTileAbilityBrain } from './abilityBrains/ExchangeWithCapturedTileAbilityBrain';
+import { TrifleSimpleOngoingAbilityBrain } from './abilityBrains/SimpleOngoingAbilityBrain';
 
 export function TrifleBrainFactory() {
 

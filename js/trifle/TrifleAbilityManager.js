@@ -5,6 +5,7 @@ import {
   TrifleTileTeam
 } from './TrifleTileInfo';
 import { debug } from '../GameData';
+import { TrifleBrainFactory } from './brains/BrainFactory';
 
 export function TrifleAbilityManager(board, customAbilityActivationOrder) {
 	this.board = board;

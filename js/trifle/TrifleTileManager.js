@@ -1,205 +1,215 @@
 // Tile Manager
 
-var STANDARD = "Standard";
-var RESTRICTED_BY_OPPONENT_TILE_ZONE = "Restricted by opponent tile zone";
+import { GUEST, HOST } from '../CommonNotationObjects';
+import { debug } from '../GameData';
+import { TrifleTile } from './TrifleTile';
+import { TrifleTiles } from './TrifleTileInfo';
+import { TrifleTileType } from './TrifleTiles';
 
-TrifleTileManager = function() {
-	this.hostTeam = [];
-	this.guestTeam = [];
-	this.hostTiles = [];
-	this.guestTiles = [];
-}
+const STANDARD = "Standard";
+const RESTRICTED_BY_OPPONENT_TILE_ZONE = "Restricted by opponent tile zone";
 
-TrifleTileManager.prototype.grabTile = function(player, tileCode) {
-	var tilePile = this.hostTiles;
-	if (player === GUEST) {
-		tilePile = this.guestTiles;
+export class TrifleTileManager {
+	constructor() {
+		this.hostTeam = [];
+		this.guestTeam = [];
+		this.hostTiles = [];
+		this.guestTiles = [];
 	}
 
-	var tile;
-	for (var i = 0; i < tilePile.length; i++) {
-		if (tilePile[i].code === tileCode) {
-			newTileArr = tilePile.splice(i, 1);
-			tile = newTileArr[0];
-			break;
-		}
-	}
-
-	if (!tile) {
-		debug("NONE OF THAT TILE FOUND");
-	}
-
-	return tile;
-};
-
-TrifleTileManager.prototype.peekTile = function(player, tileCode, tileId) {
-	var tilePile = this.hostTiles;
-	if (player === GUEST) {
-		tilePile = this.guestTiles;
-	}
-
-	var tile;
-	if (tileId) {
-		for (var i = 0; i < tilePile.length; i++) {
-			if (tilePile[i].id === tileId) {
-				return tilePile[i];
-			}
-		}
-	}
-
-	for (var i = 0; i < tilePile.length; i++) {
-		if (tilePile[i].code === tileCode) {
-			tile = tilePile[i];
-			break;
-		}
-	}
-
-	if (!tile) {
-		debug("NONE OF THAT TILE FOUND");
-	}
-
-	return tile;
-};
-
-TrifleTileManager.prototype.removeSelectedTileFlags = function() {
-	this.hostTiles.forEach(function(tile) {
-		tile.selectedFromPile = false;
-	});
-	this.guestTiles.forEach(function(tile) {
-		tile.selectedFromPile = false;
-	});
-};
-
-TrifleTileManager.prototype.unselectTiles = function(player) {
-	var tilePile = this.getPlayerTilePile(player);
-
-	tilePile.forEach(function(tile) {
-		tile.selectedFromPile = false;
-	});
-}
-
-TrifleTileManager.prototype.putTileBack = function(tile) {
-	var player = tile.ownerName;
-	var tilePile = this.getPlayerTilePile(player);
-
-	tilePile.push(tile);
-};
-
-TrifleTileManager.prototype.getTeamSize = function() {
-	return 11;
-};
-
-TrifleTileManager.prototype.hostTeamIsFull = function() {
-	return this.playerTeamIsFull(HOST);
-};
-
-TrifleTileManager.prototype.guestTeamIsFull = function() {
-	return this.playerTeamIsFull(GUEST);
-};
-
-TrifleTileManager.prototype.playerTeamIsFull = function(player) {
-	return this.getPlayerTeam(player).length >= this.getTeamSize();
-};
-
-TrifleTileManager.prototype.playersAreSelectingTeams = function() {
-	return !this.hostTeamIsFull() || !this.guestTeamIsFull();
-};
-
-TrifleTileManager.prototype.playerTeamHasBanner = function(player) {
-	var team = this.getPlayerTeam(player);
-	for (var i = 0; i < team.length; i++) {
-		var tileInfo = TrifleTrifleTiles[team[i].code];
-		if (tileInfo && this.tileInfoIsBanner(tileInfo)) {
-			return true;
-		}
-	}
-	return false;
-};
-
-TrifleTileManager.prototype.tileInfoIsBanner = function(tileInfo) {
-	return tileInfo && tileInfo.types.includes(TrifleTileType.banner);
-};
-
-TrifleTileManager.prototype.addToTeamIfOk = function(tile) {
-	var addOk = false;
-	var player = tile.ownerName;
-	if (!this.playerTeamIsFull(player)) {
-		/* Team isn't full, that's the first check! */
-		addOk = true;	// So far!
-
-		var tileInfo = TrifleTrifleTiles[tile.code];
-		/* If tile is Banner, it's ok if we don't have one */
-		if (this.tileInfoIsBanner(tileInfo)) {
-			addOk = addOk && !this.playerTeamHasBanner(player);
-		} else {
-			/* If tile is not banner, we just need to make sure we have room on the team for one or have one already */
-			addOk = addOk && (this.playerTeamHasBanner(player)
-					|| this.getPlayerTeam(player).length < this.getTeamSize() - 1);
+	grabTile(player, tileCode) {
+		let tilePile = this.hostTiles;
+		if (player === GUEST) {
+			tilePile = this.guestTiles;
 		}
 
-		var howManyAlreadyInTeam = this.countOfThisTileInTeam(tile.code, tile.ownerName);
-		addOk = addOk && howManyAlreadyInTeam < TrifleTile.getTeamLimitForTile(tile.code);
-
-		if (addOk) {
-			this.getPlayerTeam(tile.ownerName).push(tile);
-			this.getPlayerTilePile(tile.ownerName).push(tile);
-		}
-	}
-
-	return addOk;
-};
-
-TrifleTileManager.prototype.removeTileFromTeam = function(tile) {
-	if (this.countOfThisTileInTeam(tile.code, tile.ownerName) > 0) {
-		var playerTeam = this.getPlayerTeam(tile.ownerName);
-
-		for (var i = 0; i < playerTeam.length; i++) {
-			if (playerTeam[i].code === tile.code) {
-				playerTeam.splice(i, 1);
+		let tile;
+		for (let i = 0; i < tilePile.length; i++) {
+			if (tilePile[i].code === tileCode) {
+				const newTileArr = tilePile.splice(i, 1);
+				tile = newTileArr[0];
 				break;
 			}
 		}
 
-		this.grabTile(tile.ownerName, tile.code);
+		if (!tile) {
+			debug("NONE OF THAT TILE FOUND");
+		}
+
+		return tile;
 	}
-};
 
-TrifleTileManager.prototype.countOfThisTileInTeam = function(tileCode, ownerName) {
-	var count = 0;
-	var ownerTeam = this.getPlayerTeam(ownerName);
+	peekTile(player, tileCode, tileId) {
+		let tilePile = this.hostTiles;
+		if (player === GUEST) {
+			tilePile = this.guestTiles;
+		}
 
-	for (var i = 0; i < ownerTeam.length; i++) {
-		if (ownerTeam[i].code === tileCode) {
-			count++;
+		let tile;
+		if (tileId) {
+			for (let i = 0; i < tilePile.length; i++) {
+				if (tilePile[i].id === tileId) {
+					return tilePile[i];
+				}
+			}
+		}
+
+		for (let i = 0; i < tilePile.length; i++) {
+			if (tilePile[i].code === tileCode) {
+				tile = tilePile[i];
+				break;
+			}
+		}
+
+		if (!tile) {
+			debug("NONE OF THAT TILE FOUND");
+		}
+
+		return tile;
+	}
+
+	removeSelectedTileFlags() {
+		this.hostTiles.forEach(tile => {
+			tile.selectedFromPile = false;
+		});
+		this.guestTiles.forEach(tile => {
+			tile.selectedFromPile = false;
+		});
+	}
+
+	unselectTiles(player) {
+		const tilePile = this.getPlayerTilePile(player);
+
+		tilePile.forEach(tile => {
+			tile.selectedFromPile = false;
+		});
+	}
+
+	putTileBack(tile) {
+		const player = tile.ownerName;
+		const tilePile = this.getPlayerTilePile(player);
+
+		tilePile.push(tile);
+	}
+
+	getTeamSize() {
+		return 11;
+	}
+
+	hostTeamIsFull() {
+		return this.playerTeamIsFull(HOST);
+	}
+
+	guestTeamIsFull() {
+		return this.playerTeamIsFull(GUEST);
+	}
+
+	playerTeamIsFull(player) {
+		return this.getPlayerTeam(player).length >= this.getTeamSize();
+	}
+
+	playersAreSelectingTeams() {
+		return !this.hostTeamIsFull() || !this.guestTeamIsFull();
+	}
+
+	playerTeamHasBanner(player) {
+		const team = this.getPlayerTeam(player);
+		for (let i = 0; i < team.length; i++) {
+			const tileInfo = TrifleTiles[team[i].code];
+			if (tileInfo && this.tileInfoIsBanner(tileInfo)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	tileInfoIsBanner(tileInfo) {
+		return tileInfo && tileInfo.types.includes(TrifleTileType.banner);
+	}
+
+	addToTeamIfOk(tile) {
+		let addOk = false;
+		const player = tile.ownerName;
+		if (!this.playerTeamIsFull(player)) {
+			/* Team isn't full, that's the first check! */
+			addOk = true;	// So far!
+
+			const tileInfo = TrifleTiles[tile.code];
+			/* If tile is Banner, it's ok if we don't have one */
+			if (this.tileInfoIsBanner(tileInfo)) {
+				addOk = addOk && !this.playerTeamHasBanner(player);
+			} else {
+				/* If tile is not banner, we just need to make sure we have room on the team for one or have one already */
+				addOk = addOk && (this.playerTeamHasBanner(player)
+						|| this.getPlayerTeam(player).length < this.getTeamSize() - 1);
+			}
+
+			const howManyAlreadyInTeam = this.countOfThisTileInTeam(tile.code, tile.ownerName);
+			addOk = addOk && howManyAlreadyInTeam < TrifleTile.getTeamLimitForTile(tile.code);
+
+			if (addOk) {
+				this.getPlayerTeam(tile.ownerName).push(tile);
+				this.getPlayerTilePile(tile.ownerName).push(tile);
+			}
+		}
+
+		return addOk;
+	}
+
+	removeTileFromTeam(tile) {
+		if (this.countOfThisTileInTeam(tile.code, tile.ownerName) > 0) {
+			const playerTeam = this.getPlayerTeam(tile.ownerName);
+
+			for (let i = 0; i < playerTeam.length; i++) {
+				if (playerTeam[i].code === tile.code) {
+					playerTeam.splice(i, 1);
+					break;
+				}
+			}
+
+			this.grabTile(tile.ownerName, tile.code);
 		}
 	}
-	return count;
-};
 
-TrifleTileManager.prototype.getPlayerTeam = function(player) {
-	var playerTeam = this.hostTeam;
-	if (player === GUEST) {
-		playerTeam = this.guestTeam;
+	countOfThisTileInTeam(tileCode, ownerName) {
+		let count = 0;
+		const ownerTeam = this.getPlayerTeam(ownerName);
+
+		for (let i = 0; i < ownerTeam.length; i++) {
+			if (ownerTeam[i].code === tileCode) {
+				count++;
+			}
+		}
+		return count;
 	}
-	return playerTeam;
-};
 
-TrifleTileManager.prototype.getPlayerTilePile = function(player) {
-	var tilePile = this.hostTiles;
-	if (player === GUEST) {
-		tilePile = this.guestTiles;
+	getPlayerTeam(player) {
+		let playerTeam = this.hostTeam;
+		if (player === GUEST) {
+			playerTeam = this.guestTeam;
+		}
+		return playerTeam;
 	}
-	return tilePile;
-};
 
-TrifleTileManager.prototype.getAllTiles = function() {
-	return this.hostTeam.concat(this.guestTeam);
-};
+	getPlayerTilePile(player) {
+		let tilePile = this.hostTiles;
+		if (player === GUEST) {
+			tilePile = this.guestTiles;
+		}
+		return tilePile;
+	}
 
-TrifleTileManager.prototype.getCopy = function() {
-	var copy = new TrifleTileManager();
+	getAllTiles() {
+		return this.hostTeam.concat(this.guestTeam);
+	}
 
-	// copy this.hostTiles and this.guestTiles
-	
-	return copy;
-};
+	getCopy() {
+		const copy = new TrifleTileManager();
+
+		// copy this.hostTiles and this.guestTiles
+		
+		return copy;
+	}
+}
+
+export default TrifleTileManager;

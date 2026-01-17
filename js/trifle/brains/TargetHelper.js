@@ -87,7 +87,7 @@ TrifleTargetHelper.prototype.targetTileNamesCheck = function() {
 	}
 };
 
-Trifle.TargetHelper.prototype.targetTileIsNotExcludedCheck = function() {
+TrifleTargetHelper.prototype.targetTileIsNotExcludedCheck = function() {
 	if (this.abilityInfo.excludeTileCodes) {
 		var excluded = this.abilityInfo.excludeTileCodes.includes(this.possibleTargetTile.code);
 		if (excluded) {

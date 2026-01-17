@@ -31,6 +31,7 @@ import {
   guestPlayerCode,
   hostPlayerCode,
 } from '../pai-sho-common/PaiShoPlayerHelp';
+import { currentTileMetadata } from './PaiShoGamesTileMetadata';
 
 export function TrifleActuator(gameContainer, isMobile) {
 	this.gameContainer = gameContainer;
@@ -112,7 +113,7 @@ TrifleActuator.prototype.htmlify = function(board, tileManager, markingManager) 
 		this.addLineBreakInTilePile(HOST);
 		this.addLineBreakInTilePile(HOST);
 		Object.keys(TrifleTileCodes).forEach(function(key,index) {
-			if (PaiShoGames.currentTileMetadata[key] && PaiShoGames.currentTileMetadata[key].available) {
+			if (currentTileMetadata[key] && currentTileMetadata[key].available) {
 				self.addTeamTile(new TrifleTile(TrifleTileCodes[key], hostPlayerCode), HOST, true);
 			}
 		});
@@ -120,7 +121,7 @@ TrifleActuator.prototype.htmlify = function(board, tileManager, markingManager) 
 		this.addLineBreakInTilePile(GUEST);
 		this.addLineBreakInTilePile(GUEST);
 		Object.keys(TrifleTileCodes).forEach(function(key,index) {
-			if (PaiShoGames.currentTileMetadata[key] && PaiShoGames.currentTileMetadata[key].available) {
+			if (currentTileMetadata[key] && currentTileMetadata[key].available) {
 				self.addTeamTile(new TrifleTile(TrifleTileCodes[key], guestPlayerCode), GUEST, true);
 			}
 		});

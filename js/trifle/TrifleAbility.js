@@ -1,5 +1,7 @@
 import { TrifleAbilityManager } from './TrifleAbilityManager';
 import { arrayIntersection, debug } from '../GameData';
+import { TrifleBrainFactory } from './brains/BrainFactory';
+import { TrifleTile } from './TrifleTile';
 
 export function TrifleAbility(abilityContext) {
 	this.board = abilityContext.board;

@@ -1,47 +1,49 @@
 /* Trifle specific UI interaction logic */
 
 import {
-  BRAND_NEW,
-  GameType,
-  READY_FOR_BONUS,
-  WAITING_FOR_ENDPOINT,
-  callSubmitMove,
-  createGameIfThatIsOk,
-  currentMoveIndex,
-  finalizeMove,
-  gameId,
-  getCurrentPlayer,
-  getGameOptionsMessageHtml,
-  isInReplay,
-  myTurn,
-  onlinePlayEnabled,
-  playingOnlineGame,
-  refreshMessage,
-  rerunAll,
-  userIsLoggedIn,
-} from '../PaiShoMain';
-import {
-  DEPLOY,
-  DRAW_ACCEPT,
-  GUEST,
-  HOST,
-  MOVE,
-  NotationPoint,
-  TEAM_SELECTION,
+	DEPLOY,
+	DRAW_ACCEPT,
+	GUEST,
+	HOST,
+	MOVE,
+	NotationPoint,
+	TEAM_SELECTION,
 } from '../CommonNotationObjects';
-import {
-  OldTrifleGameNotation,
-  OldTrifleNotationBuilder,
-} from './OldTrifleGameNotation';
-import { POSSIBLE_MOVE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
-import { TrifleActuator } from './TrifleActuator';
-import { TrifleTileCodes, defineTrifleTiles } from './TrifleTiles';
-import { TrifleTileInfo, TrifleTiles } from './TrifleTileInfo';
 import { debug } from '../GameData';
 import {
-  setCurrentTileCodes,
-  setCurrentTileMetadata
+	BRAND_NEW,
+	GameType,
+	READY_FOR_BONUS,
+	WAITING_FOR_ENDPOINT,
+	callSubmitMove,
+	createGameIfThatIsOk,
+	currentMoveIndex,
+	finalizeMove,
+	gameId,
+	getCurrentPlayer,
+	getGameOptionsMessageHtml,
+	isInReplay,
+	myTurn,
+	onlinePlayEnabled,
+	playingOnlineGame,
+	refreshMessage,
+	rerunAll,
+	userIsLoggedIn,
+} from '../PaiShoMain';
+import { POSSIBLE_MOVE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import {
+	OldTrifleGameNotation,
+	OldTrifleNotationBuilder,
+} from './OldTrifleGameNotation';
+import {
+	setCurrentTileCodes,
+	setCurrentTileMetadata
 } from './PaiShoGamesTileMetadata';
+import { TrifleActuator } from './TrifleActuator';
+import { TrifleGameManager } from './TrifleGameManager';
+import { TrifleTile } from './TrifleTile';
+import { TrifleTileInfo, TrifleTiles } from './TrifleTileInfo';
+import { TrifleTileCodes, defineTrifleTiles } from './TrifleTiles';
 
 export function TrifleController(gameContainer, isMobile) {
 	this.actuator = new TrifleActuator(gameContainer, isMobile);

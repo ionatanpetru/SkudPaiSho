@@ -2,6 +2,7 @@
 
 import { GUEST, HOST } from '../CommonNotationObjects';
 import { debug } from '../GameData';
+import { currentTileCodes, currentTileMetadata, currentTileNames } from './PaiShoGamesTileMetadata';
 
 export var TrifleTileId = 1;
 
@@ -19,7 +20,7 @@ export var TrifleTile = function(code, ownerCode) {
 	this.selectedFromPile = false;
 }
 
-TrifleTile.prototype.resetTrifleTileId = function() {
+TrifleTile.resetTrifleTileId = function() {
 	TrifleTileId = 1;
 };
 
@@ -67,11 +68,11 @@ TrifleTile.prototype.getCopy = function() {
 TrifleTile.getTileName = function(tileCode) {
 	var name = "";
 
-	if (PaiShoGames.currentTileNames && PaiShoGames.currentTileNames[tileCode]) {
-		name = PaiShoGames.currentTileNames[tileCode];
+	if (currentTileNames && currentTileNames[tileCode]) {
+		name = currentTileNames[tileCode];
 	} else {
-		Object.keys(PaiShoGames.currentTileCodes).forEach(function(key, index) {
-			if (PaiShoGames.currentTileCodes[key] === tileCode) {
+		Object.keys(currentTileCodes).forEach(function(key, index) {
+			if (currentTileCodes[key] === tileCode) {
 				name = key;
 			}
 		});
@@ -92,7 +93,7 @@ TrifleTile.prototype.getOwnerCodeIdObjectString = function() {
 };
 
 TrifleTile.getTeamLimitForTile = function(tileCode) {
-	var tileData = PaiShoGames.currentTileMetadata[tileCode];
+	var tileData = currentTileMetadata[tileCode];
 	if (tileData) {
 		if (tileData.teamLimit) {
 			return tileData.teamLimit;
