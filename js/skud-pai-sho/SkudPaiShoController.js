@@ -199,11 +199,11 @@ SkudPaiShoController.prototype.getDefaultHelpMessageText = function() {
 };
 
 SkudPaiShoController.prototype.getAdditionalMessage = function() {
-    var msgElement = document.createElement("div");
+    const msgElement = document.createElement("div");
 
     if (this.gameNotation.moves.length === 0) {
         if (onlinePlayEnabled && gameId < 0 && userIsLoggedIn()) {
-            var onlineText = document.createElement("span");
+            const onlineText = document.createElement("span");
             if (gameOptionEnabled(OPTION_ALL_ACCENT_TILES)) {
                 onlineText.textContent = "Click Join Game above to join another player's game. Or, you can start a game that other players can join by selecting ALL of your Accent Tiles.";
             } else if (gameOptionEnabled(OPTION_DOUBLE_ACCENT_TILES)) {
@@ -213,7 +213,7 @@ SkudPaiShoController.prototype.getAdditionalMessage = function() {
             }
             msgElement.appendChild(onlineText);
         } else {
-            var startText = document.createElement("span");
+            const startText = document.createElement("span");
             if (gameOptionEnabled(OPTION_ALL_ACCENT_TILES)) {
                 startText.textContent = "Select ALL Accent Tiles to begin the game.";
             } else if (gameOptionEnabled(OPTION_DOUBLE_ACCENT_TILES)) {
@@ -226,14 +226,26 @@ SkudPaiShoController.prototype.getAdditionalMessage = function() {
 
         if (!playingOnlineGame()) {
 			if (dateIsAprilFools()) {
-				var aprilFoolsDiv = document.createElement("div");
-				aprilFoolsDiv.innerHTML = '<br /><br /><strong>Try the Diagonal Movement and Everything Captures Everything game options, it\'s more fun!<br /><img src="https://skudpaisho.com/images/aprilfools/irohwink.png" width="160px"></strong>';
+				const aprilFoolsDiv = document.createElement("div");
+				const brBefore = document.createElement("br");
+				const brAfter = document.createElement("br");
+				const aprilText = document.createElement("strong");
+				aprilText.textContent = "Try the Diagonal Movement and Everything Captures Everything game options, it's more fun!";
+				const brInMiddle = document.createElement("br");
+				const img = document.createElement("img");
+				img.src = "https://skudpaisho.com/images/aprilfools/irohwink.png";
+				img.width = 160;
+				aprilFoolsDiv.appendChild(brBefore);
+				aprilFoolsDiv.appendChild(brAfter);
+				aprilFoolsDiv.appendChild(aprilText);
+				aprilFoolsDiv.appendChild(brInMiddle);
+				aprilFoolsDiv.appendChild(img);
 				msgElement.appendChild(aprilFoolsDiv);
 			}
             msgElement.appendChild(getGameOptionsMessageElement(GameType.SkudPaiSho.gameOptions));
         }
     } else if (this.gameNotation.moves.length === 1) {
-        var move1Text = document.createElement("span");
+        const move1Text = document.createElement("span");
         if (gameOptionEnabled(OPTION_ALL_ACCENT_TILES)) {
             move1Text.textContent = "Select ALL Accent Tiles to play with, then Plant a Basic Flower Tile.";
         } else if (gameOptionEnabled(OPTION_DOUBLE_ACCENT_TILES)) {
@@ -243,21 +255,21 @@ SkudPaiShoController.prototype.getAdditionalMessage = function() {
         }
         msgElement.appendChild(move1Text);
     } else if (this.gameNotation.moves.length === 2) {
-        var move2Text = document.createElement("span");
+        const move2Text = document.createElement("span");
         move2Text.textContent = "Plant a Basic Flower Tile.";
         msgElement.appendChild(move2Text);
     } else if (!gameOptionEnabled(OPTION_INFORMAL_START) && this.gameNotation.moves.length === 4) {
-        var move4Text = document.createElement("span");
+        const move4Text = document.createElement("span");
         move4Text.textContent = "Now, make the first move of the game.";
         msgElement.appendChild(move4Text);
     } else if (this.gameNotation.moves.length > 2
             && (gameOptionEnabled(DIAGONAL_MOVEMENT) || gameOptionEnabled(EVERYTHING_CAPTURE))) {
-        var aprilFoolsText = document.createElement("em");
+        const aprilFoolsText = document.createElement("em");
         aprilFoolsText.textContent = "April Fools! I hope you get some entertainment out of the Diagonal Movement and Everything Captures Everything game options today :)\u00A0";
         msgElement.appendChild(aprilFoolsText);
     }
 
-    return msgElement.innerHTML;
+    return msgElement;
 };
 
 

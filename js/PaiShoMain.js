@@ -1443,28 +1443,41 @@ export function pauseRun() {
 }
 
 export function getAdditionalMessage() {
-	var msg = "";
+	const container = document.createElement("div");
 
 	// Is it the player's turn?
 	// TODO Could maybe get rid of this
 	if (myTurn() && !userIsLoggedIn()) {
-		msg = " (You) " + msg;
+		const youSpan = document.createElement("span");
+		youSpan.textContent = " (You) ";
+		container.appendChild(youSpan);
 	}
 
-	msg += gameController.getAdditionalMessage();
+	const additionalMsg = gameController.getAdditionalMessage();
+	if (additionalMsg) {
+		if (typeof additionalMsg === 'string') {
+			const msgSpan = document.createElement("span");
+			msgSpan.innerHTML = additionalMsg;
+			container.appendChild(msgSpan);
+		} else {
+			container.appendChild(additionalMsg);
+		}
+	}
 
 	if (getGameWinner()) {
 		// There is a winner!
-		msg += " <strong>" + getGameWinner() + getGameWinReason() + "</strong>";
+		container.appendChild(document.createElement("br"));
+		const winnerSpan = document.createElement("strong");
+		winnerSpan.textContent = getGameWinner() + getGameWinReason();
+		container.appendChild(winnerSpan);
 	} else if (gameController.gameHasEndedInDraw && gameController.gameHasEndedInDraw()) {
-		msg += "Game has ended in a draw.";
+		container.appendChild(document.createElement("br"));
+		const drawSpan = document.createElement("span");
+		drawSpan.textContent = "Game has ended in a draw.";
+		container.appendChild(drawSpan);
 	}
 
-	if (msg === "<br />") {
-		msg = "";
-	}
-
-	return msg;
+	return container;
 }
 
 export function getGameMessageElement() {
@@ -1487,24 +1500,22 @@ export function getGameMessageElement() {
 }
 
 export function refreshMessage() {
-	var messageElement = getGameMessageElement();
+	const messageElement = getGameMessageElement();
 	// Clear the message element
 	while (messageElement.firstChild) {
 		messageElement.removeChild(messageElement.firstChild);
 	}
 
 	if (!playingOnlineGame()) {
-		var playerText = document.createElement("span");
+		const playerText = document.createElement("span");
 		playerText.textContent = "Current Player: " + getCurrentPlayer();
 		messageElement.appendChild(playerText);
 		messageElement.appendChild(document.createElement("br"));
 	}
 
-	var additionalMsg = getAdditionalMessage();
+	const additionalMsg = getAdditionalMessage();
 	if (additionalMsg) {
-		var msgSpan = document.createElement("span");
-		msgSpan.innerHTML = additionalMsg;
-		messageElement.appendChild(msgSpan);
+		messageElement.appendChild(additionalMsg);
 	}
 
 	if (gameController && gameController.getAdditionalMessageElement) {
@@ -1775,27 +1786,32 @@ export function linkShortenCallback(shortUrl, ignoreNoEmail, okToUpdateWinInfo) 
             messageText.appendChild(document.createTextNode("Current Player: " + getCurrentPlayer()));
             messageText.appendChild(document.createElement("br"));
         }
-        messageText.appendChild(document.createTextNode(gameController.getAdditionalMessage()));
-        messageText.appendChild(getResetMoveElement());
-    }
+		const additionalMsgElem = gameController.getAdditionalMessage();
+		if (typeof additionalMsgElem === 'string') {
+			messageText.appendChild(document.createTextNode(additionalMsgElem));
+		} else if (additionalMsgElem) {
+			messageText.appendChild(additionalMsgElem);
+		}
+		messageText.appendChild(getResetMoveElement());
+	}
 
-    var gameMessageElement = getGameMessageElement();
-    while (gameMessageElement.firstChild) {
-        gameMessageElement.removeChild(gameMessageElement.firstChild);
-    }
-    gameMessageElement.appendChild(messageText);
+	const gameMessageElement = getGameMessageElement();
+	while (gameMessageElement.firstChild) {
+		gameMessageElement.removeChild(gameMessageElement.firstChild);
+	}
+	gameMessageElement.appendChild(messageText);
 
-    if (gameController && gameController.getAdditionalMessageElement) {
-        getGameMessageElement().appendChild(document.createElement("br"));
-        getGameMessageElement().appendChild(gameController.getAdditionalMessageElement());
-        getGameMessageElement().appendChild(document.createElement("br"));
-    }
+	if (gameController && gameController.getAdditionalMessageElement) {
+		getGameMessageElement().appendChild(document.createElement("br"));
+		getGameMessageElement().appendChild(gameController.getAdditionalMessageElement());
+		getGameMessageElement().appendChild(document.createElement("br"));
+	}
 
-    // QUICK!
-    if ((activeAi && getCurrentPlayer() === activeAi.player) || (activeAi2 && getCurrentPlayer() === activeAi2.player)) {
-        // setTimeout(function() { playAiTurn(); }, 100);	// Didn't work?
-        playAiTurn();
-    }
+	// QUICK!
+	if ((activeAi && getCurrentPlayer() === activeAi.player) || (activeAi2 && getCurrentPlayer() === activeAi2.player)) {
+		// setTimeout(function() { playAiTurn(); }, 100);	// Didn't work?
+		playAiTurn();
+	}
 }
 
 export function haveBothEmails() {
@@ -5033,9 +5049,6 @@ export function addGameOption(option) {
 	setGameController(gameController.getGameTypeId(), true);
 }
 
-// REMOVE THIS THIS IS ONLY FOR DEBUG
-window.addGameOption = addGameOption
-
 export function getGameOptionsMessageHtml(options) {
 	var msg = "<br /><br />";
 
@@ -5061,7 +5074,7 @@ export function getGameOptionsMessageHtml(options) {
 }
 
 export function getGameOptionsMessageElement(options) {
-	// Create the main container div
+	// Create the main container
     var container = document.createElement('span');
     container.style.marginTop = '20px';
 

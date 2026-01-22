@@ -263,12 +263,6 @@ export class NickActuator {
 
 			if (boardPoint.isType(POSSIBLE_MOVE)) {
 				theDiv.classList.add("possibleMove");
-				if (board.currentlyDeployingTileInfo && board.currentlyDeployingTileInfo.attributes
-								&& board.currentlyDeployingTileInfo.attributes.includes(TrifleAttributeType.gigantic)) {
-					// Gigantic!
-					this.adjustBoardPointForGiganticDeploy(theDiv, boardPoint);
-				}
-
 				theDiv.style.zIndex = 95;
 			}
 			
