@@ -1,8 +1,49 @@
 /* Cooperative Solitaire Pai Sho specific UI interaction logic */
 
 import {
+  ACCENT_TILE,
+  debug,
+} from '../GameData';
+import {
+  newKnotweedRules,
+  rocksUnwheelable,
   simpleRocks,
+  simplest,
 } from '../skud-pai-sho/SkudPaiShoRules';
+import {
+  BRAND_NEW,
+  GameType,
+  WAITING_FOR_ENDPOINT,
+  callSubmitMove,
+  createGameIfThatIsOk,
+  currentMoveIndex,
+  finalizeMove,
+  getCurrentPlayer,
+  getGameOptionsMessageElement,
+  getNeutralPointMessage,
+  getRedPointMessage,
+  getRedWhitePointMessage,
+  getWhitePointMessage,
+  myTurn,
+  onlinePlayEnabled,
+  playingOnlineGame,
+  toBullets,
+  toHeading,
+} from '../PaiShoMain';
+import {
+  GATE,
+  NEUTRAL,
+  POSSIBLE_MOVE,
+} from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import { GUEST, HOST, NotationPoint, PLANTING } from '../CommonNotationObjects';
+import { RED, WHITE } from '../skud-pai-sho/SkudPaiShoTile';
+import { SolitaireTile } from '../solitaire/SolitaireTile';
+import { CoopSolitaireActuator } from './CoopSolitaireActuator';
+import { CoopSolitaireGameManager } from './CoopSolitaireGameManager';
+import {
+  CoopSolitaireGameNotation,
+  CoopSolitaireNotationBuilder,
+} from './CoopSolitaireGameNotation';
 
 export function CoopSolitaireController(gameContainer, isMobile) {
 	this.actuator = new CoopSolitaireActuator(gameContainer, isMobile);
@@ -282,7 +323,7 @@ CoopSolitaireController.prototype.addTileSummaryToMessageArr = function(message,
 		message.push("Forms Disharmony with " + clashTile + " and the Orchid");
 	} else {
 		if (tileCode === 'R') {
-			heading = "Accent Tile: Rock";
+			var heading = "Accent Tile: Rock";
 			if (simplest) {
 				message.push("The Rock disrupts Harmonies and cannot be moved by a Wheel.");
 			} else if (rocksUnwheelable) {
@@ -312,8 +353,6 @@ CoopSolitaireController.prototype.addTileSummaryToMessageArr = function(message,
 			heading = "Accent Tile: Boat";
 			if (simplest || rocksUnwheelable) {
 				message.push("The Boat moves a Flower Tile to a surrounding space or removes an Accent tile.");
-			} else if (rocksUnwheelable) {
-				message.push("The Boat moves a Flower Tile to a surrounding space or removes a Rock or Knotweed tile.");
 			} else {
 				message.push("The Boat moves a Flower Tile to a surrounding space or removes a Knotweed tile.");
 			}
