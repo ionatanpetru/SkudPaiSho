@@ -14,7 +14,8 @@ import {
 	currentGameData,
 	ggOptions,
 	getGameTypeEntryFromId,
-	getLoadingModalText
+	showModalElem,
+	getLoadingModalElement,
 } from './PaiShoMain';
 import { debug } from './GameData';
 
@@ -96,7 +97,7 @@ const showTournamentsCallback = (results) => {
 };
 
 export function viewTournamentsClicked() {
-	showModal("Tournaments and Events", getLoadingModalText());
+	showModalElem("Tournaments and Events", getLoadingModalElement());
 	onlinePlayEngine.getCurrentTournaments(getLoginToken(), showTournamentsCallback);
 }
 
@@ -116,7 +117,7 @@ const submitTournamentSignupCallback = (results) => {
 };
 
 export function submitTournamentSignup(tournamentId) {
-	showModal("Tournament Signup", getLoadingModalText());
+	showModalElem("Tournament Signup", getLoadingModalElement());
 	signingUpForTournamentId = tournamentId;
 	onlinePlayEngine.submitTournamentSignup(getLoginToken(), tournamentId, submitTournamentSignupCallback);
 }
@@ -250,7 +251,7 @@ const showTournamentInfoCallback = (results) => {
 };
 
 export function viewTournamentInfo(tournamentId) {
-	showModal("Tournament Details", getLoadingModalText());
+	showModalElem("Tournament Details", getLoadingModalElement());
 	onlinePlayEngine.getTournamentInfo(tournamentId, showTournamentInfoCallback);
 }
 
@@ -470,7 +471,7 @@ const showManageTournamentCallback = (results) => {
 };
 
 export function manageTournamentClicked(tournamentId) {
-	showModal("Manage Tournament", getLoadingModalText());
+	showModalElem("Manage Tournament", getLoadingModalElement());
 	tournamentToManage = tournamentId;
 	onlinePlayEngine.getManageTournamentInfo(getLoginToken(), tournamentId, showManageTournamentCallback);
 }
@@ -510,6 +511,6 @@ const showManageTournamentsCallback = (results) => {
 };
 
 export function manageTournamentsClicked() {
-	showModal("Manage Tournaments", getLoadingModalText());
+	showModalElem("Manage Tournaments", getLoadingModalElement());
 	onlinePlayEngine.getManageTournamentsInfo(getLoginToken(), showManageTournamentsCallback);
 }

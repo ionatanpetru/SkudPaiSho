@@ -384,6 +384,7 @@ assets/fontawesome/
 node_modules
 .parcel-cache
 dist
+parcel-update
 images/Adevar/frumos_z
 trifle/
 assets/fontawesome

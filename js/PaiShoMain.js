@@ -168,6 +168,7 @@ import {
 } from './GameData';
 import { buildLoginModalContentElement } from './ui/LoginModal';
 import NickController from './nick/NickController';
+import { viewGameRankingsClicked } from './PaiShoMain';
 
 
 export const QueryString = (() => {
@@ -444,13 +445,40 @@ export let codeToVerify = 0;
 export let tempUserId;
 export let myGamesList = [];
 export let gameSeekList = [];
-// User status icon functions (Phase 1: returning HTML strings, future: convert to DOM elements)
+// User status icon functions
 export function getUserOnlineIcon() {
 	return "<span title='Online' style='color:#35ac19;'><i class='fa-regular fa-circle-user' aria-hidden='true'></i></span>";
 }
 
 export function getUserOfflineIcon() {
 	return "<span title='Offline' style='color:gray;'><i class='fa-regular fa-circle-user' aria-hidden='true'></i></span>";
+}
+
+// DOM element versions of icon functions
+function createUserOnlineIconElement() {
+	const span = document.createElement('span');
+	span.title = 'Online';
+	span.style.color = '#35ac19';
+
+	const icon = document.createElement('i');
+	icon.className = 'fa-regular fa-circle-user';
+	icon.setAttribute('aria-hidden', 'true');
+
+	span.appendChild(icon);
+	return span;
+}
+
+function createUserOfflineIconElement() {
+	const span = document.createElement('span');
+	span.title = 'Offline';
+	span.style.color = 'gray';
+
+	const icon = document.createElement('i');
+	icon.className = 'fa-regular fa-circle-user';
+	icon.setAttribute('aria-hidden', 'true');
+
+	span.appendChild(icon);
+	return span;
 }
 export let logOnlineStatusIntervalValue;
 export let userTurnCountInterval;
@@ -2603,9 +2631,9 @@ export let confirmMoveToSubmit = null;
 let lockedInNotationTextForUrlData = null;
 
 export function showCallSubmitMoveModal() {
-	showModal(
+	showModalElem(
 		"Submitting Move",
-		getLoadingModalText(),
+		getLoadingModalElement(),
 		true,
 		null,
 		true
@@ -3665,115 +3693,284 @@ export function showAllCompletedGames() {
 	}
 }
 
-const showMyGamesCallback = (results) => {
-	let message = "No active games.";
-	if (results) {
-		message = "";
+// Helper functions for building My Games list DOM elements
+function createGameRowStotesTheme(myGame, even) {
+	const gId = parseInt(myGame.gameId);
+	const tr = document.createElement('tr');
+	tr.className = myGame.isUserTurn ? 'highlighted-game' : (even ? 'even' : 'odd');
+	tr.onclick = () => {
+		jumpToGame(gId);
+		closeModal();
+	};
 
+	// Game Mode column
+	const tdGameMode = document.createElement('td');
+	tdGameMode.className = 'first';
+	tdGameMode.style.color = getGameColor(myGame.gameTypeDesc);
+	tdGameMode.textContent = myGame.gameTypeDesc;
+	tr.appendChild(tdGameMode);
+
+	// Host column
+	const tdHost = document.createElement('td');
+	tdHost.className = 'name';
+	if (myGame.hostOnline) {
+		tdHost.appendChild(createUserOnlineIconElement());
+	} else {
+		tdHost.appendChild(createUserOfflineIconElement());
+	}
+	tdHost.appendChild(document.createTextNode(myGame.hostUsername));
+	tr.appendChild(tdHost);
+
+	// VS column
+	const tdVs = document.createElement('td');
+	tdVs.textContent = 'vs.';
+	tr.appendChild(tdVs);
+
+	// Guest column
+	const tdGuest = document.createElement('td');
+	tdGuest.className = 'name';
+	if (myGame.guestOnline) {
+		tdGuest.appendChild(createUserOnlineIconElement());
+	} else {
+		tdGuest.appendChild(createUserOfflineIconElement());
+	}
+	tdGuest.appendChild(document.createTextNode(myGame.guestUsername));
+	tr.appendChild(tdGuest);
+
+	// Turn column
+	const tdTurn = document.createElement('td');
+	tdTurn.textContent = myGame.isUserTurn ? 'Yours' : 'Theirs';
+	tr.appendChild(tdTurn);
+
+	return tr;
+}
+
+function createGameOptionRowStotesTheme(myGame, even) {
+	const gId = parseInt(myGame.gameId);
+	const gameOptions = [];
+
+	for (let i = 0; i < myGame.gameOptions.length; i++) {
+		const tr = document.createElement('tr');
+		tr.className = even ? 'even' : 'odd';
+		tr.onclick = () => {
+			jumpToGame(gId);
+			closeModal();
+		};
+
+		const tdFirst = document.createElement('td');
+		tdFirst.className = 'first';
+		const em = document.createElement('em');
+		em.textContent = '-Game Option';
+		tdFirst.appendChild(em);
+		tr.appendChild(tdFirst);
+
+		const tdOption = document.createElement('td');
+		tdOption.colSpan = 5;
+		tdOption.textContent = getGameOptionDescription(myGame.gameOptions[i]);
+		tr.appendChild(tdOption);
+
+		gameOptions.push(tr);
+	}
+
+	return gameOptions;
+}
+
+function createGameEntryDefaultTheme(myGame) {
+	const container = document.createElement('div');
+	const gId = parseInt(myGame.gameId);
+	const userIsHost = usernameEquals(myGame.hostUsername);
+	const userIsGuest = usernameEquals(myGame.guestUsername);
+
+	// Create clickable game title
+	const gameDiv = document.createElement('div');
+	gameDiv.className = 'clickableText';
+	gameDiv.onclick = () => {
+		jumpToGame(gId);
+		closeModal();
+	};
+
+	// Build game display title
+	if (!userIsHost) {
+		if (myGame.hostOnline) {
+			gameDiv.appendChild(createUserOnlineIconElement());
+		} else {
+			gameDiv.appendChild(createUserOfflineIconElement());
+		}
+	}
+	gameDiv.appendChild(document.createTextNode(myGame.hostUsername));
+	gameDiv.appendChild(document.createTextNode(' vs. '));
+
+	if (!userIsGuest) {
+		if (myGame.guestOnline) {
+			gameDiv.appendChild(createUserOnlineIconElement());
+		} else {
+			gameDiv.appendChild(createUserOfflineIconElement());
+		}
+	}
+	gameDiv.appendChild(document.createTextNode(myGame.guestUsername));
+
+	if (myGame.isUserTurn) {
+		gameDiv.appendChild(document.createTextNode(' (Your turn)'));
+	}
+
+	container.appendChild(gameDiv);
+
+	// Add game options
+	for (let i = 0; i < myGame.gameOptions.length; i++) {
+		const optionDiv = document.createElement('div');
+		optionDiv.innerHTML = '&nbsp;&bull;&nbsp;';
+		const em = document.createElement('em');
+		em.textContent = 'Game Option: ' + getGameOptionDescription(myGame.gameOptions[i]);
+		optionDiv.appendChild(em);
+		container.appendChild(optionDiv);
+	}
+
+	return container;
+}
+
+function createClickableDiv(text, onclickFn) {
+	const div = document.createElement('div');
+	div.className = 'clickableText';
+	div.textContent = text;
+	div.onclick = onclickFn;
+	return div;
+}
+
+function createSpanWithClick(text, onclickFn) {
+	const span = document.createElement('span');
+	span.className = 'skipBonus';
+	span.textContent = text;
+	span.onclick = onclickFn;
+	return span;
+}
+
+const showMyGamesCallback = (results) => {
+	const container = document.createElement('div');
+
+	if (!results) {
+		container.textContent = 'No active games.';
+	} else {
 		populateMyGamesList(results);
+
 		if (localStorage.getItem("data-theme") == "stotes") {
-			message += "<table><tr class='tr-header'><td class='first'>Game Mode</td><td>Host</td><td></td><td>Guest</td><td>Turn</td></tr>";
+			// Build table for stotes theme
+			const table = document.createElement('table');
+
+			// Header row
+			const headerRow = document.createElement('tr');
+			headerRow.className = 'tr-header';
+			['Game Mode', 'Host', '', 'Guest', 'Turn'].forEach((text, index) => {
+				const th = document.createElement('td');
+				if (index === 0) th.className = 'first';
+				th.textContent = text;
+				headerRow.appendChild(th);
+			});
+			table.appendChild(headerRow);
+
+			// Game rows
 			let even = true;
 			for (const index in myGamesList) {
 				const myGame = myGamesList[index];
 
-				const gId = parseInt(myGame.gameId);
+				// Main game row
+				table.appendChild(createGameRowStotesTheme(myGame, even));
 
-				message += "<tr onclick='jumpToGame(" + gId + "); closeModal();' class='" + ((myGame.isUserTurn) ? ("highlighted-game") : ((even) ? ("even") : ("odd"))) + " '>";
-				message += "<td class='first' style='color:" + getGameColor(myGame.gameTypeDesc) + ";'>" + myGame.gameTypeDesc + "</td>";
+				// Game option rows
+				const optionRows = createGameOptionRowStotesTheme(myGame, even);
+				optionRows.forEach(row => table.appendChild(row));
 
-				let icon = "";
-				if (myGame.hostOnline) {
-					icon = getUserOnlineIcon();
-				} else {
-					icon = getUserOfflineIcon();
-				}
-				message += "<td class='name'>" + icon + myGame.hostUsername + "</td>";
-				message += "<td>vs.</td>";
-
-				icon = "";
-				if (myGame.guestOnline) {
-					icon = getUserOnlineIcon();
-				} else {
-					icon = getUserOfflineIcon();
-				}
-				message += "<td class='name'>" + icon + myGame.guestUsername + "</td>";
-				if (myGame.isUserTurn) {
-					message += "<td>Yours</td>";
-				} else {
-					message += "<td>Theirs</td>";
-				}
-				message += "</tr>";
-
-				for (let i = 0; i < myGame.gameOptions.length; i++) {
-					message += "<tr onclick='jumpToGame(" + gId + "); closeModal();' class='" + ((even) ? ("even") : ("odd")) + "'><td class='first'><em>-Game Option</em></td><td colspan='5'>" + getGameOptionDescription(myGame.gameOptions[i]) + "</em></td></tr>";
-				}
 				even = !even;
 			}
-			message += "<tr class='tr-footer'><td class='first'>Game Mode</td><td>Host</td><td></td><td>Guest</td><td></td></tr></table>";
+
+			// Footer row
+			const footerRow = document.createElement('tr');
+			footerRow.className = 'tr-footer';
+			['Game Mode', 'Host', '', 'Guest', ''].forEach((text, index) => {
+				const td = document.createElement('td');
+				if (index === 0) td.className = 'first';
+				td.textContent = text;
+				footerRow.appendChild(td);
+			});
+			table.appendChild(footerRow);
+
+			container.appendChild(table);
 		} else {
+			// Build divs for default theme
 			let gameTypeHeading = "";
 			for (const index in myGamesList) {
 				const myGame = myGamesList[index];
 
+				// Add game type heading if it changed
 				if (myGame.gameTypeDesc !== gameTypeHeading) {
 					if (gameTypeHeading !== "") {
-						message += "<br />";
+						container.appendChild(document.createElement('br'));
 					}
 					gameTypeHeading = myGame.gameTypeDesc;
-					message += "<div class='modalContentHeading'>" + gameTypeHeading + "</div>";
+					const headingDiv = document.createElement('div');
+					headingDiv.className = 'modalContentHeading';
+					headingDiv.textContent = gameTypeHeading;
+					container.appendChild(headingDiv);
 				}
 
-				const gId = parseInt(myGame.gameId);
-				const userIsHost = usernameEquals(myGame.hostUsername);
-				const userIsGuest = usernameEquals(myGame.guestUsername);
-
-				let gameDisplayTitle = "";
-
-				if (!userIsHost) {
-					if (myGame.hostOnline) {
-						gameDisplayTitle += getUserOnlineIcon();
-					} else {
-						gameDisplayTitle += getUserOfflineIcon();
-					}
-				}
-				gameDisplayTitle += myGame.hostUsername;
-				gameDisplayTitle += " vs. ";
-				if (!userIsGuest) {
-					if (myGame.guestOnline) {
-						gameDisplayTitle += getUserOnlineIcon();
-					} else {
-						gameDisplayTitle += getUserOfflineIcon();
-					}
-				}
-				gameDisplayTitle += myGame.guestUsername;
-				if (myGame.isUserTurn) {
-					gameDisplayTitle += " (Your turn)";
-				}
-
-				// message += "<div class='clickableText' onclick='jumpToGame(" + gId + "," + userIsHost + ",\"" + opponentUsername + "\"," + myGame.gameTypeId + ");'>" + gameDisplayTitle + "</div>";
-				message += "<div class='clickableText' onclick='jumpToGame(" + gId + "); closeModal();'>" + gameDisplayTitle + "</div>";
-				for (let i = 0; i < myGame.gameOptions.length; i++) {
-					message += "<div>&nbsp;&bull;&nbsp;<em>Game Option: " + getGameOptionDescription(myGame.gameOptions[i]) + "</em></div>";
-				}
+				// Add game entry
+				container.appendChild(createGameEntryDefaultTheme(myGame));
 			}
 		}
 	}
-	message += "<br /><br /><div class='clickableText' onclick='showPastGamesClicked();'>Show completed games</div>";
 
-	message += "<br /><hr /><div><span class='skipBonus' onclick='showGameStats();'>Completed Game Stats</span></div>";
-	message += "<br /><div><span class='skipBonus' onclick='viewGameRankingsClicked();'><i class='fa fa-tachometer' aria-hidden='true'></i> Game Rankings</span></div>";
-	message += "<br /><div><span class='skipBonus' onclick='showPreferences();'>Device Preferences</span></div><br />";
+	// Add footer links
+	container.appendChild(document.createElement('br'));
+	container.appendChild(document.createElement('br'));
+	container.appendChild(createClickableDiv('Show completed games', showPastGamesClicked));
 
-	message += "<br /><br /><div>You are currently signed in as " + getUsername() + ".</div>";
-	message += "<div><span class='skipBonus' onclick='showChangePasswordModal();'>Click here to update your password.</span></div>";
-	message += "<div><span class='skipBonus' onclick='showSignOutModal();'>Click here to sign out.</span></div>";
-	showModal("Active Games", message);
+	container.appendChild(document.createElement('br'));
+	const hr = document.createElement('hr');
+	container.appendChild(hr);
+
+	const statsDiv = document.createElement('div');
+	statsDiv.appendChild(createSpanWithClick('Completed Game Stats', showGameStats));
+	container.appendChild(statsDiv);
+
+	container.appendChild(document.createElement('br'));
+
+	const rankingsDiv = document.createElement('div');
+	const rankingsSpan = createSpanWithClick('Game Rankings', viewGameRankingsClicked);
+	const icon = document.createElement('i');
+	icon.className = 'fa fa-tachometer';
+	icon.setAttribute('aria-hidden', 'true');
+	rankingsSpan.insertBefore(icon, rankingsSpan.firstChild);
+	rankingsSpan.insertBefore(document.createTextNode(' '), icon.nextSibling);
+	rankingsDiv.appendChild(rankingsSpan);
+	container.appendChild(rankingsDiv);
+
+	container.appendChild(document.createElement('br'));
+
+	const prefsDiv = document.createElement('div');
+	prefsDiv.appendChild(createSpanWithClick('Device Preferences', showPreferences));
+	container.appendChild(prefsDiv);
+
+	container.appendChild(document.createElement('br'));
+	container.appendChild(document.createElement('br'));
+	container.appendChild(document.createElement('br'));
+
+	const signedInDiv = document.createElement('div');
+	signedInDiv.textContent = 'You are currently signed in as ' + getUsername() + '.';
+	container.appendChild(signedInDiv);
+
+	const passwordDiv = document.createElement('div');
+	passwordDiv.appendChild(createSpanWithClick('Click here to update your password.', showChangePasswordModal));
+	container.appendChild(passwordDiv);
+
+	const signOutDiv = document.createElement('div');
+	signOutDiv.appendChild(createSpanWithClick('Click here to sign out.', showSignOutModal));
+	container.appendChild(signOutDiv);
+
+	showModalElem("Active Games", container);
 };
 
 export function showMyGames() {
 	if (!onlinePlayPaused) {
-		showModal("Active Games", getLoadingModalText());
+		showModalElem("Active Games", getLoadingModalElement());
 		onlinePlayEngine.getCurrentGamesForUserNew(getLoginToken(), showMyGamesCallback);
 	} else {
 		showOnlinePlayPausedModal();
@@ -4098,7 +4295,7 @@ export function viewGameSeeksClicked() {
 		showCurrentlyOfflineModal();
 	} else if (onlinePlayEnabled && userIsLoggedIn()) {
 		if (!onlinePlayPaused) {
-			showModal("Join a game", getLoadingModalText());
+			showModalElem("Join a game", getLoadingModalElement());
 			onlinePlayEngine.getGameSeeks(getGameSeeksCallback);
 		} else {
 			showOnlinePlayPausedModal();
@@ -4148,7 +4345,7 @@ const yesCreatePrivateGame = (gameTypeId, rankedGame) => {
 };
 
 export function replaceWithLoadingText(element) {
-	element.innerHTML = getLoadingModalText();
+	element.innerHTML = getLoadingModalElement().innerHTML;
 }
 
 export function getCheckedValue(checkboxId) {
@@ -4993,7 +5190,7 @@ export function showBadMoveModal() {
 
 
 /* Utility function for loading modals */
-export function getLoadingModalText() {
+export function getLoadingModalElement() {
 	const span = document.createElement("span");
 	span.appendChild(document.createTextNode("Loading\u00A0"));
 	const icon = document.createElement("i");
