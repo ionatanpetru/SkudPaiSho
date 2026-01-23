@@ -222,39 +222,98 @@ export class VagabondController {
 		clearMessage();
 	}
 	getAdditionalMessage() {
-		var msg = "";
+		const container = document.createElement('div');
 
-	if (this.gameNotation.moves.length === 0) {
-		if (onlinePlayEnabled && gameId < 0 && userIsLoggedIn()) {
-			msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by making a move. <br />";
-		} else {
-			msg += "Sign in to enable online gameplay. Or, start playing a local game by making a move.";
-		}
+		if (this.gameNotation.moves.length === 0) {
+			if (onlinePlayEnabled && gameId < 0 && userIsLoggedIn()) {
+				const joinText = document.createElement('span');
+				joinText.appendChild(document.createTextNode('Click '));
+				const emJoin = document.createElement('em');
+				emJoin.textContent = 'Join Game';
+				joinText.appendChild(emJoin);
+				joinText.appendChild(document.createTextNode(' above to join another player\'s game. Or, you can start a game that other players can join by making a move.'));
+				container.appendChild(joinText);
+				container.appendChild(document.createElement('br'));
+			} else {
+				container.appendChild(document.createTextNode('Sign in to enable online gameplay. Or, start playing a local game by making a move.'));
+			}
 
-		if (dateIsAprilFools()) {
-			msg += '<br /><br /><strong>Try the Double Movement Distance game option, it\'s more fun!<br /><img src="https://skudpaisho.com/images/aprilfools/irohwink.png" width=160px></strong>';
-		}
+			if (dateIsAprilFools()) {
+				container.appendChild(document.createElement('br'));
+				container.appendChild(document.createElement('br'));
+				const strongEl = document.createElement('strong');
+				strongEl.appendChild(document.createTextNode('Try the Double Movement Distance game option, it\'s more fun!'));
+				strongEl.appendChild(document.createElement('br'));
+				const img = document.createElement('img');
+				img.src = 'https://skudpaisho.com/images/aprilfools/irohwink.png';
+				img.width = 160;
+				strongEl.appendChild(img);
+				container.appendChild(strongEl);
+			}
 
-			msg += getGameOptionsMessageHtml(GameType.VagabondPaiSho.gameOptions);
+			// Game options still returns HTML string, wrap it in a span
+			const gameOptionsHtml = getGameOptionsMessageHtml(GameType.VagabondPaiSho.gameOptions);
+			if (gameOptionsHtml) {
+				const optionsSpan = document.createElement('span');
+				optionsSpan.innerHTML = gameOptionsHtml;
+				container.appendChild(optionsSpan);
+			}
 		} else if (!this.theGame.hasEnded() && myTurn()) {
 			if (this.gameNotation.lastMoveHasDrawOffer() && this.promptToAcceptDraw) {
-				msg += "<br />Are you sure you want to accept the draw offer and end the game?<br />";
-				msg += "<span class='skipBonus' onclick='gameController.confirmAcceptDraw();'>Yes, accept draw and end the game</span>";
-				msg += "<br /><br />";
+				container.appendChild(document.createElement('br'));
+				container.appendChild(document.createTextNode('Are you sure you want to accept the draw offer and end the game?'));
+				container.appendChild(document.createElement('br'));
+
+				const confirmSpan = document.createElement('span');
+				confirmSpan.className = 'skipBonus';
+				confirmSpan.textContent = 'Yes, accept draw and end the game';
+				confirmSpan.onclick = () => gameController.confirmAcceptDraw();
+				container.appendChild(confirmSpan);
+				container.appendChild(document.createElement('br'));
+				container.appendChild(document.createElement('br'));
 			} else if (this.gameNotation.lastMoveHasDrawOffer()) {
-				msg += "<br />Your opponent is offering a draw. You may <span class='skipBonus' onclick='gameController.acceptDraw();'>Accept Draw</span> or make a move to refuse the draw offer.<br />";
+				container.appendChild(document.createElement('br'));
+				container.appendChild(document.createTextNode('Your opponent is offering a draw. You may '));
+
+				const acceptSpan = document.createElement('span');
+				acceptSpan.className = 'skipBonus';
+				acceptSpan.textContent = 'Accept Draw';
+				acceptSpan.onclick = () => gameController.acceptDraw();
+				container.appendChild(acceptSpan);
+
+				container.appendChild(document.createTextNode(' or make a move to refuse the draw offer.'));
+				container.appendChild(document.createElement('br'));
 			} else if (this.notationBuilder.offerDraw) {
-				msg += "<br />Your opponent will be able to accept or reject your draw offer once you make your move. Or, you may <span class='skipBonus' onclick='gameController.removeDrawOffer();'>remove your draw offer</span> from this move.";
+				container.appendChild(document.createElement('br'));
+				container.appendChild(document.createTextNode('Your opponent will be able to accept or reject your draw offer once you make your move. Or, you may '));
+
+				const removeSpan = document.createElement('span');
+				removeSpan.className = 'skipBonus';
+				removeSpan.textContent = 'remove your draw offer';
+				removeSpan.onclick = () => gameController.removeDrawOffer();
+				container.appendChild(removeSpan);
+
+				container.appendChild(document.createTextNode(' from this move.'));
 			} else {
-				msg += "<br /><span class='skipBonus' onclick='gameController.offerDraw();'>Offer Draw</span><br />";
+				container.appendChild(document.createElement('br'));
+
+				const offerSpan = document.createElement('span');
+				offerSpan.className = 'skipBonus';
+				offerSpan.textContent = 'Offer Draw';
+				offerSpan.onclick = () => gameController.offerDraw();
+				container.appendChild(offerSpan);
+
+				container.appendChild(document.createElement('br'));
 			}
 		} else if (!myTurn()) {
 			if (this.gameNotation.lastMoveHasDrawOffer()) {
-				msg += "<br />A draw has been offered.<br />";
+				container.appendChild(document.createElement('br'));
+				container.appendChild(document.createTextNode('A draw has been offered.'));
+				container.appendChild(document.createElement('br'));
 			}
 		}
 
-		return msg;
+		return container;
 	}
 	/* VagabondController.prototype.getAdditionalMessageElement = function() {
 		var msgElement = document.createElement("span");

@@ -149,7 +149,7 @@ BloomsController.prototype.getAdditionalMessage = function() {
 		msgElement.appendChild(getResetMoveElement());
 	}
 
-	return msgElement.innerHTML;
+	return msgElement;
 };
 
 /* Using my own version of this, called directly instead of from Main */
