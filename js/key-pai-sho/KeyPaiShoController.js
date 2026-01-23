@@ -39,7 +39,7 @@ import {
   finalizeMove,
   gameId,
   getCurrentPlayer,
-  getGameOptionsMessageHtml,
+  getGameOptionsMessageElement,
   getResetMoveElement,
   getUserGamePreference,
   isAnimationsOn,
@@ -156,25 +156,34 @@ export class KeyPaiShoController {
 			+ "<p>During a turn a player can either Plant a Flower in a Gate or Move one of their Tiles. A player can have up to 2 Planted Flowers at once.</p>";
 	}
 	getAdditionalMessage() {
-		var msg = "";
+		const container = document.createElement('div');
 
 		if (this.gameNotation.moves.length === 0) {
 			if (onlinePlayEnabled && gameId < 0 && userIsLoggedIn()) {
-				msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by making the first move. <br />";
+				const joinText = document.createElement('span');
+				joinText.appendChild(document.createTextNode('Click '));
+				const emJoin = document.createElement('em');
+				emJoin.textContent = 'Join Game';
+				joinText.appendChild(emJoin);
+				joinText.appendChild(document.createTextNode(' above to join another player\'s game. Or, you can start a game that other players can join by making the first move.'));
+				container.appendChild(joinText);
+				container.appendChild(document.createElement('br'));
 			} else {
-				msg += "Select 6 Effect Tiles to play with.";
+				container.appendChild(document.createTextNode('Select 6 Effect Tiles to play with.'));
 			}
 
 			if (!playingOnlineGame()) {
-				msg += getGameOptionsMessageHtml(GameType.KeyPaiShogameOptions);
+				container.appendChild(getGameOptionsMessageElement(GameType.KeyPaiShogameOptions));
 			}
 		}
 
 		if (this.theGame.playerMustMoveCenterLotus(this.getCurrentPlayer())) {
-			msg += "<br />Lotus must move out of the center Gate.<br />";
+			container.appendChild(document.createElement('br'));
+			container.appendChild(document.createTextNode('Lotus must move out of the center Gate.'));
+			container.appendChild(document.createElement('br'));
 		}
 
-		return msg;
+		return container;
 	}
 	getExtraHarmonyBonusHelpText() {
 		var container = document.createElement("span");

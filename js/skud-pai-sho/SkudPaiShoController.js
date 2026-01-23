@@ -45,7 +45,6 @@ import {
 	finalizeMove,
 	gameId,
 	getCurrentPlayer,
-	getGameOptionsMessageHtml,
 	getGameOptionsMessageElement,
 	getGatePointMessage,
 	getNeutralPointMessage,

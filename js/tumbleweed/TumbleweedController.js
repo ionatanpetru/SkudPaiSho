@@ -122,12 +122,7 @@ TumbleweedController.prototype.getAdditionalMessage = function() {
 			container.appendChild(document.createElement('br'));
 			container.appendChild(document.createTextNode('Then the Guest will choose to begin playing or swap the position of the pieces on the board.'));
 			if (this.gameNotation.moves.length === 0) {
-				const gameOptionsHtml = getGameOptionsMessageHtml(GameType.Tumbleweed.gameOptions);
-				if (gameOptionsHtml) {
-					const optionsSpan = document.createElement('span');
-					optionsSpan.innerHTML = gameOptionsHtml;
-					container.appendChild(optionsSpan);
-				}
+				container.appendChild(getGameOptionsMessageElement(GameType.Tumbleweed.gameOptions));
 			}
 		} else if (this.gameNotation.moves.length === TumbleweedController.getGameSetupCompleteMoveNumber() && !gameOptionEnabled(NO_SETUP_PHASE)) {
 			container.appendChild(document.createElement('br'));

@@ -2,7 +2,7 @@
 
 import { DEPLOY, GUEST, HOST, MOVE, NotationPoint } from "../CommonNotationObjects.js";
 import { debug } from "../GameData.js";
-import { BRAND_NEW, callSubmitMove, createGameIfThatIsOk, currentMoveIndex, finalizeMove, gameId, GameType, getGameOptionsMessageHtml, isAnimationsOn, isInReplay, myTurn, onlinePlayEnabled, playingOnlineGame, READY_FOR_BONUS, rerunAll, toBullets, userIsLoggedIn, WAITING_FOR_ENDPOINT } from "../PaiShoMain.js";
+import { BRAND_NEW, callSubmitMove, createGameIfThatIsOk, currentMoveIndex, finalizeMove, gameId, GameType, getGameOptionsMessageElement, isAnimationsOn, isInReplay, myTurn, onlinePlayEnabled, playingOnlineGame, READY_FOR_BONUS, rerunAll, toBullets, userIsLoggedIn, WAITING_FOR_ENDPOINT } from "../PaiShoMain.js";
 import { GATE, NEUTRAL, POSSIBLE_MOVE } from "../skud-pai-sho/SkudPaiShoBoardPoint.js";
 import { GodaiActuator } from "./GodaiActuator.js";
 import { GodaiGameManager } from "./GodaiGameManager.js";
@@ -391,20 +391,27 @@ export class GodaiController {
      * @returns {string}
      */
     getAdditionalMessage() {
-        let msg = ""
+        const container = document.createElement('div');
 
         if (this.gameNotation.moves.length === 0) {
             if (onlinePlayEnabled && gameId < 0 && userIsLoggedIn()) {
-                msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by making a move. <br />"
+                const joinText = document.createElement('span');
+                joinText.appendChild(document.createTextNode('Click '));
+                const emJoin = document.createElement('em');
+                emJoin.textContent = 'Join Game';
+                joinText.appendChild(emJoin);
+                joinText.appendChild(document.createTextNode(' above to join another player\'s game. Or, you can start a game that other players can join by making a move.'));
+                container.appendChild(joinText);
+                container.appendChild(document.createElement('br'));
             }
             else {
-                msg += "Sign in to enable online gameplay. Or, start playing a local game by making a move."
+                container.appendChild(document.createTextNode('Sign in to enable online gameplay. Or, start playing a local game by making a move.'));
             }
 
-            msg += getGameOptionsMessageHtml(GameType.GodaiPaiSho.gameOptions)
+            container.appendChild(getGameOptionsMessageElement(GameType.GodaiPaiSho.gameOptions));
         }
 
-        return msg
+        return container;
     }
 
     /**

@@ -29,7 +29,7 @@ import {
 	finalizeMove,
 	gameId,
 	getCurrentPlayer,
-	getGameOptionsMessageHtml,
+	getGameOptionsMessageElement,
 	getResetMoveElement,
 	getUserGamePreference,
 	isAnimationsOn,
@@ -183,24 +183,41 @@ FirePaiShoController.prototype.getDefaultHelpMessageText = function() {
 };
 
 FirePaiShoController.prototype.getAdditionalMessage = function() {
-	var msg = "";
+	const container = document.createElement('div');
 
-	msg += "<p>Host reserve tiles: " + this.theGame.tileManager.hostReserveTiles.length + "<br>Guest reserve tiles: " + this.theGame.tileManager.guestReserveTiles.length + "</p>";
+	const reserveInfo = document.createElement('p');
+	reserveInfo.appendChild(document.createTextNode('Host reserve tiles: ' + this.theGame.tileManager.hostReserveTiles.length));
+	reserveInfo.appendChild(document.createElement('br'));
+	reserveInfo.appendChild(document.createTextNode('Guest reserve tiles: ' + this.theGame.tileManager.guestReserveTiles.length));
+	container.appendChild(reserveInfo);
 
 	if (this.gameNotation.moves.length === 0) {
 		if (onlinePlayEnabled && gameId < 0 && userIsLoggedIn()) {
-				msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by selecting Start Online Game below.<br />";
-			}
+			const joinText = document.createElement('span');
+			joinText.appendChild(document.createTextNode('Click '));
+			const emJoin = document.createElement('em');
+			emJoin.textContent = 'Join Game';
+			joinText.appendChild(emJoin);
+			joinText.appendChild(document.createTextNode(' above to join another player\'s game. Or, you can start a game that other players can join by selecting Start Online Game below.'));
+			container.appendChild(joinText);
+			container.appendChild(document.createElement('br'));
+		}
 
 		if (!playingOnlineGame()) {
-			msg += getGameOptionsMessageHtml(GameType.FirePaiSho.gameOptions);
+			container.appendChild(getGameOptionsMessageElement(GameType.FirePaiSho.gameOptions));
 			if (onlinePlayEnabled && this.gameNotation.moves.length === 0) {
-				msg += "<br><span class='skipBonus' onClick='gameController.startOnlineGame()'>Start Online Game</span><br />";
+				container.appendChild(document.createElement('br'));
+				const startSpan = document.createElement('span');
+				startSpan.className = 'skipBonus';
+				startSpan.textContent = 'Start Online Game';
+				startSpan.onclick = () => gameController.startOnlineGame();
+				container.appendChild(startSpan);
+				container.appendChild(document.createElement('br'));
 			}
 		}
 	}
 
-	return msg;
+	return container;
 };
 
 FirePaiShoController.prototype.startOnlineGame = function() {

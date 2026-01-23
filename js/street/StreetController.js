@@ -25,7 +25,7 @@ import {
   finalizeMove,
   gameId,
   getCurrentPlayer,
-  getGameOptionsMessageHtml,
+  getGameOptionsMessageElement,
   getGatePointMessage,
   getNeutralPointMessage,
   getRedPointMessage,
@@ -148,18 +148,25 @@ StreetController.prototype.getDefaultHelpMessageText = function() {
 };
 
 StreetController.prototype.getAdditionalMessage = function() {
-	var msg = "";
-	
+	const container = document.createElement('div');
+
 	if (this.gameNotation.moves.length <= 2) {
 		if (onlinePlayEnabled && gameId <= 0 && userIsLoggedIn()) {
-			msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by making a move. <br />";
+			const joinText = document.createElement('span');
+			joinText.appendChild(document.createTextNode('Click '));
+			const emJoin = document.createElement('em');
+			emJoin.textContent = 'Join Game';
+			joinText.appendChild(emJoin);
+			joinText.appendChild(document.createTextNode(' above to join another player\'s game. Or, you can start a game that other players can join by making a move.'));
+			container.appendChild(joinText);
+			container.appendChild(document.createElement('br'));
 		} else {
-			msg += "Make the first move.";
+			container.appendChild(document.createTextNode('Make the first move.'));
 		}
-		msg += getGameOptionsMessageHtml(GameType.StreetPaiSho.gameOptions);
+		container.appendChild(getGameOptionsMessageElement(GameType.StreetPaiSho.gameOptions));
 	}
 
-	return msg;
+	return container;
 };
 
 StreetController.prototype.unplayedTileClicked = function(tileDiv) {

@@ -75,9 +75,9 @@ CoopSolitaireController.prototype.getDefaultHelpMessageText = function() {
 };
 
 CoopSolitaireController.prototype.getAdditionalMessage = function() {
-	var msg = "";
+	const container = document.createElement('div');
 	if (this.gameNotation.moves.length === 0) {
-		msg += getGameOptionsMessageHtml(GameType.CoopSolitaire.gameOptions);
+		container.appendChild(getGameOptionsMessageElement(GameType.CoopSolitaire.gameOptions));
 	}
 	if (!this.theGame.getWinner()) {
 		var playerName = this.getCurrentPlayer();
@@ -85,10 +85,14 @@ CoopSolitaireController.prototype.getAdditionalMessage = function() {
 		if (playerName === HOST) {
 			typeNotAllowed = "Disharmonies";
 		}
-		msg += "<br />The " + playerName + " is not allowed to form " + typeNotAllowed + ".";
-		msg += "<br /><strong>" + this.theGame.getWinReason() + "</strong>";
+		container.appendChild(document.createElement('br'));
+		container.appendChild(document.createTextNode('The ' + playerName + ' is not allowed to form ' + typeNotAllowed + '.'));
+		container.appendChild(document.createElement('br'));
+		const strong = document.createElement('strong');
+		strong.textContent = this.theGame.getWinReason();
+		container.appendChild(strong);
 	}
-	return msg;
+	return container;
 };
 
 CoopSolitaireController.prototype.unplayedTileClicked = function(tileDiv) {

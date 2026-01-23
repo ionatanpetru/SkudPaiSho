@@ -10,7 +10,7 @@ import {
 	gameId,
 	getCurrentPlayer,
 	GameType,
-	getGameOptionsMessageHtml,
+	getGameOptionsMessageElement,
 	getOnlineGameOpponentUsername,
 	getUsername,
 	iAmPlayerInCurrentOnlineGame,
@@ -223,12 +223,7 @@ export class NickController {
 				container.appendChild(document.createTextNode('Sign in to enable online gameplay. Or, start playing a local game.'));
 			}
 
-			const gameOptionsHtml = getGameOptionsMessageHtml(GameType.Nick.gameOptions);
-			if (gameOptionsHtml) {
-				const optionsSpan = document.createElement('span');
-				optionsSpan.innerHTML = gameOptionsHtml;
-				container.appendChild(optionsSpan);
-			}
+			container.appendChild(getGameOptionsMessageElement(GameType.Nick.gameOptions));
 		} else if (!this.theGame.hasEnded() && myTurn()) {
 			if (this.gameNotation.lastMoveHasDrawOffer() && this.promptToAcceptDraw) {
 				container.appendChild(document.createElement('br'));

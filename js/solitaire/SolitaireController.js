@@ -19,7 +19,7 @@ import {
   currentMoveIndex,
   finalizeMove,
   getCurrentPlayer,
-  getGameOptionsMessageHtml,
+  getGameOptionsMessageElement,
   getNeutralPointMessage,
   getRedPointMessage,
   getRedWhitePointMessage,
@@ -150,14 +150,17 @@ SolitaireController.prototype.getDefaultHelpMessageText = function() {
 };
 
 SolitaireController.prototype.getAdditionalMessage = function() {
-	var msg = "";
+	const container = document.createElement('div');
 	if (this.gameNotation.moves.length === 0) {
-		msg += getGameOptionsMessageHtml(GameType.SolitairePaiSho.gameOptions);
+		container.appendChild(getGameOptionsMessageElement(GameType.SolitairePaiSho.gameOptions));
 	}
 	if (!this.theGame.getWinner()) {
-		msg += "<br /><strong>" + this.theGame.getWinReason() + "</strong>";
+		container.appendChild(document.createElement('br'));
+		const strong = document.createElement('strong');
+		strong.textContent = this.theGame.getWinReason();
+		container.appendChild(strong);
 	}
-	return msg;
+	return container;
 };
 
 SolitaireController.prototype.unplayedTileClicked = function(tileDiv) {

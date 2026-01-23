@@ -25,7 +25,7 @@ import {
   finalizeMove,
   gameId,
   getCurrentPlayer,
-  getGameOptionsMessageHtml,
+  getGameOptionsMessageElement,
   getOnlineGameOpponentUsername,
   getUsername,
   iAmPlayerInCurrentOnlineGame,
@@ -145,34 +145,41 @@ AdevarController.prototype.getDefaultHelpMessageText = function() {
 };
 
 AdevarController.prototype.getAdditionalMessage = function() {
-	var msg = "";
-	
+	const container = document.createElement('div');
+
 	if (this.gameNotation.moves.length === 0) {
 		if (onlinePlayEnabled && gameId < 0 && userIsLoggedIn()) {
-			msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by choosing a Hidden Tile.<br />";
+			const joinText = document.createElement('span');
+			joinText.appendChild(document.createTextNode('Click '));
+			const emJoin = document.createElement('em');
+			emJoin.textContent = 'Join Game';
+			joinText.appendChild(emJoin);
+			joinText.appendChild(document.createTextNode(' above to join another player\'s game. Or, you can start a game that other players can join by choosing a Hidden Tile.'));
+			container.appendChild(joinText);
+			container.appendChild(document.createElement('br'));
 		} else {
-			msg += "Sign in to enable online gameplay. Or, start playing a local game by choosing a Hidden Tile.<br />";
+			container.appendChild(document.createTextNode('Sign in to enable online gameplay. Or, start playing a local game by choosing a Hidden Tile.'));
+			container.appendChild(document.createElement('br'));
 		}
 
 		if (gameOptionEnabled(ADEVAR_LITE)) {
-			msg += "<br /><strong>Adevăr Lite</strong> is a <em>training wheels</em> mode for beginners to learn the game - players play with their Hidden Tiles revealed and win by accomplishing their chosen Hidden Tile objective.";
+			container.appendChild(document.createElement('br'));
+			const liteSpan = document.createElement('span');
+			const strong = document.createElement('strong');
+			strong.textContent = 'Adevăr Lite';
+			liteSpan.appendChild(strong);
+			liteSpan.appendChild(document.createTextNode(' is a '));
+			const em = document.createElement('em');
+			em.textContent = 'training wheels';
+			liteSpan.appendChild(em);
+			liteSpan.appendChild(document.createTextNode(' mode for beginners to learn the game - players play with their Hidden Tiles revealed and win by accomplishing their chosen Hidden Tile objective.'));
+			container.appendChild(liteSpan);
 		}
 
-	//	if (gameOptionEnabled(BLACK_ORCHID_BUFF)) {
-	//		msg += "The Black Orchid is currently the least picked HT, and frankly could use some improvement. This changes the objective to require a greater than <em> or equal</em> number of tiles in each plot.";
-	//	}
-
-		msg += getGameOptionsMessageHtml(GameType.Adevar.gameOptions);
+		container.appendChild(getGameOptionsMessageElement(GameType.Adevar.gameOptions));
 	}
 
-	/* if (this.hoveredOverLily) {
-		msg += "<br />See the Oriental Lily garden objectives individually:"
-			+ "<br />Garden A: <span class='skipBonus' onclick='gameController.hideOrientalLilyHelp(); gameController.showOrientalLilyHelp(HOST, 0);'>HOST</span> <span class='skipBonus' onclick='gameController.hideOrientalLilyHelp(); gameController.showOrientalLilyHelp(GUEST, 0);'>GUEST</span>"
-			+ "<br />Garden B: <span class='skipBonus' onclick='gameController.hideOrientalLilyHelp(); gameController.showOrientalLilyHelp(HOST, 1);'>HOST</span> <span class='skipBonus' onclick='gameController.hideOrientalLilyHelp(); gameController.showOrientalLilyHelp(GUEST, 1);'>GUEST</span>"
-			+ "<br />Garden C: <span class='skipBonus' onclick='gameController.hideOrientalLilyHelp(); gameController.showOrientalLilyHelp(HOST, 2);'>HOST</span> <span class='skipBonus' onclick='gameController.hideOrientalLilyHelp(); gameController.showOrientalLilyHelp(GUEST, 2);'>GUEST</span>";
-	} */
-
-	return msg;
+	return container;
 };
 
 AdevarController.prototype.getAdditionalHelpTabDiv = function() {

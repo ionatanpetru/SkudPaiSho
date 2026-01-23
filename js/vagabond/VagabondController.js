@@ -19,7 +19,7 @@ import {
   gameController,
   gameId,
   getCurrentPlayer,
-  getGameOptionsMessageHtml,
+  getGameOptionsMessageElement,
   getUserGamePreference,
   isInReplay,
   myTurn,
@@ -251,13 +251,7 @@ export class VagabondController {
 				container.appendChild(strongEl);
 			}
 
-			// Game options still returns HTML string, wrap it in a span
-			const gameOptionsHtml = getGameOptionsMessageHtml(GameType.VagabondPaiSho.gameOptions);
-			if (gameOptionsHtml) {
-				const optionsSpan = document.createElement('span');
-				optionsSpan.innerHTML = gameOptionsHtml;
-				container.appendChild(optionsSpan);
-			}
+			container.appendChild(getGameOptionsMessageElement(GameType.VagabondPaiSho.gameOptions));
 		} else if (!this.theGame.hasEnded() && myTurn()) {
 			if (this.gameNotation.lastMoveHasDrawOffer() && this.promptToAcceptDraw) {
 				container.appendChild(document.createElement('br'));

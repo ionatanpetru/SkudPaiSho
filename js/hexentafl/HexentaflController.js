@@ -6,7 +6,7 @@ import {
   createGameIfThatIsOk,
   currentMoveIndex,
   finalizeMove,
-  getGameOptionsMessageHtml,
+  getGameOptionsMessageElement,
   myTurn,
   onlinePlayEnabled,
   playingOnlineGame,
@@ -158,11 +158,11 @@ HexentaflController.prototype.getDefaultHelpMessageText = function() {
 
 /* Required by Main */
 HexentaflController.prototype.getAdditionalMessage = function() {
-	var msg = "";
+	const container = document.createElement('div');
 	if (this.gameNotation.moves.length <= 2) {
-		msg += getGameOptionsMessageHtml(GameType.Hexentafl.gameOptions);
+		container.appendChild(getGameOptionsMessageElement(GameType.Hexentafl.gameOptions));
 	}
-	return msg;
+	return container;
 };
 
 /* Using my own version of this, called directly instead of from Main */

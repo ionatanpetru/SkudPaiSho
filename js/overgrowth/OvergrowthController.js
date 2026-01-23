@@ -75,14 +75,17 @@ OvergrowthController.prototype.getDefaultHelpMessageText = function() {
 };
 
 OvergrowthController.prototype.getAdditionalMessage = function() {
-	var msg = "";
+	const container = document.createElement('div');
 	if (this.gameNotation.moves.length === 0) {
-		msg += getGameOptionsMessageHtml(GameType.OvergrowthPaiSho.gameOptions);
+		container.appendChild(getGameOptionsMessageElement(GameType.OvergrowthPaiSho.gameOptions));
 	}
 	if (!this.theGame.getWinner()) {
-		msg += "<br /><strong>" + this.theGame.getScoreSummary() + "</strong>";
+		container.appendChild(document.createElement('br'));
+		const strong = document.createElement('strong');
+		strong.textContent = this.theGame.getScoreSummary();
+		container.appendChild(strong);
 	}
-	return msg;
+	return container;
 };
 
 OvergrowthController.prototype.unplayedTileClicked = function(tileDiv) {

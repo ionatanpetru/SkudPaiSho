@@ -94,44 +94,97 @@ PlaygroundController.prototype.getDefaultHelpMessageText = function() {
 };
 
 PlaygroundController.prototype.getAdditionalMessage = function() {
-	var msg = "";
-	
+	const container = document.createElement('div');
+
 	if (this.gameNotation.moves.length === 0) {
 		if (onlinePlayEnabled && gameId < 0 && userIsLoggedIn()) {
-			msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by making a move. <br />";
+			const joinText = document.createElement('span');
+			joinText.appendChild(document.createTextNode('Click '));
+			const emJoin = document.createElement('em');
+			emJoin.textContent = 'Join Game';
+			joinText.appendChild(emJoin);
+			joinText.appendChild(document.createTextNode(' above to join another player\'s game. Or, you can start a game that other players can join by making a move.'));
+			container.appendChild(joinText);
+			container.appendChild(document.createElement('br'));
 		} else {
-			msg += "Sign in to enable online gameplay. Or, start playing a local game by making a move. <br />";
+			container.appendChild(document.createTextNode('Sign in to enable online gameplay. Or, start playing a local game by making a move.'));
+			container.appendChild(document.createElement('br'));
 		}
 
-		msg += getGameOptionsMessageHtml(GameType.Playground.gameOptions);
+		container.appendChild(getGameOptionsMessageElement(GameType.Playground.gameOptions));
 	} else {
 		if (this.notationBuilder.endGame) {
-			msg += "Make a move to end the game. <span class='skipBonus' onClick='gameController.unsetEndOfGame()'>Remove end of game trigger</span><br /><br />";
+			container.appendChild(document.createTextNode('Make a move to end the game. '));
+			const removeSpan = document.createElement('span');
+			removeSpan.className = 'skipBonus';
+			removeSpan.textContent = 'Remove end of game trigger';
+			removeSpan.onclick = () => gameController.unsetEndOfGame();
+			container.appendChild(removeSpan);
+			container.appendChild(document.createElement('br'));
+			container.appendChild(document.createElement('br'));
 		} else {
-			msg += "<span class='skipBonus' onClick='gameController.setEndOfGame()'>End this game</span><br /><br />";
+			const endSpan = document.createElement('span');
+			endSpan.className = 'skipBonus';
+			endSpan.textContent = 'End this game';
+			endSpan.onclick = () => gameController.setEndOfGame();
+			container.appendChild(endSpan);
+			container.appendChild(document.createElement('br'));
+			container.appendChild(document.createElement('br'));
 		}
 	}
 
 	if (!playingOnlineGame()) {
-		msg += "<span class='skipBonus' onClick='gameController.passTurn()'>Pass Turn</span><br /><br />";
+		const passSpan = document.createElement('span');
+		passSpan.className = 'skipBonus';
+		passSpan.textContent = 'Pass Turn';
+		passSpan.onclick = () => gameController.passTurn();
+		container.appendChild(passSpan);
+		container.appendChild(document.createElement('br'));
+		container.appendChild(document.createElement('br'));
+
 		if (!this.theGame.isUsingTileReserves()) {
-			msg += "<span class='skipBonus' onClick='gameController.hideTileLibraries()'>Hide Tile Libraries</span><br />";
+			const hideSpan = document.createElement('span');
+			hideSpan.className = 'skipBonus';
+			hideSpan.textContent = 'Hide Tile Libraries';
+			hideSpan.onclick = () => gameController.hideTileLibraries();
+			container.appendChild(hideSpan);
+			container.appendChild(document.createElement('br'));
 		}
 		if (onlinePlayEnabled && this.gameNotation.moves.length > 0) {
-			msg += "<span class='skipBonus' onClick='gameController.startOnlineGame()'>End Game Setup and Create Game</span><br />";
+			const startSpan = document.createElement('span');
+			startSpan.className = 'skipBonus';
+			startSpan.textContent = 'End Game Setup and Create Game';
+			startSpan.onclick = () => gameController.startOnlineGame();
+			container.appendChild(startSpan);
+			container.appendChild(document.createElement('br'));
 		}
 	}
 
 	if (this.notationBuilder.status === WAITING_FOR_ENDPOINT) {
-		msg += "<span>Rotate tile to face:";
-		msg += " <span class='skipBonus' onClick='gameController.rotateTileToFaceDirection(PlaygroundTileFacingDirection.UP)'>Up</span>";
-		msg += " <span class='skipBonus' onClick='gameController.rotateTileToFaceDirection(PlaygroundTileFacingDirection.DOWN)'>Down</span>";
-		msg += " <span class='skipBonus' onClick='gameController.rotateTileToFaceDirection(PlaygroundTileFacingDirection.LEFT)'>Left</span>";
-		msg += " <span class='skipBonus' onClick='gameController.rotateTileToFaceDirection(PlaygroundTileFacingDirection.RIGHT)'>Right</span>";
-		msg += "</span><br />";
+		const rotateContainer = document.createElement('span');
+		rotateContainer.appendChild(document.createTextNode('Rotate tile to face: '));
+
+		const directions = [
+			{ name: 'Up', dir: PlaygroundTileFacingDirection.UP },
+			{ name: 'Down', dir: PlaygroundTileFacingDirection.DOWN },
+			{ name: 'Left', dir: PlaygroundTileFacingDirection.LEFT },
+			{ name: 'Right', dir: PlaygroundTileFacingDirection.RIGHT }
+		];
+
+		directions.forEach((d, i) => {
+			if (i > 0) rotateContainer.appendChild(document.createTextNode(' '));
+			const dirSpan = document.createElement('span');
+			dirSpan.className = 'skipBonus';
+			dirSpan.textContent = d.name;
+			dirSpan.onclick = () => gameController.rotateTileToFaceDirection(d.dir);
+			rotateContainer.appendChild(dirSpan);
+		});
+
+		container.appendChild(rotateContainer);
+		container.appendChild(document.createElement('br'));
 	}
 
-	return msg;
+	return container;
 };
 
 PlaygroundController.prototype.rotateTileToFaceDirection = function(directionToFace) {

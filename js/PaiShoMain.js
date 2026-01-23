@@ -5109,30 +5109,6 @@ export function addGameOption(option) {
 	setGameController(gameController.getGameTypeId(), true);
 }
 
-export function getGameOptionsMessageHtml(options) {
-	let msg = "<br /><br />";
-
-	let optionsListed = false;
-	if (options && options.length > 0) {
-		msg += "<strong>Add Game Option:</strong><br />";
-		for (let i = 0; i < options.length; i++) {
-			if (!gameOptionEnabled(options[i])) {
-				if (!gameController.optionOkToShow
-					|| (gameController.optionOkToShow && gameController.optionOkToShow(options[i]))) {
-					msg += "&bull;&nbsp;<span class='skipBonus' onclick='addGameOption(\"" + options[i] + "\");'>" + getGameOptionDescription(options[i]) + "</span><br />";
-					optionsListed = true;
-				}
-			}
-		}
-	}
-
-	if (!optionsListed) {
-		msg = "<br /><br />";
-	}
-
-	return msg;
-}
-
 export function getGameOptionsMessageElement(options) {
 	// Create the main container
     const container = document.createElement('span');

@@ -141,17 +141,25 @@ CaptureController.prototype.endGameNow = function() {
 };
 
 CaptureController.prototype.getAdditionalMessage = function() {
-	var msg = "";//"<span class='clickableText' onclick='gameController.endGameNow();'>End this game.</span>";
+	const container = document.createElement('div');
 
 	if (this.gameNotation.moves.length === 0) {
 		if (onlinePlayEnabled && gameId < 0 && userIsLoggedIn()) {
-			msg += "<strong>Real-time gameplay is enabled!</strong> Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by making a move. <br />";
+			const strong = document.createElement('strong');
+			strong.textContent = 'Real-time gameplay is enabled!';
+			container.appendChild(strong);
+			container.appendChild(document.createTextNode(' Click '));
+			const emJoin = document.createElement('em');
+			emJoin.textContent = 'Join Game';
+			container.appendChild(emJoin);
+			container.appendChild(document.createTextNode(' above to join another player\'s game. Or, you can start a game that other players can join by making a move.'));
+			container.appendChild(document.createElement('br'));
 		} else {
-			msg += "Sign in to enable real-time gameplay. Or, start playing a local game by making a move.";
+			container.appendChild(document.createTextNode('Sign in to enable real-time gameplay. Or, start playing a local game by making a move.'));
 		}
 	}
 
-	return msg;
+	return container;
 };
 
 CaptureController.prototype.unplayedTileClicked = function(tileDiv) {
