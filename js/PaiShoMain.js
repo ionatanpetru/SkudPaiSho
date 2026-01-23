@@ -92,6 +92,7 @@ import { Elo } from "./util/elo";
 import { FirePaiShoController } from './fire-pai-sho/FirePaiShoController';
 import { GUEST, HOST } from "./CommonNotationObjects";
 import { GameClock } from "./util/GameClock";
+import { Giveaway } from "./util/Giveaway";
 import { GinsengController } from './ginseng/GinsengController';
 import { GodaiController } from './godai/GodaiController';
 import { HexentaflController } from './hexentafl/HexentaflController';
@@ -1386,15 +1387,29 @@ export function forgetOnlinePlayInfo() {
 }
 
 export function showSignOutModal() {
-	let message = "<br /><div class='clickableText' onclick='signOut(true);'>Yes, sign out</div>";
-	message += "<br /><div class='clickableText' onclick='signOut(false);'>Cancel</div>";
+	const container = document.createElement('div');
+	container.appendChild(document.createElement('br'));
 
-	showModal("Really sign out?", message);
+	const yesDiv = document.createElement('div');
+	yesDiv.classList.add('clickableText');
+	yesDiv.textContent = 'Yes, sign out';
+	yesDiv.onclick = () => signOut(true);
+	container.appendChild(yesDiv);
+
+	container.appendChild(document.createElement('br'));
+
+	const cancelDiv = document.createElement('div');
+	cancelDiv.classList.add('clickableText');
+	cancelDiv.textContent = 'Cancel';
+	cancelDiv.onclick = () => signOut(false);
+	container.appendChild(cancelDiv);
+
+	showModalElem("Really sign out?", container);
 }
 
 export function showChangePasswordModal() {
-	const msg = document.getElementById('changePasswordModalContentContainer').innerHTML;
-	showModal("Update Password", msg);
+	const msgContent = document.getElementById('changePasswordModalContentContainer').cloneNode(true);
+	showModalElem("Update Password", msgContent);
 }
 
 export function signOut(reallySignOut) {
@@ -1704,7 +1719,7 @@ export function finalizeMove(moveAnimationBeginStep, ignoreNoEmail, okToUpdateWi
 				}
 				if (checkCount > 4) {
 					clearInterval(checkRunningInterval);
-					showModal("Error submitting move", "Error finalizing move. Sorry about that :(");
+					showModalElem("Error submitting move", document.createTextNode("Error finalizing move. Sorry about that :("));
 				}
 			}, replayIntervalLength / 2);
 		} else {
@@ -1723,7 +1738,7 @@ export function finalizeMove(moveAnimationBeginStep, ignoreNoEmail, okToUpdateWi
 				}
 				if (checkCount > 4) {
 					clearInterval(checkRunningInterval);
-					showModal("Error submitting move", "Error finalizing move. Sorry about that :(");
+					showModalElem("Error submitting move", document.createTextNode("Error finalizing move. Sorry about that :("));
 				}
 			}, replayIntervalLength / 2);
 		} else {
@@ -2107,7 +2122,12 @@ const createGameCallback = (newGameId) => {
 		});
 	}
 
-	showModal("Game Created!", "You just created a game. Anyone can join it by clicking on Join Game. You can even join your own game if you'd like.<br /><br />If anyone joins this game, it will show up in your list of games when you click My Games.");
+	const container = document.createElement('div');
+	container.appendChild(document.createTextNode("You just created a game. Anyone can join it by clicking on Join Game. You can even join your own game if you'd like."));
+	container.appendChild(document.createElement('br'));
+	container.appendChild(document.createElement('br'));
+	container.appendChild(document.createTextNode("If anyone joins this game, it will show up in your list of games when you click My Games."));
+	showModalElem("Game Created!", container);
 };
 
 const createPrivateGameCallback = (newGameId) => {
@@ -2123,7 +2143,24 @@ const createPrivateGameCallback = (newGameId) => {
 
 	const inviteLinkUrl = createInviteLinkUrl(newGameId);
 
-	showModal("Game Created!", "You just created a private game. Send <a href='" + inviteLinkUrl + "' target='_blank'>this invite link</a> to a friend so they can join. <button onclick='copyTextToClipboard(\"" + inviteLinkUrl + "\", this);' class='button'>Copy Link</button> <br /><br />When a player joins this game, it will show up in your list of games when you click My Games.", true);
+	const container = document.createElement('div');
+	container.appendChild(document.createTextNode("You just created a private game. Send "));
+	const inviteLink = document.createElement('a');
+	inviteLink.href = inviteLinkUrl;
+	inviteLink.target = '_blank';
+	inviteLink.textContent = 'this invite link';
+	container.appendChild(inviteLink);
+	container.appendChild(document.createTextNode(" to a friend so they can join. "));
+	const copyBtn = document.createElement('button');
+	copyBtn.classList.add('button');
+	copyBtn.textContent = 'Copy Link';
+	copyBtn.onclick = function() { copyTextToClipboard(inviteLinkUrl, this); };
+	container.appendChild(copyBtn);
+	container.appendChild(document.createTextNode(" "));
+	container.appendChild(document.createElement('br'));
+	container.appendChild(document.createElement('br'));
+	container.appendChild(document.createTextNode("When a player joins this game, it will show up in your list of games when you click My Games."));
+	showModalElem("Game Created!", container, true);
 };
 
 export function createInviteLinkUrl(newGameId) {
@@ -2147,32 +2184,75 @@ export function askToJoinGame(gameId, hostUsername, rankedGameInd) {
 
 export function askToJoinPrivateGame(privateGameId, hostUserName, rankedGameInd, gameClock) {
 	if (userIsLoggedIn()) {
-		let message = "Do you want to join this game hosted by " + hostUserName + "?";
-		if (rankedGameInd === 'y' || rankedGameInd === 'Y') {
-			message += "<br /><br /><strong> This is a ranked game.</strong>";
-		}
-		if (gameClock && GameClock.isEnabled()) {
-			message += "<br /><br /><strong>This game has a game clock (beta): " + gameClock.getLabelText() + "</strong><br /><a href='https://forum.skudpaisho.com/showthread.php?tid=158' target='_blank'>Read about the Game Clock feature.</a>";
-		}
-		message += "<br /><br />";
-		message += "<div class='clickableText' onclick='closeModal(); yesJoinPrivateGame(" + privateGameId + ");'>Yes - join game</div>";
-		message += "<br /><div class='clickableText' onclick='closeModal();'>No - cancel</div>";
+		const container = document.createElement('div');
 
 		if (currentGameData.hostUsername && currentGameData.guestUsername) {
-			message = "A Guest has already joined this game.";
-			message += "<br /><br />";
-			message += "<div class='clickableText' onclick='closeModal();'>OK</div>";
+			container.appendChild(document.createTextNode("A Guest has already joined this game."));
+			container.appendChild(document.createElement('br'));
+			container.appendChild(document.createElement('br'));
+			const okDiv = document.createElement('div');
+			okDiv.classList.add('clickableText');
+			okDiv.textContent = 'OK';
+			okDiv.onclick = () => closeModal();
+			container.appendChild(okDiv);
+		} else {
+			container.appendChild(document.createTextNode("Do you want to join this game hosted by " + hostUserName + "?"));
+
+			if (rankedGameInd === 'y' || rankedGameInd === 'Y') {
+				container.appendChild(document.createElement('br'));
+				container.appendChild(document.createElement('br'));
+				const strongRanked = document.createElement('strong');
+				strongRanked.textContent = ' This is a ranked game.';
+				container.appendChild(strongRanked);
+			}
+
+			if (gameClock && GameClock.isEnabled()) {
+				container.appendChild(document.createElement('br'));
+				container.appendChild(document.createElement('br'));
+				const strongClock = document.createElement('strong');
+				strongClock.textContent = 'This game has a game clock (beta): ' + gameClock.getLabelText();
+				container.appendChild(strongClock);
+				container.appendChild(document.createElement('br'));
+				const clockLink = document.createElement('a');
+				clockLink.href = 'https://forum.skudpaisho.com/showthread.php?tid=158';
+				clockLink.target = '_blank';
+				clockLink.textContent = 'Read about the Game Clock feature.';
+				container.appendChild(clockLink);
+			}
+
+			container.appendChild(document.createElement('br'));
+			container.appendChild(document.createElement('br'));
+
+			const yesDiv = document.createElement('div');
+			yesDiv.classList.add('clickableText');
+			yesDiv.textContent = 'Yes - join game';
+			yesDiv.onclick = () => { closeModal(); yesJoinPrivateGame(privateGameId); };
+			container.appendChild(yesDiv);
+
+			container.appendChild(document.createElement('br'));
+
+			const noDiv = document.createElement('div');
+			noDiv.classList.add('clickableText');
+			noDiv.textContent = 'No - cancel';
+			noDiv.onclick = () => closeModal();
+			container.appendChild(noDiv);
 		}
 
 		if (!iAmPlayerInCurrentOnlineGame() || QueryString.allowJoiningOwnGame) {
-			showModal("Join Game?", message, true);
+			showModalElem("Join Game?", container, true);
 		}
 	} else {
-		let message = "To join this game hosted by " + hostUserName + ", please sign in and then refresh this page.";
-		message += "<br /><br />";
-		message += "<div class='clickableText' onclick='closeModal();'>OK</div>";
+		const container = document.createElement('div');
+		container.appendChild(document.createTextNode("To join this game hosted by " + hostUserName + ", please sign in and then refresh this page."));
+		container.appendChild(document.createElement('br'));
+		container.appendChild(document.createElement('br'));
+		const okDiv = document.createElement('div');
+		okDiv.classList.add('clickableText');
+		okDiv.textContent = 'OK';
+		okDiv.onclick = () => closeModal();
+		container.appendChild(okDiv);
 
-		showModal("Sign In Before Joining Game", message);
+		showModalElem("Sign In Before Joining Game", container);
 	}
 }
 
@@ -2483,7 +2563,7 @@ export function openLink(linkUrl) {
 
 /* Modal */
 export function callFailed() {
-	showModal("", "Unable to load.");
+	showModalElem("", document.createTextNode("Unable to load."));
 }
 
 export function showModalElem(headingText, modalMessageElement, onlyCloseByClickingX, yesNoOptions, useInvisibleModal) {
@@ -2689,7 +2769,16 @@ const sendVerificationCodeCallback = (response) => {
 const isUserInfoAvailableCallback = (data) => {
 	if (data && data.length > 0) {
 		// user info not available
-		showModal("Sign In", "Username or email unavailable.<br /><br /><span class='skipBonus' onclick='loginClicked();'>Back</span>");
+		const container = document.createElement('div');
+		container.appendChild(document.createTextNode("Username or email unavailable."));
+		container.appendChild(document.createElement('br'));
+		container.appendChild(document.createElement('br'));
+		const backSpan = document.createElement('span');
+		backSpan.classList.add('skipBonus');
+		backSpan.textContent = 'Back';
+		backSpan.onclick = () => loginClicked();
+		container.appendChild(backSpan);
+		showModalElem("Sign In", container);
 	} else {
 		document.getElementById("verificationCodeInput").disabled = false;
 		const responseElement = document.getElementById('verificationCodeSendResponse');
@@ -2725,7 +2814,7 @@ const validateSignInCallback = (data) => {
 
 		createUserCallback(tempUserId);
 	} else {
-		showModal("Sign In", "Sign in failed with provided account info. Please try again.");
+		showModalElem("Sign In", document.createTextNode("Sign in failed with provided account info. Please try again."));
 	}
 };
 
@@ -2737,7 +2826,16 @@ export function submitSignInClicked() {
 		&& passwordIsValid(userPassword, userPassword)) {
 		onlinePlayEngine.validateSignIn(usernameOrEmail, userPassword, validateSignInCallback);
 	} else {
-		showModal("Sign In", "Invalid username or password. <br /><br /><span class='skipBonus' onclick='loginClicked();'>Back</span>");
+		const container = document.createElement('div');
+		container.appendChild(document.createTextNode("Invalid username or password. "));
+		container.appendChild(document.createElement('br'));
+		container.appendChild(document.createElement('br'));
+		const backSpan = document.createElement('span');
+		backSpan.classList.add('skipBonus');
+		backSpan.textContent = 'Back';
+		backSpan.onclick = () => loginClicked();
+		container.appendChild(backSpan);
+		showModalElem("Sign In", container);
 	}
 }
 
@@ -2753,7 +2851,16 @@ export function sendVerificationCodeClicked() {
 		&& usernameIsValid(usernameBeingVerified)) {
 		onlinePlayEngine.userInfoExists(usernameBeingVerified, encodeURIComponent(emailBeingVerified), userInfoExistsCallback);
 	} else {
-		showModal("Sign Up", "Invalid username, email, or password. Your username cannot be too short or too long, and cannot contain spaces. Your password must be at least 8 characters and can contain common special characters. <br /><br /><span class='skipBonus' onclick='loginClicked();'>Back</span>");
+		const container = document.createElement('div');
+		container.appendChild(document.createTextNode("Invalid username, email, or password. Your username cannot be too short or too long, and cannot contain spaces. Your password must be at least 8 characters and can contain common special characters. "));
+		container.appendChild(document.createElement('br'));
+		container.appendChild(document.createElement('br'));
+		const backSpan = document.createElement('span');
+		backSpan.classList.add('skipBonus');
+		backSpan.textContent = 'Back';
+		backSpan.onclick = () => loginClicked();
+		container.appendChild(backSpan);
+		showModalElem("Sign Up", container);
 		passwordBeingVerified = "";
 	}
 }
@@ -2790,9 +2897,9 @@ export function forgetPasswordClicked() {
 			onlinePlayEngine.removeUserPassword(getLoginToken(), removePasswordCallback);
 		};
 		yesNoOptions.noText = "Close";
-		showModal(
+		showModalElem(
 			"Remove password?",
-			"Really remove ",
+			document.createTextNode("Really remove "),
 			false,
 			yesNoOptions
 		);
@@ -2827,7 +2934,21 @@ const createDeviceIdCallback = (generatedDeviceId) => {
 
 	initialVerifyLogin();
 
-	showModal("<i class='fa fa-check' aria-hidden='true'></i> Successfully Signed In", "Hi, " + getUsername() + "! You are now signed in. The Garden Gate will remember you next time you come, unless you <strong>sign out</strong> from the bottom of the My Games list.");
+	const container = document.createElement('div');
+	container.appendChild(document.createTextNode("Hi, " + getUsername() + "! You are now signed in. The Garden Gate will remember you next time you come, unless you "));
+	const strongElem = document.createElement('strong');
+	strongElem.textContent = 'sign out';
+	container.appendChild(strongElem);
+	container.appendChild(document.createTextNode(" from the bottom of the My Games list."));
+
+	const headingContainer = document.createElement('span');
+	const icon = document.createElement('i');
+	icon.classList.add('fa', 'fa-check');
+	icon.setAttribute('aria-hidden', 'true');
+	headingContainer.appendChild(icon);
+	headingContainer.appendChild(document.createTextNode(" Successfully Signed In"));
+
+	showModalElem(headingContainer.innerHTML, container);
 };
 
 const createUserCallback = (generatedUserId) => {
@@ -2843,7 +2964,7 @@ const updatePasswordCallback = (data) => {
 		msg = "Password update failed.";
 	}
 
-	showModal("Update Password", msg);
+	showModalElem("Update Password", document.createTextNode(msg));
 };
 
 const removePasswordCallback = (data) => {
@@ -2854,7 +2975,7 @@ const removePasswordCallback = (data) => {
 		msg = "Password update failed.";
 	}
 
-	showModal("Remove Password", msg);
+	showModalElem("Remove Password", document.createTextNode(msg));
 };
 
 export function updatePasswordClicked() {
@@ -2885,7 +3006,7 @@ const verifyCodeCallback = (actualCode) => {
 		usernameBeingVerified = "";
 		tempUserId = null;
 		codeToVerify = 0;
-		showModal("Validation Failed", "Validation failed. Please try again.");
+		showModalElem("Validation Failed", document.createTextNode("Validation failed. Please try again."));
 	}
 };
 
@@ -3422,7 +3543,12 @@ export function setGameController(gameTypeId, keepGameOptions) {
 	gameController = getGameControllerForGameType(gameTypeId);
 	if (!gameController) {
 		gameController = getGameControllerForGameType(GameType.VagabondPaiSho.id);
-		showModal("Cannot Load Game", "This game is unavailable. Try Vagabond Pai Sho instead :)<br /><br />To know why the selected game is unavailable, ask in The Garden Gate Discord. Perhaps you have selected a new game that is coming soon!");
+		const container = document.createElement('div');
+		container.appendChild(document.createTextNode("This game is unavailable. Try Vagabond Pai Sho instead :)"));
+		container.appendChild(document.createElement('br'));
+		container.appendChild(document.createElement('br'));
+		container.appendChild(document.createTextNode("To know why the selected game is unavailable, ask in The Garden Gate Discord. Perhaps you have selected a new game that is coming soon!"));
+		showModalElem("Cannot Load Game", container);
 		successResult = false;
 	}
 
@@ -3572,18 +3698,27 @@ export function getLoginToken() {
 }
 
 const showPastGamesCallback = (results) => {
-	let message = "No completed games.";
+	const container = document.createElement('div');
 	let showAll;
-	if (results) {
-		message = "";
 
+	if (results) {
 		showAll = showAllCompletedGamesInList;
 		let countOfGamesShown = 0;
 
 		populateMyGamesList(results);
 
 		if (localStorage.getItem("data-theme") == "stotes") {
-			message += "<table><tr class='tr-header'><td class='first'>Game Mode</td><td>Host</td><td></td><td>Guest</td><td>Result</td><td>Date</td></tr>";
+			const table = document.createElement('table');
+			const headerRow = document.createElement('tr');
+			headerRow.classList.add('tr-header');
+			['Game Mode', 'Host', '', 'Guest', 'Result', 'Date'].forEach((text, idx) => {
+				const td = document.createElement('td');
+				if (idx === 0) td.classList.add('first');
+				td.textContent = text;
+				headerRow.appendChild(td);
+			});
+			table.appendChild(headerRow);
+
 			let even = true;
 			for (const index in myGamesList) {
 				const myGame = myGamesList[index];
@@ -3592,30 +3727,65 @@ const showPastGamesCallback = (results) => {
 				const userIsHost = usernameEquals(myGame.hostUsername);
 				const opponentUsername = userIsHost ? myGame.guestUsername : myGame.hostUsername;
 
-				message += "<tr onclick='jumpToGame(" + gId + "); closeModal();' class='" + ((even) ? ("even") : ("odd")) + "'>";
-				message += "<td class='first' style='color:" + getGameColor(myGame.gameTypeDesc) + ";'>" + myGame.gameTypeDesc + "</td>";
+				const row = document.createElement('tr');
+				row.classList.add(even ? 'even' : 'odd');
+				row.onclick = () => { jumpToGame(gId); closeModal(); };
 
-				message += "<td class='name'>" + myGame.hostUsername + "</td>";
-				message += "<td>vs.</td>";
-				message += "<td class='name'>" + myGame.guestUsername + "</td>";
+				const gameTypeTd = document.createElement('td');
+				gameTypeTd.classList.add('first');
+				gameTypeTd.style.color = getGameColor(myGame.gameTypeDesc);
+				gameTypeTd.textContent = myGame.gameTypeDesc;
+				row.appendChild(gameTypeTd);
 
+				const hostTd = document.createElement('td');
+				hostTd.classList.add('name');
+				hostTd.textContent = myGame.hostUsername;
+				row.appendChild(hostTd);
 
+				const vsTd = document.createElement('td');
+				vsTd.textContent = 'vs.';
+				row.appendChild(vsTd);
+
+				const guestTd = document.createElement('td');
+				guestTd.classList.add('name');
+				guestTd.textContent = myGame.guestUsername;
+				row.appendChild(guestTd);
+
+				const resultTd = document.createElement('td');
 				if (myGame.resultId === 10) {
-					message += "<td>[inactive]</td>";
+					resultTd.textContent = '[inactive]';
 				} else if (myGame.resultId === 8) {
-					message += "<td>[quit]</td>";
+					resultTd.textContent = '[quit]';
 				} else if (usernameEquals(myGame.winnerUsername)) {
-					message += "<td>[win]</td>";
+					resultTd.textContent = '[win]';
 				} else if (myGame.winnerUsername === opponentUsername) {
-					message += "<td>[loss]</td>";
+					resultTd.textContent = '[loss]';
 				} else {
-					message += "<td>[ended]</td>";
+					resultTd.textContent = '[ended]';
 				}
-				message += "<td>" + myGame.timestamp.slice(0, 10) + "</td>";
-				message += "</tr>";
+				row.appendChild(resultTd);
+
+				const dateTd = document.createElement('td');
+				dateTd.textContent = myGame.timestamp.slice(0, 10);
+				row.appendChild(dateTd);
+
+				table.appendChild(row);
 
 				for (let i = 0; i < myGame.gameOptions.length; i++) {
-					message += "<tr onclick='jumpToGame(" + gId + "); closeModal();' class='" + ((even) ? ("even") : ("odd")) + "'><td class='first'><em>-Game Option</em></td><td colspan='5'>" + getGameOptionDescription(myGame.gameOptions[i]) + "</em></td></tr>";
+					const optRow = document.createElement('tr');
+					optRow.classList.add(even ? 'even' : 'odd');
+					optRow.onclick = () => { jumpToGame(gId); closeModal(); };
+					const optTd1 = document.createElement('td');
+					optTd1.classList.add('first');
+					const optEm = document.createElement('em');
+					optEm.textContent = '-Game Option';
+					optTd1.appendChild(optEm);
+					optRow.appendChild(optTd1);
+					const optTd2 = document.createElement('td');
+					optTd2.colSpan = 5;
+					optTd2.textContent = getGameOptionDescription(myGame.gameOptions[i]);
+					optRow.appendChild(optTd2);
+					table.appendChild(optRow);
 				}
 
 				even = !even;
@@ -3624,7 +3794,17 @@ const showPastGamesCallback = (results) => {
 					break;
 				}
 			}
-			message += "<tr class='tr-footer'><td class='first'>Game Mode</td><td>Host</td><td></td><td>Guest</td><td>Result</td><td>Date</td></tr></table>";
+
+			const footerRow = document.createElement('tr');
+			footerRow.classList.add('tr-footer');
+			['Game Mode', 'Host', '', 'Guest', 'Result', 'Date'].forEach((text, idx) => {
+				const td = document.createElement('td');
+				if (idx === 0) td.classList.add('first');
+				td.textContent = text;
+				footerRow.appendChild(td);
+			});
+			table.appendChild(footerRow);
+			container.appendChild(table);
 		} else {
 			let gameTypeHeading = "";
 			for (const index in myGamesList) {
@@ -3632,10 +3812,13 @@ const showPastGamesCallback = (results) => {
 
 				if (myGame.gameTypeDesc !== gameTypeHeading) {
 					if (gameTypeHeading !== "") {
-						message += "<br />";
+						container.appendChild(document.createElement('br'));
 					}
 					gameTypeHeading = myGame.gameTypeDesc;
-					message += "<div class='modalContentHeading'>" + gameTypeHeading + "</div>";
+					const headingDiv = document.createElement('div');
+					headingDiv.classList.add('modalContentHeading');
+					headingDiv.textContent = gameTypeHeading;
+					container.appendChild(headingDiv);
 				}
 
 				const gId = parseInt(myGame.gameId);
@@ -3655,7 +3838,11 @@ const showPastGamesCallback = (results) => {
 					gameDisplayTitle += " [loss]";
 				}
 
-				message += "<div class='clickableText' onclick='jumpToGame(" + gId + "); closeModal();'>" + gameDisplayTitle + "</div>";
+				const gameDiv = document.createElement('div');
+				gameDiv.classList.add('clickableText');
+				gameDiv.textContent = gameDisplayTitle;
+				gameDiv.onclick = () => { jumpToGame(gId); closeModal(); };
+				container.appendChild(gameDiv);
 
 				countOfGamesShown++;
 				if (!showAll && countOfGamesShown > 20) {
@@ -3665,13 +3852,20 @@ const showPastGamesCallback = (results) => {
 			}
 		}
 
+	} else {
+		container.appendChild(document.createTextNode("No completed games."));
 	}
 
 	if (!showAll) {
-		message += "<br /><div class='clickableText' onclick='showAllCompletedGames();'>Show all</div>";
+		container.appendChild(document.createElement('br'));
+		const showAllDiv = document.createElement('div');
+		showAllDiv.classList.add('clickableText');
+		showAllDiv.textContent = 'Show all';
+		showAllDiv.onclick = () => showAllCompletedGames();
+		container.appendChild(showAllDiv);
 	}
 
-	showModal("Completed Games", message);
+	showModalElem("Completed Games", container);
 };
 
 let showAllCompletedGamesInList = false;
@@ -4043,13 +4237,18 @@ export function loginClicked() {
 }
 
 export function signUpClicked() {
-	let msg = document.getElementById('signUpModalContentContainer').innerHTML;
+	let msgContent;
 
 	if (userIsLoggedIn()) {
-		msg = "<div><br /><br />You are currently signed in as " + getUsername() + "</div>";
+		msgContent = document.createElement('div');
+		msgContent.appendChild(document.createElement('br'));
+		msgContent.appendChild(document.createElement('br'));
+		msgContent.appendChild(document.createTextNode("You are currently signed in as " + getUsername()));
+	} else {
+		msgContent = document.getElementById('signUpModalContentContainer').cloneNode(true);
 	}
 
-	showModal("Sign Up", msg);
+	showModalElem("Sign Up", msgContent);
 }
 
 const completeJoinGameSeekCallback = (gameJoined) => {
@@ -4088,7 +4287,7 @@ const getCurrentGamesForUserNewCallback = (results) => {
 
 		if (gameExistsWithOpponent) {
 			closeModal();
-			showModal("Cannot Join Game", "You are already playing a game against that user, so you will have to finish that game first.");
+			showModalElem("Cannot Join Game", document.createTextNode("You are already playing a game against that user, so you will have to finish that game first."));
 		} else {
 			askToJoinGame(gameSeek.gameId, gameSeek.hostUsername, gameSeek.rankedGame);
 		}
@@ -4136,7 +4335,7 @@ export function acceptGameSeekClicked(gameIdChosen) {
 		selectedGameSeek = gameSeek;
 		onlinePlayEngine.getCurrentGamesForUserNew(getLoginToken(), getCurrentGamesForUserNewCallback);
 	} else {
-		showModal("Cannot Join Game", "This game is using new features that your version of The Garden Gate does not support.");
+		showModalElem("Cannot Join Game", document.createTextNode("This game is using new features that your version of The Garden Gate does not support."));
 	}
 }
 
@@ -4165,10 +4364,9 @@ export function gameOptionsSupportedForGameSeek(gameSeek) {
 }
 
 const getGameSeeksCallback = (results) => {
-	let message = "";
+	const container = document.createElement('div');
 	let gameSeeksDisplayed = false;
 	if (results) {
-		message = "";
 		const resultRows = results.split('\n');
 
 		gameSeekList = [];
@@ -4195,7 +4393,20 @@ const getGameSeeksCallback = (results) => {
 		let gameTypeHeading = "";
 
 		if (localStorage.getItem("data-theme") == "stotes") {
-			message += "<table><tr class='tr-header'><td>Game Mode</td><td>Host</td><td>Ranking</td></tr>";
+			const table = document.createElement('table');
+			const headerRow = document.createElement('tr');
+			headerRow.classList.add('tr-header');
+			const headerGameMode = document.createElement('td');
+			headerGameMode.textContent = 'Game Mode';
+			const headerHost = document.createElement('td');
+			headerHost.textContent = 'Host';
+			const headerRanking = document.createElement('td');
+			headerRanking.textContent = 'Ranking';
+			headerRow.appendChild(headerGameMode);
+			headerRow.appendChild(headerHost);
+			headerRow.appendChild(headerRanking);
+			table.appendChild(headerRow);
+
 			let even = true;
 			for (const index in gameSeekList) {
 				const gameSeek = gameSeekList[index];
@@ -4204,28 +4415,60 @@ const getGameSeeksCallback = (results) => {
 					|| !getGameTypeEntryFromId(gameSeek.gameTypeId).usersWithAccess
 					|| usernameIsOneOf(getGameTypeEntryFromId(gameSeek.gameTypeId).usersWithAccess)
 				) {
-					message += "<tr onclick='acceptGameSeekClicked(" + parseInt(gameSeek.gameId) + ");' class='gameSeekEntry " + ((even) ? ("even") : ("odd")) + "'>";
-					message += "<td style='color:" + getGameColor(gameSeek.gameTypeDesc) + ";'>" + gameSeek.gameTypeDesc + "</td>";
+					const gId = parseInt(gameSeek.gameId);
+					const row = document.createElement('tr');
+					row.classList.add('gameSeekEntry', even ? 'even' : 'odd');
+					row.onclick = () => acceptGameSeekClicked(gId);
 
-					let icon = getUserOfflineIcon();
-					if (gameSeek.hostOnline) { icon = getUserOnlineIcon(); }
-					message += "<td>" + icon + gameSeek.hostUsername + "</td>";
+					const gameModeTd = document.createElement('td');
+					gameModeTd.style.color = getGameColor(gameSeek.gameTypeDesc);
+					gameModeTd.textContent = gameSeek.gameTypeDesc;
+					row.appendChild(gameModeTd);
 
-					if (gameSeek.rankedGame) {
-						message += "<td>" + gameSeek.hostRating + "</td>";
-					} else {
-						message += "<td>N/A</td>";
-					}
-					message += "</tr>";
+					const hostTd = document.createElement('td');
+					const iconSpan = document.createElement('span');
+					iconSpan.innerHTML = gameSeek.hostOnline ? getUserOnlineIcon() : getUserOfflineIcon();
+					hostTd.appendChild(iconSpan);
+					hostTd.appendChild(document.createTextNode(gameSeek.hostUsername));
+					row.appendChild(hostTd);
+
+					const rankingTd = document.createElement('td');
+					rankingTd.textContent = gameSeek.rankedGame ? gameSeek.hostRating : 'N/A';
+					row.appendChild(rankingTd);
+
+					table.appendChild(row);
 
 					for (let i = 0; i < gameSeek.gameOptions.length; i++) {
-						message += "<tr onclick='acceptGameSeekClicked(" + parseInt(gameSeek.gameId) + ");' class='" + ((even) ? ("even") : ("odd")) + "'><td colspan='3'><em>-Game Option: " + getGameOptionDescription(gameSeek.gameOptions[i]) + "</em></td></tr>";
+						const optionRow = document.createElement('tr');
+						optionRow.classList.add(even ? 'even' : 'odd');
+						optionRow.onclick = () => acceptGameSeekClicked(gId);
+						const optionTd = document.createElement('td');
+						optionTd.colSpan = 3;
+						const emElem = document.createElement('em');
+						emElem.textContent = '-Game Option: ' + getGameOptionDescription(gameSeek.gameOptions[i]);
+						optionTd.appendChild(emElem);
+						optionRow.appendChild(optionTd);
+						table.appendChild(optionRow);
 					}
 					even = !even;
 					gameSeeksDisplayed = true;
 				}
 			}
-			message += "<tr class='tr-footer'><td>Game Mode</td><td>Host</td><td>Ranking</td></tr></table>";
+
+			const footerRow = document.createElement('tr');
+			footerRow.classList.add('tr-footer');
+			const footerGameMode = document.createElement('td');
+			footerGameMode.textContent = 'Game Mode';
+			const footerHost = document.createElement('td');
+			footerHost.textContent = 'Host';
+			const footerRanking = document.createElement('td');
+			footerRanking.textContent = 'Ranking';
+			footerRow.appendChild(footerGameMode);
+			footerRow.appendChild(footerHost);
+			footerRow.appendChild(footerRanking);
+			table.appendChild(footerRow);
+
+			container.appendChild(table);
 		} else {
 			for (const index in gameSeekList) {
 				const gameSeek = gameSeekList[index];
@@ -4234,27 +4477,43 @@ const getGameSeeksCallback = (results) => {
 					|| !getGameTypeEntryFromId(gameSeek.gameTypeId).usersWithAccess
 					|| usernameIsOneOf(getGameTypeEntryFromId(gameSeek.gameTypeId).usersWithAccess)
 				) {
-					let hostOnlineOrNotIconText = getUserOfflineIcon();
-					if (gameSeek.hostOnline) {
-						hostOnlineOrNotIconText = getUserOnlineIcon();
-					}
-
 					if (gameSeek.gameTypeDesc !== gameTypeHeading) {
 						if (gameTypeHeading !== "") {
-							message += "<br />";
+							container.appendChild(document.createElement('br'));
 						}
 						gameTypeHeading = gameSeek.gameTypeDesc;
-						message += "<div class='modalContentHeading'>" + gameTypeHeading + "</div>";
+						const headingDiv = document.createElement('div');
+						headingDiv.classList.add('modalContentHeading');
+						headingDiv.textContent = gameTypeHeading;
+						container.appendChild(headingDiv);
 					}
-					message += "<div><div class='clickableText gameSeekEntry' onclick='acceptGameSeekClicked(" + parseInt(gameSeek.gameId) + ");'>Host: " + hostOnlineOrNotIconText + gameSeek.hostUsername;
+
+					const entryContainer = document.createElement('div');
+					const gId = parseInt(gameSeek.gameId);
+
+					const clickableDiv = document.createElement('div');
+					clickableDiv.classList.add('clickableText', 'gameSeekEntry');
+					clickableDiv.onclick = () => acceptGameSeekClicked(gId);
+					clickableDiv.appendChild(document.createTextNode('Host: '));
+					const iconSpan = document.createElement('span');
+					iconSpan.innerHTML = gameSeek.hostOnline ? getUserOnlineIcon() : getUserOfflineIcon();
+					clickableDiv.appendChild(iconSpan);
+					let hostText = gameSeek.hostUsername;
 					if (gameSeek.rankedGame) {
-						message += " (" + gameSeek.hostRating + ")";
+						hostText += ' (' + gameSeek.hostRating + ')';
 					}
-					message += "</div>";
+					clickableDiv.appendChild(document.createTextNode(hostText));
+					entryContainer.appendChild(clickableDiv);
+
 					for (let i = 0; i < gameSeek.gameOptions.length; i++) {
-						message += "<div>&nbsp;&bull;&nbsp;<em>Game Option: " + getGameOptionDescription(gameSeek.gameOptions[i]) + "</em></div>";
+						const optionDiv = document.createElement('div');
+						optionDiv.appendChild(document.createTextNode('\u00A0\u2022\u00A0'));
+						const emElem = document.createElement('em');
+						emElem.textContent = 'Game Option: ' + getGameOptionDescription(gameSeek.gameOptions[i]);
+						optionDiv.appendChild(emElem);
+						entryContainer.appendChild(optionDiv);
 					}
-					message += "</div>";
+					container.appendChild(entryContainer);
 					gameSeeksDisplayed = true;
 				}
 			}
@@ -4262,14 +4521,29 @@ const getGameSeeksCallback = (results) => {
 	}
 
 	if (!gameSeeksDisplayed) {
-		message = "No games available to join. You can create a new game, or join <a href='https://skudpaisho.com/discord' target='_blank'>Join the Discord</a> to find people to play with!";
+		container.innerHTML = '';
+		container.appendChild(document.createTextNode('No games available to join. You can create a new game, or '));
+		const discordLink = document.createElement('a');
+		discordLink.href = 'https://skudpaisho.com/discord';
+		discordLink.target = '_blank';
+		discordLink.textContent = 'Join the Discord';
+		container.appendChild(discordLink);
+		container.appendChild(document.createTextNode(' to find people to play with!'));
 	}
 
-	message += "<br /><br /><em><div id='activeGamesCountDisplay' style='font-size:smaller'>&nbsp;</div></em>";
+	container.appendChild(document.createElement('br'));
+	container.appendChild(document.createElement('br'));
+	const emElem = document.createElement('em');
+	const activeCountDiv = document.createElement('div');
+	activeCountDiv.id = 'activeGamesCountDisplay';
+	activeCountDiv.style.fontSize = 'smaller';
+	activeCountDiv.innerHTML = '&nbsp;';
+	emElem.appendChild(activeCountDiv);
+	container.appendChild(emElem);
 
 	onlinePlayEngine.getActiveGamesCount(getActiveGamesCountCallback);
 
-	showModal("Join a game", message);
+	showModalElem("Join a game", container);
 };
 
 /* From https://css-tricks.com/snippets/javascript/unescape-html-in-js/ */
@@ -4301,12 +4575,26 @@ export function viewGameSeeksClicked() {
 			showOnlinePlayPausedModal();
 		}
 	} else if (onlinePlayEnabled) {
-		let message = "<span class='skipBonus' onclick='loginClicked();'>Sign in</span> to play real-time games with others online. When you are signed in, this is where you can join games against other players.";
-		message += "<br /><br /><em><div id='activeGamesCountDisplay' style='font-size:smaller'>&nbsp;</div></em>";
-		showModal("Join a game", message);
+		const container = document.createElement('div');
+		const signInSpan = document.createElement('span');
+		signInSpan.classList.add('skipBonus');
+		signInSpan.textContent = 'Sign in';
+		signInSpan.onclick = () => loginClicked();
+		container.appendChild(signInSpan);
+		container.appendChild(document.createTextNode(" to play real-time games with others online. When you are signed in, this is where you can join games against other players."));
+		container.appendChild(document.createElement('br'));
+		container.appendChild(document.createElement('br'));
+		const emElem = document.createElement('em');
+		const activeCountDiv = document.createElement('div');
+		activeCountDiv.id = 'activeGamesCountDisplay';
+		activeCountDiv.style.fontSize = 'smaller';
+		activeCountDiv.innerHTML = '&nbsp;';
+		emElem.appendChild(activeCountDiv);
+		container.appendChild(emElem);
+		showModalElem("Join a game", container);
 		onlinePlayEngine.getActiveGamesCount(getActiveGamesCountCallback);
 	} else {
-		showModal("Join a game", "Online play is disabled right now. Maybe you are offline. Try again later!");
+		showModalElem("Join a game", document.createTextNode("Online play is disabled right now. Maybe you are offline. Try again later!"));
 	}
 }
 
@@ -4360,26 +4648,71 @@ const getCurrentGameSeeksHostedByUserCallback = (results) => {
 		if (gameController.isSolitaire()) {
 			yesCreateGame(gameTypeId);
 		} else {
-			let message = "<div>Do you want to create a game for others to join?</div>";
+			const container = document.createElement('div');
+
+			const questionDiv = document.createElement('div');
+			questionDiv.textContent = 'Do you want to create a game for others to join?';
+			container.appendChild(questionDiv);
+
 			if (!getGameTypeEntryFromId(gameTypeId).noRankedGames) {
 				if (!getBooleanPreference(createNonRankedGamePreferredKey)) {
 					toggleBooleanPreference(createNonRankedGamePreferredKey);
 				}
-				// var checkedValue = getBooleanPreference(createNonRankedGamePreferredKey) ? "" : "checked='true'";
-				const checkedValue = false;
-				message += "<br /><div><input id='createRankedGameCheckbox' type='checkbox' onclick='toggleBooleanPreference(createNonRankedGamePreferredKey);' " + checkedValue + "'><label for='createRankedGameCheckbox'> Ranked game (Player rankings will be affected and - in the future - publicly viewable game)</label></div>";
+				container.appendChild(document.createElement('br'));
+				const rankedDiv = document.createElement('div');
+				const rankedCheckbox = document.createElement('input');
+				rankedCheckbox.id = 'createRankedGameCheckbox';
+				rankedCheckbox.type = 'checkbox';
+				rankedCheckbox.checked = false;
+				rankedCheckbox.onclick = () => toggleBooleanPreference(createNonRankedGamePreferredKey);
+				rankedDiv.appendChild(rankedCheckbox);
+				const rankedLabel = document.createElement('label');
+				rankedLabel.htmlFor = 'createRankedGameCheckbox';
+				rankedLabel.textContent = ' Ranked game (Player rankings will be affected and - in the future - publicly viewable game)';
+				rankedDiv.appendChild(rankedLabel);
+				container.appendChild(rankedDiv);
 			}
 
 			if (GameClock.userHasGameClockAccess()) {
-				message += "<br /><div id='timeControlsDropdownContainer'></div>";
+				container.appendChild(document.createElement('br'));
+				const timeControlsDiv = document.createElement('div');
+				timeControlsDiv.id = 'timeControlsDropdownContainer';
+				container.appendChild(timeControlsDiv);
 			}
 
 			if (!gameController.isInviteOnly) {
-				message += "<br /><div class='clickableText' onclick='replaceWithLoadingText(this); yesCreateGame(" + gameTypeId + ", !getBooleanPreference(createNonRankedGamePreferredKey)); closeModal();'>Yes - create public game</div>";
+				container.appendChild(document.createElement('br'));
+				const publicGameDiv = document.createElement('div');
+				publicGameDiv.classList.add('clickableText');
+				publicGameDiv.textContent = 'Yes - create public game';
+				publicGameDiv.onclick = function() {
+					replaceWithLoadingText(this);
+					yesCreateGame(gameTypeId, !getBooleanPreference(createNonRankedGamePreferredKey));
+					closeModal();
+				};
+				container.appendChild(publicGameDiv);
 			}
-			message += "<br /><div class='clickableText' onclick='replaceWithLoadingText(this); yesCreatePrivateGame(" + gameTypeId + ", !getBooleanPreference(createNonRankedGamePreferredKey)); closeModal();'>Yes - create an invite-link game</div>";
-			message += "<br /><div class='clickableText' onclick='closeModal(); finalizeMove();'>No - local game only</div>";
-			showModal("Create game?", message);
+
+			container.appendChild(document.createElement('br'));
+			const privateGameDiv = document.createElement('div');
+			privateGameDiv.classList.add('clickableText');
+			privateGameDiv.textContent = 'Yes - create an invite-link game';
+			privateGameDiv.onclick = function() {
+				replaceWithLoadingText(this);
+				yesCreatePrivateGame(gameTypeId, !getBooleanPreference(createNonRankedGamePreferredKey));
+				closeModal();
+			};
+			container.appendChild(privateGameDiv);
+
+			container.appendChild(document.createElement('br'));
+			const localOnlyDiv = document.createElement('div');
+			localOnlyDiv.classList.add('clickableText');
+			localOnlyDiv.textContent = 'No - local game only';
+			localOnlyDiv.onclick = () => { closeModal(); finalizeMove(); };
+			container.appendChild(localOnlyDiv);
+
+			showModalElem("Create game?", container);
+
 			if (GameClock.userHasGameClockAccess()) {
 				setTimeout(() => {
 					const timeControlsDiv = document.getElementById("timeControlsDropdownContainer");
@@ -4398,23 +4731,62 @@ const getCurrentGameSeeksHostedByUserCallback = (results) => {
 		}
 	} else {
 		finalizeMove();
-		let message = "";
 		if (userIsLoggedIn()) {
-			message = "<div>You already have a public game waiting for an opponent. Do you want to create a private game for others to join?</div>";
+			const container = document.createElement('div');
+
+			const questionDiv = document.createElement('div');
+			questionDiv.textContent = 'You already have a public game waiting for an opponent. Do you want to create a private game for others to join?';
+			container.appendChild(questionDiv);
+
 			if (!getGameTypeEntryFromId(gameTypeId).noRankedGames) {
-				const checkedValue = getBooleanPreference(createNonRankedGamePreferredKey) ? "" : "checked='true'";
-				message += "<br /><div><input id='createRankedGameCheckbox' type='checkbox' onclick='toggleBooleanPreference(createNonRankedGamePreferredKey);' " + checkedValue + "'><label for='createRankedGameCheckbox'> Ranked game (Player rankings will be affected and - coming soon - publicly available game)</label></div>";
+				container.appendChild(document.createElement('br'));
+				const rankedDiv = document.createElement('div');
+				const rankedCheckbox = document.createElement('input');
+				rankedCheckbox.id = 'createRankedGameCheckbox';
+				rankedCheckbox.type = 'checkbox';
+				rankedCheckbox.checked = !getBooleanPreference(createNonRankedGamePreferredKey);
+				rankedCheckbox.onclick = () => toggleBooleanPreference(createNonRankedGamePreferredKey);
+				rankedDiv.appendChild(rankedCheckbox);
+				const rankedLabel = document.createElement('label');
+				rankedLabel.htmlFor = 'createRankedGameCheckbox';
+				rankedLabel.textContent = ' Ranked game (Player rankings will be affected and - coming soon - publicly available game)';
+				rankedDiv.appendChild(rankedLabel);
+				container.appendChild(rankedDiv);
 			}
+
 			if (GameClock.userHasGameClockAccess()) {
-				message += "<br /><div id='timeControlsDropdownContainer'></div>";
+				container.appendChild(document.createElement('br'));
+				const timeControlsDiv = document.createElement('div');
+				timeControlsDiv.id = 'timeControlsDropdownContainer';
+				container.appendChild(timeControlsDiv);
 			}
-			message += "<br /><div class='clickableText' onclick='replaceWithLoadingText(this); yesCreatePrivateGame(" + gameTypeId + ", !getBooleanPreference(createNonRankedGamePreferredKey)); closeModal();'>Yes - create a private game with a friend</div>";
-			message += "<br /><div class='clickableText' onclick='closeModal(); finalizeMove();'>No - local game only</div>";
-			showModal("Create game?", message);
+
+			container.appendChild(document.createElement('br'));
+			const privateGameDiv = document.createElement('div');
+			privateGameDiv.classList.add('clickableText');
+			privateGameDiv.textContent = 'Yes - create a private game with a friend';
+			privateGameDiv.onclick = function() {
+				replaceWithLoadingText(this);
+				yesCreatePrivateGame(gameTypeId, !getBooleanPreference(createNonRankedGamePreferredKey));
+				closeModal();
+			};
+			container.appendChild(privateGameDiv);
+
+			container.appendChild(document.createElement('br'));
+			const localOnlyDiv = document.createElement('div');
+			localOnlyDiv.classList.add('clickableText');
+			localOnlyDiv.textContent = 'No - local game only';
+			localOnlyDiv.onclick = () => { closeModal(); finalizeMove(); };
+			container.appendChild(localOnlyDiv);
+
+			showModalElem("Create game?", container);
 		} else {
-			message = "You are not signed in. ";
-			message += "<br /><br />You can still play the game locally, but it will not be saved online.";
-			showModal("Game Not Created", message);
+			const notSignedInContainer = document.createElement('div');
+			notSignedInContainer.appendChild(document.createTextNode("You are not signed in. "));
+			notSignedInContainer.appendChild(document.createElement('br'));
+			notSignedInContainer.appendChild(document.createElement('br'));
+			notSignedInContainer.appendChild(document.createTextNode("You can still play the game locally, but it will not be saved online."));
+			showModalElem("Game Not Created", notSignedInContainer);
 			if (GameClock.userHasGameClockAccess()) {
 				setTimeout(() => {
 					const timeControlsDiv = document.getElementById("timeControlsDropdownContainer");
@@ -4708,11 +5080,40 @@ const processChatEasterEggCommands = (chatMessage) => {
 };
 
 export function promptForAgeToTreeYears() {
-	let message = "<br />Age: <input type='text' id='humanAgeInput' name='humanAgeInput' />";
-	message += "<br /><div class='clickableText' onclick='submitHumanAge()'>Convert to tree years</div>";
-	message += "<br /><div id='treeYearsResult'></div>";
-	message += "<br /><br /><div>Confused? <a href='https://skudpaisho.com/discord' target='_blank'>Join the Discord</a>! :))</div>";
-	showModal("How Old Are You in Tree Years?", message);
+	const container = document.createElement('div');
+	container.appendChild(document.createElement('br'));
+	container.appendChild(document.createTextNode('Age: '));
+	const ageInput = document.createElement('input');
+	ageInput.type = 'text';
+	ageInput.id = 'humanAgeInput';
+	ageInput.name = 'humanAgeInput';
+	container.appendChild(ageInput);
+
+	container.appendChild(document.createElement('br'));
+	const convertDiv = document.createElement('div');
+	convertDiv.classList.add('clickableText');
+	convertDiv.textContent = 'Convert to tree years';
+	convertDiv.onclick = () => submitHumanAge();
+	container.appendChild(convertDiv);
+
+	container.appendChild(document.createElement('br'));
+	const resultDiv = document.createElement('div');
+	resultDiv.id = 'treeYearsResult';
+	container.appendChild(resultDiv);
+
+	container.appendChild(document.createElement('br'));
+	container.appendChild(document.createElement('br'));
+	const confusedDiv = document.createElement('div');
+	confusedDiv.appendChild(document.createTextNode('Confused? '));
+	const discordLink = document.createElement('a');
+	discordLink.href = 'https://skudpaisho.com/discord';
+	discordLink.target = '_blank';
+	discordLink.textContent = 'Join the Discord';
+	confusedDiv.appendChild(discordLink);
+	confusedDiv.appendChild(document.createTextNode('! :))'));
+	container.appendChild(confusedDiv);
+
+	showModalElem("How Old Are You in Tree Years?", container);
 }
 
 export function submitHumanAge() {
@@ -4759,13 +5160,14 @@ export function openTab(evt, tabIdName) {
 }
 
 export function showGameNotationModal() {
-	let message = "";
+	const container = document.createElement('div');
+	const notationDiv = document.createElement('div');
+	notationDiv.classList.add('coordinatesNotation');
+	notationDiv.innerHTML = gameController.gameNotation.getNotationForEmail().replace(/\[BR\]/g, '<br />');
+	container.appendChild(notationDiv);
+	container.appendChild(document.createElement('br'));
 
-	message += "<div class='coordinatesNotation'>";
-	message += gameController.gameNotation.getNotationForEmail().replace(/\[BR\]/g, '<br />');
-	message += "</div><br />";
-
-	showModal("Game Notation", message);
+	showModalElem("Game Notation", container);
 }
 
 export function showGameReplayLink() {
@@ -4795,13 +5197,46 @@ export function showGameReplayLink() {
 	linkUrl = sandboxUrl + "?" + linkUrl;
 
 	debug("GameReplayLinkUrl: " + linkUrl);
-	let message = "Here is the <a id='gameReplayLink' href=\"" + linkUrl + "\" target='_blank'>game replay link</a> to the current point in the game.<button id='copyGameLinkButton' disabled class='button gone'>Copy Link</button> <br /><br />";
+	const container = document.createElement('div');
+	container.appendChild(document.createTextNode("Here is the "));
+	const replayLink = document.createElement('a');
+	replayLink.id = 'gameReplayLink';
+	replayLink.href = linkUrl;
+	replayLink.target = '_blank';
+	replayLink.textContent = 'game replay link';
+	container.appendChild(replayLink);
+	container.appendChild(document.createTextNode(" to the current point in the game."));
+	const copyReplayBtn = document.createElement('button');
+	copyReplayBtn.id = 'copyGameLinkButton';
+	copyReplayBtn.disabled = true;
+	copyReplayBtn.classList.add('button', 'gone');
+	copyReplayBtn.textContent = 'Copy Link';
+	container.appendChild(copyReplayBtn);
+	container.appendChild(document.createTextNode(" "));
+	container.appendChild(document.createElement('br'));
+	container.appendChild(document.createElement('br'));
+
 	if (playingOnlineGame()) {
 		const spectateUrl = buildSpectateUrl();
-		message += "<br /><br />";
-		message += "Here is the <a href=\"" + spectateUrl + "\" target='_blank'>spectate link</a> others can use to watch the game live and participate in the Game Chat. <button onclick='copyTextToClipboard(\"" + spectateUrl + "\", this);' class='button'>Copy Link</button> <br /><br />";
+		container.appendChild(document.createElement('br'));
+		container.appendChild(document.createElement('br'));
+		container.appendChild(document.createTextNode("Here is the "));
+		const spectateLink = document.createElement('a');
+		spectateLink.href = spectateUrl;
+		spectateLink.target = '_blank';
+		spectateLink.textContent = 'spectate link';
+		container.appendChild(spectateLink);
+		container.appendChild(document.createTextNode(" others can use to watch the game live and participate in the Game Chat. "));
+		const copySpectateBtn = document.createElement('button');
+		copySpectateBtn.classList.add('button');
+		copySpectateBtn.textContent = 'Copy Link';
+		copySpectateBtn.onclick = function() { copyTextToClipboard(spectateUrl, this); };
+		container.appendChild(copySpectateBtn);
+		container.appendChild(document.createTextNode(" "));
+		container.appendChild(document.createElement('br'));
+		container.appendChild(document.createElement('br'));
 	}
-	showModal("Game Links", message);
+	showModalElem("Game Links", container);
 
 	getShortUrl(linkUrl, (shortUrl) => {
 		const linkTag = document.getElementById('gameReplayLink');
@@ -4828,13 +5263,23 @@ export function buildSpectateUrl() {
 }
 
 export function showPrivacyPolicy() {
-	let message = "";
-	message += "<ul>";
-	message += "<li>All online games (and associated chat conversations) are recorded and may be available to view by others.</li>";
-	message += "<li>Usernames will be shown publicly to other players and anyone viewing game replays.</li>";
-	message += "<li>Email addresses will never be purposefully shared with other players.</li>";
-	message += "</ul>";
-	showModal("Privacy Policy", message);
+	const container = document.createElement('div');
+	const ul = document.createElement('ul');
+
+	const li1 = document.createElement('li');
+	li1.textContent = "All online games (and associated chat conversations) are recorded and may be available to view by others.";
+	ul.appendChild(li1);
+
+	const li2 = document.createElement('li');
+	li2.textContent = "Usernames will be shown publicly to other players and anyone viewing game replays.";
+	ul.appendChild(li2);
+
+	const li3 = document.createElement('li');
+	li3.textContent = "Email addresses will never be purposefully shared with other players.";
+	ul.appendChild(li3);
+
+	container.appendChild(ul);
+	showModalElem("Privacy Policy", container);
 }
 
 export function dismissChatAlert() {
@@ -4871,9 +5316,72 @@ export function closeNav() {
 }
 
 export function aboutClicked() {
-	let message = "<div><em>The Garden Gate</em> is a place to play various fan-made <em>Pai Sho</em> games and other games, too. A Pai Sho game is a game played on a board for the fictional game of Pai Sho as seen in Avatar: The Last Airbender. <a href='https://skudpaisho.com/site/' target='_blank'>Learn more</a>.</div>";
-	message += "<hr /><div> Modern Skud Pai Sho tile designs by Hector Lowe<br /> ©2017 | Used with permission<br /> <a href='http://hector-lowe.com/' target='_blank'>www.hector-lowe.com</a> </div> <div class='license'><a rel='license' href='http://creativecommons.org/licenses/by-nc/3.0/us/'><img alt='Creative Commons License' style='border-width:0' src='https://i.creativecommons.org/l/by-nc/3.0/us/88x31.png' /></a>&nbsp;All other content of this work is licensed under a <a rel='license' href='http://creativecommons.org/licenses/by-nc/3.0/us/'>Creative Commons Attribution-NonCommercial 3.0 United States License</a>.</div> <br /> <div><span class='skipBonus' onclick='showPrivacyPolicy();'>Privacy policy</span></div>";
-	showModal("About", message);
+	const container = document.createElement('div');
+
+	const introDiv = document.createElement('div');
+	const em1 = document.createElement('em');
+	em1.textContent = 'The Garden Gate';
+	introDiv.appendChild(em1);
+	introDiv.appendChild(document.createTextNode(' is a place to play various fan-made '));
+	const em2 = document.createElement('em');
+	em2.textContent = 'Pai Sho';
+	introDiv.appendChild(em2);
+	introDiv.appendChild(document.createTextNode(' games and other games, too. A Pai Sho game is a game played on a board for the fictional game of Pai Sho as seen in Avatar: The Last Airbender. '));
+	const learnMoreLink = document.createElement('a');
+	learnMoreLink.href = 'https://skudpaisho.com/site/';
+	learnMoreLink.target = '_blank';
+	learnMoreLink.textContent = 'Learn more';
+	introDiv.appendChild(learnMoreLink);
+	introDiv.appendChild(document.createTextNode('.'));
+	container.appendChild(introDiv);
+
+	container.appendChild(document.createElement('hr'));
+
+	const creditsDiv = document.createElement('div');
+	creditsDiv.appendChild(document.createTextNode(' Modern Skud Pai Sho tile designs by Hector Lowe'));
+	creditsDiv.appendChild(document.createElement('br'));
+	creditsDiv.appendChild(document.createTextNode(' ©2017 | Used with permission'));
+	creditsDiv.appendChild(document.createElement('br'));
+	creditsDiv.appendChild(document.createTextNode(' '));
+	const hectorLink = document.createElement('a');
+	hectorLink.href = 'http://hector-lowe.com/';
+	hectorLink.target = '_blank';
+	hectorLink.textContent = 'www.hector-lowe.com';
+	creditsDiv.appendChild(hectorLink);
+	creditsDiv.appendChild(document.createTextNode(' '));
+	container.appendChild(creditsDiv);
+
+	const licenseDiv = document.createElement('div');
+	licenseDiv.classList.add('license');
+	const ccLink = document.createElement('a');
+	ccLink.rel = 'license';
+	ccLink.href = 'http://creativecommons.org/licenses/by-nc/3.0/us/';
+	const ccImg = document.createElement('img');
+	ccImg.alt = 'Creative Commons License';
+	ccImg.style.borderWidth = '0';
+	ccImg.src = 'https://i.creativecommons.org/l/by-nc/3.0/us/88x31.png';
+	ccLink.appendChild(ccImg);
+	licenseDiv.appendChild(ccLink);
+	licenseDiv.appendChild(document.createTextNode('\u00A0All other content of this work is licensed under a '));
+	const ccLink2 = document.createElement('a');
+	ccLink2.rel = 'license';
+	ccLink2.href = 'http://creativecommons.org/licenses/by-nc/3.0/us/';
+	ccLink2.textContent = 'Creative Commons Attribution-NonCommercial 3.0 United States License';
+	licenseDiv.appendChild(ccLink2);
+	licenseDiv.appendChild(document.createTextNode('.'));
+	container.appendChild(licenseDiv);
+
+	container.appendChild(document.createElement('br'));
+
+	const privacyDiv = document.createElement('div');
+	const privacySpan = document.createElement('span');
+	privacySpan.classList.add('skipBonus');
+	privacySpan.textContent = 'Privacy policy';
+	privacySpan.onclick = () => showPrivacyPolicy();
+	privacyDiv.appendChild(privacySpan);
+	container.appendChild(privacyDiv);
+
+	showModalElem("About", container);
 }
 
 export function getOnlineGameOpponentUsername() {
@@ -4922,20 +5430,35 @@ export function quitInactiveOnlineGame() {
 }
 
 export function quitOnlineGameClicked() {
-	let message = "";
+	const container = document.createElement('div');
+
 	if (playingOnlineGame() && iAmPlayerInCurrentOnlineGame()
 		&& !getGameWinner()
 		&& (currentGameData.hostUsername === currentGameData.guestUsername
 			|| (!myTurn() && onlineGameIsOldEnoughToBeQuit()))
 	) {
-		message = "<div>Are you sure you want to quit and end this inactive game? The game will appear as Inactive in your Completed Games list, but will become active again when your opponent plays.</div>";
-		message += "<br /><div class='clickableText' onclick='closeModal(); quitInactiveOnlineGame();'>Yes - mark current game inactive</div>";
-		message += "<br /><div class='clickableText' onclick='closeModal();'>No - cancel</div>";
+		const questionDiv = document.createElement('div');
+		questionDiv.textContent = "Are you sure you want to quit and end this inactive game? The game will appear as Inactive in your Completed Games list, but will become active again when your opponent plays.";
+		container.appendChild(questionDiv);
+
+		container.appendChild(document.createElement('br'));
+		const yesDiv = document.createElement('div');
+		yesDiv.classList.add('clickableText');
+		yesDiv.textContent = 'Yes - mark current game inactive';
+		yesDiv.onclick = () => { closeModal(); quitInactiveOnlineGame(); };
+		container.appendChild(yesDiv);
+
+		container.appendChild(document.createElement('br'));
+		const noDiv = document.createElement('div');
+		noDiv.classList.add('clickableText');
+		noDiv.textContent = 'No - cancel';
+		noDiv.onclick = () => closeModal();
+		container.appendChild(noDiv);
 	} else {
-		message = "When playing an unfinished inactive online game, this is where you can mark the game inactive to hide it from your My Games list.";
+		container.appendChild(document.createTextNode("When playing an unfinished inactive online game, this is where you can mark the game inactive to hide it from your My Games list."));
 	}
 
-	showModal("Quit Current Online Game", message);
+	showModalElem("Quit Current Online Game", container);
 }
 
 export function doNotShowMarkInactiveDialogAgain() {
@@ -4944,7 +5467,6 @@ export function doNotShowMarkInactiveDialogAgain() {
 
 export function markGameInactiveClicked() {
 	// Do they want to have it take immediate action? Or do they want the dialog to show?
-	let message = "";
 	if (playingOnlineGame() && iAmPlayerInCurrentOnlineGame()
 		&& !getGameWinner()
 		&& (currentGameData.hostUsername === currentGameData.guestUsername
@@ -4953,17 +5475,37 @@ export function markGameInactiveClicked() {
 		if (localStorage.getItem(markGameInactiveWithoutDialogKey) === 'true') {
 			quitInactiveOnlineGame();
 		} else {
-			message = "<div>Are you sure you want mark this game inactive? The game will appear as Inactive in your Completed Games list, but will become active again when your opponent plays.</div>";
-			message += "<br /><div class='clickableText' onclick='closeModal(); quitInactiveOnlineGame();'>Yes - mark current game inactive</div>";
-			message += "<br /><div class='clickableText' onclick='closeModal(); doNotShowMarkInactiveDialogAgain(); quitInactiveOnlineGame();'>Yes - mark current game inactive and don't show this again</div>";
-			message += "<br /><div class='clickableText' onclick='closeModal();'>No - cancel</div>";
+			const container = document.createElement('div');
+
+			const questionDiv = document.createElement('div');
+			questionDiv.textContent = "Are you sure you want mark this game inactive? The game will appear as Inactive in your Completed Games list, but will become active again when your opponent plays.";
+			container.appendChild(questionDiv);
+
+			container.appendChild(document.createElement('br'));
+			const yesDiv = document.createElement('div');
+			yesDiv.classList.add('clickableText');
+			yesDiv.textContent = 'Yes - mark current game inactive';
+			yesDiv.onclick = () => { closeModal(); quitInactiveOnlineGame(); };
+			container.appendChild(yesDiv);
+
+			container.appendChild(document.createElement('br'));
+			const yesDontShowDiv = document.createElement('div');
+			yesDontShowDiv.classList.add('clickableText');
+			yesDontShowDiv.textContent = "Yes - mark current game inactive and don't show this again";
+			yesDontShowDiv.onclick = () => { closeModal(); doNotShowMarkInactiveDialogAgain(); quitInactiveOnlineGame(); };
+			container.appendChild(yesDontShowDiv);
+
+			container.appendChild(document.createElement('br'));
+			const noDiv = document.createElement('div');
+			noDiv.classList.add('clickableText');
+			noDiv.textContent = 'No - cancel';
+			noDiv.onclick = () => closeModal();
+			container.appendChild(noDiv);
+
+			showModalElem("Mark Current Game Inactive", container);
 		}
 	} else {
-		message = "When playing an unfinished inactive online game, this is where you can mark the game inactive to hide it from your My Games list.";
-	}
-
-	if (message.length > 0) {
-		showModal("Mark Current Game Inactive", message);
+		showModalElem("Mark Current Game Inactive", document.createTextNode("When playing an unfinished inactive online game, this is where you can mark the game inactive to hide it from your My Games list."));
 	}
 }
 
@@ -4984,20 +5526,35 @@ export function resignOnlineGame() {
 }
 
 export function resignOnlineGameClicked() {
-	let message = "";
+	const container = document.createElement('div');
+
 	if (playingOnlineGame()
 		&& iAmPlayerInCurrentOnlineGame()
 		&& !getGameWinner()
 		&& myTurn()
 	) {
-		message = "<div>Are you sure you want to resign this game, marking it as your loss?</div>";
-		message += "<br /><div class='clickableText' onclick='closeModal(); resignOnlineGame();'>Yes - resign current game</div>";
-		message += "<br /><div class='clickableText' onclick='closeModal();'>No - cancel</div>";
+		const questionDiv = document.createElement('div');
+		questionDiv.textContent = "Are you sure you want to resign this game, marking it as your loss?";
+		container.appendChild(questionDiv);
+
+		container.appendChild(document.createElement('br'));
+		const yesDiv = document.createElement('div');
+		yesDiv.classList.add('clickableText');
+		yesDiv.textContent = 'Yes - resign current game';
+		yesDiv.onclick = () => { closeModal(); resignOnlineGame(); };
+		container.appendChild(yesDiv);
+
+		container.appendChild(document.createElement('br'));
+		const noDiv = document.createElement('div');
+		noDiv.classList.add('clickableText');
+		noDiv.textContent = 'No - cancel';
+		noDiv.onclick = () => closeModal();
+		container.appendChild(noDiv);
 	} else {
-		message = "When playing an online game, this is where you can resign the game on your turn.";
+		container.appendChild(document.createTextNode("When playing an online game, this is where you can resign the game on your turn."));
 	}
 
-	showModal("Resign Current Online Game", message);
+	showModalElem("Resign Current Online Game", container);
 }
 
 export function onlineGameIsOldEnoughToBeQuit() {
@@ -5021,10 +5578,24 @@ export function iOSShake() {
 	// If undo move is allowed, ask user if they wanna
 	if ((playingOnlineGame() && !myTurn() && !getGameWinner())
 		|| (!playingOnlineGame())) {
-		let message = "<br /><div class='clickableText' onclick='resetMove(); closeModal();'>Yes, undo move</div>";
-		message += "<br /><div class='clickableText' onclick='closeModal();'>Cancel</div>";
+		const container = document.createElement('div');
+		container.appendChild(document.createElement('br'));
 
-		showModal("Undo move?", message);
+		const yesDiv = document.createElement('div');
+		yesDiv.classList.add('clickableText');
+		yesDiv.textContent = 'Yes, undo move';
+		yesDiv.onclick = () => { resetMove(); closeModal(); };
+		container.appendChild(yesDiv);
+
+		container.appendChild(document.createElement('br'));
+
+		const cancelDiv = document.createElement('div');
+		cancelDiv.classList.add('clickableText');
+		cancelDiv.textContent = 'Cancel';
+		cancelDiv.onclick = () => closeModal();
+		container.appendChild(cancelDiv);
+
+		showModalElem("Undo move?", container);
 	}
 }
 
@@ -5070,38 +5641,79 @@ export function promptAddOption() {
 		Ads.showRandomPopupAd();
 	}
 
-	let message = "";
 	if (usernameIsOneOf(['SkudPaiSho'])) {
 		Ads.enableAds(true);
 
-		message = "<br /><input type='text' id='optionAddInput' name='optionAddInput' />";
-		message += "<br /><div class='clickableText' onclick='addOptionFromInput()'>Add</div>";
+		const container = document.createElement('div');
+		container.appendChild(document.createElement('br'));
+
+		const optionInput = document.createElement('input');
+		optionInput.type = 'text';
+		optionInput.id = 'optionAddInput';
+		optionInput.name = 'optionAddInput';
+		container.appendChild(optionInput);
+
+		container.appendChild(document.createElement('br'));
+		const addDiv = document.createElement('div');
+		addDiv.classList.add('clickableText');
+		addDiv.textContent = 'Add';
+		addDiv.onclick = () => addOptionFromInput();
+		container.appendChild(addDiv);
 
 		if (ggOptions.length > 0) {
-			message += "<br />";
+			container.appendChild(document.createElement('br'));
 			for (let i = 0; i < ggOptions.length; i++) {
-				message += "<div>";
-				message += ggOptions[i];
-				message += "</div>";
+				const optDiv = document.createElement('div');
+				optDiv.textContent = ggOptions[i];
+				container.appendChild(optDiv);
 			}
-			message += "<br /><div class='clickableText' onclick='clearOptions()'>Clear Options</div>";
+			container.appendChild(document.createElement('br'));
+			const clearDiv = document.createElement('div');
+			clearDiv.classList.add('clickableText');
+			clearDiv.textContent = 'Clear Options';
+			clearDiv.onclick = () => clearOptions();
+			container.appendChild(clearDiv);
 		}
 
-		message += "<br /><div class='clickableText' onclick='Ads.showRandomPopupAd()'>Show Ad</div>";
+		container.appendChild(document.createElement('br'));
+		const adDiv = document.createElement('div');
+		adDiv.classList.add('clickableText');
+		adDiv.textContent = 'Show Ad';
+		adDiv.onclick = () => Ads.showRandomPopupAd();
+		container.appendChild(adDiv);
 
-		showModal("Secrets", message);
+		showModalElem("Secrets", container);
 	} else if (usernameIsOneOf(['SkudPaiSho', 'Adevar'])) {
 		showGiveawayDrawingModal();
 	}
 }
 
 export function showGiveawayDrawingModal() {
-	let message = "Enter list of names:";
-	message += "<br /><textarea rows = '11' cols = '40' name = 'description' id='giveawayNamesTextbox'></textarea>";
-	message += "<br /><div class='clickableText' onclick='Giveaway.doIt()'>Choose name</div>";
-	message += "<br /><div id='giveawayResults'>:)</div>";
+	const container = document.createElement('div');
+	container.appendChild(document.createTextNode('Enter list of names:'));
+	container.appendChild(document.createElement('br'));
 
-	showModal("Giveaway Winner Chooser!", message);
+	const textarea = document.createElement('textarea');
+	textarea.rows = 11;
+	textarea.cols = 40;
+	textarea.name = 'description';
+	textarea.id = 'giveawayNamesTextbox';
+	container.appendChild(textarea);
+
+	container.appendChild(document.createElement('br'));
+	const chooseDiv = document.createElement('div');
+	chooseDiv.classList.add('clickableText');
+	chooseDiv.textContent = 'Choose name';
+	chooseDiv.onclick = () => Giveaway.doIt();
+	container.appendChild(chooseDiv);
+
+	container.appendChild(document.createElement('br'));
+	const resultsDiv = document.createElement('div');
+	resultsDiv.id = 'giveawayResults';
+	resultsDiv.textContent = ':)';
+	container.appendChild(resultsDiv);
+
+	showModalElem("Giveaway Winner Chooser!", container);
 }
 
 export function addGameOption(option) {
@@ -5161,7 +5773,14 @@ export function getGameOptionsMessageElement(options) {
 
 export function showBadMoveModal() {
 	clearGameWatchInterval();
-	showModal("Uh Oh", "A move went wrong somewhere. If you see this each time you look at this game, then this game may be corrupt. <br /><br />Please let your opponent know that you saw this message. You may want to quit this game and try again.<br />Live game updates have been paused.");
+	const container = document.createElement('div');
+	container.appendChild(document.createTextNode("A move went wrong somewhere. If you see this each time you look at this game, then this game may be corrupt. "));
+	container.appendChild(document.createElement('br'));
+	container.appendChild(document.createElement('br'));
+	container.appendChild(document.createTextNode("Please let your opponent know that you saw this message. You may want to quit this game and try again."));
+	container.appendChild(document.createElement('br'));
+	container.appendChild(document.createTextNode("Live game updates have been paused."));
+	showModalElem("Uh Oh", container);
 }
 
 
@@ -5265,9 +5884,9 @@ export function setWebsiteTheme(theme) {
 			closeModal();
 			setWebsiteTheme("stotes");
 		};
-		showModal(
+		showModalElem(
 			"Changing Theme",
-			"To apply this theme, you will need to refresh the website.",
+			document.createTextNode("To apply this theme, you will need to refresh the website."),
 			false,
 			yesNoOptions);
 	}
@@ -5417,34 +6036,43 @@ export function show2020GameStats(showWins) {
 				} catch (error) {
 					debug("Error parsing info");
 					closeModal();
-					showModal("Error", "Error getting stats info.");
+					showModalElem("Error", document.createTextNode("Error getting stats info."));
+					return;
 				}
 
 				if (resultData.stats) {
-
-					let message = getUsername() + "'s total completed games against other players:<br />";
+					const container = document.createElement('div');
+					container.appendChild(document.createTextNode(getUsername() + "'s total completed games against other players:"));
+					container.appendChild(document.createElement('br'));
 
 					const stats = resultData.stats;
 
 					for (let i = 0; i < stats.length; i++) {
 						const totalWins = stats[i].totalWins ? stats[i].totalWins : 0;
 						const winPercent = Math.round(totalWins / stats[i].totalGamesCompleted * 100);
+						container.appendChild(document.createElement('br'));
 						if (showWins) {
 							let winOrWins = "wins";
 							if (totalWins === 1) {
 								winOrWins = "win";
 							}
-							message += "<br />" + stats[i].gameType + ": " + stats[i].totalGamesCompleted + " (" + totalWins + " " + winOrWins + ", " + winPercent + "%)";
+							container.appendChild(document.createTextNode(stats[i].gameType + ": " + stats[i].totalGamesCompleted + " (" + totalWins + " " + winOrWins + ", " + winPercent + "%)"));
 						} else {
-							message += "<br />" + stats[i].gameType + ": " + stats[i].totalGamesCompleted;
+							container.appendChild(document.createTextNode(stats[i].gameType + ": " + stats[i].totalGamesCompleted));
 						}
 					}
 
 					if (!showWins) {
-						message += "<br /><br /><span class='skipBonus' onclick='show2020GameStats(true);'>Show number of wins for each game</span>";
+						container.appendChild(document.createElement('br'));
+						container.appendChild(document.createElement('br'));
+						const showWinsSpan = document.createElement('span');
+						showWinsSpan.classList.add('skipBonus');
+						showWinsSpan.textContent = 'Show number of wins for each game';
+						showWinsSpan.onclick = () => show2020GameStats(true);
+						container.appendChild(showWinsSpan);
 					}
 
-					showModal("2020 Completed Games Stats", message);
+					showModalElem("2020 Completed Games Stats", container);
 				}
 			}
 		}
@@ -5462,12 +6090,14 @@ export function showGameStats(showWins) {
 				} catch (error) {
 					debug("Error parsing info");
 					closeModal();
-					showModal("Error", "Error getting stats info.");
+					showModalElem("Error", document.createTextNode("Error getting stats info."));
+					return;
 				}
 
 				if (resultData.stats) {
-
-					let message = getUsername() + "'s total completed games against other players:<br />";
+					const container = document.createElement('div');
+					container.appendChild(document.createTextNode(getUsername() + "'s total completed games against other players:"));
+					container.appendChild(document.createElement('br'));
 
 					const stats = resultData.stats;
 
@@ -5479,26 +6109,53 @@ export function showGameStats(showWins) {
 						}
 						const totalWins = stats[i].totalWins ? stats[i].totalWins : 0;
 						const winPercent = Math.round(totalWins / stats[i].totalGamesCompleted * 100);
+						container.appendChild(document.createElement('br'));
 						if (showWins) {
 							let winOrWins = "wins";
 							if (totalWins === 1) {
 								winOrWins = "win";
 							}
-							message += "<br />" + stats[i].gameType + ": " + stats[i].totalGamesCompleted + " (" + totalWins + " " + winOrWins + ", " + winPercent + "%)";
+							container.appendChild(document.createTextNode(stats[i].gameType + ": " + stats[i].totalGamesCompleted + " (" + totalWins + " " + winOrWins + ", " + winPercent + "%)"));
 						} else {
-							message += "<br />" + stats[i].gameType + ": " + stats[i].totalGamesCompleted;
+							container.appendChild(document.createTextNode(stats[i].gameType + ": " + stats[i].totalGamesCompleted));
 						}
 					}
 
-					message += "<br /><br />Total games (excluding Playground): " + totalGamesTally;
-					message += "<br /><br />" + getHonoraryTitleMessage(stats, totalGamesTally);
-					message += "<br />You can use this honorary title at <a href='https://skudpaisho.com/discord' target='_blank'>The Garden Gate Discord</a>. <a href='https://discord.com/channels/380904760556912641/1160675521496105143/1160675598813896735' target='_blank'>See Honorary Title information here.</a>";
+					container.appendChild(document.createElement('br'));
+					container.appendChild(document.createElement('br'));
+					container.appendChild(document.createTextNode("Total games (excluding Playground): " + totalGamesTally));
+
+					container.appendChild(document.createElement('br'));
+					container.appendChild(document.createElement('br'));
+					const titleSpan = document.createElement('span');
+					titleSpan.innerHTML = getHonoraryTitleMessage(stats, totalGamesTally);
+					container.appendChild(titleSpan);
+
+					container.appendChild(document.createElement('br'));
+					container.appendChild(document.createTextNode("You can use this honorary title at "));
+					const discordLink = document.createElement('a');
+					discordLink.href = 'https://skudpaisho.com/discord';
+					discordLink.target = '_blank';
+					discordLink.textContent = 'The Garden Gate Discord';
+					container.appendChild(discordLink);
+					container.appendChild(document.createTextNode(". "));
+					const infoLink = document.createElement('a');
+					infoLink.href = 'https://discord.com/channels/380904760556912641/1160675521496105143/1160675598813896735';
+					infoLink.target = '_blank';
+					infoLink.textContent = 'See Honorary Title information here.';
+					container.appendChild(infoLink);
 
 					if (!showWins) {
-						message += "<br /><br /><span class='skipBonus' onclick='showGameStats(true);'>Show number of wins for each game</span>";
+						container.appendChild(document.createElement('br'));
+						container.appendChild(document.createElement('br'));
+						const showWinsSpan = document.createElement('span');
+						showWinsSpan.classList.add('skipBonus');
+						showWinsSpan.textContent = 'Show number of wins for each game';
+						showWinsSpan.onclick = () => showGameStats(true);
+						container.appendChild(showWinsSpan);
 					}
 
-					showModal("Completed Games Stats", message);
+					showModalElem("Completed Games Stats", container);
 				}
 			}
 		}
@@ -5559,19 +6216,32 @@ export function setCustomTileDesignsFromInput() {
 }
 
 export function promptForCustomTileDesigns(gameType, existingCustomTilesUrl) {
-	let message = "<p>You can use fan-created tile design sets. See the #custom-tile-designs channel in The Garden Gate Discord. Copy and paste the link to one of the images here:</p>";
-	// message += "<br />Name: <input type='text' id='customTileDesignsNameInput' name='customTileDesignsNameInput' /><br />";
+	const container = document.createElement('div');
 
-	message += "<br />URL: <input type='text' id='customTileDesignsUrlInput' name='customTileDesignsUrlInput'";
+	const p = document.createElement('p');
+	p.textContent = "You can use fan-created tile design sets. See the #custom-tile-designs channel in The Garden Gate Discord. Copy and paste the link to one of the images here:";
+	container.appendChild(p);
+
+	container.appendChild(document.createElement('br'));
+	container.appendChild(document.createTextNode('URL: '));
+	const urlInput = document.createElement('input');
+	urlInput.type = 'text';
+	urlInput.id = 'customTileDesignsUrlInput';
+	urlInput.name = 'customTileDesignsUrlInput';
 	if (existingCustomTilesUrl) {
-		message += " value='" + existingCustomTilesUrl + "'";
+		urlInput.value = existingCustomTilesUrl;
 	}
-	message += " /><br />";
+	container.appendChild(urlInput);
+	container.appendChild(document.createElement('br'));
 
-	message += "<br /><div class='clickableText' onclick='closeModal();setCustomTileDesignsFromInput()'>Apply Custom Tile Designs for " + gameType.desc + "</div>";
-	// message += "<br /><br /><div class='clickableText' onclick='clearCustomBoardEntries()'>Clear Custom Boards</div>";
+	container.appendChild(document.createElement('br'));
+	const applyDiv = document.createElement('div');
+	applyDiv.classList.add('clickableText');
+	applyDiv.textContent = 'Apply Custom Tile Designs for ' + gameType.desc;
+	applyDiv.onclick = () => { closeModal(); setCustomTileDesignsFromInput(); };
+	container.appendChild(applyDiv);
 
-	showModal("Use Custom Tile Designs", message);
+	showModalElem("Use Custom Tile Designs", container);
 }
 
 

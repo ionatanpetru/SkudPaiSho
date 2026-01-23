@@ -14,7 +14,7 @@ import {
 	callSubmitMove,
 	submitMoveData,
 	confirmMoveToSubmit,
-	showModal
+	showModalElem,
 } from './PaiShoMain';
 import { OnboardingFunctions } from './OnBoardingVars';
 import { GameClock } from './util/GameClock';
@@ -111,31 +111,93 @@ export function setCustomBgColorFromInput() {
 }
 
 export function showPreferences() {
-	let message = "";
+	const container = document.createElement('div');
 
-	const checkedValue = isMoveConfirmationRequired() ? "checked='true'" : "";
-	message += "<div><input id='confirmMoveBeforeSubmittingCheckbox' type='checkbox' onclick='toggleConfirmMovePreference();' " + checkedValue + "'><label for='confirmMoveBeforeSubmittingCheckbox'> Confirm move before submitting?</label></div>";
+	// Confirm move checkbox
+	const confirmDiv = document.createElement('div');
+	const confirmCheckbox = document.createElement('input');
+	confirmCheckbox.id = 'confirmMoveBeforeSubmittingCheckbox';
+	confirmCheckbox.type = 'checkbox';
+	confirmCheckbox.checked = isMoveConfirmationRequired();
+	confirmCheckbox.onclick = () => toggleConfirmMovePreference();
+	confirmDiv.appendChild(confirmCheckbox);
+	const confirmLabel = document.createElement('label');
+	confirmLabel.htmlFor = 'confirmMoveBeforeSubmittingCheckbox';
+	confirmLabel.textContent = ' Confirm move before submitting?';
+	confirmDiv.appendChild(confirmLabel);
+	container.appendChild(confirmDiv);
 
-	let customBgColorValue = localStorage.getItem(customBgColorKey);
-	if (!customBgColorValue) {
-		customBgColorValue = "";
-	}
-	message += '<br /><div>Custom <code>html</code> background color code: <input type="text" id="customBgColorInput" value="' + customBgColorValue + '" oninput="setCustomBgColorFromInput()" maxlength="15"></div>';
+	// Custom background color input
+	container.appendChild(document.createElement('br'));
+	const bgColorDiv = document.createElement('div');
+	bgColorDiv.appendChild(document.createTextNode('Custom '));
+	const codeElem = document.createElement('code');
+	codeElem.textContent = 'html';
+	bgColorDiv.appendChild(codeElem);
+	bgColorDiv.appendChild(document.createTextNode(' background color code: '));
+	const bgColorInput = document.createElement('input');
+	bgColorInput.type = 'text';
+	bgColorInput.id = 'customBgColorInput';
+	bgColorInput.value = localStorage.getItem(customBgColorKey) || '';
+	bgColorInput.maxLength = 15;
+	bgColorInput.oninput = () => setCustomBgColorFromInput();
+	bgColorDiv.appendChild(bgColorInput);
+	container.appendChild(bgColorDiv);
 
-	const soundOnCheckedValue = soundManager.isMoveSoundsEnabled() ? "checked='true'" : "";
-	message += "<br /><div><input id='soundsOnCheckBox' type='checkbox' onclick='toggleSoundOn();' " + soundOnCheckedValue + "'><label for='soundsOnCheckBox'> Move sounds enabled?</label></div>";
+	// Sound checkbox
+	container.appendChild(document.createElement('br'));
+	const soundDiv = document.createElement('div');
+	const soundCheckbox = document.createElement('input');
+	soundCheckbox.id = 'soundsOnCheckBox';
+	soundCheckbox.type = 'checkbox';
+	soundCheckbox.checked = soundManager.isMoveSoundsEnabled();
+	soundCheckbox.onclick = () => toggleSoundOn();
+	soundDiv.appendChild(soundCheckbox);
+	const soundLabel = document.createElement('label');
+	soundLabel.htmlFor = 'soundsOnCheckBox';
+	soundLabel.textContent = ' Move sounds enabled?';
+	soundDiv.appendChild(soundLabel);
+	container.appendChild(soundDiv);
 
-	const animationsOnCheckedValue = isAnimationsOn() ? "checked='true'" : "";
-	message += "<div><input id='animationsOnCheckBox' type='checkbox' onclick='toggleAnimationsOn();' " + animationsOnCheckedValue + "'><label for='animationsOnCheckBox'> Move animations enabled?</label></div>";
+	// Animations checkbox
+	const animDiv = document.createElement('div');
+	const animCheckbox = document.createElement('input');
+	animCheckbox.id = 'animationsOnCheckBox';
+	animCheckbox.type = 'checkbox';
+	animCheckbox.checked = isAnimationsOn();
+	animCheckbox.onclick = () => toggleAnimationsOn();
+	animDiv.appendChild(animCheckbox);
+	const animLabel = document.createElement('label');
+	animLabel.htmlFor = 'animationsOnCheckBox';
+	animLabel.textContent = ' Move animations enabled?';
+	animDiv.appendChild(animLabel);
+	container.appendChild(animDiv);
 
-	const gameClockOnCheckedValue = GameClock.isEnabled() ? "checked='true'" : "";
-	message += "<div><input id='gameClockOnCheckBox' type='checkbox' onclick='GameClock.toggleEnabled();' " + gameClockOnCheckedValue + "'><label for='gameClockOnCheckBox'> (Beta) Game Clock enabled?</label></div>";
+	// Game clock checkbox
+	const clockDiv = document.createElement('div');
+	const clockCheckbox = document.createElement('input');
+	clockCheckbox.id = 'gameClockOnCheckBox';
+	clockCheckbox.type = 'checkbox';
+	clockCheckbox.checked = GameClock.isEnabled();
+	clockCheckbox.onclick = () => GameClock.toggleEnabled();
+	clockDiv.appendChild(clockCheckbox);
+	const clockLabel = document.createElement('label');
+	clockLabel.htmlFor = 'gameClockOnCheckBox';
+	clockLabel.textContent = ' (Beta) Game Clock enabled?';
+	clockDiv.appendChild(clockLabel);
+	container.appendChild(clockDiv);
 
+	// Minimal ads option
 	if (Ads.Options.showAds) {
-		message += "<br /><div class='clickableText' onclick='Ads.minimalAdsEnabled()'>Minimal sponsored messages</div>";
+		container.appendChild(document.createElement('br'));
+		const adsDiv = document.createElement('div');
+		adsDiv.classList.add('clickableText');
+		adsDiv.textContent = 'Minimal sponsored messages';
+		adsDiv.onclick = () => Ads.minimalAdsEnabled();
+		container.appendChild(adsDiv);
 	}
 
-	showModal("Device Preferences", message);
+	showModalElem("Device Preferences", container);
 }
 
 export function getBooleanPreference(key, defaultValue) {

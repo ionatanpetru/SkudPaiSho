@@ -60,7 +60,7 @@ import {
 	rerunAll,
 	setSkudTilesOption,
 	setUserGamePreference,
-	showModal,
+	showModalElem,
 	showResetMoveMessage,
 	skudTilesKey,
 	tileDesignTypeKey,
@@ -353,11 +353,11 @@ export class SkudPaiShoController {
 	}; */
 
 	async playMctsMove() {
-		showModal('AI Move Loading', 'AI move loading...', true);
+		showModalElem('AI Move Loading', document.createTextNode('AI move loading...'), true);
 		setTimeout(() => {
 			const move = this.mctsGame.mcts.selectMove();
 			if (!move) {
-				showModal('AI Move', "No AI move found :(");
+				showModalElem('AI Move', document.createTextNode("No AI move found :("));
 				return;
 			}
 			this.gameNotation.addMove(move);

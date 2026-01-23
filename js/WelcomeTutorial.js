@@ -2,7 +2,7 @@
 // Handles the onboarding tutorial shown to new users
 
 import {
-	showModal,
+	showModalElem,
 	userIsLoggedIn,
 	loginClicked,
 	markGameInactiveWithoutDialogKey
@@ -43,7 +43,9 @@ export function showWelcomeScreensClicked() {
 export function showWelcomeTutorial() {
 	tutorialInProgress = true;
 	tutorialOpen = true;
-	showModal("The Garden Gate", "<div id='tutorialContent'></div>");
+	const tutorialContent = document.createElement('div');
+	tutorialContent.id = 'tutorialContent';
+	showModalElem("The Garden Gate", tutorialContent);
 	setTimeout(() => { runTutorial(); }, 400);
 }
 

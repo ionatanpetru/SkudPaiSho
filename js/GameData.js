@@ -1,6 +1,6 @@
 import html2canvas from 'html2canvas';
 
-import { QueryString, gameContainerDiv, showModal } from "./PaiShoMain";
+import { QueryString, gameContainerDiv, showModalElem } from "./PaiShoMain";
 
 // Skud Pai Sho specific game rules have been moved to skud-pai-sho/SkudPaiShoRules.js
 // This keeps game-specific configuration separate from shared utilities and constants.
@@ -359,7 +359,7 @@ export async function copyDivToClipboard() {
 			navigator.clipboard.write([
 				new ClipboardItem({ 'image/png': blob })
 			]).then(function() {
-				showModal("Board Image Copied!", "Board image copied!");
+				showModalElem("Board Image Copied!", document.createTextNode("Board image copied!"));
 			}, function(err) {
 				console.error('Could not copy image to clipboard: ', err);
 			});

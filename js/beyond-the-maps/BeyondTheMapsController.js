@@ -21,7 +21,7 @@ import {
   refreshMessage,
   replayIntervalLength,
   rerunAll,
-  showModal,
+  showModalElem,
   showReplayControls,
   userIsLoggedIn,
 } from '../PaiShoMain';
@@ -212,7 +212,7 @@ export class BeyondTheMapsController {
 		if (this.theGame.getWinResultTypeCode() > 0) {
 			return;
 		}
-		showModal('AI Move Loading', 'AI move loading...', true);
+		showModalElem('AI Move Loading', document.createTextNode('AI move loading...'), true);
         var state = this.jsMctsGame.mctsPlayer.startThinking(this.jsMctsGame.game);
         state.startTime = Date.now();
         this.mctsTimer = window.setTimeout(() => {
@@ -248,11 +248,11 @@ export class BeyondTheMapsController {
       }
 	
 	async playMctsMove(autoPlayNext) {
-		showModal('AI Move Loading', 'AI move loading...', true);
+		showModalElem('AI Move Loading', document.createTextNode('AI move loading...'), true);
 		setTimeout(() => {
 			var move = this.mctsGame.mcts.selectMove();
 			if (!move) {
-				showModal('AI Move', "No AI move found :(");
+				showModalElem('AI Move', document.createTextNode("No AI move found :("));
 				return;
 			}
 			this.gameNotation.addMove(move);

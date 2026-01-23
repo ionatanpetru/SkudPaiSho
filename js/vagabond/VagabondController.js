@@ -29,7 +29,7 @@ import {
   refreshMessage,
   rerunAll,
   setUserGamePreference,
-  showModal,
+  showModalElem,
   userIsLoggedIn,
   vagabondTileDesignTypeKey
 } from '../PaiShoMain';
@@ -318,11 +318,11 @@ export class VagabondController {
 		return msgElement;
 	}; */
 	playMctsMove() {
-		showModal('AI Move Loading', 'AI move loading...', true);
+		showModalElem('AI Move Loading', document.createTextNode('AI move loading...'), true);
 		setTimeout(() => {
 			var move = this.mctsGame.mcts.selectMove();
 			if (!move) {
-				showModal('AI Move', "No AI move found :(");
+				showModalElem('AI Move', document.createTextNode("No AI move found :("));
 				return;
 			}
 			this.gameNotation.addMove(move);

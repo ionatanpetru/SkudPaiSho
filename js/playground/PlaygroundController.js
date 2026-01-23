@@ -1,5 +1,10 @@
 /* Playground specific UI interaction logic */
 
+import {
+  closeModal,
+  showModalElem,
+} from '../PaiShoMain';
+
 export function PlaygroundController(gameContainer, isMobile) {
 	this.actuator = new PlaygroundActuator(gameContainer, isMobile, isAnimationsOn());
 
@@ -278,7 +283,7 @@ PlaygroundController.prototype.setEndOfGame = function() {
 		gameController.confirmEndGame();
 	};
 	yesNoOptions.noText = "No - Cancel";
-	showModal("End Game?", "Are you sure you would like to end the current game and mark it Complete?", false, yesNoOptions);
+	showModalElem("End Game?", document.createTextNode("Are you sure you would like to end the current game and mark it Complete?"), false, yesNoOptions);
 };
 
 PlaygroundController.prototype.confirmEndGame = function() {
