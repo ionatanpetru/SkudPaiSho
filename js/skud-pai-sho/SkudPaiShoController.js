@@ -390,7 +390,7 @@ export class SkudPaiShoController {
 	}
 
 	showHarmonyBonusMessage() {
-		const messageDiv = document.createElement("div");
+		const messageDiv = document.createElement("span");
 
 		// Create the main message text
 		const mainMessage = document.createElement("span");

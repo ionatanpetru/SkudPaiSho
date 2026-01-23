@@ -14,7 +14,9 @@
 	"type": "module",
 	"source": "index.html",
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1",
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"test:ui": "vitest --ui",
 		"start": "parcel index.html --open",
 		"build": "parcel build index.html",
 		"start-ugly": "./minify.sh && parcel --open",
@@ -69,8 +71,10 @@
 		"eslint": "^8.57.0",
 		"eslint-config-airbnb-base": "^15.0.0",
 		"eslint-plugin-import": "^2.29.1",
+		"happy-dom": "^20.3.7",
 		"parcel": "^2.12.0",
 		"parcel-reporter-static-files-copy": "^1.5.3",
-		"process": "^0.11.10"
+		"process": "^0.11.10",
+		"vitest": "^4.0.18"
 	}
 }
