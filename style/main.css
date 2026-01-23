@@ -754,15 +754,23 @@ figure > div {
   float: left;
 }
 
+/* TODO: Maybe specify which class this applies to so we avoid accidentally applying */
 .tilePileContainer div div {
   display: inline;
   float: left;
   margin-top: 8px;
 }
-
 .tilePileContainer.PaiSho div div {
   width: 34px;
 }
+
+/* Does this help? */
+.gameMessage > div, .gameMessage2 > div {
+  display: block;
+  float: none;
+  width: 100%;
+}
+
 
 .streetTileContainer {
   width: 100%;

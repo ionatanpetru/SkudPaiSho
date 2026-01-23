@@ -1443,7 +1443,7 @@ export function pauseRun() {
 }
 
 export function getAdditionalMessage() {
-	const container = document.createElement("div");
+	const container = document.createElement("span");
 
 	// Is it the player's turn?
 	// TODO Could maybe get rid of this
