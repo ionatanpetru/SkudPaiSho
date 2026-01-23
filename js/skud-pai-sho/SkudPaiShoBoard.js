@@ -1227,25 +1227,30 @@ export class SkudPaiShoBoard {
 	canMoveTileToPoint(player, boardPointStart, boardPointEnd) {
 		// start point must have a tile
 		if (!boardPointStart.hasTile()) {
+			debug("canMoveTileToPoint: Start point has no tile");
 			return false;
 		}
 
 		// Tile must belong to player
 		if (boardPointStart.tile.ownerName !== player) {
+			debug("canMoveTileToPoint: Tile does not belong to player (owner: " + boardPointStart.tile.ownerName + ", player: " + player + ")");
 			return false;
 		}
 
 		// Cannot move drained or trapped tile
 		if (boardPointStart.tile.trapped) {
+			debug("canMoveTileToPoint: Tile is trapped");
 			return false;
 		}
 
 		if (!newKnotweedRules && boardPointStart.tile.drained) {
+			debug("canMoveTileToPoint: Tile is drained (old knotweed rules)");
 			return false;
 		}
 
 		// If endpoint is a Gate, that's wrong.
 		if (boardPointEnd.isType(GATE)) {
+			debug("canMoveTileToPoint: Cannot move to a Gate");
 			return false;
 		}
 
@@ -1256,22 +1261,24 @@ export class SkudPaiShoBoard {
 
 		// If endpoint has a tile there that can't be captured, that is wrong.
 		if (boardPointEnd.hasTile() && !canCapture) {
+			debug("canMoveTileToPoint: Endpoint has a tile that cannot be captured");
 			return false;
 		}
 
 		if (!boardPointEnd.canHoldTile(boardPointStart.tile, canCapture)) {
+			debug("canMoveTileToPoint: Endpoint cannot hold this tile");
 			return false;
 		}
 
 		// If endpoint is too far away, that is wrong.
 		const numMoves = boardPointStart.tile.getMoveDistance();
 		if (Math.abs(boardPointStart.row - boardPointEnd.row) + Math.abs(boardPointStart.col - boardPointEnd.col) > numMoves) {
-			// end point is too far away, can't move that far
+			debug("canMoveTileToPoint: Endpoint is too far away (distance: " + (Math.abs(boardPointStart.row - boardPointEnd.row) + Math.abs(boardPointStart.col - boardPointEnd.col)) + ", max moves: " + numMoves + ")");
 			return false;
 		} else {
 			// Move may be possible. But there may be tiles in the way...
 			if (!this.verifyAbleToReach(boardPointStart, boardPointEnd, numMoves)) {
-				// debug("Tiles are in the way, so you can't reach that spot.");
+				debug("canMoveTileToPoint: Tiles are in the way, cannot reach destination");
 				return false;
 			}
 		}
@@ -1279,6 +1286,7 @@ export class SkudPaiShoBoard {
 		// What if moving the tile there creates a Disharmony on the board? That can't happen!
 		if (!gameOptionEnabled(IGNORE_CLASHING)
 			&& this.moveCreatesDisharmony(boardPointStart, boardPointEnd)) {
+			debug("canMoveTileToPoint: Move would create a disharmony");
 			return false;
 		}
 
@@ -1368,62 +1376,79 @@ export class SkudPaiShoBoard {
 
 	pathFound(boardPointStart, boardPointEnd, numMoves) {
 		if (!boardPointStart || !boardPointEnd) {
-			return false; // start or end point not given
+			return false;
 		}
 
 		if (boardPointStart.isType(NON_PLAYABLE) || boardPointEnd.isType(NON_PLAYABLE)) {
-			return false;	// Paths must be through playable points
+			return false;
 		}
 
-		if (boardPointStart.row === boardPointEnd.row && boardPointStart.col === boardPointEnd.col) {
-			return true; // Yay! start point equals end point
+		const startRow = boardPointStart.row;
+		const startCol = boardPointStart.col;
+		const endRow = boardPointEnd.row;
+		const endCol = boardPointEnd.col;
+
+		if (startRow === endRow && startCol === endCol) {
+			return true;
 		}
+
 		if (numMoves <= 0) {
-			return false; // No more moves left
+			return false;
 		}
 
-		// Idea: Get min num moves necessary!
-		let minMoves = Math.abs(boardPointStart.row - boardPointEnd.row) + Math.abs(boardPointStart.col - boardPointEnd.col);
-
+		const minMoves = Math.abs(startRow - endRow) + Math.abs(startCol - endCol);
 		if (minMoves === 1) {
-			return true; // Yay! Only 1 space away (and remember, numMoves is more than 0)
+			return true;
 		}
 
-		// Check moving UP
-		let nextRow = boardPointStart.row - 1;
-		if (nextRow >= 0) {
-			let nextPoint = this.cells[nextRow][boardPointStart.col];
-			if (!nextPoint.hasTile() && this.pathFound(nextPoint, boardPointEnd, numMoves - 1)) {
-				return true; // Yay!
+		// Check each direction with explicit variables (no reassignment)
+		const upRow = startRow - 1;
+		const downRow = startRow + 1;
+		const leftCol = startCol - 1;
+		const rightCol = startCol + 1;
+		const movesLeft = numMoves - 1;
+
+		// UP
+		if (upRow >= 0) {
+			const upPoint = this.cells[upRow][startCol];
+			if (!upPoint.hasTile()) {
+				if (this.pathFound(upPoint, boardPointEnd, movesLeft)) {
+					return true;
+				}
 			}
 		}
 
-		// Check moving DOWN
-		nextRow = boardPointStart.row + 1;
-		if (nextRow < 17) {
-			let nextPoint = this.cells[nextRow][boardPointStart.col];
-			if (!nextPoint.hasTile() && this.pathFound(nextPoint, boardPointEnd, numMoves - 1)) {
-				return true; // Yay!
+		// DOWN
+		if (downRow < 17) {
+			const downPoint = this.cells[downRow][startCol];
+			if (!downPoint.hasTile()) {
+				if (this.pathFound(downPoint, boardPointEnd, movesLeft)) {
+					return true;
+				}
 			}
 		}
 
-		// Check moving LEFT
-		let nextCol = boardPointStart.col - 1;
-		if (nextCol >= 0) {
-			let nextPoint = this.cells[boardPointStart.row][nextCol];
-			if (!nextPoint.hasTile() && this.pathFound(nextPoint, boardPointEnd, numMoves - 1)) {
-				return true; // Yay!
+		// LEFT
+		if (leftCol >= 0) {
+			const leftPoint = this.cells[startRow][leftCol];
+			if (!leftPoint.hasTile()) {
+				if (this.pathFound(leftPoint, boardPointEnd, movesLeft)) {
+					return true;
+				}
 			}
 		}
 
-		// Check moving RIGHT
-		nextCol = boardPointStart.col + 1;
-		if (nextCol < 17) {
-			let nextPoint = this.cells[boardPointStart.row][nextCol];
-			if (!nextPoint.hasTile() && this.pathFound(nextPoint, boardPointEnd, numMoves - 1)) {
-				return true; // Yay!
+		// RIGHT
+		if (rightCol < 17) {
+			const rightPoint = this.cells[startRow][rightCol];
+			if (!rightPoint.hasTile()) {
+				if (this.pathFound(rightPoint, boardPointEnd, movesLeft)) {
+					return true;
+				}
 			}
 		}
+
+		return false;
 	}
 
 	rowBlockedByRock(rowNum) {
