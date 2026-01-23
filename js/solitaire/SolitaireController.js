@@ -3,11 +3,13 @@
 import {
   ACCENT_TILE,
   debug,
+} from '../GameData';
+import {
   newKnotweedRules,
   rocksUnwheelable,
   simpleRocks,
   simplest,
-} from '../GameData';
+} from '../skud-pai-sho/SkudPaiShoRules';
 import {
   BRAND_NEW,
   GameType,

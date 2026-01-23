@@ -14,8 +14,10 @@ import {
   WHEEL,
   WHITE_LOTUS,
   debug,
-  newOrchidClashRule,
 } from '../GameData';
+import {
+  newOrchidClashRule,
+} from '../skud-pai-sho/SkudPaiShoRules';
 import { GUEST, HOST } from '../CommonNotationObjects';
 import { RED, WHITE, tileIdIncrement } from '../skud-pai-sho/SkudPaiShoTile';
 

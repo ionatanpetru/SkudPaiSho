@@ -3,12 +3,8 @@ import { PaiShoMarkingManager } from '../pai-sho-common/PaiShoMarkingManager';
 import { UndergrowthBoard } from './UndergrowthBoard';
 import { UndergrowthNotationVars } from './UndergrowthGameNotation';
 import { UndergrowthTileManager } from './UndergrowthTileManager';
-import {
-  debug,
-  lessBonus,
-  newGatesRule,
-  newSpecialFlowerRules,
-} from '../GameData';
+import { debug } from '../GameData';
+import { lessBonus, newGatesRule, newSpecialFlowerRules } from '../skud-pai-sho/SkudPaiShoRules';
 
 export function UndergrowthGameManager(actuator, ignoreActuate, isCopy) {
 	this.isCopy = isCopy;

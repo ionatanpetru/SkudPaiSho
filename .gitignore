@@ -387,4 +387,7 @@ dist
 images/Adevar/frumos_z
 trifle/
 assets/fontawesome
+
 js/PaiShoMain.js.bak
+
+*.js.*

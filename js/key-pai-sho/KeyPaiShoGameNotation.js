@@ -10,7 +10,8 @@ import {
 import { BRAND_NEW } from '../PaiShoMain';
 import { KeyPaiShoTile } from './KeyPaiShoTile';
 import { NO_EFFECT_TILES, gameOptionEnabled } from '../GameOptions';
-import { debug, sameStart, simpleCanonRules } from '../GameData';
+import { debug } from '../GameData';
+import { sameStart, simpleCanonRules } from '../skud-pai-sho/SkudPaiShoRules';
 
 export function KeyPaiShoNotationMove(text) {
 	this.fullMoveText = text;

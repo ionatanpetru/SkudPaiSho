@@ -4,8 +4,10 @@ import {
   ACCENT_TILE,
   BASIC_FLOWER,
   debug,
-  simpleCanonRules,
 } from '../GameData';
+import {
+  simpleCanonRules,
+} from '../skud-pai-sho/SkudPaiShoRules';
 import {
   ARRANGING,
   GUEST,

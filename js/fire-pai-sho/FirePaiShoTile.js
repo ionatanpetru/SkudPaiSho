@@ -17,9 +17,11 @@ import {
   WHEEL,
   WHITE_LOTUS,
   debug,
+} from '../GameData';
+import {
   newOrchidClashRule,
   superHarmonies,
-} from '../GameData';
+} from '../skud-pai-sho/SkudPaiShoRules';
 import { ETHEREAL_ACCENT_TILES, gameOptionEnabled } from '../GameOptions';
 import { GUEST, HOST } from '../CommonNotationObjects';
 import { RED, WHITE, tileIdIncrement } from '../skud-pai-sho/SkudPaiShoTile';

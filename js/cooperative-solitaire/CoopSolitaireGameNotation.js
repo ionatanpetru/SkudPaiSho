@@ -1,5 +1,8 @@
 // Coop Solitaire Notation
 
+import { GUEST, HOST, PLANTING, ARRANGING } from '../CommonNotationObjects';
+import { simpleCanonRules, sameStart } from '../skud-pai-sho/SkudPaiShoRules';
+
 export function CoopSolitaireNotationMove(text) {
 	this.fullMoveText = text;
 	this.analyzeMove();

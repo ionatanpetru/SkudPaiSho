@@ -1,6 +1,7 @@
 /* Street Pai Sho specific UI interaction logic */
 
-import { ACCENT_TILE, boatOnlyMoves, debug } from '../GameData';
+import { ACCENT_TILE, debug } from '../GameData';
+import { boatOnlyMoves } from '../skud-pai-sho/SkudPaiShoRules';
 import {
   ARRANGING,
   GUEST,

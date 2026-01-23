@@ -9,8 +9,10 @@ import {
   ROCK,
   WHEEL,
   WHITE_LOTUS,
-  boatOnlyMoves,
   debug,
+} from '../GameData';
+import {
+  boatOnlyMoves,
   lotusNoCapture,
   newKnotweedRules,
   newOrchidVulnerableRule,
@@ -20,7 +22,7 @@ import {
   simpleSpecialFlowerRule,
   simplest,
   superRocks,
-} from '../GameData';
+} from '../skud-pai-sho/SkudPaiShoRules';
 import {
   GATE,
   NON_PLAYABLE,

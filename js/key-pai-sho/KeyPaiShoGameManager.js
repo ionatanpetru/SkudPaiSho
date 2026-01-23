@@ -9,11 +9,13 @@ import { PaiShoMarkingManager } from '../pai-sho-common/PaiShoMarkingManager';
 import {
   SPECIAL_FLOWER,
   debug,
+} from '../GameData';
+import {
   lessBonus,
   limitedGatesRule,
   newGatesRule,
   newSpecialFlowerRules,
-} from '../GameData';
+} from '../skud-pai-sho/SkudPaiShoRules';
 import { SPECIAL_FLOWERS_BOUNCE, gameOptionEnabled } from '../GameOptions';
 import { getOpponentName } from '../pai-sho-common/PaiShoPlayerHelp';
 import { setGameLogText } from '../PaiShoMain';

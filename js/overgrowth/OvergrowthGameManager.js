@@ -1,5 +1,9 @@
 // Solitaire Game Manager
 
+import { ACCENT_TILE, debug } from '../GameData';
+import { PLANTING } from '../CommonNotationObjects';
+import { lessBonus, newGatesRule, newSpecialFlowerRules } from '../skud-pai-sho/SkudPaiShoRules';
+
 export function OvergrowthGameManager(actuator, ignoreActuate, isCopy, existingDrawnTile, existingLastDrawnTile) {
 	this.isCopy = isCopy;
 

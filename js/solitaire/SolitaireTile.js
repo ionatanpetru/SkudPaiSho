@@ -16,10 +16,10 @@ import {
   WHEEL,
   WHITE_LOTUS,
   debug,
-  superHarmonies,
 } from '../GameData';
 import { GUEST, HOST } from '../CommonNotationObjects';
 import { RED, WHITE, tileId, tileIdIncrement } from '../skud-pai-sho/SkudPaiShoTile';
+import { superHarmonies } from '../skud-pai-sho/SkudPaiShoRules';
 
 export function SolitaireTile(code, ownerCode) {
 	this.code = code;

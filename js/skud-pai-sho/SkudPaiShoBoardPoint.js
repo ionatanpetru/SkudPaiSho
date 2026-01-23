@@ -26,38 +26,38 @@ export class SkudPaiShoBoardPoint {
 	}
 	// Point makers
 	static neutral() {
-		var point = new SkudPaiShoBoardPoint();
+		const point = new SkudPaiShoBoardPoint();
 		point.addType(NEUTRAL);
 
 		return point;
 	}
 	static gate() {
-		var point = new SkudPaiShoBoardPoint();
+		const point = new SkudPaiShoBoardPoint();
 		point.addType(GATE);
 
 		return point;
 	}
 	static red() {
-		var point = new SkudPaiShoBoardPoint();
+		const point = new SkudPaiShoBoardPoint();
 		point.addType(RED);
 
 		return point;
 	}
 	static white() {
-		var point = new SkudPaiShoBoardPoint();
+		const point = new SkudPaiShoBoardPoint();
 		point.addType(WHITE);
 
 		return point;
 	}
 	static redWhite() {
-		var point = new SkudPaiShoBoardPoint();
+		const point = new SkudPaiShoBoardPoint();
 		point.addType(RED);
 		point.addType(WHITE);
 
 		return point;
 	}
 	static redWhiteNeutral() {
-		var point = new SkudPaiShoBoardPoint();
+		const point = new SkudPaiShoBoardPoint();
 		point.addType(RED);
 		point.addType(WHITE);
 		point.addType(NEUTRAL);
@@ -65,14 +65,14 @@ export class SkudPaiShoBoardPoint {
 		return point;
 	}
 	static redNeutral() {
-		var point = new SkudPaiShoBoardPoint();
+		const point = new SkudPaiShoBoardPoint();
 		point.addType(RED);
 		point.addType(NEUTRAL);
 
 		return point;
 	}
 	static whiteNeutral() {
-		var point = new SkudPaiShoBoardPoint();
+		const point = new SkudPaiShoBoardPoint();
 		point.addType(WHITE);
 		point.addType(NEUTRAL);
 
@@ -84,7 +84,7 @@ export class SkudPaiShoBoardPoint {
 		}
 	}
 	removeType(type) {
-		for (var i = 0; i < this.types.length; i++) {
+		for (let i = 0; i < this.types.length; i++) {
 			if (this.types[i] === type) {
 				this.types.splice(i, 1);
 			}
@@ -94,13 +94,13 @@ export class SkudPaiShoBoardPoint {
 		if (this.tile) {
 			return this.tile.getConsoleDisplay();
 		} else {
-			var consoleDisplay = thinDot;
+			let consoleDisplay = thinDot;
 
 			if (this.types.includes(NON_PLAYABLE)) {
 				consoleDisplay = " ";
 			}
 
-			var str = "";
+			let str = "";
 
 			if (this.types.includes(RED)) {
 				str = "R";
@@ -142,7 +142,7 @@ export class SkudPaiShoBoardPoint {
 		return !this.hasTile() && this.types.includes(GATE);
 	}
 	removeTile() {
-		var theTile = this.tile;
+		const theTile = this.tile;
 
 		this.tile = null;
 
@@ -206,10 +206,10 @@ export class SkudPaiShoBoardPoint {
 		this.moveDistanceRemaining = null;
 	}
 	getCopy() {
-		var copy = new SkudPaiShoBoardPoint();
+		const copy = new SkudPaiShoBoardPoint();
 
 		// this.types
-		for (var i = 0; i < this.types.length; i++) {
+		for (let i = 0; i < this.types.length; i++) {
 			copy.types.push(this.types[i]);
 		}
 

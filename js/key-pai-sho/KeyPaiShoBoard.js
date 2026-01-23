@@ -13,8 +13,10 @@ import {
   SPECIAL_FLOWER,
   WHEEL,
   WHITE_LOTUS,
-  boatOnlyMoves,
   debug,
+} from '../GameData';
+import {
+  boatOnlyMoves,
   lotusNoCapture,
   newKnotweedRules,
   newOrchidVulnerableRule,
@@ -24,7 +26,7 @@ import {
   simpleSpecialFlowerRule,
   simplest,
   superRocks,
-} from '../GameData';
+} from '../skud-pai-sho/SkudPaiShoRules';
 import { AdevarTileType } from '../adevar/AdevarTile';
 import {
   EVERYTHING_CAPTURE,

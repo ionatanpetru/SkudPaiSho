@@ -4,9 +4,11 @@ import {
   ACCENT_TILE,
   BASIC_FLOWER,
   SPECIAL_FLOWER,
-  boatOnlyMoves,
   dateIsAprilFools,
   debug,
+} from '../GameData';
+import {
+  boatOnlyMoves,
   limitedGatesRule,
   lotusNoCapture,
   newKnotweedRules,
@@ -16,7 +18,7 @@ import {
   simpleSpecialFlowerRule,
   simplest,
   specialFlowerLimitedRule,
-} from '../GameData';
+} from './SkudPaiShoRules';
 import {
   ARRANGING,
   GUEST,
@@ -93,12 +95,13 @@ import {
 
 export var SkudConstants = {
 	preferencesKey: "SkudPaiShoPreferencesKey"
-};
+	}
 export var SkudPreferences = {
 	customTilesUrl: ""
-};
+	}
 
-export function SkudPaiShoController(gameContainer, isMobile) {
+export class SkudPaiShoController {
+	constructor(gameContainer, isMobile) {
 	this.actuator = new SkudPaiShoActuator(gameContainer, isMobile, isAnimationsOn());
 
 	SkudPaiShoController.loadPreferences();
@@ -114,66 +117,134 @@ export function SkudPaiShoController(gameContainer, isMobile) {
 	this.supportsMoveLogMessages = true;
 }
 
-SkudPaiShoController.loadPreferences = function() {
-	var savedPreferences = JSON.parse(localStorage.getItem(SkudConstants.preferencesKey));
-	if (savedPreferences) {
-		SkudPreferences = savedPreferences;
+	static hideHarmonyAidsKey = "HideHarmonyAids";
+
+	static loadPreferences() {
+		const savedPreferences = JSON.parse(localStorage.getItem(SkudConstants.preferencesKey));
+		if (savedPreferences) {
+			SkudPreferences = savedPreferences;
+		}
 	}
-};
 
-SkudPaiShoController.hideHarmonyAidsKey = "HideHarmonyAids";
-
-SkudPaiShoController.prototype.getGameTypeId = function() {
+	getGameTypeId() {
 	return GameType.SkudPaiSho.id;
-};
+	}
 
-SkudPaiShoController.prototype.resetGameManager = function() {
+	resetGameManager() {
 	this.theGame = new SkudPaiShoGameManager(this.actuator);
 
-	var vgame = new SkudMctsGame(GUEST);
+	const vgame = new SkudMctsGame(GUEST);
 	let iterations = 10; //more iterations -> stronger AI, more computation
 	let exploration = 0.55; //1.41 //exploration vs. explotation parameter, sqrt(2) is reasonable default (c constant in UBC forumula)
-	var mcts = new MCTS(vgame, GUEST, iterations, exploration);
+	const mcts = new MCTS(vgame, GUEST, iterations, exploration);
 
 	this.mctsGame = {
 		game: vgame,
 		mcts: mcts
 	};
-};
+	}
 
-SkudPaiShoController.prototype.resetNotationBuilder = function() {
+	resetNotationBuilder() {
 	this.notationBuilder = new SkudPaiShoNotationBuilder();	// Will be ... SkudPaiShoNotationBuilder
-};
+	}
 
-SkudPaiShoController.prototype.resetGameNotation = function() {
+	resetGameNotation() {
 	this.gameNotation = this.getNewGameNotation();
-};
+	}
 
-SkudPaiShoController.prototype.getNewGameNotation = function() {
+	getNewGameNotation() {
 	return new SkudPaiShoGameNotation();
-};
-
-SkudPaiShoController.getHostTilesContainerDivs = function() {
-	var divs = '<div class="HR3"></div> <div class="HR4"></div> <div class="HR5"></div> <div class="HW3"></div> <div class="HW4"></div> <div class="HW5"></div> <br class="clear" /> <div class="HR"></div> <div class="HW"></div> <div class="HK"></div> <div class="HB"></div> <div class="HL"></div> <div class="HO"></div>';
-	if (gameOptionEnabled(OPTION_ANCIENT_OASIS_EXPANSION)) {
-		divs += '<br class="clear" /> <div class="HM"></div> <div class="HP"></div> <div class="HT"></div>';
 	}
-	return divs;
-};
 
-SkudPaiShoController.getGuestTilesContainerDivs = function() {
-	var divs = '<div class="GR3"></div> <div class="GR4"></div> <div class="GR5"></div> <div class="GW3"></div> <div class="GW4"></div> <div class="GW5"></div> <br class="clear" /> <div class="GR"></div> <div class="GW"></div> <div class="GK"></div> <div class="GB"></div> <div class="GL"></div> <div class="GO"></div>';
-	if (gameOptionEnabled(OPTION_ANCIENT_OASIS_EXPANSION)) {
-		divs += '<br class="clear" /> <div class="GM"></div> <div class="GP"></div> <div class="GT"></div>';
+	static getHostTilesContainerDivs = () => {
+		const container = document.createElement('div');
+
+		// Basic flower tiles
+		['HR3', 'HR4', 'HR5', 'HW3', 'HW4', 'HW5'].forEach(className => {
+			const div = document.createElement('div');
+			div.className = className;
+			container.appendChild(div);
+			container.appendChild(document.createTextNode(' '));
+		});
+
+		const clearBr = document.createElement('br');
+		clearBr.className = 'clear';
+		container.appendChild(clearBr);
+		container.appendChild(document.createTextNode(' '));
+
+		// Accent and special tiles
+		['HR', 'HW', 'HK', 'HB', 'HL', 'HO'].forEach(className => {
+			const div = document.createElement('div');
+			div.className = className;
+			container.appendChild(div);
+			container.appendChild(document.createTextNode(' '));
+		});
+
+		// Ancient Oasis expansion tiles
+		if (gameOptionEnabled(OPTION_ANCIENT_OASIS_EXPANSION)) {
+			const clearBr2 = document.createElement('br');
+			clearBr2.className = 'clear';
+			container.appendChild(clearBr2);
+			container.appendChild(document.createTextNode(' '));
+
+			['HM', 'HP', 'HT'].forEach(className => {
+				const div = document.createElement('div');
+				div.className = className;
+				container.appendChild(div);
+				container.appendChild(document.createTextNode(' '));
+			});
+		}
+
+		return container.innerHTML;
 	}
-	return divs;
-};
 
-SkudPaiShoController.prototype.callActuate = function() {
+	static getGuestTilesContainerDivs = () => {
+		const container = document.createElement('div');
+
+		// Basic flower tiles
+		['GR3', 'GR4', 'GR5', 'GW3', 'GW4', 'GW5'].forEach(className => {
+			const div = document.createElement('div');
+			div.className = className;
+			container.appendChild(div);
+			container.appendChild(document.createTextNode(' '));
+		});
+
+		const clearBr = document.createElement('br');
+		clearBr.className = 'clear';
+		container.appendChild(clearBr);
+		container.appendChild(document.createTextNode(' '));
+
+		// Accent and special tiles
+		['GR', 'GW', 'GK', 'GB', 'GL', 'GO'].forEach(className => {
+			const div = document.createElement('div');
+			div.className = className;
+			container.appendChild(div);
+			container.appendChild(document.createTextNode(' '));
+		});
+
+		// Ancient Oasis expansion tiles
+		if (gameOptionEnabled(OPTION_ANCIENT_OASIS_EXPANSION)) {
+			const clearBr2 = document.createElement('br');
+			clearBr2.className = 'clear';
+			container.appendChild(clearBr2);
+			container.appendChild(document.createTextNode(' '));
+
+			['GM', 'GP', 'GT'].forEach(className => {
+				const div = document.createElement('div');
+				div.className = className;
+				container.appendChild(div);
+				container.appendChild(document.createTextNode(' '));
+			});
+		}
+
+		return container.innerHTML;
+	}
+
+	callActuate() {
 	this.theGame.actuate();
-};
+	}
 
-SkudPaiShoController.prototype.resetMove = function() {
+	resetMove() {
 	if (this.notationBuilder.status === BRAND_NEW) {
 		// Remove last move
 		this.gameNotation.removeLastMove();
@@ -192,13 +263,13 @@ SkudPaiShoController.prototype.resetMove = function() {
 			this.hostAccentTiles = [];
 		}
 	}
-};
+	}
 
-SkudPaiShoController.prototype.getDefaultHelpMessageText = function() {
+	getDefaultHelpMessageText() {
 	return "<h4>Skud Pai Sho</h4> <p>Skud Pai Sho is a game of harmony. The goal is to arrange your Flower Tiles to create a ring of Harmonies that surrounds the center of the board.</p> <p>Harmonies are created when two of a player's harmonious tiles are on the same line with nothing in between them. But be careful; tiles that clash can never be lined up on the board.</p> <p>Select tiles or points on the board to learn more, and read through the <a href='https://skudpaisho.com/site/games/skud-pai-sho/' target='_blank'>rules page</a> for the full rules.</p>";
-};
+	}
 
-SkudPaiShoController.prototype.getAdditionalMessage = function() {
+	getAdditionalMessage() {
     const msgElement = document.createElement("div");
 
     if (this.gameNotation.moves.length === 0) {
@@ -270,11 +341,11 @@ SkudPaiShoController.prototype.getAdditionalMessage = function() {
     }
 
     return msgElement;
-};
+	}
 
 
 /* SkudPaiShoController.prototype.getAdditionalMessageElement = function() {
-	var msgElement = document.createElement("span");
+	const msgElement = document.createElement("span");
 	msgElement.innerText = "Play MCTS move";
 	msgElement.addEventListener('click', () => {
 		this.playMctsMove();
@@ -282,10 +353,10 @@ SkudPaiShoController.prototype.getAdditionalMessage = function() {
 	return msgElement;
 }; */
 
-SkudPaiShoController.prototype.playMctsMove = async function() {
+	async playMctsMove() {
 	showModal('AI Move Loading', 'AI move loading...', true);
 	setTimeout(() => {
-		var move = this.mctsGame.mcts.selectMove();
+		const move = this.mctsGame.mcts.selectMove();
 		if (!move) {
 			showModal('AI Move', "No AI move found :(");
 			return;
@@ -294,13 +365,13 @@ SkudPaiShoController.prototype.playMctsMove = async function() {
 		finalizeMove();
 		closeModal();
 	}, 50);
-};
+	}
 
-SkudPaiShoController.prototype.getExtraHarmonyBonusHelpText = function() {
-	var container = document.createElement("span");
+	getExtraHarmonyBonusHelpText() {
+	const container = document.createElement("span");
 	container.appendChild(document.createElement("br"));
 	
-	var text = document.createElement("span");
+	const text = document.createElement("span");
 	if (!limitedGatesRule) {
 		if (this.theGame.playerCanBonusPlant(getCurrentPlayer())) {
 			text.textContent = "You can choose an Accent Tile, Special Flower Tile, or, since you have less than two Growing Flowers, a Basic Flower Tile.";
@@ -316,17 +387,17 @@ SkudPaiShoController.prototype.getExtraHarmonyBonusHelpText = function() {
 	}
 	container.appendChild(text);
 	return container;
-};
+	}
 
-SkudPaiShoController.prototype.showHarmonyBonusMessage = function() {
-	var messageDiv = document.createElement("div");
+	showHarmonyBonusMessage() {
+	const messageDiv = document.createElement("div");
 	
 	// Create the main message text
-	var mainMessage = document.createElement("span");
+	const mainMessage = document.createElement("span");
 	mainMessage.textContent = "Harmony Bonus! Select a tile to play or ";
 	
 	// Create the skip link
-		var skipSpan = document.createElement("span");
+		const skipSpan = document.createElement("span");
 		skipSpan.className = "skipBonus";
 		skipSpan.textContent = "skip";
 		skipSpan.onclick = () => this.skipHarmonyBonus();	mainMessage.appendChild(skipSpan);
@@ -344,9 +415,9 @@ SkudPaiShoController.prototype.showHarmonyBonusMessage = function() {
 	// Set it in the game message container
 	document.querySelector(".gameMessage").innerHTML = "";
 	document.querySelector(".gameMessage").appendChild(messageDiv);
-};
+	}
 
-SkudPaiShoController.prototype.unplayedTileClicked = function(tileDiv) {
+	unplayedTileClicked(tileDiv) {
 	this.theGame.markingManager.clearMarkings();
 	this.callActuate();
 
@@ -361,17 +432,17 @@ SkudPaiShoController.prototype.unplayedTileClicked = function(tileDiv) {
 		return;
 	}
 
-	var divName = tileDiv.getAttribute("name");	// Like: GW5 or HL
-	var tileId = parseInt(tileDiv.getAttribute("id"));
-	var playerCode = divName.charAt(0);
-	var tileCode = divName.substring(1);
+	const divName = tileDiv.getAttribute("name");	// Like: GW5 or HL
+	const tileId = parseInt(tileDiv.getAttribute("id"));
+	const playerCode = divName.charAt(0);
+	const tileCode = divName.substring(1);
 
-	var player = GUEST;
+	let player = GUEST;
 	if (playerCode === 'H') {
 		player = HOST;
 	}
 
-	var tile = this.theGame.tileManager.peekTile(player, tileCode, tileId);
+	const tile = this.theGame.tileManager.peekTile(player, tileCode, tileId);
 
 	if (tile.ownerName !== getCurrentPlayer()) {
 		// debug("That's not your tile!");
@@ -386,7 +457,7 @@ SkudPaiShoController.prototype.unplayedTileClicked = function(tileDiv) {
 
 		if (!tile.selectedFromPile) {
 			tile.selectedFromPile = true;
-			var removeTileCodeFrom = this.hostAccentTiles;
+			let removeTileCodeFrom = this.hostAccentTiles;
 			if (getCurrentPlayer() === GUEST) {
 				removeTileCodeFrom = this.guestAccentTiles;
 			}
@@ -399,7 +470,7 @@ SkudPaiShoController.prototype.unplayedTileClicked = function(tileDiv) {
 
 		tile.selectedFromPile = false;
 
-		var accentTilesNeededToStart = 4;
+		let accentTilesNeededToStart = 4;
 		if (gameOptionEnabled(OPTION_ALL_ACCENT_TILES)) {
 			accentTilesNeededToStart = this.theGame.tileManager.numberOfAccentTilesPerPlayerSet();
 		} else if (gameOptionEnabled(OPTION_DOUBLE_ACCENT_TILES)) {
@@ -413,7 +484,7 @@ SkudPaiShoController.prototype.unplayedTileClicked = function(tileDiv) {
 			this.hostAccentTiles.push(tileCode);
 
 			if (this.hostAccentTiles.length === accentTilesNeededToStart || (simpleCanonRules && this.hostAccentTiles.length === 2)) {
-				var move = new SkudPaiShoNotationMove("0H." + this.hostAccentTiles.join());
+				const move = new SkudPaiShoNotationMove("0H." + this.hostAccentTiles.join());
 				this.gameNotation.addMove(move);
 				if (onlinePlayEnabled) {
 					createGameIfThatIsOk(GameType.SkudPaiSho.id);
@@ -425,7 +496,7 @@ SkudPaiShoController.prototype.unplayedTileClicked = function(tileDiv) {
 			this.guestAccentTiles.push(tileCode);
 
 			if (this.guestAccentTiles.length === accentTilesNeededToStart || (simpleCanonRules && this.guestAccentTiles.length === 2)) {
-				var move = new SkudPaiShoNotationMove("0G." + this.guestAccentTiles.join());
+				const move = new SkudPaiShoNotationMove("0G." + this.guestAccentTiles.join());
 				this.gameNotation.addMove(move);
 				// No finalize move because it is still Guest's turn
 				rerunAll();
@@ -480,23 +551,23 @@ SkudPaiShoController.prototype.unplayedTileClicked = function(tileDiv) {
 			this.notationBuilder = new SkudPaiShoNotationBuilder();
 		}
 	}
-};
+	}
 
 
-SkudPaiShoController.prototype.RmbDown = function(htmlPoint) {
-	var npText = htmlPoint.getAttribute("name");
+	RmbDown(htmlPoint) {
+	const npText = htmlPoint.getAttribute("name");
 
-	var notationPoint = new NotationPoint(npText);
-	var rowCol = notationPoint.rowAndColumn;
+	const notationPoint = new NotationPoint(npText);
+	const rowCol = notationPoint.rowAndColumn;
 	this.mouseStartPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
 }
 
-SkudPaiShoController.prototype.RmbUp = function(htmlPoint) {
-	var npText = htmlPoint.getAttribute("name");
+	RmbUp(htmlPoint) {
+	const npText = htmlPoint.getAttribute("name");
 
-	var notationPoint = new NotationPoint(npText);
-	var rowCol = notationPoint.rowAndColumn;
-	var mouseEndPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
+	const notationPoint = new NotationPoint(npText);
+	const rowCol = notationPoint.rowAndColumn;
+	const mouseEndPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
 
 	if (mouseEndPoint == this.mouseStartPoint) {
 		this.theGame.markingManager.toggleMarkedPoint(mouseEndPoint);
@@ -509,7 +580,7 @@ SkudPaiShoController.prototype.RmbUp = function(htmlPoint) {
 	this.callActuate();
 }
 
-SkudPaiShoController.prototype.pointClicked = function(htmlPoint) {
+	pointClicked(htmlPoint) {
 	this.theGame.markingManager.clearMarkings();
 	this.callActuate();
 
@@ -525,11 +596,11 @@ SkudPaiShoController.prototype.pointClicked = function(htmlPoint) {
 		return;
 	}
 
-	var npText = htmlPoint.getAttribute("name");
+	const npText = htmlPoint.getAttribute("name");
 
-	var notationPoint = new NotationPoint(npText);
-	var rowCol = notationPoint.rowAndColumn;
-	var boardPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
+	const notationPoint = new NotationPoint(npText);
+	const rowCol = notationPoint.rowAndColumn;
+	const boardPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
 
 	if (this.notationBuilder.status === BRAND_NEW) {
 		if (boardPoint.hasTile()) {
@@ -562,14 +633,14 @@ SkudPaiShoController.prototype.pointClicked = function(htmlPoint) {
 			// Need the notation!
 			this.notationBuilder.endPoint = new NotationPoint(htmlPoint.getAttribute("name"));
 
-			var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
+			const move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
 			this.theGame.hidePossibleMovePoints(false, move);
-			var bonusAllowed = this.theGame.runNotationMove(move);
+			const bonusAllowed = this.theGame.runNotationMove(move);
 
 			if (!gameOptionEnabled(OPTION_INFORMAL_START) && this.gameNotation.moves.length === 2) {
 				// Host auto-copies Guest's first Plant
 				this.gameNotation.addMove(move);
-				var hostMoveBuilder = this.notationBuilder.getFirstMoveForHost(this.notationBuilder.plantedFlowerType);
+				const hostMoveBuilder = this.notationBuilder.getFirstMoveForHost(this.notationBuilder.plantedFlowerType);
 				this.gameNotation.addMove(this.gameNotation.getNotationMoveFromBuilder(hostMoveBuilder));
 				rerunAll(true);
 				// No finalize move because it's still Guest's turn
@@ -602,7 +673,7 @@ SkudPaiShoController.prototype.pointClicked = function(htmlPoint) {
 				this.notationBuilder.status = WAITING_FOR_BOAT_BONUS_POINT;
 				this.theGame.revealBoatBonusPoints(boardPoint);
 			} else {
-				var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
+				const move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
 
 				this.gameNotation.addMove(move);
 				if (playingOnlineGame()) {
@@ -622,7 +693,7 @@ SkudPaiShoController.prototype.pointClicked = function(htmlPoint) {
 
 			this.theGame.hidePossibleMovePoints();
 			this.notationBuilder.boatBonusPoint = new NotationPoint(htmlPoint.getAttribute("name"));
-			var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
+			const move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
 			this.gameNotation.addMove(move);
 			if (playingOnlineGame()) {
 				callSubmitMove(1, null, move);
@@ -634,13 +705,13 @@ SkudPaiShoController.prototype.pointClicked = function(htmlPoint) {
 			this.notationBuilder.status = READY_FOR_BONUS;
 		}
 	}
-};
+	}
 
-SkudPaiShoController.prototype.skipHarmonyBonus = function() {
+	skipHarmonyBonus() {
 	if (this.notationBuilder.status !== MOVE_DONE) {
 		this.notationBuilder.status = MOVE_DONE;
 		this.notationBuilder.bonusEndPoint = null;
-		var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
+		const move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
 		this.gameNotation.addMove(move);
 		if (playingOnlineGame()) {
 			callSubmitMove(1, null, move);
@@ -648,33 +719,33 @@ SkudPaiShoController.prototype.skipHarmonyBonus = function() {
 			finalizeMove(1);
 		}
 	}
-};
+	}
 
-SkudPaiShoController.prototype.getTileMessage = function(tileDiv) {
-	var divName = tileDiv.getAttribute("name");	// Like: GW5 or HL
-	var tileId = parseInt(tileDiv.getAttribute("id"));
+	getTileMessage(tileDiv) {
+	const divName = tileDiv.getAttribute("name");	// Like: GW5 or HL
+	const tileId = parseInt(tileDiv.getAttribute("id"));
 
-	var tile = new SkudPaiShoTile(divName.substring(1), divName.charAt(0));
+	const tile = new SkudPaiShoTile(divName.substring(1), divName.charAt(0));
 
-	var tileMessage = this.getHelpMessageForTile(tile);
+	const tileMessage = this.getHelpMessageForTile(tile);
 
 	return {
 		heading: tileMessage.heading,
 		message: tileMessage.message
 	}
-};
+	}
 
-SkudPaiShoController.prototype.getPointMessage = function(htmlPoint) {
-	var npText = htmlPoint.getAttribute("name");
+	getPointMessage(htmlPoint) {
+	const npText = htmlPoint.getAttribute("name");
 
-	var notationPoint = new NotationPoint(npText);
-	var rowCol = notationPoint.rowAndColumn;
-	var boardPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
+	const notationPoint = new NotationPoint(npText);
+	const rowCol = notationPoint.rowAndColumn;
+	const boardPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
 
-	var heading;
-	var message = [];
+	let heading;
+	const message = [];
 	if (boardPoint.hasTile()) {
-		var tileMessage = this.getHelpMessageForTile(boardPoint.tile);
+		const tileMessage = this.getHelpMessageForTile(boardPoint.tile);
 		tileMessage.message.forEach(function(messageString){
 			message.push(messageString);
 		});
@@ -685,11 +756,11 @@ SkudPaiShoController.prototype.getPointMessage = function(htmlPoint) {
 		* In Harmony with Chrysanthemum to the north
 		* Trapped by Orchid
 		*/
-		var tileHarmonies = this.theGame.board.harmonyManager.getHarmoniesWithThisTile(boardPoint.tile);
+		const tileHarmonies = this.theGame.board.harmonyManager.getHarmoniesWithThisTile(boardPoint.tile);
 		if (tileHarmonies.length > 0) {
-			var bullets = [];
+			const bullets = [];
 			tileHarmonies.forEach(function(harmony) {
-				var otherTile = harmony.getTileThatIsNotThisOne(boardPoint.tile);
+				const otherTile = harmony.getTileThatIsNotThisOne(boardPoint.tile);
 				bullets.push(otherTile.getName()
 					+ " to the " + harmony.getDirectionForTile(boardPoint.tile));
 			});
@@ -721,23 +792,23 @@ SkudPaiShoController.prototype.getPointMessage = function(htmlPoint) {
 		heading: heading,
 		message: message
 	}
-};
+	}
 
-SkudPaiShoController.prototype.getHelpMessageForTile = function(tile) {
-	var message = [];
+	getHelpMessageForTile(tile) {
+	const message = [];
 
-	var tileCode = tile.code;
+	const tileCode = tile.code;
 
-	var heading = SkudPaiShoTile.getTileName(tileCode);
+	let heading = SkudPaiShoTile.getTileName(tileCode);
 
 	message.push(tile.ownerName + "'s tile");
 
 	if (tileCode.length > 1) {
-		var colorCode = tileCode.charAt(0);
-		var tileNum = parseInt(tileCode.charAt(1));
+		const colorCode = tileCode.charAt(0);
+		const tileNum = parseInt(tileCode.charAt(1));
 
-		var harmTileNum = tileNum - 1;
-		var harmTileColor = colorCode;
+		let harmTileNum = tileNum - 1;
+		let harmTileColor = colorCode;
 		if (harmTileNum < 3) {
 			harmTileNum = 5;
 			if (colorCode === 'R') {
@@ -747,7 +818,7 @@ SkudPaiShoController.prototype.getHelpMessageForTile = function(tile) {
 			}
 		}
 
-		var harmTile1 = SkudPaiShoTile.getTileName(harmTileColor + harmTileNum);
+		const harmTile1 = SkudPaiShoTile.getTileName(harmTileColor + harmTileNum);
 
 		harmTileNum = tileNum + 1;
 		harmTileColor = colorCode;
@@ -760,7 +831,7 @@ SkudPaiShoController.prototype.getHelpMessageForTile = function(tile) {
 			}
 		}
 
-		var harmTile2 = SkudPaiShoTile.getTileName(harmTileColor + harmTileNum);
+		const harmTile2 = SkudPaiShoTile.getTileName(harmTileColor + harmTileNum);
 
 		harmTileNum = tileNum;
 		if (colorCode === 'R') {
@@ -768,7 +839,7 @@ SkudPaiShoController.prototype.getHelpMessageForTile = function(tile) {
 		} else {
 			harmTileColor = 'R';
 		}
-		var clashTile = SkudPaiShoTile.getTileName(harmTileColor + harmTileNum);
+		const clashTile = SkudPaiShoTile.getTileName(harmTileColor + harmTileNum);
 
 		message.push("Basic Flower Tile");
 		message.push("Can move up to " + tileNum + " spaces");
@@ -854,29 +925,29 @@ SkudPaiShoController.prototype.getHelpMessageForTile = function(tile) {
 		heading: heading,
 		message: message
 	}
-};
+	}
 
-SkudPaiShoController.prototype.playAiTurn = function(finalizeMove) {
+	playAiTurn(finalizeMove) {
 	if (this.theGame.getWinner()) {
 		return;
 	}
-	var theAi = activeAi;
+	let theAi = activeAi;
 	if (activeAi2) {
 		if (activeAi2.player === getCurrentPlayer()) {
 			theAi = activeAi2;
 		}
 	}
 
-	var playerMoveNum = this.gameNotation.getPlayerMoveNum();
+	const playerMoveNum = this.gameNotation.getPlayerMoveNum();
 
 	if (playerMoveNum === 1 && getCurrentPlayer() === HOST) {
 		// Auto mirror guest move
 		// Host auto-copies Guest's first Plant
-		var hostMoveBuilder = this.notationBuilder.getFirstMoveForHost(this.gameNotation.moves[this.gameNotation.moves.length - 1].plantedFlowerType);
+		const hostMoveBuilder = this.notationBuilder.getFirstMoveForHost(this.gameNotation.moves[this.gameNotation.moves.length - 1].plantedFlowerType);
 		this.gameNotation.addMove(this.gameNotation.getNotationMoveFromBuilder(hostMoveBuilder));
 		finalizeMove();
 	} else if (playerMoveNum < 3) {
-		var move = theAi.getMove(this.theGame.getCopy(), playerMoveNum);
+		const move = theAi.getMove(this.theGame.getCopy(), playerMoveNum);
 		if (!move) {
 			debug("No move given...");
 			return;
@@ -884,9 +955,9 @@ SkudPaiShoController.prototype.playAiTurn = function(finalizeMove) {
 		this.gameNotation.addMove(move);
 		finalizeMove();
 	} else {
-		var self = this;
+		const self = this;
 		setTimeout(function(){
-			var move = theAi.getMove(self.theGame.getCopy(), playerMoveNum);
+			const move = theAi.getMove(self.theGame.getCopy(), playerMoveNum);
 			if (!move) {
 				debug("No move given...");
 				return;
@@ -895,29 +966,29 @@ SkudPaiShoController.prototype.playAiTurn = function(finalizeMove) {
 			finalizeMove();
 		}, 10);
 	}
-};
+	}
 
-SkudPaiShoController.prototype.startAiGame = function(finalizeMove) {
+	startAiGame(finalizeMove) {
 	this.playAiTurn(finalizeMove);
 	if (this.gameNotation.getPlayerMoveNum() === 1) {
 		this.playAiTurn(finalizeMove);
 	}
 	if (this.gameNotation.getPlayerMoveNum() === 1) {
 		// Host auto-copies Guest's first Plant
-		var hostMoveBuilder = this.notationBuilder.getFirstMoveForHost(this.gameNotation.moves[this.gameNotation.moves.length - 1].plantedFlowerType);
+		const hostMoveBuilder = this.notationBuilder.getFirstMoveForHost(this.gameNotation.moves[this.gameNotation.moves.length - 1].plantedFlowerType);
 		this.gameNotation.addMove(this.gameNotation.getNotationMoveFromBuilder(hostMoveBuilder));
 		finalizeMove();
 	}
 	if (this.gameNotation.getPlayerMoveNum() === 2 && getCurrentPlayer() === GUEST) {
 		this.playAiTurn(finalizeMove);
 	}
-};
+	}
 
-SkudPaiShoController.prototype.getAiList = function() {
+	getAiList() {
 	return [new SkudAIv1()];
-};
+	}
 
-SkudPaiShoController.prototype.getCurrentPlayer = function() {
+	getCurrentPlayer() {
 	if (this.gameNotation.moves.length <= 1) {
 		if (this.gameNotation.moves.length === 0) {
 			return HOST;
@@ -928,39 +999,39 @@ SkudPaiShoController.prototype.getCurrentPlayer = function() {
 	if (this.gameNotation.moves.length <= 2) {
 		return GUEST;
 	}
-	var lastPlayer = this.gameNotation.moves[this.gameNotation.moves.length - 1].player;
+	const lastPlayer = this.gameNotation.moves[this.gameNotation.moves.length - 1].player;
 
 	if (lastPlayer === HOST) {
 		return GUEST;
 	} else if (lastPlayer === GUEST) {
 		return HOST;
 	}
-};
+	}
 
-SkudPaiShoController.prototype.runMove = function(move, withActuate, moveAnimationBeginStep, skipAnimation) {
+	runMove(move, withActuate, moveAnimationBeginStep, skipAnimation) {
 	this.theGame.runNotationMove(move, withActuate);
 
 	if (this.mctsGame) {
 		this.mctsGame.game.playMove(move);
 	}
-};
+	}
 
-SkudPaiShoController.prototype.cleanup = function() {
+	cleanup() {
 	// Nothing.
-};
+	}
 
-SkudPaiShoController.prototype.isSolitaire = function() {
+	isSolitaire() {
 	return false;
-};
+	}
 
-SkudPaiShoController.prototype.setGameNotation = function(newGameNotation) {
+	setGameNotation(newGameNotation) {
 	this.gameNotation.setNotationText(newGameNotation);
-};
+	}
 
-SkudPaiShoController.prototype.getAdditionalHelpTabDiv = function() {
-	var settingsDiv = document.createElement("div");
+	getAdditionalHelpTabDiv() {
+	const settingsDiv = document.createElement("div");
 
-	var heading = document.createElement("h4");
+	const heading = document.createElement("h4");
 	heading.innerText = "Skud Pai Sho Preferences:";
 
 	settingsDiv.appendChild(heading);
@@ -972,61 +1043,62 @@ SkudPaiShoController.prototype.getAdditionalHelpTabDiv = function() {
 
 	settingsDiv.appendChild(document.createElement("br"));
 	return settingsDiv;
-};
+	}
 
-SkudPaiShoController.buildTileDesignDropdownDiv = function(alternateLabelText) {
-	var labelText = alternateLabelText ? alternateLabelText : "Tile Designs";
+	static buildTileDesignDropdownDiv = (alternateLabelText) => {
+	const labelText = alternateLabelText ? alternateLabelText : "Tile Designs";
 	return buildDropdownDiv("skudPaiShoTileDesignDropdown", labelText + ":", tileDesignTypeValues,
 							localStorage.getItem(tileDesignTypeKey),
 							function() {
 								setSkudTilesOption(this.value);
 							});
-};
+	}
 
-SkudPaiShoController.prototype.buildToggleHarmonyAidsDiv = function() {
-	var div = document.createElement("div");
-	var onOrOff = getUserGamePreference(SkudPaiShoController.hideHarmonyAidsKey) !== "true" ? "on" : "off";
+	buildToggleHarmonyAidsDiv() {
+	const div = document.createElement("div");
+	const onOrOff = getUserGamePreference(SkudPaiShoController.hideHarmonyAidsKey) !== "true" ? "on" : "off";
 	
-	var textSpan = document.createElement("span");
+	const textSpan = document.createElement("span");
 	textSpan.textContent = "Harmony aids are " + onOrOff + ": ";
 	div.appendChild(textSpan);
 	
-	var toggleSpan = document.createElement("span");
+	const toggleSpan = document.createElement("span");
 	toggleSpan.className = "skipBonus";
 	toggleSpan.textContent = "toggle";
 	toggleSpan.onclick = () => this.toggleHarmonyAids();
 	div.appendChild(toggleSpan);
 	
 	if (gameOptionEnabled(NO_HARMONY_VISUAL_AIDS)) {
-		var warningSpan = document.createElement("span");
+		const warningSpan = document.createElement("span");
 		warningSpan.textContent = " (Will not affect games with " + NO_HARMONY_VISUAL_AIDS + " game option)";
 		div.appendChild(warningSpan);
 	}
 	
 	return div;
-};
+	}
 
-SkudPaiShoController.prototype.toggleHarmonyAids = function() {
+	toggleHarmonyAids() {
 	setUserGamePreference(SkudPaiShoController.hideHarmonyAidsKey, 
 		getUserGamePreference(SkudPaiShoController.hideHarmonyAidsKey) !== "true");
 	clearMessage();
 	this.callActuate();
-};
+	}
 
-SkudPaiShoController.prototype.setAnimationsOn = function(isAnimationsOn) {
+	setAnimationsOn(isAnimationsOn) {
 	this.actuator.setAnimationOn(isAnimationsOn);
-};
+	}
 
-SkudPaiShoController.isUsingCustomTileDesigns = function() {
-	return skudTilesKey === 'custom';
-};
+	static isUsingCustomTileDesigns = () => {
+		return skudTilesKey === 'custom';
+	}
 
-SkudPaiShoController.getCustomTileDesignsUrl = function() {
-	return SkudPreferences.customTilesUrl;
-};
+	static getCustomTileDesignsUrl = () => {
+		return SkudPreferences.customTilesUrl;
+	}
 
-SkudPaiShoController.prototype.setCustomTileDesignUrl = function(url) {
+	setCustomTileDesignUrl(url) {
 	SkudPreferences.customTilesUrl = url;
 	localStorage.setItem(SkudConstants.preferencesKey, JSON.stringify(SkudPreferences));
 	setSkudTilesOption('custom', true);
-};
+	}
+}

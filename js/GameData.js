@@ -2,30 +2,8 @@ import html2canvas from 'html2canvas';
 
 import { QueryString, gameContainerDiv, showModal } from "./PaiShoMain";
 
-export var newKnotweedRules = true;  // They're good. Always on!
-export var simpleCanonRules = false;
-export var newSpecialFlowerRules = false;  // Special Flowers planted next to Growing Flower
-export var newGatesRule = true;  // Great! Always on! (New Gate Rules: Player cannot plant on Bonus if already controlling two Gates)
-export var newWheelRule = true;  // Wheel can be played next to Gate as long as it's ok. Always on.
-export var newOrchidClashRule = false; // Orchid clashes with all opponent Flowers... I don't think it's a good idea.
-export var newOrchidVulnerableRule = false;  // Testing new Orchid vulnerable rules
-export var newOrchidCaptureRule = false;  // Testing new Orchid capture rules
-export var simpleSpecialFlowerRule = false;  // Simplest special flower rule
-export var specialFlowerBonusRule = false; // Special Flowers can be moved on Harmony Bonus - not implemented
-export var rocksUnwheelable = true; // Rocks Unwheelable: Rocks cannot be moved by Wheel but can be removed by Boat. Boat can remove any Accent Tile.
-export var lotusNoCapture = true; // Lotus not able to be captured. Always on.
-export var simpleRocks = false;  // Rocks don't disable Harmonies.
-export var simplest = false; // Simple Accents and Special Flowers.
-export var lessBonus = false;  // Can only Plant on Bonus if no Growing Flowers.
-export var superHarmonies = false; // Any number flower harmonies with differently numbered flower.
-export var completeHarmony = false; // Harmony Ring must contain a 3, 4, and 5
-export var superRocks = false;  // Tiles surrounding Rock cannot be moved by Wheel.
-export var boatOnlyMoves = false;  // Boat moves all tiles to surrounding space. No removing of Accent Tiles.
-export var sameStart = true;  // Host starts with same tile, not clashing tile.
-export var oneGrowingFlower = false;
-
-export var limitedGatesRule = true; // Cannot Plant Basic Flower on Harmony Bonus if already controlling one or more Gates
-export var specialFlowerLimitedRule = false; // NOT UI READY, DO NOT SET TO TRUE. Cannot Plant Special Flower on Harmony Bonus if not able to Plant Basic Flower either.
+// Skud Pai Sho specific game rules have been moved to skud-pai-sho/SkudPaiShoRules.js
+// This keeps game-specific configuration separate from shared utilities and constants.
 
 export var customBoardUrl = null;
 export function setCustomBoardUrl(newValue) {

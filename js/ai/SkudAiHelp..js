@@ -1,7 +1,8 @@
 /* Skud AI Help */
 
 
-import { ACCENT_TILE, BASIC_FLOWER, simpleCanonRules } from '../GameData';
+import { ACCENT_TILE, BASIC_FLOWER } from '../GameData';
+import { simpleCanonRules } from '../skud-pai-sho/SkudPaiShoRules';
 import {
   ARRANGING,
   GUEST,

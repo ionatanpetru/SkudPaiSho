@@ -6,7 +6,8 @@ import {
   NotationPoint,
   RowAndColumn,
 } from '../CommonNotationObjects';
-import { completeHarmony, debug } from '../GameData';
+import { debug } from '../GameData';
+import { completeHarmony } from '../skud-pai-sho/SkudPaiShoRules';
 
 export function KeyPaiShoHarmony(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn) {
 	this.tile1 = tile1;

@@ -11,8 +11,10 @@ import {
   WHEEL,
   WHITE_LOTUS,
   debug,
-  superHarmonies,
 } from '../GameData';
+import {
+  superHarmonies,
+} from '../skud-pai-sho/SkudPaiShoRules';
 import { GUEST, HOST } from '../CommonNotationObjects';
 import { RED, WHITE, tileIdIncrement } from '../skud-pai-sho/SkudPaiShoTile';
 

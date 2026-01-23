@@ -1,5 +1,10 @@
 // Board
 
+import {
+  simpleRocks,
+  simplest,
+} from '../skud-pai-sho/SkudPaiShoRules';
+
 export function CoopSolitaireBoard() {
 	this.size = new RowAndColumn(17, 17);
 	this.cells = this.brandNew();

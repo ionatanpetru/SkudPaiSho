@@ -4,14 +4,16 @@ import {
   ACCENT_TILE,
   BASIC_FLOWER,
   SPECIAL_FLOWER,
-  boatOnlyMoves,
   debug,
+} from '../GameData';
+import {
+  boatOnlyMoves,
   limitedGatesRule,
   newKnotweedRules,
   simpleCanonRules,
   simpleSpecialFlowerRule,
   specialFlowerLimitedRule,
-} from '../GameData';
+} from '../skud-pai-sho/SkudPaiShoRules';
 import {
   ARRANGING,
   GUEST,

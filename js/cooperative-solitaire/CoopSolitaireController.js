@@ -1,5 +1,9 @@
 /* Cooperative Solitaire Pai Sho specific UI interaction logic */
 
+import {
+  simpleRocks,
+} from '../skud-pai-sho/SkudPaiShoRules';
+
 export function CoopSolitaireController(gameContainer, isMobile) {
 	this.actuator = new CoopSolitaireActuator(gameContainer, isMobile);
 

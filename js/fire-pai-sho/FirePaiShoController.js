@@ -53,7 +53,8 @@ import {
 } from '../PaiShoMain';
 import { NO_HARMONY_VISUAL_AIDS, gameOptionEnabled } from '../GameOptions';
 import { GATE, NEUTRAL, POSSIBLE_MOVE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
-import { ACCENT_TILE, boatOnlyMoves, debugOn, newKnotweedRules, rocksUnwheelable, simpleRocks, simplest, debug } from '../GameData';
+import { ACCENT_TILE, debugOn, debug } from '../GameData';
+import { boatOnlyMoves, newKnotweedRules, rocksUnwheelable, simpleRocks, simplest } from '../skud-pai-sho/SkudPaiShoRules';
 import { RED, WHITE } from '../skud-pai-sho/SkudPaiShoTile';
 
 export function FirePaiShoController(gameContainer, isMobile) {

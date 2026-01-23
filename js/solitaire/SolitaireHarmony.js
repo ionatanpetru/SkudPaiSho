@@ -1,6 +1,7 @@
 // Solitaire Harmony
 
-import { ACCENT_TILE, completeHarmony, debug } from '../GameData';
+import { ACCENT_TILE, debug } from '../GameData';
+import { completeHarmony } from '../skud-pai-sho/SkudPaiShoRules';
 import { GUEST, HOST, NotationPoint } from '../CommonNotationObjects';
 
 export function SolitaireHarmony(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn) {

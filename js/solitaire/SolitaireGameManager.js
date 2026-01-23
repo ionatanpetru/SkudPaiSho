@@ -3,15 +3,13 @@
 import {
   ACCENT_TILE,
   debug,
-  lessBonus,
-  newGatesRule,
-  newSpecialFlowerRules,
 } from '../GameData';
 import { ARRANGING, HOST, PLANTING } from '../CommonNotationObjects';
 import { PaiShoMarkingManager } from '../pai-sho-common/PaiShoMarkingManager';
 import { SolitaireBoard } from './SolitaireBoard';
 import { SolitaireTileManager } from './SolitaireTileManager';
 import { gameController } from '../PaiShoMain';
+import { lessBonus, newGatesRule, newSpecialFlowerRules } from '../skud-pai-sho/SkudPaiShoRules';
 
 export function SolitaireGameManager(actuator, ignoreActuate, isCopy) {
 	this.isCopy = isCopy;
