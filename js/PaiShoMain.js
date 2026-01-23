@@ -146,6 +146,7 @@ import {
 	notifyThisMessage
 } from './Notifications';
 import { addEventToElement, setupUiEvents } from './ui/UiSetup';
+import { setupHtmlEventHandlers } from './ui/HtmlEventHandlers';
 import { applyBoardOptionToBgSvg, mobileAndTabletcheck } from "./ActuatorHelp";
 import {
 	arrayIncludesAll,
@@ -443,8 +444,14 @@ export let codeToVerify = 0;
 export let tempUserId;
 export let myGamesList = [];
 export let gameSeekList = [];
-export const userOnlineIcon = "<span title='Online' style='color:#35ac19;'><i class='fa-regular fa-circle-user' aria-hidden='true'></i></span>";
-export const userOfflineIcon = "<span title='Offline' style='color:gray;'><i class='fa-regular fa-circle-user' aria-hidden='true'></i></span>";
+// User status icon functions (Phase 1: returning HTML strings, future: convert to DOM elements)
+export function getUserOnlineIcon() {
+	return "<span title='Online' style='color:#35ac19;'><i class='fa-regular fa-circle-user' aria-hidden='true'></i></span>";
+}
+
+export function getUserOfflineIcon() {
+	return "<span title='Offline' style='color:gray;'><i class='fa-regular fa-circle-user' aria-hidden='true'></i></span>";
+}
 export let logOnlineStatusIntervalValue;
 export let userTurnCountInterval;
 
@@ -462,6 +469,7 @@ export const createNonRankedGamePreferredKey = "createNonRankedGamePreferred";
 window.requestAnimationFrame(function() {
 
 	setupUiEvents();
+	setupHtmlEventHandlers();
 
 	/* Online play is enabled! */
 	onlinePlayEnabled = true;
@@ -879,9 +887,9 @@ export function updateCurrentGameTitle(isOpponentOnline) {
 	}
 	/* --- */
 
-	let opponentOnlineIconText = userOfflineIcon;
+	let opponentOnlineIconText = getUserOfflineIcon();
 	if (isOpponentOnline) {
-		opponentOnlineIconText = userOnlineIcon;
+		opponentOnlineIconText = getUserOnlineIcon();
 	}
 
 	const currentPlayer = getCurrentPlayer();
@@ -932,12 +940,88 @@ const checkIfUserOnlineCallback = (isOpponentOnline) => {
 	updateCurrentGameTitle(isOpponentOnline);
 };
 
+// Chat message DOM builder functions (Phase 2 refactoring)
+function createMoveStampElement(message) {
+	const p = document.createElement("p");
+	p.textContent = message.replace(/&amp;/g, '&');
+	return p;
+}
+
+function createStotesChatMessageElement(chatMessage, showTimestamp, pastMessageUsername) {
+	const messageDiv = document.createElement("div");
+	messageDiv.className = 'chatMessage';
+
+	if (usernameEquals(chatMessage.username)) {
+		messageDiv.classList.add('self');
+	}
+
+	if (showTimestamp) {
+		const timestamp = document.createElement("em");
+		timestamp.textContent = getTimestampString(chatMessage.timestamp);
+		messageDiv.appendChild(timestamp);
+		messageDiv.appendChild(document.createTextNode(" "));
+	}
+
+	const contentDiv = document.createElement("div");
+	contentDiv.className = 'message';
+	contentDiv.textContent = chatMessage.message.replace(/&amp;/g, '&');
+
+	if (usernameEquals(chatMessage.username)) {
+		// User's own message
+		messageDiv.appendChild(contentDiv);
+	} else if (chatMessage.username === currentGameOpponentUsername) {
+		// Opponent's message
+		contentDiv.classList.add('opponent');
+		contentDiv.textContent = " " + chatMessage.message.replace(/&amp;/g, '&');
+		messageDiv.appendChild(contentDiv);
+	} else {
+		// Other user's message
+		if (chatMessage.username !== pastMessageUsername) {
+			const usernameStrong = document.createElement("strong");
+			usernameStrong.textContent = chatMessage.username;
+			messageDiv.appendChild(usernameStrong);
+			messageDiv.appendChild(document.createTextNode(" "));
+		}
+
+		if (chatMessage.username === "SkudPaiSho" && chatMessage.username === pastMessageUsername) {
+			contentDiv.classList.add('golden');
+			contentDiv.textContent = " " + chatMessage.message.replace(/&amp;/g, '&');
+		}
+
+		messageDiv.appendChild(contentDiv);
+	}
+
+	return messageDiv;
+}
+
+function createTggChatMessageElement(chatMessage, showTimestamp, isMoveLogMessage) {
+	const messageDiv = document.createElement("div");
+	messageDiv.className = 'chatMessage';
+
+	if (showTimestamp) {
+		const timestamp = document.createElement("em");
+		timestamp.textContent = getTimestampString(chatMessage.timestamp);
+		messageDiv.appendChild(timestamp);
+		messageDiv.appendChild(document.createTextNode(" "));
+	}
+
+	if (isMoveLogMessage) {
+		messageDiv.appendChild(document.createTextNode(chatMessage.message.replace(/&amp;/g, '&')));
+	} else {
+		const usernameStrong = document.createElement("strong");
+		usernameStrong.textContent = chatMessage.username + ":";
+		messageDiv.appendChild(usernameStrong);
+		messageDiv.appendChild(document.createTextNode(" " + chatMessage.message.replace(/&amp;/g, '&')));
+	}
+
+	return messageDiv;
+}
+
 const getNewChatMessagesCallback = (results) => {
 	if (results != "") {
 		const resultRows = results.split('\n');
 
 		const chatMessageList = [];
-		let newChatMessagesHtml = "";
 
 		for (const index in resultRows) {
 			const row = resultRows[index].split('|||');
@@ -951,45 +1035,28 @@ const getNewChatMessagesCallback = (results) => {
 		}
 
 		let alertNewMessages = false;
-
-		let pastMessageUsername = "";
-		let lastMoveStamp = "";
+		const containerElement = document.createElement("div");
+		containerElement.classList.add("chatMessageContainer");
 
 		if (localStorage.getItem("data-theme") == "stotes") {
+			let pastMessageUsername = "";
+			let lastMoveStampElement = null;
+
 			for (const index in chatMessageList) {
 				const chatMessage = chatMessageList[index];
-				const chatMsgTimestamp = getTimestampString(chatMessage.timestamp);
 
 				if (chatMessage.message[0] == "➢") {
-					lastMoveStamp = "<p>" + chatMessage.message.replace(/&amp;/g, '&') + "</p>";
+					lastMoveStampElement = createMoveStampElement(chatMessage.message);
 				} else {
-					if (lastMoveStamp != "") {//Only add the most recent move stamp. The entire game doesn't need to be displayed in chat.
-						newChatMessagesHtml += lastMoveStamp;
-						lastMoveStamp = "";
+					if (lastMoveStampElement) {
+						// Only add the most recent move stamp. The entire game doesn't need to be displayed in chat.
+						containerElement.appendChild(lastMoveStampElement);
+						lastMoveStampElement = null;
 						pastMessageUsername = "moveStamp";
 					}
-					newChatMessagesHtml += "<div class='chatMessage " + ((usernameEquals(chatMessage.username)) ? (' self') : ('')) + "'>";
 
-					if (isTimestampsOn()) {
-						newChatMessagesHtml += "<em>" + chatMsgTimestamp + "</em> ";
-					}
-					if (usernameEquals(chatMessage.username)) {
-						newChatMessagesHtml += "<div class='message'>" + chatMessage.message.replace(/&amp;/g, '&') + "</div>";
-					} else if (chatMessage.username == currentGameOpponentUsername) {
-						newChatMessagesHtml += "<div class='message opponent'> " + chatMessage.message.replace(/&amp;/g, '&') + "</div>";
-					} else {
-						//Don't display the username multiple times if someone does many messages in a row.
-						if (chatMessage.username == pastMessageUsername) {
-							if (chatMessage.username == "SkudPaiSho") {
-								newChatMessagesHtml += "<div class='message golden'> " + chatMessage.message.replace(/&amp;/g, '&') + "</div>";
-							} else {
-								newChatMessagesHtml += "<div class='message'>" + chatMessage.message.replace(/&amp;/g, '&') + "</div>";
-							}
-						} else {
-							newChatMessagesHtml += "<strong>" + chatMessage.username + "</strong> <div class='message'>" + chatMessage.message.replace(/&amp;/g, '&') + "</div>";
-						}
-					}
-					newChatMessagesHtml += "</div>";
+					const messageElement = createStotesChatMessageElement(chatMessage, isTimestampsOn(), pastMessageUsername);
+					containerElement.appendChild(messageElement);
 
 					// The most recent message will determine whether to alert
 					if (!usernameEquals(chatMessage.username)) {
@@ -1009,20 +1076,8 @@ const getNewChatMessagesCallback = (results) => {
 				const isMoveLogMessage = chatMessage.message.includes("➢ ");
 
 				if (!isMoveLogMessage || isMoveLogDisplayOn()) {
-
-					const chatMsgTimestamp = getTimestampString(chatMessage.timestamp);
-
-					newChatMessagesHtml += "<div class='chatMessage'>";
-
-					if (isTimestampsOn()) {
-						newChatMessagesHtml += "<em>" + chatMsgTimestamp + "</em> ";
-					}
-
-					if (isMoveLogMessage) {
-						newChatMessagesHtml += chatMessage.message.replace(/&amp;/g, '&') + "</div>";
-					} else {
-						newChatMessagesHtml += "<strong>" + chatMessage.username + ":</strong> " + chatMessage.message.replace(/&amp;/g, '&') + "</div>";
-					}
+					const messageElement = createTggChatMessageElement(chatMessage, isTimestampsOn(), isMoveLogMessage);
+					containerElement.appendChild(messageElement);
 
 					// The most recent message will determine whether to alert
 					if (!usernameEquals(chatMessage.username) && !isMoveLogMessage) {
@@ -1043,10 +1098,7 @@ const getNewChatMessagesCallback = (results) => {
 		const chatMessagesDisplay = document.getElementById('chatMessagesDisplay');
 		// allow 1px inaccuracy by adding 1
 		const isScrolledToBottom = chatMessagesDisplay.scrollHeight - chatMessagesDisplay.clientHeight <= chatMessagesDisplay.scrollTop + 1;
-		const newElement = document.createElement("div");
-		newElement.innerHTML = newChatMessagesHtml;
-		newElement.classList.add("chatMessageContainer");
-		chatMessagesDisplay.appendChild(newElement);
+		chatMessagesDisplay.appendChild(containerElement);
 		// scroll to bottom if isScrolledToBottom
 		if (isScrolledToBottom) {
 			chatMessagesDisplay.scrollTop = chatMessagesDisplay.scrollHeight - chatMessagesDisplay.clientHeight;
@@ -1943,13 +1995,7 @@ export function skipClicked() {
 	}
 }
 
-export function getSkipButtonHtmlText(overrideText) {
-	let text = "Skip";
-	if (overrideText) {
-		text = overrideText;
-	}
-	return "<br /><button onclick='skipClicked()' style='font-size:medium'>" + text + "</button>";
-}
+// getSkipButtonHtmlText removed - use getSkipButtonElement instead
 
 export function getSkipButtonElement(overrideText) {
     let text = "Skip";
@@ -3638,18 +3684,18 @@ const showMyGamesCallback = (results) => {
 
 				let icon = "";
 				if (myGame.hostOnline) {
-					icon = userOnlineIcon;
+					icon = getUserOnlineIcon();
 				} else {
-					icon = userOfflineIcon;
+					icon = getUserOfflineIcon();
 				}
 				message += "<td class='name'>" + icon + myGame.hostUsername + "</td>";
 				message += "<td>vs.</td>";
 
 				icon = "";
 				if (myGame.guestOnline) {
-					icon = userOnlineIcon;
+					icon = getUserOnlineIcon();
 				} else {
-					icon = userOfflineIcon;
+					icon = getUserOfflineIcon();
 				}
 				message += "<td class='name'>" + icon + myGame.guestUsername + "</td>";
 				if (myGame.isUserTurn) {
@@ -3686,18 +3732,18 @@ const showMyGamesCallback = (results) => {
 
 				if (!userIsHost) {
 					if (myGame.hostOnline) {
-						gameDisplayTitle += userOnlineIcon;
+						gameDisplayTitle += getUserOnlineIcon();
 					} else {
-						gameDisplayTitle += userOfflineIcon;
+						gameDisplayTitle += getUserOfflineIcon();
 					}
 				}
 				gameDisplayTitle += myGame.hostUsername;
 				gameDisplayTitle += " vs. ";
 				if (!userIsGuest) {
 					if (myGame.guestOnline) {
-						gameDisplayTitle += userOnlineIcon;
+						gameDisplayTitle += getUserOnlineIcon();
 					} else {
-						gameDisplayTitle += userOfflineIcon;
+						gameDisplayTitle += getUserOfflineIcon();
 					}
 				}
 				gameDisplayTitle += myGame.guestUsername;
@@ -3964,8 +4010,8 @@ const getGameSeeksCallback = (results) => {
 					message += "<tr onclick='acceptGameSeekClicked(" + parseInt(gameSeek.gameId) + ");' class='gameSeekEntry " + ((even) ? ("even") : ("odd")) + "'>";
 					message += "<td style='color:" + getGameColor(gameSeek.gameTypeDesc) + ";'>" + gameSeek.gameTypeDesc + "</td>";
 
-					let icon = userOfflineIcon;
-					if (gameSeek.hostOnline) { icon = userOnlineIcon; }
+					let icon = getUserOfflineIcon();
+					if (gameSeek.hostOnline) { icon = getUserOnlineIcon(); }
 					message += "<td>" + icon + gameSeek.hostUsername + "</td>";
 
 					if (gameSeek.rankedGame) {
@@ -3991,9 +4037,9 @@ const getGameSeeksCallback = (results) => {
 					|| !getGameTypeEntryFromId(gameSeek.gameTypeId).usersWithAccess
 					|| usernameIsOneOf(getGameTypeEntryFromId(gameSeek.gameTypeId).usersWithAccess)
 				) {
-					let hostOnlineOrNotIconText = userOfflineIcon;
+					let hostOnlineOrNotIconText = getUserOfflineIcon();
 					if (gameSeek.hostOnline) {
-						hostOnlineOrNotIconText = userOnlineIcon;
+						hostOnlineOrNotIconText = getUserOnlineIcon();
 					}
 
 					if (gameSeek.gameTypeDesc !== gameTypeHeading) {
@@ -4976,6 +5022,11 @@ export {
 	manageTournamentsClicked,
 	submitTournamentSignup
 } from './TournamentManager';
+
+/* Game Rankings - Re-exported from GameRankings module */
+export {
+	viewGameRankingsClicked
+} from './ui/GameRankings';
 
 //   function toggleDarkMode() {
 // 	  var currentTheme = localStorage.getItem("data-theme") || "dark";

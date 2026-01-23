@@ -80,16 +80,16 @@
 					<i class="fa fa-user" aria-hidden="true"></i> View my games
 					<span id='myGamesNumberMyTurn'></span>
 				</div>
-				<div class='sidenavEntry sidenavLink skipBonus' onclick='viewGameSeeksClicked();'>
+				<div class='sidenavEntry sidenavLink skipBonus' id="sidenavJoinGame">
 					<i class="fa fa-plug" aria-hidden="true"></i> Join a game
 				</div>
 				<div class='sidenavEntry sidenavLink skipBonus' id="sidenavNewGame">
 					<i class="fa fa-plus-circle" aria-hidden="true"></i> New game
 				</div>
-				<div class='sidenavEntry sidenavLink skipBonus' onclick='viewTournamentsClicked();'>
+				<div class='sidenavEntry sidenavLink skipBonus' id="sidenavTournaments">
 					<i class="fa fa-trophy" aria-hidden="true"></i> Tournaments
 				</div>
-				<div class='sidenavEntry sidenavLink skipBonus' onclick='viewGameRankingsClicked();'>
+				<div class='sidenavEntry sidenavLink skipBonus' id="sidenavGameRankings">
 					<i class="fa fa-tachometer" aria-hidden="true"></i> Game Rankings
 				</div>
 				<div class='sidenavEntry'>
@@ -104,22 +104,22 @@
 			<hr />
 			<div class='sidenavSection even'>
 				<div class='sidenavSectionHeader'>Current Game</div>
-				<div class='sidenavEntry sidenavLink skipBonus' onclick='toggleReplayControls();'>Toggle replay controls</div>
-				<div class='sidenavEntry sidenavLink skipBonus' onclick='sandboxFromMove();'>Sandbox this game</div>
-				<div class='sidenavEntry sidenavLink skipBonus' onclick='showGameReplayLink();'>Get game link</div>
-				<div class='sidenavEntry sidenavLink skipBonus' onclick='showGameNotationModal();'>Show game notation</div>
-				<div class='sidenavEntry sidenavLink skipBonus' onclick='markGameInactiveClicked();'>Mark game inactive</div>
-				<div class='sidenavEntry sidenavLink skipBonus' onclick='resignOnlineGameClicked();'>Resign game</div>
-				<div class='sidenavEntry sidenavLink skipBonus' onclick='closeGame();'>Close this game</div>
+				<div class='sidenavEntry sidenavLink skipBonus' id="sidenavToggleReplay">Toggle replay controls</div>
+				<div class='sidenavEntry sidenavLink skipBonus' id="sidenavSandbox">Sandbox this game</div>
+				<div class='sidenavEntry sidenavLink skipBonus' id="sidenavGameLink">Get game link</div>
+				<div class='sidenavEntry sidenavLink skipBonus' id="sidenavShowNotation">Show game notation</div>
+				<div class='sidenavEntry sidenavLink skipBonus' id="sidenavMarkInactive">Mark game inactive</div>
+				<div class='sidenavEntry sidenavLink skipBonus' id="sidenavResign">Resign game</div>
+				<div class='sidenavEntry sidenavLink skipBonus' id="sidenavCloseGame">Close this game</div>
 			</div>
 			<hr />
 			<div class='sidenavSection odd'>
 				<div class='sidenavSectionHeader'>About</div>
-				<div class='sidenavEntry sidenavLink skipBonus' onclick='aboutClicked();'>About
+				<div class='sidenavEntry sidenavLink skipBonus' id="sidenavAbout">About
 					<em>The Garden Gate</em>
 				</div>
-				<div class='sidenavEntry sidenavLink skipBonus' onclick='showWelcomeScreensClicked();'>Show welcome screens</div>
-				<div class='sidenavEntry sidenavLink skipBonus' onclick='openShop();'>Buy Pai Sho sets</div>
+				<div class='sidenavEntry sidenavLink skipBonus' id="sidenavWelcomeScreens">Show welcome screens</div>
+				<div class='sidenavEntry sidenavLink skipBonus' id="sidenavShop">Buy Pai Sho sets</div>
 				<div class='sidenavEntry'>
 					<a href='https://skudpaisho.com/discord' target='_blank' class='sidenavLink'><i class="fa-brands fa-discord"></i> Join Discord Server</a>
 				</div>
@@ -141,21 +141,21 @@
 			<hr />
 			<div class='sidenavSection odd'>
 			<div class='sidenavSectionHeader'>
-				<div onClick='promptAddOption()'>Other</div>
+				<div id="sidenavOtherHeader">Other</div>
 			</div>
-			<div class='sidenavEntry sidenavLink skipBonus' onclick='showPreferences();'>Device Preferences</div>
+			<div class='sidenavEntry sidenavLink skipBonus' id="sidenavPreferences">Device Preferences</div>
 			<!-- <div class='sidenavEntry sidenavLink skipBonus' onclick='toggleSoundOn();'>Toggle Sound On/Off</div>
 			<div class='sidenavEntry sidenavLink skipBonus' onclick='toggleAnimationsOn();'>Toggle Animations On/Off</div>
 			<div class='sidenavEntry sidenavLink skipBonus' onclick='toggleDarkMode();'>Toggle Dark Mode</div> -->
 			<div class='sidenavEntry skipBonus'>
 				<label>Website Style:</label>
-				<select id='websiteStyleDropdown' onchange='setWebsiteTheme(this.value);'>
+				<select id='websiteStyleDropdown'>
 					<option value='dark'>Classic Dark Mode</option>
 					<option value='light'>Classic Light Mode</option>
 					<option value='stotes'>Chu Ji Theme</option>
 				</select>
 			</div>
-			<div class='sidenavEntry sidenavLink skipBonus' onclick='location.reload(true);'>Reload website</div>
+			<div class='sidenavEntry sidenavLink skipBonus' id="sidenavReload">Reload website</div>
 			</div>
 
 			<div>&nbsp;</div><div>&nbsp;</div><div>&nbsp;</div>
@@ -270,16 +270,16 @@
 					</div>
 					<div id="globalChatMessageInputContainer" class="chatMessageInputContainer">
 						<textarea id="globalChatMessageInput" class="chatMessageInput"></textarea>
-						<span id="sendGlobalChatMessageButton" class="button" onclick='sendGlobalChat();'>Send</span>
+						<span id="sendGlobalChatMessageButton" class="button">Send</span>
 					</div>
 				</div>
-				<div id="gameChatTab" class="tabcontent" onclick='dismissChatAlert();'>
+				<div id="gameChatTab" class="tabcontent">
 					<div id="chatTabAvContainer" class="gone chatTabAvContainer"></div>
-					<div id="chatMessagesHeader" class="chatMessagesHeader"><em>Game Chat messages may be viewed by other players. Abide by the Discord server #rules to be allowed to use Game Chat. Thank you!</em><div class='clickableText' onclick='toggleTimestamps()'>Toggle timestamp display</div><div id='toggleMoveLogDisplayDiv' class='clickableText gone' onclick='toggleMoveLogDisplay()'>Toggle move log messages</div><div id='rollD6LinkAboveChat' class='clickableText gone' onclick='sendChat("/d6 2")'>Roll D6</div><hr /></div>
+					<div id="chatMessagesHeader" class="chatMessagesHeader"><em>Game Chat messages may be viewed by other players. Abide by the Discord server #rules to be allowed to use Game Chat. Thank you!</em><div id='toggleTimestampsLink' class='clickableText'>Toggle timestamp display</div><div id='toggleMoveLogDisplayDiv' class='clickableText gone'>Toggle move log messages</div><div id='rollD6LinkAboveChat' class='clickableText gone'>Roll D6</div><hr /></div>
 					<div id="chatMessagesDisplay" class="chatMessagesDisplay"></div>
 					<div id="chatMessageInputContainer" class="chatMessageInputContainer">
 						<textarea id="chatMessageInput" class="chatMessageInput"></textarea>
-						<span id="sendChatMessageButton" class="button" onclick='sendChat();'>Send</span>
+						<span id="sendChatMessageButton" class="button">Send</span>
 					</div>
 				</div>
 			</div>
@@ -292,7 +292,7 @@
 		<div id="footerAvContainer" class="gone"></div>
 		<div id='confirmMoveButton' class='gone'>
 			<div class="center">
-				<span class='replayButton' onclick="confirmMoveClicked()">
+				<span class='replayButton' id="confirmMoveBtn">
 					Submit Move
 				</span>
 			</div>
@@ -300,23 +300,23 @@
 		<div id='gameLogText' class='gameLogText replayControlsAdditionalContent'></div>
 		<div id='gameClockContainer' class='gameClockContainer replayControlsAdditionalContent'></div>
 		<div id='replayButtonContainer' class="center">
-			<span class='replayButton' onclick="rewindAllMoves()">
+			<span class='replayButton' id="rewindAllBtn">
 				<i class="fa fa-fast-backward" aria-hidden="true"></i>
 			</span>
-			<span class='replayButton' onclick="playPrevMove()">
+			<span class='replayButton' id="playPrevBtn">
 				<i class="fa fa-step-backward" aria-hidden="true"></i>
 			</span>
-			<span class='replayButton playPauseButton' onclick="playPause()">
+			<span class='replayButton playPauseButton' id="playPauseBtn">
 				<i class="fa fa-play" aria-hidden="true"></i>
 			</span>
-			<span class='replayButton' onclick="playNextMove(true); pauseRun();">
+			<span class='replayButton' id="playNextBtn">
 				<i class="fa fa-step-forward" aria-hidden="true"></i>
 			</span>
-			<span class='replayButton' onclick="playAllMoves()">
+			<span class='replayButton' id="playAllBtn">
 				<i class="fa fa-fast-forward" aria-hidden="true"></i>
 			</span>
 		</div>
-		<span class="replayControlsCloseButton" onClick='toggleReplayControls()'>&nbsp;&times;
+		<span class="replayControlsCloseButton" id="replayControlsCloseBtn">&nbsp;&times;
 				<!-- <i class="fa fa-times" aria-hidden="true"></i> -->
 			</span>
 	</div>
@@ -368,11 +368,11 @@
 				</tr>
 			</table>
 			<div>
-				<button type='button' class="signupbutton" onclick='updatePasswordClicked();'>Change Password</button>
+				<button type='button' class="signupbutton" id="updatePasswordBtn">Change Password</button>
 			</div>
 			<br /><br />
 			<div>
-				Forgot your password? <span class='clickableText' onclick='forgetPasswordClicked()'>Click here to remove the password from your account.</span> You will still be able to log in with email verification and can set a password here later.
+				Forgot your password? <span class='clickableText' id="forgetPasswordLink">Click here to remove the password from your account.</span> You will still be able to log in with email verification and can set a password here later.
 			</div>
 		</div>
 	</div>
