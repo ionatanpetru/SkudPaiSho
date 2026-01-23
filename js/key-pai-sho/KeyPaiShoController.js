@@ -156,7 +156,7 @@ export class KeyPaiShoController {
 			+ "<p>During a turn a player can either Plant a Flower in a Gate or Move one of their Tiles. A player can have up to 2 Planted Flowers at once.</p>";
 	}
 	getAdditionalMessage() {
-		const container = document.createElement('div');
+		const container = document.createElement('span');
 
 		if (this.gameNotation.moves.length === 0) {
 			if (onlinePlayEnabled && gameId < 0 && userIsLoggedIn()) {

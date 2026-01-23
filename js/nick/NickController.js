@@ -204,7 +204,7 @@ export class NickController {
 	}
 
 	getAdditionalMessage() {
-		const container = document.createElement('div');
+		const container = document.createElement('span');
 
 		if (this.gameNotBegun() && !playingOnlineGame()) {
 			if (onlinePlayEnabled && gameId < 0 && userIsLoggedIn()) {

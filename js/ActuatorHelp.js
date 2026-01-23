@@ -219,10 +219,15 @@ export function setupPaiShoBoard(gameContainer,
 
 	var response = createDivWithId("response");
 	var gameMessage = createDivWithClass("gameMessage");
+	
 	var hostTilesContainer = createDivWithClass("hostTilesContainer");
 	hostTilesContainer.id = "hostTilesContainer";
+	hostTilesContainer.classList.add("tileContainer");
+	
 	var guestTilesContainer = createDivWithClass("guestTilesContainer");
 	guestTilesContainer.id = "guestTilesContainer";
+	guestTilesContainer.classList.add("tileContainer");
+	
 	var tilePileContainer = createDivWithClass("tilePileContainer");
 	tilePileContainer.classList.add("PaiSho");
 	var gameMessage2 = createDivWithClass("gameMessage2");

@@ -183,7 +183,7 @@ FirePaiShoController.prototype.getDefaultHelpMessageText = function() {
 };
 
 FirePaiShoController.prototype.getAdditionalMessage = function() {
-	const container = document.createElement('div');
+	const container = document.createElement('span');
 
 	const reserveInfo = document.createElement('p');
 	reserveInfo.appendChild(document.createTextNode('Host reserve tiles: ' + this.theGame.tileManager.hostReserveTiles.length));

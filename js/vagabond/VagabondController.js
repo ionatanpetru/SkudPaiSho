@@ -222,7 +222,7 @@ export class VagabondController {
 		clearMessage();
 	}
 	getAdditionalMessage() {
-		const container = document.createElement('div');
+		const container = document.createElement('span');
 
 		if (this.gameNotation.moves.length === 0) {
 			if (onlinePlayEnabled && gameId < 0 && userIsLoggedIn()) {

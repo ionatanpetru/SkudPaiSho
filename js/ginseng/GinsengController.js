@@ -231,7 +231,7 @@ GinsengController.prototype.gameNotBegun = function() {
 };
 
 GinsengController.prototype.getAdditionalMessage = function() {
-	const container = document.createElement('div');
+	const container = document.createElement('span');
 
 	if (this.gameNotBegun() && !playingOnlineGame()) {
 		if (onlinePlayEnabled && gameId < 0 && userIsLoggedIn()) {

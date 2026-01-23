@@ -110,7 +110,7 @@ TumbleweedController.prototype.getDefaultHelpMessageText = function() {
 
 /* Required by Main */
 TumbleweedController.prototype.getAdditionalMessage = function() {
-	const container = document.createElement('div');
+	const container = document.createElement('span');
 
 	if (!this.theGame.getWinner()) {
 		if (this.gameNotation.moves.length < TumbleweedController.getGameSetupCompleteMoveNumber()) {

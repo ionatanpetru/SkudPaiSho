@@ -150,7 +150,7 @@ SolitaireController.prototype.getDefaultHelpMessageText = function() {
 };
 
 SolitaireController.prototype.getAdditionalMessage = function() {
-	const container = document.createElement('div');
+	const container = document.createElement('span');
 	if (this.gameNotation.moves.length === 0) {
 		container.appendChild(getGameOptionsMessageElement(GameType.SolitairePaiSho.gameOptions));
 	}

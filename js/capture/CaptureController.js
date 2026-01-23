@@ -141,7 +141,7 @@ CaptureController.prototype.endGameNow = function() {
 };
 
 CaptureController.prototype.getAdditionalMessage = function() {
-	const container = document.createElement('div');
+	const container = document.createElement('span');
 
 	if (this.gameNotation.moves.length === 0) {
 		if (onlinePlayEnabled && gameId < 0 && userIsLoggedIn()) {

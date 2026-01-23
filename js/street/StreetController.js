@@ -148,7 +148,7 @@ StreetController.prototype.getDefaultHelpMessageText = function() {
 };
 
 StreetController.prototype.getAdditionalMessage = function() {
-	const container = document.createElement('div');
+	const container = document.createElement('span');
 
 	if (this.gameNotation.moves.length <= 2) {
 		if (onlinePlayEnabled && gameId <= 0 && userIsLoggedIn()) {

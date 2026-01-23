@@ -158,7 +158,7 @@ HexentaflController.prototype.getDefaultHelpMessageText = function() {
 
 /* Required by Main */
 HexentaflController.prototype.getAdditionalMessage = function() {
-	const container = document.createElement('div');
+	const container = document.createElement('span');
 	if (this.gameNotation.moves.length <= 2) {
 		container.appendChild(getGameOptionsMessageElement(GameType.Hexentafl.gameOptions));
 	}
