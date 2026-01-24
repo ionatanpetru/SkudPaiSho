@@ -12,7 +12,7 @@ function AdevarOptions() {
 	/* Set default tile designs */
 	if (!localStorage.getItem(AdevarOptions.tileDesignTypeKey)
 		|| !AdevarOptions.tileDesignTypeValues[localStorage.getItem(AdevarOptions.tileDesignTypeKey)]) {
-		AdevarOptions.setTileDesignsPreference("frumos", true);
+		AdevarOptions.setTileDesignsPreference("gaoling", true);
 	}
 
 	AdevarOptions.viewAsGuest = false || AdevarOptions.viewAsGuest;
@@ -28,6 +28,7 @@ AdevarOptions.tileDesignTypeKey = "adevarTileDesignTypeKey";
 
 /* Adevar tile designs */
 AdevarOptions.tileDesignTypeValues = {
+	gaoling: "Gaoling",
 	frumos: "Frumos",
 	classic: "Classic",
 	sleek: "Sleek",
