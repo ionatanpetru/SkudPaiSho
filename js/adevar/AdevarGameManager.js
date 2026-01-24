@@ -1,6 +1,23 @@
 // Adevar Pai Sho Game Manager
 
-var AdevarBoardSetupPoints = {
+import { ADEVAR_LITE, gameOptionEnabled } from '../GameOptions';
+import { AdevarBoard } from './AdevarBoard';
+import { AdevarMoveType } from './AdevarGameNotation';
+import { AdevarTile, AdevarTileCode, AdevarTileType } from './AdevarTile';
+import { AdevarTileManager } from './AdevarTileManager';
+import {
+  DEPLOY,
+  GUEST,
+  HOST,
+  MOVE,
+  NotationPoint
+} from '../CommonNotationObjects';
+import { PaiShoMarkingManager } from '../pai-sho-common/PaiShoMarkingManager';
+import { debug } from '../GameData';
+import { getOpponentName } from '../pai-sho-common/PaiShoPlayerHelp';
+import { setGameLogText } from '../PaiShoMain';
+
+export var AdevarBoardSetupPoints = {
 	hiddenTile: {
 		HOST: new NotationPoint("6,-6"),
 		GUEST: new NotationPoint("-5,5")
@@ -55,7 +72,7 @@ var AdevarBoardSetupPoints = {
 	}
 };
 
-var AdevarOrientalLilyObjectivePoints = [
+export var AdevarOrientalLilyObjectivePoints = [
 	/* Pre-3.9.6 */
 	/*
 	{
@@ -166,7 +183,7 @@ var AdevarOrientalLilyObjectivePoints = [
 	}
 ];
 
-function AdevarGameManager(actuator, ignoreActuate, isCopy) {
+export function AdevarGameManager(actuator, ignoreActuate, isCopy) {
 	this.isCopy = isCopy;
 
 	this.actuator = actuator;
@@ -179,7 +196,7 @@ function AdevarGameManager(actuator, ignoreActuate, isCopy) {
 	this.playersWhoHaveCapturedReflection = [];
 
 	this.setup(ignoreActuate);
-};
+}
 
 AdevarGameManager.prototype.updateActuator = function(newActuator) {
 	this.actuator = newActuator;

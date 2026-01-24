@@ -1,6 +1,9 @@
 /* For controlling Ads spaces and appearances in UI */
 
-function Ads() {
+import { peekRandomFromArray } from "./GameData";
+import { closeModal, showModalElem } from "./PaiShoMain";
+
+export function Ads() {
 
 }
 
@@ -110,7 +113,7 @@ Ads.enableAds = function(shouldShowAds) {
 				Ads.showRandomPopupAd();
 			}
 		});
-		
+
 		var topAvContainerDiv = document.getElementById("topAvContainer");
 		if (topAvContainerDiv) {
 			topAvContainerDiv.classList.remove("gone");
@@ -149,10 +152,15 @@ Ads.minimalAdsEnabled = function() {
 
 	var topAvContainerDiv = document.getElementById("topAvContainer");
 	topAvContainerDiv.classList.add("gone");
+	topAvContainerDiv.classList.add("gone");
 
 	var footerAvContainerDiv = document.getElementById("footerAvContainer");
 	footerAvContainerDiv.classList.add("gone");
+	var footerAvContainerDiv = document.getElementById("footerAvContainer");
+	footerAvContainerDiv.classList.add("gone");
 
+	var sideMenuAvContainerDiv = document.getElementById("sideMenuAvContainer");
+	sideMenuAvContainerDiv.classList.add("gone");
 	var sideMenuAvContainerDiv = document.getElementById("sideMenuAvContainer");
 	sideMenuAvContainerDiv.classList.add("gone");
 };
@@ -182,15 +190,67 @@ Ads.getAdDiv = function(adInfo, maxWidthNum, maxHeightNum) {
 	return txt;
 };
 
+Ads.getAdDivElement = function(adInfo, maxWidthNum, maxHeightNum) {
+	var linkUrl = adInfo.linkUrl;
+	if (!linkUrl) {
+		linkUrl = "https://skudpaisho.com/discord";
+	}
+	const link = document.createElement('a');
+	link.href = linkUrl;
+	link.target = '_blank';
+
+	const wrapper = document.createElement('div');
+	wrapper.style.display = 'inline-block';
+	wrapper.style.position = 'relative';
+
+	const img = document.createElement('img');
+	img.src = adInfo.imageUrl;
+	img.style.maxWidth = maxWidthNum + '%';
+	img.style.maxHeight = maxHeightNum + 'vh';
+	wrapper.appendChild(img);
+
+	const closeBtn = document.createElement('input');
+	closeBtn.type = 'button';
+	closeBtn.value = '[X]';
+	closeBtn.style.position = 'absolute';
+	closeBtn.style.right = '0';
+	closeBtn.style.top = '0';
+	closeBtn.style.opacity = '0.5';
+	wrapper.appendChild(closeBtn);
+
+	link.appendChild(wrapper);
+	return link;
+};
+
 Ads.showAdPopup = function(adKey) {
 	var adInfo = Ads.getAdInfo(adKey);
 
 	if (Ads.Options.showAds && adInfo && adInfo.imageUrl) {
-		showModal(
-			"A Message From Our Sponsors",
-			Ads.getAdDiv(adInfo, 98, 75)
-			+ "<br /><br />Thanks to our sponsors that support The Garden Gate! Be sure to join <a href='https://skudpaisho.com/discord' target='_blank'>The Garden Gate Discord</a> to get more involved in all things Pai Sho. <br /><br />Click <span class='clickableText' onclick='Ads.minimalAdsEnabled();closeModal()'>here to hide some of the ads</span>.<br /><br />Have a great day ;)"
-		);
+		const container = document.createElement('div');
+		container.appendChild(Ads.getAdDivElement(adInfo, 98, 75));
+		container.appendChild(document.createElement('br'));
+		container.appendChild(document.createElement('br'));
+		container.appendChild(document.createTextNode('Thanks to our sponsors that support The Garden Gate! Be sure to join '));
+		const discordLink = document.createElement('a');
+		discordLink.href = 'https://skudpaisho.com/discord';
+		discordLink.target = '_blank';
+		discordLink.textContent = 'The Garden Gate Discord';
+		container.appendChild(discordLink);
+		container.appendChild(document.createTextNode(' to get more involved in all things Pai Sho. '));
+		container.appendChild(document.createElement('br'));
+		container.appendChild(document.createElement('br'));
+		container.appendChild(document.createTextNode('Click '));
+		const hideAdsSpan = document.createElement('span');
+		hideAdsSpan.classList.add('clickableText');
+		hideAdsSpan.textContent = 'here to hide some of the ads';
+		hideAdsSpan.onclick = () => { Ads.minimalAdsEnabled(); closeModal(); };
+		container.appendChild(hideAdsSpan);
+		container.appendChild(document.createTextNode('.'));
+		container.appendChild(document.createElement('br'));
+		container.appendChild(document.createElement('br'));
+		container.appendChild(document.createTextNode('Have a great day ;)'));
+
+		showModalElem("A Message From Our Sponsors", container);
 	}
 };
 
@@ -212,7 +272,7 @@ Ads.showTopAd = function(adKey) {
 
 Ads.showRandomTopAd = function() {
 	var wideAdsList = Ads.AdsList.filter(adInfo => adInfo.shape === "wide");
-	Ads.showTopAd(peekRandomFromArray(wideAdsList).key)
+	Ads.showTopAd(peekRandomFromArray(wideAdsList).key);
 };
 
 Ads.showFooterAd = function(adKey) {
@@ -228,7 +288,7 @@ Ads.showFooterAd = function(adKey) {
 
 Ads.showRandomFooterAd = function() {
 	var wideAdsList = Ads.AdsList.filter(adInfo => adInfo.shape === "wide");
-	Ads.showFooterAd(peekRandomFromArray(wideAdsList).key)
+	Ads.showFooterAd(peekRandomFromArray(wideAdsList).key);
 };
 
 Ads.showSideMenuAd = function(adKey) {
@@ -244,7 +304,7 @@ Ads.showSideMenuAd = function(adKey) {
 
 Ads.showRandomSideMenuAd = function() {
 	var tallAdsList = Ads.AdsList.filter(adInfo => adInfo.shape === "tall");
-	Ads.showSideMenuAd(peekRandomFromArray(tallAdsList).key)
+	Ads.showSideMenuAd(peekRandomFromArray(tallAdsList).key);
 };
 
 Ads.showChatTabAd = function(adKey) {
@@ -263,14 +323,29 @@ Ads.showChatTabAd = function(adKey) {
 
 Ads.showRandomChatTabAd = function() {
 	var boxAdsList = Ads.AdsList.filter(adInfo => adInfo.shape === "box");
-	Ads.showChatTabAd(peekRandomFromArray(boxAdsList).key)
+	Ads.showChatTabAd(peekRandomFromArray(boxAdsList).key);
 };
 
 Ads.showSponsorMessagesTeaserPopup = function() {
-	showModal(
-		"Sponsored Messages",
-		"Would you like to support The Garden Gate and sponsor a message that could show here? <br /><br />Contact @SkudPaiSho on <a href='https://skudpaisho.com/discord' target='_blank'>The Garden Gate Discord</a> and consider supporting The Garden Gate on <a href='https://buymeacoffee.com/skudpaisho' target='_blank'>Buy Me A Coffee</a>."
-	);
+	const container = document.createElement('div');
+	container.appendChild(document.createTextNode('Would you like to support The Garden Gate and sponsor a message that could show here? '));
+	container.appendChild(document.createElement('br'));
+	container.appendChild(document.createElement('br'));
+	container.appendChild(document.createTextNode('Contact @SkudPaiSho on '));
+	const discordLink = document.createElement('a');
+	discordLink.href = 'https://skudpaisho.com/discord';
+	discordLink.target = '_blank';
+	discordLink.textContent = 'The Garden Gate Discord';
+	container.appendChild(discordLink);
+	container.appendChild(document.createTextNode(' and consider supporting The Garden Gate on '));
+	const coffeeLink = document.createElement('a');
+	coffeeLink.href = 'https://buymeacoffee.com/skudpaisho';
+	coffeeLink.target = '_blank';
+	coffeeLink.textContent = 'Buy Me A Coffee';
+	container.appendChild(coffeeLink);
+	container.appendChild(document.createTextNode('.'));
+
+	showModalElem("Sponsored Messages", container);
 };
 
 Ads.viewSponsoredMessageClicked = function() {

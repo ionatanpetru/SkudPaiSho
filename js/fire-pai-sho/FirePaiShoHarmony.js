@@ -1,6 +1,6 @@
 /* Skud Pai Sho Harmony */
 
-function FirePaiShoHarmony(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn) {
+export function FirePaiShoHarmony(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn) {
 	this.tile1 = tile1;
 	this.tile1Pos = new RowAndColumn(tile1RowAndColumn.row, tile1RowAndColumn.col);
 	this.tile2 = tile2;
@@ -165,7 +165,7 @@ FirePaiShoHarmony.prototype.crossesCenter = function() {
 
 
 // HarmonyManager manages list of harmonies
-function FirePaiShoHarmonyManager() {
+export function FirePaiShoHarmonyManager() {
 	this.harmonies = [];
 }
 

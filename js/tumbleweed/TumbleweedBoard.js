@@ -8,7 +8,7 @@ var TumbleweedDirections = {
 	DOWN_LEFT: 6
 }
 
-function TumbleweedBoard() {
+export function TumbleweedBoard() {
 	this.edgeLength = 8;
 	if (gameOptionEnabled(HEXHEX_11)) {
 		this.edgeLength = 11;

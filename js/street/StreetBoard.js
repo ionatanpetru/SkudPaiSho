@@ -1,6 +1,6 @@
 /* Street Pai Sho Board */
 
-function StreetBoard() {
+export function StreetBoard() {
 	this.size = new RowAndColumn(17, 17);
 	this.cells = this.brandNew();
 
@@ -491,83 +491,100 @@ StreetBoard.prototype.verifyAbleToReach = function(boardPointStart, boardPointEn
   return ableToReach;
 };
 
+// Minifier-safe implementation: uses unique const variables and nested if statements
+// instead of && with recursive calls to prevent Terser optimization issues
 StreetBoard.prototype.pathFound = function(boardPointStart, boardPointEnd, numMoves, playerMoving, markPossibleAsGo, travelDirection) {
   if (!boardPointStart || !boardPointEnd) {
-    return false; // start or end point not given
+    return false;
   }
 
   this.debugCount++;
 
   if (boardPointStart.isType(NON_PLAYABLE) || boardPointEnd.isType(NON_PLAYABLE)) {
-  	return false;	// Paths must be through playable points
+    return false;
   }
 
   if (markPossibleAsGo) {
-	if (!boardPointStart.hasTile()) {
-		boardPointStart.addType(POSSIBLE_MOVE);
-	}
-	  if (boardPointEnd.isType(POSSIBLE_MOVE)) {
-		  return true;
-	  }
+    if (!boardPointStart.hasTile()) {
+      boardPointStart.addType(POSSIBLE_MOVE);
+    }
+    if (boardPointEnd.isType(POSSIBLE_MOVE)) {
+      return true;
+    }
   }
 
-  if (boardPointStart.row === boardPointEnd.row && boardPointStart.col === boardPointEnd.col) {
-    return true; // Yay! start point equals end point
+  var startRow = boardPointStart.row;
+  var startCol = boardPointStart.col;
+  var endRow = boardPointEnd.row;
+  var endCol = boardPointEnd.col;
+
+  if (startRow === endRow && startCol === endCol) {
+    return true;
   }
   if (numMoves <= 0) {
-    return false; // No more moves left
+    return false;
   }
-  
-  // Idea: Get min num moves necessary!
-  var minMoves = Math.abs(boardPointStart.row - boardPointEnd.row) + Math.abs(boardPointStart.col - boardPointEnd.col);
-  
+
+  var minMoves = Math.abs(startRow - endRow) + Math.abs(startCol - endCol);
   if (minMoves === 1) {
-    return true; // Yay! Only 1 space away (and remember, numMoves is more than 0)
+    return true;
   }
 
-	if (travelDirection !== "DOWN") {
-		// Check moving UP
-		var nextRow = boardPointStart.row - 1;
-		if (nextRow >= 0) {
-			var nextPoint = this.cells[nextRow][boardPointStart.col];
-			if (!nextPoint.hasEnemyTile(playerMoving) && this.pathFound(nextPoint, boardPointEnd, numMoves - 1, playerMoving, markPossibleAsGo, "UP")) {
-			return true; // Yay!
-			}
-		}
-	}
+  var movesLeft = numMoves - 1;
 
-	if (travelDirection !== "UP") {
-		// Check moving DOWN
-		nextRow = boardPointStart.row + 1;
-		if (nextRow < 17) {
-			var nextPoint = this.cells[nextRow][boardPointStart.col];
-			if (!nextPoint.hasEnemyTile(playerMoving) && this.pathFound(nextPoint, boardPointEnd, numMoves - 1, playerMoving, markPossibleAsGo, "DOWN")) {
-			return true; // Yay!
-			}
-		}
-	}
+  // Check UP - nested if instead of &&
+  if (travelDirection !== "DOWN") {
+    var upRow = startRow - 1;
+    if (upRow >= 0) {
+      var upPoint = this.cells[upRow][startCol];
+      if (!upPoint.hasEnemyTile(playerMoving)) {
+        if (this.pathFound(upPoint, boardPointEnd, movesLeft, playerMoving, markPossibleAsGo, "UP")) {
+          return true;
+        }
+      }
+    }
+  }
 
-	if (travelDirection !== "RIGHT") {
-		// Check moving LEFT
-		var nextCol = boardPointStart.col - 1;
-		if (nextCol >= 0) {
-			var nextPoint = this.cells[boardPointStart.row][nextCol];
-			if (!nextPoint.hasEnemyTile(playerMoving) && this.pathFound(nextPoint, boardPointEnd, numMoves - 1, playerMoving, markPossibleAsGo, "LEFT")) {
-			return true; // Yay!
-			}
-		}
-	}
+  // Check DOWN
+  if (travelDirection !== "UP") {
+    var downRow = startRow + 1;
+    if (downRow < 17) {
+      var downPoint = this.cells[downRow][startCol];
+      if (!downPoint.hasEnemyTile(playerMoving)) {
+        if (this.pathFound(downPoint, boardPointEnd, movesLeft, playerMoving, markPossibleAsGo, "DOWN")) {
+          return true;
+        }
+      }
+    }
+  }
 
-	if (travelDirection !== "LEFT") {
-		// Check moving RIGHT
-		nextCol = boardPointStart.col + 1;
-		if (nextCol < 17) {
-			var nextPoint = this.cells[boardPointStart.row][nextCol];
-			if (!nextPoint.hasEnemyTile(playerMoving) && this.pathFound(nextPoint, boardPointEnd, numMoves - 1, playerMoving, markPossibleAsGo, "RIGHT")) {
-			return true; // Yay!
-			}
-		}
-	}
+  // Check LEFT
+  if (travelDirection !== "RIGHT") {
+    var leftCol = startCol - 1;
+    if (leftCol >= 0) {
+      var leftPoint = this.cells[startRow][leftCol];
+      if (!leftPoint.hasEnemyTile(playerMoving)) {
+        if (this.pathFound(leftPoint, boardPointEnd, movesLeft, playerMoving, markPossibleAsGo, "LEFT")) {
+          return true;
+        }
+      }
+    }
+  }
+
+  // Check RIGHT
+  if (travelDirection !== "LEFT") {
+    var rightCol = startCol + 1;
+    if (rightCol < 17) {
+      var rightPoint = this.cells[startRow][rightCol];
+      if (!rightPoint.hasEnemyTile(playerMoving)) {
+        if (this.pathFound(rightPoint, boardPointEnd, movesLeft, playerMoving, markPossibleAsGo, "RIGHT")) {
+          return true;
+        }
+      }
+    }
+  }
+
+  return false;
 };
 
 StreetBoard.prototype.markSpacesBetweenHarmonies = function() {

@@ -1,22 +1,25 @@
+import { buildDropdownDiv, clearMessage, currentGameData, gameController, GameType, promptForCustomTileDesigns, usernameEquals } from "../PaiShoMain";
 
-Nick.Options = function() {
-	if (!localStorage.getItem(Nick.Options.tileDesignTypeKey)
-		|| !Nick.Options.tileDesignTypeValues[localStorage.getItem(Nick.Options.tileDesignTypeKey)]) {
-		Nick.Options.setTileDesignsPreference("siyuan", true);
-	}
+export class NickOptions {
+	constructor() {
+		if (!localStorage.getItem(NickOptions.tileDesignTypeKey)
+			|| !NickOptions.tileDesignTypeValues[localStorage.getItem(NickOptions.tileDesignTypeKey)]) {
+			NickOptions.setTileDesignsPreference("siyuan", true);
+		}
 
-	Nick.Options.viewAsGuest = false || Nick.Options.viewAsGuest;
-	if (currentGameData && currentGameData.gameTypeId === GameType.Nick.id && usernameEquals(currentGameData.guestUsername)) {
-		Nick.Options.viewAsGuest = true;
-	}
-	if (currentGameData && currentGameData.gameTypeId === GameType.Nick.id && usernameEquals(currentGameData.hostUsername)) {
-		Nick.Options.viewAsGuest = false;
+		NickOptions.viewAsGuest = false || NickOptions.viewAsGuest;
+		if (currentGameData && currentGameData.gameTypeId === GameType.Nick.id && usernameEquals(currentGameData.guestUsername)) {
+			NickOptions.viewAsGuest = true;
+		}
+		if (currentGameData && currentGameData.gameTypeId === GameType.Nick.id && usernameEquals(currentGameData.hostUsername)) {
+			NickOptions.viewAsGuest = false;
+		}
 	}
 }
 
-Nick.Options.tileDesignTypeKey = "nickTileDesignTypeKey";
+NickOptions.tileDesignTypeKey = "nickTileDesignTypeKey";
 
-Nick.Options.tileDesignTypeValues = {
+NickOptions.tileDesignTypeValues = {
 	siyuan: "Sì Yuán",
 	fournations: "Four Nations",
 	siyuangaoling: "Sì Yuán Gāolíng",
@@ -24,35 +27,35 @@ Nick.Options.tileDesignTypeValues = {
 	custom: "Custom"
 };
 
-Nick.Options.setTileDesignsPreference = function(tileDesignKey, ignoreActuate) {
+NickOptions.setTileDesignsPreference = function(tileDesignKey, ignoreActuate) {
 	if (tileDesignKey === 'custom') {
-		promptForCustomTileDesigns(GameType.Nick, Nick.Preferences.customTilesUrl);
+		promptForCustomTileDesigns(GameType.Nick, NickOptions.Preferences.customTilesUrl);
 	} else {
-		localStorage.setItem(Nick.Options.tileDesignTypeKey, tileDesignKey);
+		localStorage.setItem(NickOptions.tileDesignTypeKey, tileDesignKey);
 		if (gameController && gameController.callActuate && !ignoreActuate) {
 			gameController.callActuate();
 		}
 		// Add this line to refresh the help message and update the image
-        if (typeof refreshMessage === "function") {
-            clearMessage();
-        }
+		if (typeof refreshMessage === "function") {
+			clearMessage();
+		}
 	}
 };
 
-Nick.Options.buildTileDesignDropdownDiv = function(alternateLabelText) {
-	var labelText = alternateLabelText ? alternateLabelText : "Tile Designs";
-	return buildDropdownDiv("NickTileDesignDropdown", labelText + ":", Nick.Options.tileDesignTypeValues,
-							localStorage.getItem(Nick.Options.tileDesignTypeKey),
-							function() {
-								Nick.Options.setTileDesignsPreference(this.value);
-							});
+NickOptions.buildTileDesignDropdownDiv = function(alternateLabelText) {
+	const labelText = alternateLabelText ? alternateLabelText : "Tile Designs";
+	return buildDropdownDiv("NickTileDesignDropdown", labelText + ":", NickOptions.tileDesignTypeValues,
+		localStorage.getItem(NickOptions.tileDesignTypeKey),
+		function() {
+			NickOptions.setTileDesignsPreference(this.value);
+		});
 };
 
-Nick.Options.buildToggleViewAsGuestDiv = function() {
-	var div = document.createElement("div");
-	var message = "Viewing board as Host";
-	var linkText = "View as Guest";
-	if (Nick.Options.viewAsGuest) {
+NickOptions.buildToggleViewAsGuestDiv = function() {
+	const div = document.createElement("div");
+	let message = "Viewing board as Host";
+	let linkText = "View as Guest";
+	if (NickOptions.viewAsGuest) {
 		message = "Viewing board as Guest";
 		linkText = "View as Host";
 	}
@@ -60,4 +63,4 @@ Nick.Options.buildToggleViewAsGuestDiv = function() {
 	return div;
 };
 
-
+export default NickOptions;

@@ -1,14 +1,17 @@
+import { BRAND_NEW } from '../PaiShoMain';
+import { GUEST, HOST, NotationPoint, PLANTING } from '../CommonNotationObjects';
+import { debug } from '../GameData';
 
-Undergrowth.NotationVars = {
+export const UndergrowthNotationVars = {
 	PASS_TURN: "-"
 };
 
-Undergrowth.NotationMove = function(text) {
+export function UndergrowthNotationMove(text) {
 	this.fullMoveText = text;
 	this.analyzeMove();
 }
 
-Undergrowth.NotationMove.prototype.analyzeMove = function() {
+UndergrowthNotationMove.prototype.analyzeMove = function() {
 	this.valid = true;
 
 	// Example move: 5H.R3(1,1)+W3(-1,-1)
@@ -38,9 +41,9 @@ Undergrowth.NotationMove.prototype.analyzeMove = function() {
 	var char0 = moveText.charAt(0);
 	this.moveType = PLANTING;
 
-	if (moveText === Undergrowth.NotationVars.PASS_TURN) {
+	if (moveText === UndergrowthNotationVars.PASS_TURN) {
 		this.passTurn = true;
-		this.moveType = Undergrowth.NotationVars.PASS_TURN;
+		this.moveType = UndergrowthNotationVars.PASS_TURN;
 	} else if (this.moveType === PLANTING) {
 		var char1 = moveText.charAt(1);
 		this.plantedFlowerType = char0;
@@ -74,15 +77,15 @@ Undergrowth.NotationMove.prototype.analyzeMove = function() {
 	debug(this);
 };
 
-Undergrowth.NotationMove.prototype.hasHarmonyBonus = function() {
+UndergrowthNotationMove.prototype.hasHarmonyBonus = function() {
 	return typeof this.bonusTileCode !== 'undefined';
 };
 
-Undergrowth.NotationMove.prototype.isValidNotation = function() {
+UndergrowthNotationMove.prototype.isValidNotation = function() {
 	return this.valid;
 };
 
-Undergrowth.NotationMove.prototype.equals = function(otherMove) {
+UndergrowthNotationMove.prototype.equals = function(otherMove) {
 	return this.fullMoveText === otherMove.fullMoveText;
 };
 
@@ -90,7 +93,7 @@ Undergrowth.NotationMove.prototype.equals = function(otherMove) {
 
 // --------------------------------------- //
 
-Undergrowth.NotationBuilder = function() {
+export function UndergrowthNotationBuilder() {
 	// this.moveNum;	// Let's try making this magic
 	// this.player;		// Magic
 	this.moveType;
@@ -111,10 +114,10 @@ Undergrowth.NotationBuilder = function() {
 	this.passTurn = false;
 }
 
-Undergrowth.NotationBuilder.WAITING_FOR_SECOND_MOVE = "Waiting for second move";
-Undergrowth.NotationBuilder.WAITING_FOR_SECOND_ENDPOINT = "Waiting for second endpoint";
+UndergrowthNotationBuilder.WAITING_FOR_SECOND_MOVE = "Waiting for second move";
+UndergrowthNotationBuilder.WAITING_FOR_SECOND_ENDPOINT = "Waiting for second endpoint";
 
-Undergrowth.NotationBuilder.prototype.getNotationMove = function(moveNum, player) {
+UndergrowthNotationBuilder.prototype.getNotationMove = function(moveNum, player) {
 	// Example move: 5H.R3(1,1)+W3(-1,-1)
 	var notationLine = moveNum + player.charAt(0) + ".";
 	if (this.moveType === PLANTING) {
@@ -122,33 +125,33 @@ Undergrowth.NotationBuilder.prototype.getNotationMove = function(moveNum, player
 		if (this.plantedFlowerType2 && this.endPoint2) {
 			notationLine += "+" + this.plantedFlowerType2 + "(" + this.endPoint2.pointText + ")";
 		}
-	} else if (this.moveType === Undergrowth.NotationVars.PASS_TURN) {
-		notationLine += Undergrowth.NotationVars.PASS_TURN;
+	} else if (this.moveType === UndergrowthNotationVars.PASS_TURN) {
+		notationLine += UndergrowthNotationVars.PASS_TURN;
 	}
 	
-	return new Undergrowth.NotationMove(notationLine);
+	return new UndergrowthNotationMove(notationLine);
 };
 
 // --------------------------------------- //
 
 
 
-Undergrowth.GameNotation = function() {
+export function UndergrowthGameNotation() {
 	this.notationText = "";
 	this.moves = [];
 }
 
-Undergrowth.GameNotation.prototype.setNotationText = function(text) {
+UndergrowthGameNotation.prototype.setNotationText = function(text) {
 	this.notationText = text;
 	this.loadMoves();
 };
 
-Undergrowth.GameNotation.prototype.addNotationLine = function(text) {
+UndergrowthGameNotation.prototype.addNotationLine = function(text) {
 	this.notationText += ";" + text.trim();
 	this.loadMoves();
 };
 
-Undergrowth.GameNotation.prototype.addMove = function(move) {
+UndergrowthGameNotation.prototype.addMove = function(move) {
 	if (this.notationText) {
 		this.notationText += ";" + move.fullMoveText;
 	} else {
@@ -157,15 +160,17 @@ Undergrowth.GameNotation.prototype.addMove = function(move) {
 	this.loadMoves();
 };
 
-Undergrowth.GameNotation.prototype.removeLastMove = function() {
+UndergrowthGameNotation.prototype.removeLastMove = function() {
 	this.notationText = this.notationText.substring(0, this.notationText.lastIndexOf(";"));
 	this.loadMoves();
 };
 
-Undergrowth.GameNotation.prototype.getPlayerMoveNum = function() {
+UndergrowthGameNotation.prototype.getPlayerMoveNum = function() {
 	var moveNum = 0;
 	var lastMove = this.moves[this.moves.length-1];
 
+	var player;
+	
 	if (lastMove) {
 		moveNum = lastMove.moveNum;
 		// At game beginning:
@@ -183,7 +188,7 @@ Undergrowth.GameNotation.prototype.getPlayerMoveNum = function() {
 	return moveNum;
 };
 
-Undergrowth.GameNotation.prototype.getNotationMoveFromBuilder = function(builder) {
+UndergrowthGameNotation.prototype.getNotationMoveFromBuilder = function(builder) {
 	// Example move: 5H.R3(1,1)+W3(-1,-1)
 
 	var moveNum = 1;
@@ -204,7 +209,7 @@ Undergrowth.GameNotation.prototype.getNotationMoveFromBuilder = function(builder
 	return builder.getNotationMove(moveNum, player);
 };
 
-Undergrowth.GameNotation.prototype.loadMoves = function() {
+UndergrowthGameNotation.prototype.loadMoves = function() {
 	this.moves = [];
 	var lines = [];
 	if (this.notationText) {
@@ -218,7 +223,7 @@ Undergrowth.GameNotation.prototype.loadMoves = function() {
 	var self = this;
 	var lastPlayer = GUEST;
 	lines.forEach(function(line) {
-		var move = new Undergrowth.NotationMove(line);
+		var move = new UndergrowthNotationMove(line);
 		if (move.moveNum === 0 && move.isValidNotation()) {
 			self.moves.push(move);
 		} else if (move.isValidNotation() && move.player !== lastPlayer) {
@@ -230,7 +235,7 @@ Undergrowth.GameNotation.prototype.loadMoves = function() {
 	});
 };
 
-Undergrowth.GameNotation.prototype.getNotationHtml = function() {
+UndergrowthGameNotation.prototype.getNotationHtml = function() {
 	var lines = [];
 	if (this.notationText) {
 		if (this.notationText.includes(';')) {
@@ -249,7 +254,7 @@ Undergrowth.GameNotation.prototype.getNotationHtml = function() {
 	return notationHtml;
 };
 
-Undergrowth.GameNotation.prototype.getNotationForEmail = function() {
+UndergrowthGameNotation.prototype.getNotationForEmail = function() {
 	var lines = [];
 	if (this.notationText) {
 		if (this.notationText.includes(';')) {
@@ -268,16 +273,16 @@ Undergrowth.GameNotation.prototype.getNotationForEmail = function() {
 	return notationHtml;
 };
 
-Undergrowth.GameNotation.prototype.notationTextForUrl = function() {
+UndergrowthGameNotation.prototype.notationTextForUrl = function() {
 	var str = this.notationText;
 	return str;
 };
 
-Undergrowth.GameNotation.prototype.getLastMoveText = function() {
+UndergrowthGameNotation.prototype.getLastMoveText = function() {
 	return this.moves[this.moves.length - 1].fullMoveText;
 };
 
-Undergrowth.GameNotation.prototype.getLastMoveNumber = function() {
+UndergrowthGameNotation.prototype.getLastMoveNumber = function() {
 	return this.moves[this.moves.length - 1].moveNum;
 };
 

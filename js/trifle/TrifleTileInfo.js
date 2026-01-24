@@ -1,5 +1,10 @@
 
-Trifle.TileCategory = {
+import { TrifleBoardPoint } from './TrifleBoardPoint';
+import { TrifleTileType } from './TrifleTiles';
+import { debugOn } from '../GameData';
+import { getCurrentTileMetadata } from './PaiShoGamesTileMetadata';
+
+export const TrifleTileCategory = {
 	thisTile: "thisTile",
 	allButThisTile: "allButThisTile",
 	allTileTypes: "allTileTypes",
@@ -8,7 +13,7 @@ Trifle.TileCategory = {
 	tileWithAbility: "tileWithAbility"
 };
 
-Trifle.TargetType = {
+export const TrifleTargetType = {
 	thisTile: "thisTile",			// 
 	allTileTypes: "allTileTypes",	//
 	landingTile: "landingTile",		//
@@ -18,17 +23,17 @@ Trifle.TargetType = {
 	chosenCapturedTile: "chosenCapturedTile"
 }
 
-Trifle.DeployType = {
+export const TrifleDeployType = {
 	anywhere: "anywhere",
 	temple: "temple",
 	adjacentToTemple: "adjacentToTemple"
 };
 
-Trifle.SpecialDeployType = {
+export const TrifleSpecialDeployType = {
 	withinFriendlyTileZone: "withinFriendlyTileZone"
 };
 
-Trifle.MovementType = {
+export const TrifleMovementType = {
 	standard: "standard",
 	diagonal: "diagonal",
 	orthAndDiag: "orthAndDiag",
@@ -44,12 +49,12 @@ Trifle.MovementType = {
 	jumpSurroundingTiles: "jumpSurroundingTiles"
 };
 
-Trifle.MovementDirection = {
+export const TrifleMovementDirection = {
 	orthogonal: "orthogonal",
 	diagonal: "diagonal"
 };
 
-Trifle.MovementRestriction = {
+export const TrifleMovementRestriction = {
 	// restrictedByOpponentTileZones: "restrictedByOpponentTileZones",
 	// immobilizedByAdjacentOpponentTile: "immobilizedByAdjacentOpponentTile", // unused
 	// immobilizedByOpponentTileZones: "immobilizedByOpponentTileZones",
@@ -58,13 +63,13 @@ Trifle.MovementRestriction = {
 	restrictMovementOntoRecordedTilePoint: "restrictMovementOntoRecordedTilePoint"
 };
 
-Trifle.MovementAbility = {
+export const TrifleMovementAbility = {
 	// carry: "carry", // For future
 	jumpOver: "jumpOver",
 	chargeCapture: "chargeCapture"
 };
 
-Trifle.MoveDirection = {
+export const TrifleMoveDirection = {
 	any: "any",	/* Any direction starts movement */
 	straight: "straight",
 	turn: "turn",
@@ -72,19 +77,19 @@ Trifle.MoveDirection = {
 	right: "right"
 }
 
-Trifle.CaptureType = {
+export const TrifleCaptureType = {
 	none: "none",
 	all: "all",
 	tilesTargetedByAbility: "tilesTargetedByAbility",
 	allExcludingCertainTiles: "allExcludingCertainTiles"
 };
 
-Trifle.ActivationRequirement = {
+export const TrifleActivationRequirement = {
 	tilesNotInTemple: "tilesNotInTemple",
 	tileIsOnPointOfType: "tileIsOnPointOfType"
 };
 
-Trifle.ZoneAbility = {
+export const TrifleZoneAbility = {
 	canceledWhenInTemple: "canceledWhenInTemple", // Note: Too specific, how to split up to *dynamicize*?
 	protectFriendlyTilesFromCapture: "protectFriendlyTilesFromCapture", // Too specific, can be ProtectTilesFromCapture and have a target tiles metadata
 	// immobilizesOpponentTiles: "immobilizesOpponentTiles", // Outdated, replaced by ImmobilizesTiles
@@ -94,7 +99,7 @@ Trifle.ZoneAbility = {
 	captureLandingTiles: "captureLandingTiles" // unused?
 }
 
-Trifle.BoardPresenceAbility = {
+export const TrifleBoardPresenceAbility = {
 	increaseFriendlyTileMovementDistance: "increaseFriendlyTileMovementDistance",	// TODO replace with Ability.grantBonusMovement
 	// spawnAdditionalCopies: "spawnAdditionalCopies",	// TODO,
 	canBeCapturedByFriendlyTiles: "canBeCapturedByFriendlyTiles",
@@ -102,15 +107,15 @@ Trifle.BoardPresenceAbility = {
 	// captureProtection: "captureProtection"
 }
 
-Trifle.SpawnLocation = {
+export const TrifleSpawnLocation = {
 	adjacent: "adjacent"
 };
 
-Trifle.AttributeType = {
+export const TrifleAttributeType = {
 	gigantic: "gigantic"
 }
 
-Trifle.AbilityName = {
+export const TrifleAbilityName = {
 	captureTargetTiles: "captureTargetTiles",
 	removeEffects: "removeEffects",
 	protectFromCapture: "protectFromCapture",
@@ -135,31 +140,31 @@ Trifle.AbilityName = {
 	exchangeWithCapturedTile: "exchangeWithCapturedTile"
 };
 
-Trifle.AbilityType = {
+export const TrifleAbilityType = {
 	all: "all",
 	protection: "protection"
 };
 
-Trifle.AbilityCategory = {
+export const TrifleAbilityCategory = {
 	instant: "instant",
 	ongoing: "ongoing"
 };
 
-Trifle.AbilitiesByCategory = {};
-Trifle.AbilitiesByCategory[Trifle.AbilityCategory.instant] = [
-	Trifle.AbilityName.captureTargetTiles,
-	Trifle.AbilityName.moveTargetTile,
-	Trifle.AbilityName.recordTilePoint,
-	Trifle.AbilityName.moveTileToRecordedPoint,
-	Trifle.AbilityName.moveTargetTileToPile,
-	Trifle.AbilityName.exchangeWithCapturedTile
+export const TrifleAbilitiesByCategory = {};
+TrifleAbilitiesByCategory[TrifleAbilityCategory.instant] = [
+	TrifleAbilityName.captureTargetTiles,
+	TrifleAbilityName.moveTargetTile,
+	TrifleAbilityName.recordTilePoint,
+	TrifleAbilityName.moveTileToRecordedPoint,
+	TrifleAbilityName.moveTargetTileToPile,
+	TrifleAbilityName.exchangeWithCapturedTile
 ];
 
-Trifle.AbilityPriorityLevel = {
+export const TrifleAbilityPriorityLevel = {
 	highest: "highest"
 };
 
-Trifle.AbilityTriggerType = {
+export const TrifleAbilityTriggerType = {
 	whenCapturedByTargetTile: "whenCapturedByTargetTile",
 	whenCapturingTargetTile: "whenCapturingTargetTile",
 	whenTargetTileLandsInZone: "whenTargetTileLandsInZone",
@@ -181,40 +186,40 @@ Trifle.AbilityTriggerType = {
 	whenTargetTileLandsInTemple: "whenTargetTileLandsInTemple"
 };
 
-Trifle.PromptTargetType = {
+export const TriflePromptTargetType = {
 	boardPoint: "boardPoint",
 	tilePile: "tilePile",
 	capturedTile: "capturedTile"
 };
 
-Trifle.TargetPromptId = {
+export const TrifleTargetPromptId = {
 	movedTilePoint: "movedTilePoint",
 	movedTileDestinationPoint: "movedTileDestinationPoint",
 	chosenCapturedTile: "chosenCapturedTile"
 };
 
-Trifle.TileTeam = {
+export const TrifleTileTeam = {
 	friendly: "friendly",
 	enemy: "enemy"
 };
 
-Trifle.RecordTilePointType = {
+export const TrifleRecordTilePointType = {
 	startPoint: "startPoint"
 };
 
-Trifle.AbilitiesForType = {};
+export let TrifleAbilitiesForType = {};
 
-Trifle.AbilityTypes = {};
+export let TrifleAbilityTypes = {};
 
-Trifle.TrifleTiles = {};
+export const TrifleTiles = {};
 
-Trifle.TileInfo = {};
+export const TrifleTileInfo = {};
 
-Trifle.TileInfo.tileIsBanner = function(tileInfo) {
-	return tileInfo && tileInfo.types && tileInfo.types.includes(Trifle.TileType.banner);
+TrifleTileInfo.tileIsBanner = function(tileInfo) {
+	return tileInfo && tileInfo.types && tileInfo.types.includes(TrifleTileType.banner);
 };
 
-Trifle.TileInfo.tileIsOneOfTheseTypes = function(tileInfo, types) {
+TrifleTileInfo.tileIsOneOfTheseTypes = function(tileInfo, types) {
 	var isTargetType = false;
 	if (tileInfo) {
 		types.forEach(function(type) {
@@ -227,17 +232,17 @@ Trifle.TileInfo.tileIsOneOfTheseTypes = function(tileInfo, types) {
 	return isTargetType;
 };
 
-Trifle.TileInfo.getTerritorialZone = function(tileInfo) {
+TrifleTileInfo.getTerritorialZone = function(tileInfo) {
 	if (tileInfo.territorialZone) {
 		return tileInfo.territorialZone;
 	}
 };
 
-Trifle.TileInfo.movementMustPreserveDirection = function(movementInfo) {
+TrifleTileInfo.movementMustPreserveDirection = function(movementInfo) {
 	var mustPreserveDirection = false;
 	if (movementInfo && movementInfo.restrictions && movementInfo.restrictions.length > 0) {
 		movementInfo.restrictions.forEach(function(movementRestriction) {
-			if (movementRestriction.type === Trifle.MovementRestriction.mustPreserveDirection) {
+			if (movementRestriction.type === TrifleMovementRestriction.mustPreserveDirection) {
 				mustPreserveDirection = true;
 				return;
 			}
@@ -246,7 +251,7 @@ Trifle.TileInfo.movementMustPreserveDirection = function(movementInfo) {
 	return mustPreserveDirection;
 };
 
-Trifle.TileInfo.tileHasBoardPresenceAbility = function(tileInfo, abilityType) {
+TrifleTileInfo.tileHasBoardPresenceAbility = function(tileInfo, abilityType) {
 	var result = false;
 	if (tileInfo && tileInfo.abilities) {
 		tileInfo.abilities.forEach(function(ability) {
@@ -259,19 +264,19 @@ Trifle.TileInfo.tileHasBoardPresenceAbility = function(tileInfo, abilityType) {
 	return result;
 };
 
-// Trifle.TileInfo.tileHasDrawTilesInLineOfSightAbility = function(tileInfo) {
-// 	return Trifle.TileInfo.tileHasBoardPresenceAbility(tileInfo, Trifle.BoardPresenceAbility.drawTilesInLineOfSight);
+// TrifleTileInfo.tileHasDrawTilesInLineOfSightAbility = function(tileInfo) {
+// 	return TrifleTileInfo.tileHasBoardPresenceAbility(tileInfo, TrifleBoardPresenceAbility.drawTilesInLineOfSight);
 // };
 
-Trifle.TileInfo.tileCanBeCapturedByFriendlyTiles = function(tileInfo) {
-	return Trifle.TileInfo.tileHasBoardPresenceAbility(tileInfo, Trifle.BoardPresenceAbility.canBeCapturedByFriendlyTiles);
+TrifleTileInfo.tileCanBeCapturedByFriendlyTiles = function(tileInfo) {
+	return TrifleTileInfo.tileHasBoardPresenceAbility(tileInfo, TrifleBoardPresenceAbility.canBeCapturedByFriendlyTiles);
 };
 
-Trifle.TileInfo.tileHasOnlyOneMovement = function(tileInfo) {
+TrifleTileInfo.tileHasOnlyOneMovement = function(tileInfo) {
 	return tileInfo && tileInfo.movements && tileInfo.movements.length === 1;
 };
 
-Trifle.TileInfo.tileHasMovementAbility = function(tileInfo, targetMovementAbilityType) {
+TrifleTileInfo.tileHasMovementAbility = function(tileInfo, targetMovementAbilityType) {
 	var tileHasMovementAbility = false;
 	if (tileInfo && tileInfo.movements) {
 		tileInfo.movements.forEach(function(movementInfo) {
@@ -288,7 +293,7 @@ Trifle.TileInfo.tileHasMovementAbility = function(tileInfo, targetMovementAbilit
 	return tileHasMovementAbility;
 };
 
-Trifle.TileInfo.tileHasAbilityTrigger = function(tileInfo, abilityTrigger) {
+TrifleTileInfo.tileHasAbilityTrigger = function(tileInfo, abilityTrigger) {
 	var tileHasAbilityTrigger = false;
 	if (tileInfo && tileInfo.abilities) {
 		tileInfo.abilities.forEach(function(abilityInfo) {
@@ -301,7 +306,7 @@ Trifle.TileInfo.tileHasAbilityTrigger = function(tileInfo, abilityTrigger) {
 	return tileHasAbilityTrigger;
 };
 
-Trifle.TileInfo.getAbilitiesWithAbilityTrigger = function(tileInfo, abilityTrigger) {
+TrifleTileInfo.getAbilitiesWithAbilityTrigger = function(tileInfo, abilityTrigger) {
 	var abilitiesWithTrigger = [];
 	if (tileInfo && tileInfo.abilities) {
 		tileInfo.abilities.forEach(function(abilityInfo) {
@@ -313,7 +318,7 @@ Trifle.TileInfo.getAbilitiesWithAbilityTrigger = function(tileInfo, abilityTrigg
 	return abilitiesWithTrigger;
 };
 
-Trifle.TileInfo.getZoneAbilitiesWithAbilityTrigger = function(tileInfo, abilityTrigger) {
+TrifleTileInfo.getZoneAbilitiesWithAbilityTrigger = function(tileInfo, abilityTrigger) {
 	var abilitiesWithTrigger = [];
 	if (tileInfo && tileInfo.territorialZone && tileInfo.territorialZone.abilities) {
 		tileInfo.territorialZone.abilities.forEach(function(abilityInfo) {
@@ -325,11 +330,11 @@ Trifle.TileInfo.getZoneAbilitiesWithAbilityTrigger = function(tileInfo, abilityT
 	return abilitiesWithTrigger;
 };
 
-Trifle.TileInfo.tileAbilityIsTriggeredWhenCaptured = function(tileAbilityInfo) {
+TrifleTileInfo.tileAbilityIsTriggeredWhenCaptured = function(tileAbilityInfo) {
 	var isTriggeredWhenCaptured = false;
 	if (tileAbilityInfo.triggers) {
 		tileAbilityInfo.triggers.forEach(function(triggerInfo) {
-			if (triggerInfo.triggerType === Trifle.AbilityTriggerType.whenCapturedByTargetTile) {
+			if (triggerInfo.triggerType === TrifleAbilityTriggerType.whenCapturedByTargetTile) {
 				isTriggeredWhenCaptured = true;
 			}
 		});
@@ -338,42 +343,42 @@ Trifle.TileInfo.tileAbilityIsTriggeredWhenCaptured = function(tileAbilityInfo) {
 };
 
 /* TODO Does not belong in 'TileInfo' space? */
-Trifle.TileInfo.abilityIsCategory = function(abilityObject, abilityCategory) {
-	return Trifle.AbilitiesByCategory[abilityCategory] 
-		&& Trifle.AbilitiesByCategory[abilityCategory].includes(abilityObject.abilityType);
+TrifleTileInfo.abilityIsCategory = function(abilityObject, abilityCategory) {
+	return TrifleAbilitiesByCategory[abilityCategory] 
+		&& TrifleAbilitiesByCategory[abilityCategory].includes(abilityObject.abilityType);
 };
 
-Trifle.TileInfo.initializeTrifleData = function() {
-	Trifle.TileInfo.defineAbilitiesForAbilityTypes();
-	Trifle.TileInfo.defineAbilityTypes();
+TrifleTileInfo.initializeTrifleData = function() {
+	TrifleTileInfo.defineAbilitiesForAbilityTypes();
+	TrifleTileInfo.defineAbilityTypes();
 };
 
-Trifle.TileInfo.defineAbilitiesForAbilityTypes = function () {
-	Trifle.AbilitiesForType = {};
+TrifleTileInfo.defineAbilitiesForAbilityTypes = function () {
+	TrifleAbilitiesForType = {};
 
-	Trifle.AbilitiesForType[Trifle.AbilityType.protection] = [
-		Trifle.ZoneAbility.protectFriendlyTilesFromCapture,
-		Trifle.AbilityName.protectFromCapture
+	TrifleAbilitiesForType[TrifleAbilityType.protection] = [
+		TrifleZoneAbility.protectFriendlyTilesFromCapture,
+		TrifleAbilityName.protectFromCapture
 	];
 };
 
-Trifle.TileInfo.defineAbilityTypes = function () {
-	AbilityTypes = {};
+TrifleTileInfo.defineAbilityTypes = function () {
+	TrifleAbilityTypes = {};
 
-	AbilityTypes[Trifle.ZoneAbility.protectFriendlyTilesFromCapture] = [
-		Trifle.AbilityType.protection
+	TrifleAbilityTypes[TrifleZoneAbility.protectFriendlyTilesFromCapture] = [
+		TrifleAbilityType.protection
 	];
 
-	AbilityTypes[Trifle.AbilityName.protectFromCapture] = [
-		Trifle.AbilityType.protection
+	TrifleAbilityTypes[TrifleAbilityName.protectFromCapture] = [
+		TrifleAbilityType.protection
 	];
 };
 
 
-Trifle.TileInfo.getReadableDescription = function(tileCode) {
+TrifleTileInfo.getReadableDescription = function(tileCode) {
 	var tileHtml = "";
 
-	var tileInfo = PaiShoGames.currentTileMetadata[tileCode];
+	var tileInfo = getCurrentTileMetadata()[tileCode];
 
 	if (tileInfo.textLines && !debugOn) {
 		tileInfo.textLines.forEach(function(textLine) {
@@ -427,7 +432,7 @@ Trifle.TileInfo.getReadableDescription = function(tileCode) {
 							tileHtml += "<br />- " + key + ": " + captureTypeInfoEntry;
 						});
 					}); */
-					tileHtml += Trifle.TileInfo.getObjectSummary("Capturing Properties", movementInfo.captureTypes, 0);
+					tileHtml += TrifleTileInfo.getObjectSummary("Capturing Properties", movementInfo.captureTypes, 0);
 				}
 			});
 		}
@@ -459,7 +464,7 @@ Trifle.TileInfo.getReadableDescription = function(tileCode) {
 				if (abilityInfo.targetTeams) tileHtml += "<br />-- Target Tiles: " + abilityInfo.targetTeams;
 				if (abilityInfo.targetTileTypes) tileHtml += "<br />-- Target Tiles: " + abilityInfo.targetTileTypes; */
 
-				tileHtml += Trifle.TileInfo.getObjectSummary("Ability", abilityInfo, 0);
+				tileHtml += TrifleTileInfo.getObjectSummary("Ability", abilityInfo, 0);
 			});
 		}
 
@@ -471,8 +476,8 @@ Trifle.TileInfo.getReadableDescription = function(tileCode) {
 	return tileHtml;
 };
 
-Trifle.TileInfo.getObjectSummary = function(origKey, theObject, indentDepth) {
-	if (theObject instanceof Trifle.BoardPoint) {
+TrifleTileInfo.getObjectSummary = function(origKey, theObject, indentDepth) {
+	if (theObject instanceof TrifleBoardPoint) {
 		return "<br />" + origKey + ": (BoardPoint object)";
 	}
 
@@ -491,7 +496,7 @@ Trifle.TileInfo.getObjectSummary = function(origKey, theObject, indentDepth) {
 		}
 		Object.keys(theObject).forEach((key, index) => {
 			var captureTypeInfoEntry = theObject[key];
-			htmlSummary += Trifle.TileInfo.getObjectSummary(key, captureTypeInfoEntry, indentDepth+1);
+			htmlSummary += TrifleTileInfo.getObjectSummary(key, captureTypeInfoEntry, indentDepth+1);
 		});
 	} else {
 		htmlSummary += "<br />" + indentDashStr + " " + origKey + ": " + theObject;

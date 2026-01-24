@@ -1,6 +1,16 @@
 /* Game Rankings UI */
-function viewGameRankingsClicked() {
-	showModal("Player Game Rankings", getLoadingModalText());
+import {
+  closeModal,
+  getLoadingModalElement,
+  getLoginToken,
+  getUsername,
+  onlinePlayEngine,
+  showModalElem,
+} from '../PaiShoMain';
+import { debug } from '../GameData';
+
+export function viewGameRankingsClicked() {
+	showModalElem("Player Game Rankings", getLoadingModalElement());
 	onlinePlayEngine.getGameRankings(getLoginToken(), showGameRankingsCallback);
 }
 
@@ -12,33 +22,36 @@ var showGameRankingsCallback = function showGameRankingsCallback(results) {
 		} catch (error) {
 			debug("Error parsing info");
 			closeModal();
-			showModal("Error", "Error getting game rankings info.");
+			showModalElem("Error", document.createTextNode("Error getting game rankings info."));
+			return;
 		}
 
-		var message = "";
+		const container = document.createElement('div');
 
 		if (resultData.playerGameRatings) {
-			message = getUsername() + "'s game rankings:<br />";
+			container.appendChild(document.createTextNode(getUsername() + "'s game rankings:"));
+			container.appendChild(document.createElement('br'));
 
 			var gameRatings = resultData.playerGameRatings;
 
 			if (gameRatings.length === 0) {
-				message += "After you play a ranked game, you can see your game rankings here."
+				container.appendChild(document.createTextNode("After you play a ranked game, you can see your game rankings here."));
 			} else {
 				for (var i = 0; i < gameRatings.length; i++) {
 					var gameRating = gameRatings[i];
-					message += "<br />";
-					message += gameRating.gameTypeDesc + ": " + gameRating.playerRating;
+					container.appendChild(document.createElement('br'));
+					container.appendChild(document.createTextNode(gameRating.gameTypeDesc + ": " + gameRating.playerRating));
 				}
 			}
 		}
 
-		message += "<hr />";
-		message += "Game Leaderboards:<br />";
+		container.appendChild(document.createElement('hr'));
+		container.appendChild(document.createTextNode("Game Leaderboards:"));
+		container.appendChild(document.createElement('br'));
+		container.appendChild(document.createElement('br'));
+		container.appendChild(document.createTextNode("Coming soon!"));
 
-		message += "<br />Coming soon!";
-
-		showModal("Player Game Rankings", message);
+		showModalElem("Player Game Rankings", container);
 	}
 };
 

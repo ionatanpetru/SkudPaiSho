@@ -1,9 +1,10 @@
+import { GUEST, HOST } from '../CommonNotationObjects';
 
-var hostPlayerCode = 'H';
-var guestPlayerCode = 'G';
+export var hostPlayerCode = 'H';
+export var guestPlayerCode = 'G';
 
 
-function getPlayerCodeFromName(playerName) {
+export function getPlayerCodeFromName(playerName) {
 	if (playerName === HOST) {
 		return hostPlayerCode;
 	} else if (playerName === GUEST) {
@@ -11,7 +12,7 @@ function getPlayerCodeFromName(playerName) {
 	}
 }
 
-function getPlayerNameFromCode(playerCode) {
+export function getPlayerNameFromCode(playerCode) {
 	if (playerCode === hostPlayerCode) {
 		return HOST;
 	} else if (playerCode === guestPlayerCode) {
@@ -19,7 +20,7 @@ function getPlayerNameFromCode(playerCode) {
 	}
 }
 
-function getOpponentName(playerName) {
+export function getOpponentName(playerName) {
 	if (playerName === HOST) {
 		return GUEST;
 	} else {

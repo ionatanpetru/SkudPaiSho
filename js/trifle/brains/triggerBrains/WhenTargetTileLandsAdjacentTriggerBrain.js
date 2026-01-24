@@ -1,5 +1,6 @@
+import { TrifleTriggerHelper } from '../TriggerHelper';
 
-Trifle.WhenTargetTileLandsAdjacentTriggerBrain = function(triggerContext) {
+export function TrifleWhenTargetTileLandsAdjacentTriggerBrain(triggerContext) {
 	this.targetTiles = [];
 	this.targetTilePoints = [];
 	this.board = triggerContext.board;
@@ -14,7 +15,7 @@ Trifle.WhenTargetTileLandsAdjacentTriggerBrain = function(triggerContext) {
 	this.thisTilePoint = triggerContext.pointWithTile;
 }
 
-Trifle.WhenTargetTileLandsAdjacentTriggerBrain.prototype.isTriggerMet = function() {
+TrifleWhenTargetTileLandsAdjacentTriggerBrain.prototype.isTriggerMet = function() {
 	/* Look at the tile that moved, did it just land adjacent to this tile? Is it targeted? */
 
 	if (this.possibleTargetTilePoint && this.possibleTargetTilePoint.tile === this.possibleTargetTile) {
@@ -31,7 +32,7 @@ Trifle.WhenTargetTileLandsAdjacentTriggerBrain.prototype.isTriggerMet = function
 		});
 
 		if (possibleTargetIsAdjacent) {
-			var triggerHelper = new Trifle.TriggerHelper(this.triggerContext, this.possibleTargetTilePoint);
+			var triggerHelper = new TrifleTriggerHelper(this.triggerContext, this.possibleTargetTilePoint);
 			if (triggerHelper.tileIsTargeted()) {
 				this.targetTiles.push(this.possibleTargetTilePoint.tile);
 				this.targetTilePoints.push(this.possibleTargetTilePoint);

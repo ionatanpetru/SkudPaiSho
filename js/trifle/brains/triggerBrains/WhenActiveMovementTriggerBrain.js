@@ -1,12 +1,13 @@
+import { TrifleTriggerHelper } from '../TriggerHelper';
 
-Trifle.WhenActiveMovementTriggerBrain = function(triggerContext) {
+export function TrifleWhenActiveMovementTriggerBrain(triggerContext) {
 	this.board = triggerContext.board;
 	this.triggerContext = triggerContext;
 	this.targetTiles = [];
 	this.targetTilePoints = [];
 }
 
-Trifle.WhenActiveMovementTriggerBrain.prototype.isTriggerMet = function() {
+TrifleWhenActiveMovementTriggerBrain.prototype.isTriggerMet = function() {
 	this.targetTiles = [];
 	this.targetTilePoints = [];
 
@@ -16,7 +17,7 @@ Trifle.WhenActiveMovementTriggerBrain.prototype.isTriggerMet = function() {
 		var activeTilePoint = this.triggerContext.lastTurnAction.boardPointEnd;
 		var activeTile = this.triggerContext.lastTurnAction.tileMovedOrPlaced;
 
-		var triggerHelper = new Trifle.TriggerHelper(this.triggerContext, activeTilePoint);
+		var triggerHelper = new TrifleTriggerHelper(this.triggerContext, activeTilePoint);
 		if (triggerHelper.tileIsTargeted()) {
 			this.targetTiles.push(activeTile);
 			this.targetTilePoints.push(activeTilePoint);

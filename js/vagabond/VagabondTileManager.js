@@ -1,6 +1,16 @@
 // Tile Manager
 
-function VagabondTileManager() {
+import { GUEST } from '../CommonNotationObjects';
+import {
+  OPTION_DOUBLE_TILES,
+  SWAP_BISON_WITH_LEMUR,
+  gameOptionEnabled,
+} from '../GameOptions';
+import { VagabondTile, VagabondTileCodes } from './VagabondTile';
+import { copyArray, debug } from '../GameData';
+import { guestPlayerCode } from '../pai-sho-common/PaiShoPlayerHelp';
+
+export function VagabondTileManager() {
 	this.hostTiles = this.loadTileSet('H');
 	this.guestTiles = this.loadTileSet('G');
 }
@@ -47,7 +57,7 @@ VagabondTileManager.prototype.grabTile = function(player, tileCode) {
 	var tile;
 	for (var i = 0; i < tilePile.length; i++) {
 		if (tilePile[i].code === tileCode) {
-			newTileArr = tilePile.splice(i, 1);
+			var newTileArr = tilePile.splice(i, 1);
 			tile = newTileArr[0];
 			break;
 		}
@@ -127,4 +137,21 @@ VagabondTileManager.prototype.getCopy = function() {
 	copy.guestTiles = copyArray(this.guestTiles);
 	
 	return copy;
+};
+
+VagabondTileManager.prototype.getBgIoState = function() {
+	var hostTilesState = [];
+	var guestTilesState = [];
+
+	this.hostTiles.forEach(tile => {
+		hostTilesState.push(tile.getBgIoState());
+	});
+	this.guestTiles.forEach(tile => {
+		guestTilesState.push(tile.getBgIoState());
+	});
+	
+	return {
+		hostTiles: hostTilesState,
+		guestTiles: guestTilesState
+	}
 };

@@ -1,6 +1,6 @@
 /* Skud Pai Sho Harmony */
 
-function StreetHarmony(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn) {
+export function StreetHarmony(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn) {
 	this.tile1 = tile1;
 	this.tile1Pos = new RowAndColumn(tile1RowAndColumn.row, tile1RowAndColumn.col);
 	this.tile2 = tile2;
@@ -120,7 +120,7 @@ StreetHarmony.prototype.crossesCenter = function() {
 
 
 // HarmonyManager manages list of harmonies
-function StreetHarmonyManager() {
+export function StreetHarmonyManager() {
 	this.harmonies = [];
 }
 

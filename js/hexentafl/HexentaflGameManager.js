@@ -1,5 +1,11 @@
+import { HexentaflBoard, HexentaflDirections } from './HexentaflBoard';
+import { HexentaflBoardPoint } from './HexentaflBoardPoint';
+import { HexentaflVars } from './HexentaflController';
+import { INITIAL_SETUP } from '../CommonNotationObjects';
+import { MORE_ATTACKERS, gameOptionEnabled } from '../GameOptions';
+import { debug } from '../GameData';
 
-function HexentaflGameManager(actuator, ignoreActuate, isCopy) {
+export function HexentaflGameManager(actuator, ignoreActuate, isCopy) {
 	this.isCopy = isCopy;
 	this.actuator = actuator;
 
@@ -44,7 +50,7 @@ HexentaflGameManager.prototype.runNotationMove = function(move, withActuate) {
 					break;
 				case "2":	// Default 5perSide
 					kingPoint = this.board.thronePoint;
-					var defendersPoints = this.board.getAdjacentNotationPointsFromNotationPoint(kingPoint);
+					defendersPoints = this.board.getAdjacentNotationPointsFromNotationPoint(kingPoint);
 					break;
 				default:
 					debug("Unknown board setup code for " + HexentaflVars.DEFENDERS_PLAYER);
@@ -74,7 +80,7 @@ HexentaflGameManager.prototype.runNotationMove = function(move, withActuate) {
 					attackersPoints = this.board.cornerPoints;
 					var otherAttackers = [];
 					for (var i = 0; i < attackersPoints.length; i++) {
-						attackerPoint = attackersPoints[i];
+						var attackerPoint = attackersPoints[i];
 						var adjacentPoints = this.board.getAdjacentPoints(this.board.getBoardPointFromNotationPoint(attackerPoint));
 						for (var j = 0; j < adjacentPoints.length; j++) {
 							if (this.board.getValidAdjacentPoints(adjacentPoints[j]).length >= 6) {
@@ -104,7 +110,7 @@ HexentaflGameManager.prototype.runNotationMove = function(move, withActuate) {
 					debug("Unknown board setup code for " + HexentaflVars.ATTACKERS_PLAYER);
 			}
 
-			var self = this;
+			self = this;
 			attackersPoints.forEach(
 				function(pointName) {
 					self.board.placeAttacker(pointName);

@@ -1,6 +1,6 @@
 // Coop Solitaire Harmony
 
-function CoopSolitaireHarmony(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn) {
+export function CoopSolitaireHarmony(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn) {
 	this.tile1 = tile1;
 	this.tile1Pos = tile1RowAndColumn;
 	this.tile2 = tile2;
@@ -127,7 +127,7 @@ CoopSolitaireHarmony.prototype.crossesCenter = function() {
 
 
 // HarmonyManager manages list of harmonies
-function CoopSolitaireHarmonyManager() {
+export function CoopSolitaireHarmonyManager() {
 	this.harmonies = [];
 	this.clashes = [];
 }

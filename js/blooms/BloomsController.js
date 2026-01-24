@@ -1,5 +1,38 @@
+import { GUEST, HOST } from '../CommonNotationObjects';
+import { debug } from '../GameData';
+import {
+	EIGHT_SIDED_BOARD,
+	FOUR_SIDED_BOARD,
+	HEXHEX_10,
+	SIX_SIDED_BOARD,
+	gameOptionEnabled,
+} from '../GameOptions';
+import {
+	GameType,
+	activeAi,
+	callSubmitMove,
+	createGameIfThatIsOk,
+	currentMoveIndex,
+	finalizeMove,
+	getCurrentPlayer,
+	getGameOptionsMessageElement,
+	getResetMoveElement,
+	myTurn,
+	onlinePlayEnabled,
+	playingOnlineGame,
+	refreshMessage,
+	rerunAll
+} from '../PaiShoMain';
+import { hostPlayerCode } from '../pai-sho-common/PaiShoPlayerHelp';
+import { BloomsActuator } from './BloomsActuator';
+import { BloomsGameManager } from './BloomsGameManager';
+import {
+	BloomsGameNotation,
+	BloomsNotationBuilder,
+} from './BloomsGameNotation';
+import { BloomsRandomAIv1 } from './ai/BloomsRandomAIv1';
 
-function BloomsController(gameContainer, isMobile) {
+export function BloomsController(gameContainer, isMobile) {
 	if (!isMobile) {
 		this.additionalTilePileClass = "desktop";
 	} else {
@@ -93,19 +126,30 @@ BloomsController.prototype.getDefaultHelpMessageText = function() {
 
 /* Required by Main */
 BloomsController.prototype.getAdditionalMessage = function() {
-	var msg = "";
+	var msgElement = document.createElement("div");
 
 	if (this.gameNotation.moves.length === 0) {
-		msg += "To begin a game, the Host places one stone.";
-		msg += getGameOptionsMessageHtml(GameType.Blooms.gameOptions);
+		var startText = document.createElement("span");
+		startText.textContent = "To begin a game, the Host places one stone.";
+		msgElement.appendChild(startText);
+		msgElement.appendChild(getGameOptionsMessageElement(GameType.Meadow.gameOptions));
 	}
 
 	if (this.notationBuilder.selectedPiece) {
-		msg += "<br />Place second stone or <span class='clickableText' onclick='gameController.skipSecondPiece();'>skip</span>";
-		msg += getResetMoveText();
+		var br = document.createElement("br");
+		msgElement.appendChild(br);
+		var container = document.createElement("span");
+		container.appendChild(document.createTextNode("Place second stone or "));
+		var skipSpan = document.createElement("span");
+		skipSpan.className = 'clickableText';
+		skipSpan.textContent = 'skip';
+		skipSpan.onclick = () => this.skipSecondPiece();
+		container.appendChild(skipSpan);
+		msgElement.appendChild(container);
+		msgElement.appendChild(getResetMoveElement());
 	}
 
-	return msg;
+	return msgElement;
 };
 
 /* Using my own version of this, called directly instead of from Main */

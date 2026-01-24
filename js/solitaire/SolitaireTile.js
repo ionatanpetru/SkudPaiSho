@@ -1,11 +1,27 @@
 // Tile
 
-var RED = "Red";
-var WHITE = "White";
+// var RED = "Red";
+// var WHITE = "White";
 
-var tileId = 1;
+// var tileId = 1;
 
-function SolitaireTile(code, ownerCode) {
+import {
+  ACCENT_TILE,
+  BASIC_FLOWER,
+  BOAT,
+  KNOTWEED,
+  ORCHID,
+  ROCK,
+  SPECIAL_FLOWER,
+  WHEEL,
+  WHITE_LOTUS,
+  debug,
+} from '../GameData';
+import { GUEST, HOST } from '../CommonNotationObjects';
+import { RED, WHITE, tileId, tileIdIncrement } from '../skud-pai-sho/SkudPaiShoTile';
+import { superHarmonies } from '../skud-pai-sho/SkudPaiShoRules';
+
+export function SolitaireTile(code, ownerCode) {
 	this.code = code;
 	this.ownerCode = ownerCode;
 	if (this.ownerCode === 'G') {
@@ -17,7 +33,7 @@ function SolitaireTile(code, ownerCode) {
 	} else {
 		debug("INCORRECT OWNER CODE");
 	}
-	this.id = tileId++;
+	this.id = tileIdIncrement();
 	this.drained = false;
 	this.selectedFromPile = false;
 

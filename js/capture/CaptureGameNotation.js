@@ -2,7 +2,18 @@
 
 // --------------------------------------------- // 
 
-function CaptureNotationMove(text) {
+import { BRAND_NEW } from '../PaiShoMain';
+import {
+  DEPLOY,
+  GUEST,
+  HOST,
+  INITIAL_SETUP,
+  MOVE,
+  NotationPoint,
+} from '../CommonNotationObjects';
+import { debug } from '../GameData';
+
+export function CaptureNotationMove(text) {
 	this.fullMoveText = text;
 	this.analyzeMove();
 }
@@ -73,7 +84,7 @@ CaptureNotationMove.prototype.equals = function(otherMove) {
 
 // --------------------------------------- //
 
-function CaptureNotationBuilder() {
+export function CaptureNotationBuilder() {
 	// this.moveNum;	// Let's try making this magic
 	// this.player;		// Magic
 	this.moveType;
@@ -104,7 +115,7 @@ CaptureNotationBuilder.prototype.getNotationMove = function(moveNum, player) {
 
 
 
-function CaptureGameNotation() {
+export function CaptureGameNotation() {
 	this.notationText = "";
 	this.moves = [];
 }

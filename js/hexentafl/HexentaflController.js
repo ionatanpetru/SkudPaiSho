@@ -1,6 +1,42 @@
-var HexentaflVars = {};
+import {
+  BRAND_NEW,
+  GameType,
+  WAITING_FOR_ENDPOINT,
+  callSubmitMove,
+  createGameIfThatIsOk,
+  currentMoveIndex,
+  finalizeMove,
+  getGameOptionsMessageElement,
+  myTurn,
+  onlinePlayEnabled,
+  playingOnlineGame,
+  rerunAll
+} from '../PaiShoMain';
+import {
+  FIVE_SIDED_BOARD,
+  KING_MOVES_LIKE_PAWNS,
+  OPTION_ATTACKERS_MOVE_FIRST,
+  gameOptionEnabled
+} from '../GameOptions';
+import { GUEST, HOST, MOVE } from '../CommonNotationObjects';
+import { HexentaflActuator } from "./HexentaflActuator";
+import { HexentaflBoardPoint } from './HexentaflBoardPoint';
+import { HexentaflGameManager } from './HexentaflGameManager';
+import {
+  HexentaflGameNotation,
+  HexentaflNotationBuilder,
+  HexentaflNotationMove,
+} from './HexentaflGameNotation';
+import { POSSIBLE_MOVE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import { debug } from '../GameData';
 
-function HexentaflController(gameContainer, isMobile) {
+export var HexentaflVars = {};
+
+export function setHexentaflVars(newVars) {
+	HexentaflVars = newVars;
+}
+
+export function HexentaflController(gameContainer, isMobile) {
 	HexentaflVars = {
 		DEFENDERS_PLAYER: HOST,
 		ATTACKERS_PLAYER: GUEST
@@ -122,11 +158,11 @@ HexentaflController.prototype.getDefaultHelpMessageText = function() {
 
 /* Required by Main */
 HexentaflController.prototype.getAdditionalMessage = function() {
-	var msg = "";
+	const container = document.createElement('span');
 	if (this.gameNotation.moves.length <= 2) {
-		msg += getGameOptionsMessageHtml(GameType.Hexentafl.gameOptions);
+		container.appendChild(getGameOptionsMessageElement(GameType.Hexentafl.gameOptions));
 	}
-	return msg;
+	return container;
 };
 
 /* Using my own version of this, called directly instead of from Main */

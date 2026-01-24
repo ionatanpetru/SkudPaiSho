@@ -1,35 +1,42 @@
+import {
+  GameType,
+  buildDropdownDiv,
+  gameController,
+  promptForCustomTileDesigns,
+} from '../PaiShoMain';
 
-KeyPaiSho.Options = function() {
-	if (!localStorage.getItem(KeyPaiSho.Options.tileDesignTypeKey)
-		|| !KeyPaiSho.Options.tileDesignTypeValues[localStorage.getItem(KeyPaiSho.Options.tileDesignTypeKey)]) {
-		KeyPaiSho.Options.setTileDesignsPreference("keygyatso", true);
+export function KeyPaiShoOptions() {
+	if (!localStorage.getItem(KeyPaiShoOptions.tileDesignTypeKey)
+		|| !KeyPaiShoOptions.tileDesignTypeValues[localStorage.getItem(KeyPaiShoOptions.tileDesignTypeKey)]) {
+		KeyPaiShoOptions.setTileDesignsPreference("keygyatso", true);
 	}
 }
 
-KeyPaiSho.Options.tileDesignTypeKey = "keyPaiShoTileDesignTypeKey";
+KeyPaiShoOptions.tileDesignTypeKey = "keyPaiShoTileDesignTypeKey";
 
-KeyPaiSho.Options.tileDesignTypeValues = {
+KeyPaiShoOptions.tileDesignTypeValues = {
 	keygyatso: "Key Pai Sho",
 	custom: "Use Custom Designs"
 };
 
-KeyPaiSho.Options.setTileDesignsPreference = function(tileDesignKey, ignoreActuate) {
+KeyPaiShoOptions.setTileDesignsPreference = function(tileDesignKey, ignoreActuate) {
 	if (tileDesignKey === 'custom') {
-		promptForCustomTileDesigns(GameType.KeyPaiSho, KeyPaiSho.Preferences.customTilesUrl);
+		// Not yet supported
+		//promptForCustomTileDesigns(GameType.KeyPaiSho, KeyPaiShoPreferences.customTilesUrl);
 	} else {
-		localStorage.setItem(KeyPaiSho.Options.tileDesignTypeKey, tileDesignKey);
+		localStorage.setItem(KeyPaiShoOptions.tileDesignTypeKey, tileDesignKey);
 		if (gameController && gameController.callActuate && !ignoreActuate) {
 			gameController.callActuate();
 		}
 	}
 };
 
-KeyPaiSho.Options.buildTileDesignDropdownDiv = function(alternateLabelText) {
+KeyPaiShoOptions.buildTileDesignDropdownDiv = function(alternateLabelText) {
 	var labelText = alternateLabelText ? alternateLabelText : "Tile Designs";
-	return buildDropdownDiv("KeyPaiShoTileDesignDropdown", labelText + ":", KeyPaiSho.Options.tileDesignTypeValues,
-							localStorage.getItem(KeyPaiSho.Options.tileDesignTypeKey),
+	return buildDropdownDiv("KeyPaiShoTileDesignDropdown", labelText + ":", KeyPaiShoOptions.tileDesignTypeValues,
+							localStorage.getItem(KeyPaiShoOptions.tileDesignTypeKey),
 							function() {
-								KeyPaiSho.Options.setTileDesignsPreference(this.value);
+								KeyPaiShoOptions.setTileDesignsPreference(this.value);
 							});
 };
 

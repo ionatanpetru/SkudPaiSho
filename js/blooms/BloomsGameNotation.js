@@ -2,7 +2,7 @@
 
 // --------------------------------------------- // 
 
-function BloomsNotationMove(text) {
+export function BloomsNotationMove(text) {
 	this.fullMoveText = text;
 	this.analyzeMove();
 }
@@ -56,7 +56,7 @@ BloomsNotationMove.prototype.equals = function(otherMove) {
 
 // --------------------------------------- //
 
-function BloomsNotationBuilder() {
+export function BloomsNotationBuilder() {
 	this.piece1;
 	this.deployPoint1;
 	this.piece2
@@ -99,7 +99,7 @@ BloomsNotationBuilder.prototype.moveComplete = function() {
 
 
 
-function BloomsGameNotation() {
+export function BloomsGameNotation() {
 	this.notationText = "";
 	this.moves = [];
 }

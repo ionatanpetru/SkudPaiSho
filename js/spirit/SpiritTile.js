@@ -1,8 +1,12 @@
 // Spirit Pai Sho Tile
 
+import { GUEST, HOST, NotationPoint } from '../CommonNotationObjects';
+import { debug } from '../GameData';
+import { tileIdIncrement } from "../skud-pai-sho/SkudPaiShoTile";
+
 // var tileId = 1;	// common
 
-function SpiritTile(code, ownerCode) {
+export function SpiritTile(code, ownerCode) {
 	this.code = code;
 	this.ownerCode = ownerCode;
 	if (this.ownerCode === 'G') {
@@ -12,7 +16,7 @@ function SpiritTile(code, ownerCode) {
 	} else {
 		debug("INCORRECT OWNER CODE");
 	}
-	this.id = tileId++;
+	this.id = tileIdIncrement();
 	this.selectedFromPile = false;
 }
 

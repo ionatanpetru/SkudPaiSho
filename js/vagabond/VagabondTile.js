@@ -1,6 +1,11 @@
 // Tile
 
-var VagabondTileCodes = {
+import { GUEST, HOST } from '../CommonNotationObjects';
+import { debug } from '../GameData';
+import { gameOptionEnabled, V_DOUBLE_MOVE_DISTANCE } from '../GameOptions';
+import { tileIdIncrement } from '../skud-pai-sho/SkudPaiShoTile';
+
+export var VagabondTileCodes = {
 	SkyBison: 'S',
 	Badgermole: 'B',
 	Wheel: 'W',
@@ -11,7 +16,7 @@ var VagabondTileCodes = {
 	FlyingLemur: 'Y'
 }
 
-function VagabondTile(code, ownerCode) {
+export function VagabondTile(code, ownerCode) {
 	this.code = code;
 	this.ownerCode = ownerCode;
 	if (this.ownerCode === 'G') {
@@ -21,7 +26,7 @@ function VagabondTile(code, ownerCode) {
 	} else {
 		debug("INCORRECT OWNER CODE");
 	}
-	this.id = tileId++;
+	this.id = tileIdIncrement();
 	this.selectedFromPile = false;
 }
 
@@ -66,7 +71,11 @@ VagabondTile.prototype.getName = function() {
 };
 
 VagabondTile.prototype.getCopy = function() {
-	return new VagabondTile(this.code, this.ownerCode);
+	var copyTile = new VagabondTile(this.code, this.ownerCode);
+	if (this.protected) {
+		copyTile.protected = this.protected;
+	}
+	return copyTile;
 };
 
 
@@ -92,6 +101,13 @@ VagabondTile.getTileName = function(tileCode) {
 	}
 
 	return name;
+};
+
+VagabondTile.prototype.getBgIoState = function() {
+	return {
+		code: this.code,
+		ownerCode: this.ownerCode
+	};
 };
 
 

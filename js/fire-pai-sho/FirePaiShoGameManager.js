@@ -1,6 +1,6 @@
 // Skud Pai Sho Game Manager
 
-function FirePaiShoGameManager(actuator, ignoreActuate, isCopy) {
+export function FirePaiShoGameManager(actuator, ignoreActuate, isCopy) {
 	this.gameLogText = '';
 	this.isCopy = isCopy;
 

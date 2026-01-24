@@ -2,7 +2,7 @@
 
 var CENTER = "Center";
 
-function FirePaiShoBoardPoint() {
+export function FirePaiShoBoardPoint() {
 	this.types = [];
 	this.row = -1;
 	this.col = -1;

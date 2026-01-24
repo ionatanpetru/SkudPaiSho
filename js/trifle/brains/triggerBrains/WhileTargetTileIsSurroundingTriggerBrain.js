@@ -1,12 +1,13 @@
+import { TrifleTriggerHelper } from '../TriggerHelper';
 
-Trifle.WhileTargetTileIsSurroundingTriggerBrain = function(triggerContext) {
+export function TrifleWhileTargetTileIsSurroundingTriggerBrain(triggerContext) {
 	this.board = triggerContext.board;
 	this.triggerContext = triggerContext;
 	this.targetTiles = [];
 	this.targetTilePoints = [];
 }
 
-Trifle.WhileTargetTileIsSurroundingTriggerBrain.prototype.isTriggerMet = function() {
+TrifleWhileTargetTileIsSurroundingTriggerBrain.prototype.isTriggerMet = function() {
 	/* Get surrounding tiles...  */
 	var surroundingPoints = this.board.getSurroundingBoardPoints(this.triggerContext.pointWithTile);
 
@@ -14,7 +15,7 @@ Trifle.WhileTargetTileIsSurroundingTriggerBrain.prototype.isTriggerMet = functio
 
 	surroundingPoints.forEach(function(surroundingPoints) {
 		if (surroundingPoints.hasTile()) {
-			var triggerHelper = new Trifle.TriggerHelper(self.triggerContext, surroundingPoints);
+			var triggerHelper = new TrifleTriggerHelper(self.triggerContext, surroundingPoints);
 			if (triggerHelper.tileIsTargeted()) {
 				self.targetTiles.push(surroundingPoints.tile);
 				self.targetTilePoints.push(surroundingPoints);

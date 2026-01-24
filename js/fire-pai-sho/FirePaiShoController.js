@@ -1,6 +1,63 @@
 /* Skud Pai Sho specific UI interaction logic */
 
-function FirePaiShoController(gameContainer, isMobile) {
+import { FirePaiShoActuator } from './FirePaiShoActuator';
+import { FirePaiShoGameManager } from './FirePaiShoGameManager';
+import { FirePaiShoGameNotation, FirePaiShoNotationBuilder } from './FirePaiShoGameNotation';
+import { FirePaiShoTile } from './FirePaiShoTile';
+import {
+	ARRANGING,
+	GUEST,
+	HOST,
+	NotationPoint,
+	PLANTING,
+} from '../CommonNotationObjects';
+import {
+	BRAND_NEW,
+	GameType,
+	MOVE_DONE,
+	READY_FOR_BONUS,
+	WAITING_FOR_BOAT_BONUS_POINT,
+	WAITING_FOR_BONUS_ENDPOINT,
+	WAITING_FOR_ENDPOINT,
+	activeAi,
+	activeAi2,
+	buildDropdownDiv,
+	callSubmitMove,
+	clearMessage,
+	createGameIfThatIsOk,
+	currentMoveIndex,
+	finalizeMove,
+	gameId,
+	getCurrentPlayer,
+	getGameOptionsMessageElement,
+	getResetMoveElement,
+	getUserGamePreference,
+	isAnimationsOn,
+	myTurn,
+	onlinePlayEnabled,
+	playingOnlineGame,
+	refreshMessage,
+	rerunAll,
+	setSkudTilesOption,
+	setUserGamePreference,
+	tileDesignTypeKey,
+	tileDesignTypeValues,
+	userIsLoggedIn,
+} from '../PaiShoMain';
+import {
+	getNeutralPointMessage,
+	getRedPointMessage,
+	getRedWhitePointMessage,
+	getWhitePointMessage,
+	toBullets,
+} from '../PaiShoMain';
+import { NO_HARMONY_VISUAL_AIDS, gameOptionEnabled } from '../GameOptions';
+import { GATE, NEUTRAL, POSSIBLE_MOVE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import { ACCENT_TILE, debugOn, debug } from '../GameData';
+import { boatOnlyMoves, newKnotweedRules, rocksUnwheelable, simpleRocks, simplest } from '../skud-pai-sho/SkudPaiShoRules';
+import { RED, WHITE } from '../skud-pai-sho/SkudPaiShoTile';
+
+export function FirePaiShoController(gameContainer, isMobile) {
 	this.actuator = new FirePaiShoActuator(gameContainer, isMobile, isAnimationsOn());
 	this.gameContainer = gameContainer;
 	this.resetGameManager();
@@ -126,24 +183,41 @@ FirePaiShoController.prototype.getDefaultHelpMessageText = function() {
 };
 
 FirePaiShoController.prototype.getAdditionalMessage = function() {
-	var msg = "";
+	const container = document.createElement('span');
 
-	msg += "<p>Host reserve tiles: " + this.theGame.tileManager.hostReserveTiles.length + "<br>Guest reserve tiles: " + this.theGame.tileManager.guestReserveTiles.length + "</p>";
+	const reserveInfo = document.createElement('p');
+	reserveInfo.appendChild(document.createTextNode('Host reserve tiles: ' + this.theGame.tileManager.hostReserveTiles.length));
+	reserveInfo.appendChild(document.createElement('br'));
+	reserveInfo.appendChild(document.createTextNode('Guest reserve tiles: ' + this.theGame.tileManager.guestReserveTiles.length));
+	container.appendChild(reserveInfo);
 
 	if (this.gameNotation.moves.length === 0) {
 		if (onlinePlayEnabled && gameId < 0 && userIsLoggedIn()) {
-				msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by selecting Start Online Game below.<br />";
-			}
+			const joinText = document.createElement('span');
+			joinText.appendChild(document.createTextNode('Click '));
+			const emJoin = document.createElement('em');
+			emJoin.textContent = 'Join Game';
+			joinText.appendChild(emJoin);
+			joinText.appendChild(document.createTextNode(' above to join another player\'s game. Or, you can start a game that other players can join by selecting Start Online Game below.'));
+			container.appendChild(joinText);
+			container.appendChild(document.createElement('br'));
+		}
 
 		if (!playingOnlineGame()) {
-			msg += getGameOptionsMessageHtml(GameType.FirePaiSho.gameOptions);
+			container.appendChild(getGameOptionsMessageElement(GameType.FirePaiSho.gameOptions));
 			if (onlinePlayEnabled && this.gameNotation.moves.length === 0) {
-				msg += "<br><span class='skipBonus' onClick='gameController.startOnlineGame()'>Start Online Game</span><br />";
+				container.appendChild(document.createElement('br'));
+				const startSpan = document.createElement('span');
+				startSpan.className = 'skipBonus';
+				startSpan.textContent = 'Start Online Game';
+				startSpan.onclick = () => gameController.startOnlineGame();
+				container.appendChild(startSpan);
+				container.appendChild(document.createElement('br'));
 			}
 		}
 	}
 
-	return msg;
+	return container;
 };
 
 FirePaiShoController.prototype.startOnlineGame = function() {
@@ -199,16 +273,32 @@ FirePaiShoController.getFireGatePointMessage = function() {
 }
 
 FirePaiShoController.prototype.getExtraHarmonyBonusHelpText = function() {
-
-	var retstring = " <br /> Your bonus tile is: ";
-	retstring += FirePaiShoController.getTileNameFromCode(this.notationBuilder.bonusTileCode);
-	return retstring; 
+	var container = document.createElement("span");
+	container.appendChild(document.createElement("br"));
+	
+	var text = document.createElement("span");
+	text.textContent = " Your bonus tile is: " + FirePaiShoController.getTileNameFromCode(this.notationBuilder.bonusTileCode);
+	container.appendChild(text);
+	return container; 
 };
 
 FirePaiShoController.prototype.showHarmonyBonusMessage = function() {
-	document.querySelector(".gameMessage").innerHTML = "Harmony Bonus! Play a random tile from your reserve!"
-	+ this.getExtraHarmonyBonusHelpText()
-	+ getResetMoveText();
+	var messageDiv = document.createElement("div");
+	
+	// Create the main message text
+	var mainMessage = document.createElement("span");
+	mainMessage.textContent = "Harmony Bonus! Play a random tile from your reserve!";
+	messageDiv.appendChild(mainMessage);
+	
+	// Add the extra help text
+	messageDiv.appendChild(this.getExtraHarmonyBonusHelpText());
+	
+	// Add the reset move element
+	messageDiv.appendChild(getResetMoveElement());
+	
+	// Set it in the game message container
+	document.querySelector(".gameMessage").innerHTML = "";
+	document.querySelector(".gameMessage").appendChild(messageDiv);
 };
 
 FirePaiShoController.prototype.unplayedTileClicked = function(tileDiv) {
@@ -243,6 +333,8 @@ FirePaiShoController.prototype.unplayedTileClicked = function(tileDiv) {
 	if (this.notationBuilder.status === READY_FOR_BONUS){
 		bonus = true;
 	}
+
+	var correctPile = null;
 
 	if (bonus){
 		if (player === HOST){
@@ -291,7 +383,7 @@ FirePaiShoController.prototype.unplayedTileClicked = function(tileDiv) {
 		}
 
 	} else if (this.notationBuilder.status === READY_FOR_BONUS) {
-
+		// empty
 	} else if (this.notationBuilder.status === WAITING_FOR_BONUS_ENDPOINT
 			|| this.notationBuilder.status === WAITING_FOR_BOAT_BONUS_POINT) {
 			//this.notationBuilder.status = READY_FOR_BONUS;
@@ -819,17 +911,40 @@ FirePaiShoController.buildTileDesignDropdownDiv = function(alternateLabelText) {
 FirePaiShoController.prototype.buildToggleHarmonyAidsDiv = function() {
 	var div = document.createElement("div");
 	var onOrOff = getUserGamePreference(FirePaiShoController.hideHarmonyAidsKey) !== "true" ? "on" : "off";
-	div.innerHTML = "Harmony aids are " + onOrOff + ": <span class='skipBonus' onclick='gameController.toggleHarmonyAids();'>toggle</span>";
+	
+	var textSpan = document.createElement("span");
+	textSpan.textContent = "Harmony aids are " + onOrOff + ": ";
+	div.appendChild(textSpan);
+	
+	var toggleSpan = document.createElement("span");
+	toggleSpan.className = "skipBonus";
+	toggleSpan.textContent = "toggle";
+	toggleSpan.onclick = () => this.toggleHarmonyAids();
+	div.appendChild(toggleSpan);
+	
 	if (gameOptionEnabled(NO_HARMONY_VISUAL_AIDS)) {
-		div.innerHTML += " (Will not affect games with " + NO_HARMONY_VISUAL_AIDS + " game option)";
+		var warningSpan = document.createElement("span");
+		warningSpan.textContent = " (Will not affect games with " + NO_HARMONY_VISUAL_AIDS + " game option)";
+		div.appendChild(warningSpan);
 	}
+	
 	return div;
 };
 
 FirePaiShoController.prototype.buildBoardRotateDiv = function() {
 	var div = document.createElement("div");
 	var orientation = getUserGamePreference(FirePaiShoController.boardRotationKey) !== "true" ? "Desert" : "Skud";
-	div.innerHTML = "Board orientation: " + orientation + ": <span class='skipBonus' onclick='gameController.toggleBoardRotation();'>toggle</span>";
+	
+	var textSpan = document.createElement("span");
+	textSpan.textContent = "Board orientation: " + orientation + ": ";
+	div.appendChild(textSpan);
+	
+	var toggleSpan = document.createElement("span");
+	toggleSpan.className = "skipBonus";
+	toggleSpan.textContent = "toggle";
+	toggleSpan.onclick = () => this.toggleBoardRotation();
+	div.appendChild(toggleSpan);
+	
 	return div;
 };
 

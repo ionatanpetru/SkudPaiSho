@@ -1,6 +1,12 @@
 // Capture Game Manager
 
-function CaptureGameManager(actuator, ignoreActuate, isCopy) {
+import { CaptureBoard } from './CaptureBoard';
+import { CaptureTileManager } from './CaptureTileManager';
+import { INITIAL_SETUP, MOVE } from '../CommonNotationObjects';
+import { PaiShoMarkingManager } from '../pai-sho-common/PaiShoMarkingManager';
+import { debug } from '../GameData';
+
+export function CaptureGameManager(actuator, ignoreActuate, isCopy) {
 	this.isCopy = isCopy;
 
 	this.actuator = actuator;

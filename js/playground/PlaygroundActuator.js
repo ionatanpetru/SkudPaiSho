@@ -1,6 +1,21 @@
 // Actuator
 
-function PlaygroundActuator(gameContainer, isMobile, enableAnimations) {
+import { createBoardArrow, createBoardPointDiv, isSamePoint, setupPaiShoBoard } from "../ActuatorHelp";
+import { AdevarOptions } from "../adevar/AdevarOptions";
+import { CapturePreferences } from "../capture/CaptureController";
+import { DEPLOY, MOVE } from "../CommonNotationObjects";
+import { debug, peekRandomFromArray } from "../GameData";
+import { ADEVAR_ROTATE, gameOptionEnabled, GINSENG_GUEST_ROTATE, GINSENG_ROTATE, PLAY_IN_SPACES, SQUARE_SPACES, VAGABOND_ROTATE } from "../GameOptions";
+import { clearMessage, gameController, GameType, getUserGamePreference, pieceAnimationLength, piecePlaceAnimation, pointClicked, RmbDown, RmbUp, showPointMessage, showTileMessage, tileDesignTypeKey, unplayedTileClicked, vagabondTileDesignTypeKey } from "../PaiShoMain";
+import { MARKED, NON_PLAYABLE, POSSIBLE_MOVE } from "../skud-pai-sho/SkudPaiShoBoardPoint";
+import { SkudPaiShoController } from "../skud-pai-sho/SkudPaiShoController";
+import { ElementStyleTransform } from "../util/ElementStyleTransform";
+import { VagabondController } from "../vagabond/VagabondController";
+import { PlaygroundController } from "./PlaygroundController";
+import { PlaygroundNotationConstants } from "./PlaygroundGameNotation";
+import { PlaygroundTileManager } from "./PlaygroundTileManager";
+
+export function PlaygroundActuator(gameContainer, isMobile, enableAnimations) {
 	this.gameContainer = gameContainer;
 	this.mobile = isMobile;
 
@@ -232,11 +247,14 @@ PlaygroundActuator.prototype.addTile = function(tile, tileContainer, pileName) {
 	theDiv.setAttribute("data-pileName", pileName);
 
 	if (this.mobile) {
-		theDiv.setAttribute("onclick", "unplayedTileClicked(this); showTileMessage(this);");
+		theDiv.addEventListener('click', () => {
+				unplayedTileClicked(this);
+				showTileMessage(this);
+			});
 	} else {
-		theDiv.setAttribute("onclick", "unplayedTileClicked(this);");
-		theDiv.setAttribute("onmouseover", "showTileMessage(this);");
-		theDiv.setAttribute("onmouseout", "clearMessage();");
+		theDiv.addEventListener('click', () => unplayedTileClicked(this));
+		theDiv.addEventListener('mouseover', () => showTileMessage(this));
+		theDiv.addEventListener('mouseout', clearMessage);
 	}
 
 	tileContainer.appendChild(theDiv);
@@ -313,11 +331,14 @@ PlaygroundActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate)
 		}
 		
 		if (this.mobile) {
-			theDiv.setAttribute("onclick", "pointClicked(this); showPointMessage(this);");
+			theDiv.addEventListener('click', function() {
+				pointClicked(this);
+				showPointMessage(this);
+			});
 		} else {
-			theDiv.setAttribute("onclick", "pointClicked(this);");
-			theDiv.setAttribute("onmouseover", "showPointMessage(this);");
-			theDiv.setAttribute("onmouseout", "clearMessage();");
+			theDiv.addEventListener('click', function() { pointClicked(this); });
+			theDiv.addEventListener('mouseover', function() { showPointMessage(this); });
+			theDiv.addEventListener('mouseout', clearMessage);
 			theDiv.addEventListener('mousedown', e => {
 				 // Right Mouse Button
 				if (e.button == 2) {

@@ -1,6 +1,43 @@
 // Actuator
 
-function FirePaiShoActuator(gameContainer, isMobile, enableAnimations) {
+import { ACCENT_TILE, debug } from '../GameData';
+import {
+  ADEVAR_GUEST_ROTATE,
+  ETHEREAL_ACCENT_TILES,
+  HIDE_RESERVE_TILES,
+  NO_HARMONY_VISUAL_AIDS,
+  gameOptionEnabled,
+} from '../GameOptions';
+import { ARRANGING, PLANTING } from '../CommonNotationObjects';
+import { ElementStyleTransform } from '../util/ElementStyleTransform';
+import { FirePaiShoController } from './FirePaiShoController';
+import { FirePaiShoTileManager } from './FirePaiShoTileManager';
+import {
+  MARKED,
+  NON_PLAYABLE,
+  POSSIBLE_MOVE,
+} from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import {
+  RmbDown,
+  RmbUp,
+  clearMessage,
+  getUserGamePreference,
+  pieceAnimationLength,
+  piecePlaceAnimation,
+  pointClicked,
+  showPointMessage,
+  showTileMessage,
+  unplayedTileClicked,
+} from '../PaiShoMain';
+import {
+  createBoardArrow,
+  createBoardPointDiv,
+  getSkudTilesSrcPath,
+  isSamePoint,
+  setupPaiShoBoard,
+} from '../ActuatorHelp';
+
+export function FirePaiShoActuator(gameContainer, isMobile, enableAnimations) {
 	this.gameContainer = gameContainer;
 	this.mobile = isMobile;
 
@@ -159,8 +196,8 @@ FirePaiShoActuator.prototype.clearContainer = function (container) {
 };
 
 FirePaiShoActuator.prototype.clearTileContainer = function () {
-	this.clearContainer(hostTilesContainer);
-	this.clearContainer(guestTilesContainer);
+	this.clearContainer(this.hostTilesContainer);
+	this.clearContainer(this.guestTilesContainer);
 /**	var container = document.querySelector("." + tile.getImageName());
 	if (container) {
 		while (container.firstChild) {
@@ -196,18 +233,21 @@ FirePaiShoActuator.prototype.addTile = function(tile, mainContainer, clickable) 
 
 	if (this.mobile) {
 		if (clickable) {
-			theDiv.setAttribute("onclick", "unplayedTileClicked(this); showTileMessage(this);");
+			theDiv.addEventListener('click', () => {
+				unplayedTileClicked(theDiv);
+				showTileMessage(theDiv);
+			});
 		} else {//not clickable, for reserve tiles
 			theDiv.setAttribute("showTileMessage(this);");
 		}
 	} else { //desktop
 		if (clickable) {
-			theDiv.setAttribute("onclick", "unplayedTileClicked(this);");
-			theDiv.setAttribute("onmouseover", "showTileMessage(this);");
-			theDiv.setAttribute("onmouseout", "clearMessage();");
+			theDiv.addEventListener('click', () => unplayedTileClicked(theDiv));
+			theDiv.addEventListener('mouseover', () => showTileMessage(theDiv));
+			theDiv.addEventListener('mouseout', clearMessage);
 		} else {//not clickable, for reserve tiles
-			theDiv.setAttribute("onmouseover", "showTileMessage(this);");
-			theDiv.setAttribute("onmouseout", "clearMessage();");
+			theDiv.addEventListener('mouseover', () => showTileMessage(theDiv));
+			theDiv.addEventListener('mouseout', clearMessage);
 			
 		}
 	}
@@ -278,11 +318,14 @@ FirePaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 		}
 
 		if (this.mobile) {
-			theDiv.setAttribute("onclick", "pointClicked(this); showPointMessage(this);");
+			theDiv.addEventListener('click', function() {
+				pointClicked(this);
+				showPointMessage(this);
+			});
 		} else {
-			theDiv.setAttribute("onclick", "pointClicked(this);");
-			theDiv.setAttribute("onmouseover", "showPointMessage(this);");
-			theDiv.setAttribute("onmouseout", "clearMessage();");
+			theDiv.addEventListener('click', function() { pointClicked(this); });
+			theDiv.addEventListener('mouseover', function() { showPointMessage(this); });
+			theDiv.addEventListener('mouseout', clearMessage);
 			theDiv.addEventListener('mousedown', e => {
 				 // Right Mouse Button
 				if (e.button == 2) {

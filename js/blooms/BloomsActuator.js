@@ -1,6 +1,24 @@
-
 /* Create boardContainer, hostTilesContainer, and guestTilesContainer */
-function BloomsActuator(gameContainer, isMobile, hostTilesContainerDivs, guestTilesContainerDivs) {
+import { BloomsBoardPoint } from './BloomsBoardPoint';
+import {
+  EIGHT_SIDED_BOARD,
+  HEXHEX_10,
+  SIX_SIDED_BOARD,
+  gameOptionEnabled,
+} from '../GameOptions';
+import {
+  createDivWithClass,
+  createDivWithId,
+  removeChildren,
+} from '../ActuatorHelp';
+import {
+  clearMessage,
+  gameController,
+  pointClicked,
+  showPointMessage,
+} from '../PaiShoMain';
+
+export function BloomsActuator(gameContainer, isMobile, hostTilesContainerDivs, guestTilesContainerDivs) {
 	this.gameContainer = gameContainer;
 	this.isMobile = isMobile;
 
@@ -131,18 +149,25 @@ BloomsActuator.prototype.addBoardPoint = function(rowDiv, boardPoint) {
 		theDiv.classList.add("hexagon");
 
 		if (boardPoint.types.includes(BloomsBoardPoint.Types.normal)) {
+			const bloomId = boardPoint.bloomId;
+			const hasTile = boardPoint.hasTile();
 			if (this.isMobile) {
-				theDiv.setAttribute("onclick", "gameController.pointClicked(this," + boardPoint.bloomId + "); showPointMessage(this);");
+				theDiv.addEventListener('click', function() {
+					gameController.pointClicked(this, bloomId);
+					showPointMessage(this);
+				});
 			} else {
-				theDiv.setAttribute("onclick", "pointClicked(this);");
-				theDiv.setAttribute("onmouseover", "showPointMessage(this); gameController.revealBloom(" + boardPoint.bloomId + ");");
-				
-				var onmouseoutText = "clearMessage()";
-				if (boardPoint.hasTile()) {
-					onmouseoutText += ";gameController.clearRevealedBloomId(" + boardPoint.bloomId + ")";
-				}
-				onmouseoutText += ";";
-				theDiv.setAttribute("onmouseout", onmouseoutText);
+				theDiv.addEventListener('click', function() { pointClicked(this); });
+				theDiv.addEventListener('mouseover', function() {
+					showPointMessage(this);
+					gameController.revealBloom(bloomId);
+				});
+				theDiv.addEventListener('mouseout', function() {
+					clearMessage();
+					if (hasTile) {
+						gameController.clearRevealedBloomId(bloomId);
+					}
+				});
 			}
 		}
 

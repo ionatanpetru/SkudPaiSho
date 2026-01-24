@@ -2,7 +2,12 @@
 
 // --------------------------------------------- // 
 
-function HexentaflNotationMove(text) {
+import { BRAND_NEW } from '../PaiShoMain';
+import { GUEST, HOST, INITIAL_SETUP, MOVE } from '../CommonNotationObjects';
+import { HexentaflVars, setHexentaflVars } from './HexentaflController';
+import { debug } from '../GameData';
+
+export function HexentaflNotationMove(text) {
 	this.fullMoveText = text;
 	this.analyzeMove();
 }
@@ -36,7 +41,7 @@ HexentaflNotationMove.prototype.analyzeMove = function() {
 	if (moveText.includes('-')) {
 		this.moveType = MOVE;
 		// Move string like: 'Ka2-a1' or just 'a2-a1'
-		var parts = moveText.split('-');
+		parts = moveText.split('-');
 
 		if (parts[0].charAt(0) === 'K') {
 			this.isKingMove = true;
@@ -62,7 +67,7 @@ HexentaflNotationMove.prototype.equals = function(otherMove) {
 
 // --------------------------------------- //
 
-function HexentaflNotationBuilder() {
+export function HexentaflNotationBuilder() {
 	this.isKingMove;
 	this.startPoint;
 	this.endPoint;
@@ -94,7 +99,7 @@ HexentaflNotationBuilder.prototype.moveComplete = function() {
 
 
 
-function HexentaflGameNotation() {
+export function HexentaflGameNotation() {
 	this.notationText = "";
 	this.moves = [];
 }
@@ -169,12 +174,12 @@ HexentaflGameNotation.prototype.loadMoves = function() {
 	var lastPlayer = GUEST;
 	var firstMove = new HexentaflNotationMove(lines[0]);
 	if (firstMove.player === GUEST) {
-		newAttacker = HexentaflVars.DEFENDERS_PLAYER;
-		newDefender = HexentaflVars.ATTACKERS_PLAYER;
-		HexentaflVars = {
+		var newAttacker = HexentaflVars.DEFENDERS_PLAYER;
+		var newDefender = HexentaflVars.ATTACKERS_PLAYER;
+		setHexentaflVars({
 			DEFENDERS_PLAYER: newDefender,
 			ATTACKERS_PLAYER: newAttacker
-		};
+		});
 	}
 	lines.forEach(function(line) {
 		var move = new HexentaflNotationMove(line);

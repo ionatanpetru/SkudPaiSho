@@ -1,5 +1,5 @@
 
-function TumbleweedBoardPoint() {
+export function TumbleweedBoardPoint() {
 	this.types = [];
 	this.row = -1;
 	this.col = -1;

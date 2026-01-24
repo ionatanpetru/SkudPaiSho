@@ -1,0 +1,56 @@
+#!/bin/bash
+
+# Deploy Preparation Script
+# Copies built files from dist/ to parcel-update/ for deployment
+# Excludes source maps and other non-production files
+
+set -e  # Exit on error
+
+DIST_DIR="dist"
+DEPLOY_DIR="parcel-update"
+
+# Colors for output
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+echo -e "${BLUE}🚀 Preparing deployment files...${NC}"
+
+# Check if dist directory exists
+if [ ! -d "$DIST_DIR" ]; then
+    echo -e "${YELLOW}⚠️  dist/ directory not found. Running build first...${NC}"
+    npm run build
+fi
+
+# Remove old deploy directory if it exists
+if [ -d "$DEPLOY_DIR" ]; then
+    echo -e "${BLUE}🧹 Cleaning old $DEPLOY_DIR directory...${NC}"
+    rm -rf "$DEPLOY_DIR"
+fi
+
+# Create deploy directory
+mkdir -p "$DEPLOY_DIR"
+
+# Copy files, excluding source maps and other development files
+echo -e "${BLUE}📦 Copying production files...${NC}"
+
+# Use rsync to copy with exclusions
+rsync -av \
+    --exclude='*.map' \
+    --exclude='*.DS_Store' \
+    --exclude='.gitkeep' \
+    "$DIST_DIR/" "$DEPLOY_DIR/"
+
+# Count files
+FILE_COUNT=$(find "$DEPLOY_DIR" -type f | wc -l | tr -d ' ')
+TOTAL_SIZE=$(du -sh "$DEPLOY_DIR" | cut -f1)
+
+echo -e "${GREEN}✅ Deployment prep complete!${NC}"
+echo -e "${GREEN}📊 Copied $FILE_COUNT files ($TOTAL_SIZE total)${NC}"
+echo -e "${GREEN}📁 Ready to deploy from: $DEPLOY_DIR/${NC}"
+echo ""
+echo -e "${BLUE}Next steps:${NC}"
+echo -e "  1. Review files in $DEPLOY_DIR/"
+echo -e "  2. Upload contents to your web server"
+echo ""

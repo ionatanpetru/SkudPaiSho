@@ -1,12 +1,13 @@
+import { TEMPLE } from '../../TrifleBoardPoint';
 
-Trifle.WhileOutsideTempleTriggerBrain = function(triggerContext) {
+export function TrifleWhileOutsideTempleTriggerBrain(triggerContext) {
 	this.board = triggerContext.board;
 	this.triggerContext = triggerContext;
 	this.targetTiles = [];
 	this.targetTilePoints = [];
 }
 
-Trifle.WhileOutsideTempleTriggerBrain.prototype.isTriggerMet = function() {
+TrifleWhileOutsideTempleTriggerBrain.prototype.isTriggerMet = function() {
 	this.targetTiles = [];
 	
 	var isInsideTemple = this.triggerContext.pointWithTile.isType(TEMPLE);

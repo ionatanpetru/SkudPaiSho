@@ -1,5 +1,7 @@
+import { debug, peekRandomFromArray, shuffleArray } from "../GameData";
+import { GameClock } from "./GameClock";
 
-function Giveaway() {}
+export function Giveaway() {}
 
 Giveaway.doIt = function() {
     var textBox = document.getElementById('giveawayNamesTextbox');

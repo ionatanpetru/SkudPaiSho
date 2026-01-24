@@ -13,7 +13,7 @@ var thickDot = "•";
 var whiteDot = "◦";
 var gateDot = "⟡";
 
-function StreetBoardPoint() {
+export function StreetBoardPoint() {
 	this.types = [];
 	this.row = -1;
 	this.col = -1;

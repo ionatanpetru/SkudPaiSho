@@ -1,6 +1,11 @@
 // Spirit Game Manager
 
-function SpiritGameManager(actuator, ignoreActuate, isCopy) {
+import { INITIAL_SETUP, MOVE } from '../CommonNotationObjects';
+import { SpiritBoard } from './SpiritBoard';
+import { SpiritTileManager } from './SpiritTileManager';
+import { debug } from '../GameData';
+
+export function SpiritGameManager(actuator, ignoreActuate, isCopy) {
 	this.isCopy = isCopy;
 
 	this.actuator = actuator;

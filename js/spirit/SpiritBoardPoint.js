@@ -1,20 +1,13 @@
 // Board Point
 
-var NON_PLAYABLE = "Non-Playable";
-var NEUTRAL = "Neutral";
-var RED = "Red";
-var WHITE = "White";
-var GATE = "Gate";
+import {
+  GATE,
+  NEUTRAL,
+  NON_PLAYABLE,
+} from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import { RED, WHITE } from '../skud-pai-sho/SkudPaiShoTile';
 
-var POSSIBLE_MOVE = "Possible Move";
-var OPEN_GATE = "OPEN GATE";
-
-var thinDot = "·";
-var thickDot = "•";
-var whiteDot = "◦";
-var gateDot = "⟡";
-
-function SpiritBoardPoint() {
+export function SpiritBoardPoint() {
 	this.types = [];
 	this.row = -1;
 	this.col = -1;
@@ -89,7 +82,7 @@ SpiritBoardPoint.prototype.canHoldTile = function(tile, ignoreTileCheck) {
 };
 
 SpiritBoardPoint.prototype.getCopy = function() {
-	var copy = new BoardPoint();
+	var copy = new SpiritBoardPoint();
 
 	// this.types
 	for (var i = 0; i < this.types.length; i++) {

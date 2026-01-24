@@ -1,5 +1,13 @@
+import {
+  GameType,
+  buildDropdownDiv,
+  currentGameData,
+  gameController,
+  usernameEquals
+} from '../PaiShoMain';
+import { dateIsBetween } from "../GameData";
 
-function AdevarOptions() {
+export function AdevarOptions() {
 	// Adevar options
 	if (dateIsBetween("10/01/2023", "11/04/2023")) {
 		AdevarOptions.enableSpoopyTiles();
@@ -65,7 +73,17 @@ AdevarOptions.buildToggleViewAsGuestDiv = function() {
 		message = "Viewing board as Guest";
 		linkText = "View as Host";
 	}
-	div.innerHTML = message + ": <span class='skipBonus' onclick='gameController.toggleViewAsGuest();'>" + linkText + "</span>";
+	
+	var textSpan = document.createElement("span");
+	textSpan.textContent = message + ": ";
+	div.appendChild(textSpan);
+	
+	var toggleSpan = document.createElement("span");
+	toggleSpan.className = "skipBonus";
+	toggleSpan.textContent = linkText;
+	toggleSpan.onclick = function() { gameController.toggleViewAsGuest(); };
+	div.appendChild(toggleSpan);
+	
 	return div;
 };
 

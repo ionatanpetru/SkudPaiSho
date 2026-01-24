@@ -1,6 +1,40 @@
 /* Spirit Pai Sho specific UI interaction logic */
 
-var SpiritPreferences = {
+import {
+  BRAND_NEW,
+  GameType,
+  WAITING_FOR_ENDPOINT,
+  buildPreferenceDropdownDiv,
+  callSubmitMove,
+  createGameIfThatIsOk,
+  currentMoveIndex,
+  finalizeMove,
+  gameController,
+  gameId,
+  getCurrentPlayer,
+  getLoginToken,
+  getUserGamePreference,
+  myTurn,
+  onlinePlayEnabled,
+  onlinePlayEngine,
+  playingOnlineGame,
+  rerunAll,
+  setUserGamePreference,
+  userIsLoggedIn,
+} from '../PaiShoMain';
+import { GUEST, HOST, MOVE, NotationPoint } from '../CommonNotationObjects';
+import { POSSIBLE_MOVE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import { SpiritActuator } from './SpiritActuator';
+import { SpiritGameManager } from './SpiritGameManager';
+import {
+  SpiritGameNotation,
+  SpiritNotationBuilder,
+  SpiritNotationMove,
+} from './SpiritGameNotation';
+import { SpiritTile } from './SpiritTile';
+import { debug } from '../GameData';
+
+export var SpiritPreferences = {
 	tileDesignKey: "TileDesigns",
 	tileDesignTypeValues: {
 		original: "Blue and Green",
@@ -11,7 +45,7 @@ var SpiritPreferences = {
 	}
 };
 
-function SpiritController(gameContainer, isMobile) {
+export function SpiritController(gameContainer, isMobile) {
 	this.actuator = new SpiritActuator(gameContainer, isMobile);
 	
 	this.resetGameManager();
@@ -97,17 +131,25 @@ SpiritController.prototype.endGameNow = function() {
 };
 
 SpiritController.prototype.getAdditionalMessage = function() {
-	var msg = "";//"<span class='clickableText' onclick='gameController.endGameNow();'>End this game.</span>";
+	const container = document.createElement('span');
 
 	if (this.gameNotation.moves.length === 0) {
 		if (onlinePlayEnabled && gameId < 0 && userIsLoggedIn()) {
-			msg += "<strong>Real-time gameplay is enabled!</strong> Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by making a move. <br />";
+			const strong = document.createElement('strong');
+			strong.textContent = 'Real-time gameplay is enabled!';
+			container.appendChild(strong);
+			container.appendChild(document.createTextNode(' Click '));
+			const emJoin = document.createElement('em');
+			emJoin.textContent = 'Join Game';
+			container.appendChild(emJoin);
+			container.appendChild(document.createTextNode(' above to join another player\'s game. Or, you can start a game that other players can join by making a move.'));
+			container.appendChild(document.createElement('br'));
 		} else {
-			msg += "Sign in to enable real-time gameplay. Or, start playing a local game by making a move.";
+			container.appendChild(document.createTextNode('Sign in to enable real-time gameplay. Or, start playing a local game by making a move.'));
 		}
 	}
 
-	return msg;
+	return container;
 };
 
 SpiritController.prototype.unplayedTileClicked = function(tileDiv) {

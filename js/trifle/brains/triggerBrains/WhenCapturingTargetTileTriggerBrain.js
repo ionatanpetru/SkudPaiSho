@@ -1,5 +1,7 @@
+import { TrifleTriggerHelper } from '../TriggerHelper';
+import { debug } from '../../../GameData';
 
-Trifle.WhenCapturingTargetTileTriggerBrain = function(triggerContext) {
+export function TrifleWhenCapturingTargetTileTriggerBrain(triggerContext) {
 	this.board = triggerContext.board;
 	this.triggerContext = triggerContext;
 	this.targetTiles = [];
@@ -20,21 +22,21 @@ Trifle.WhenCapturingTargetTileTriggerBrain = function(triggerContext) {
 	this.setAction();
 }
 
-Trifle.WhenCapturingTargetTileTriggerBrain.prototype.setAction = function() {
+TrifleWhenCapturingTargetTileTriggerBrain.prototype.setAction = function() {
 	this.triggeringAction = {
 		actionType: "Capture",	// TODO clean up!
 		tileId: this.possibleTargetTile && this.possibleTargetTile.tileId
 	};
 };
 
-Trifle.WhenCapturingTargetTileTriggerBrain.prototype.isTriggerMet = function() {
+TrifleWhenCapturingTargetTileTriggerBrain.prototype.isTriggerMet = function() {
 	this.targetTiles = [];
 	this.targetTilePoints = [];
 
 	var tileMovedOrPlaced = this.triggerContext.lastTurnAction.tileMovedOrPlaced;
 
 	if (this.thisTile === tileMovedOrPlaced && this.possibleTargetTile) {
-		var triggerHelper = new Trifle.TriggerHelper(this.triggerContext, null, this.possibleTargetTile);
+		var triggerHelper = new TrifleTriggerHelper(this.triggerContext, null, this.possibleTargetTile);
 		if (triggerHelper.tileIsTargeted()) {
 			this.targetTiles.push(this.possibleTargetTile);
 		}

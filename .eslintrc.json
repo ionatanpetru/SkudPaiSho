@@ -1,0 +1,39 @@
+{
+    "env": {
+        "browser": true,
+        "es2021": true
+    },
+    "extends": "eslint:recommended",
+    "parserOptions": {
+        "ecmaVersion": "latest",
+        "sourceType": "module"
+    },
+    "rules": {
+		"no-undef": [
+			"error"
+		],
+        "no-redeclare": "off",
+        "no-unused-vars": "off",
+        "no-unreachable": "off",
+        "no-mixed-spaces-and-tabs": "off",
+        "eslint-plugin-vue/no-dupe-v-else-if": "off",
+        "no-useless-escape": "off"
+    }
+    // "rulesForLater": {
+    //     "indent": [
+    //         "error",
+    //         "tab"
+    //     ],
+    //     "linebreak-style": [
+    //         "error",
+    //         "unix"
+    //     ],
+    //     "semi": [
+    //         "error",
+    //         "always"
+    //     ],
+	// 	"no-undef": [
+	// 		"error"
+	// 	]
+    // }
+}

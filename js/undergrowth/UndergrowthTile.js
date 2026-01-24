@@ -1,8 +1,24 @@
 // Tile
 
-Undergrowth.SIMPLE_TILE = "SimpleTile";
+import {
+  ACCENT_TILE,
+  BASIC_FLOWER,
+  BOAT,
+  KNOTWEED,
+  ORCHID,
+  ROCK,
+  SPECIAL_FLOWER,
+  WHEEL,
+  WHITE_LOTUS,
+  debug,
+} from '../GameData';
+import { GUEST, HOST } from '../CommonNotationObjects';
+import { RED, WHITE, tileIdIncrement } from '../skud-pai-sho/SkudPaiShoTile';
+import { UNDERGROWTH_SIMPLE, gameOptionEnabled } from '../GameOptions';
 
-Undergrowth.Tile = function(code, ownerCode, isSimple) {
+export const UndergrowthSIMPLE_TILE = "SimpleTile";
+
+export function UndergrowthTile(code, ownerCode, isSimple) {
 	this.code = code;
 	this.ownerCode = ownerCode;
 	if (this.ownerCode === 'G') {
@@ -14,12 +30,12 @@ Undergrowth.Tile = function(code, ownerCode, isSimple) {
 	} else {
 		debug("INCORRECT OWNER CODE");
 	}
-	this.id = tileId++;
+	this.id = tileIdIncrement();
 	this.drained = false;
 	this.selectedFromPile = false;
 
 	if (isSimple && gameOptionEnabled(UNDERGROWTH_SIMPLE)) {
-		this.type = Undergrowth.SIMPLE_TILE;
+		this.type = UndergrowthSIMPLE_TILE;
 	} else if (this.code.length === 2 && (this.code.includes('R') || this.code.includes('W'))) {
 		this.type = BASIC_FLOWER;
 		this.basicColorCode = this.code.charAt(0);
@@ -40,7 +56,7 @@ Undergrowth.Tile = function(code, ownerCode, isSimple) {
 	}
 }
 
-Undergrowth.Tile.prototype.setAccentInfo = function() {
+UndergrowthTile.prototype.setAccentInfo = function() {
 	if (this.code === 'R') {
 		this.accentType = ROCK;
 	} else if (this.code === 'W') {
@@ -52,7 +68,7 @@ Undergrowth.Tile.prototype.setAccentInfo = function() {
 	}
 };
 
-Undergrowth.Tile.prototype.setSpecialFlowerInfo = function() {
+UndergrowthTile.prototype.setSpecialFlowerInfo = function() {
 	if (this.code === 'L') {
 		this.specialFlowerType = WHITE_LOTUS;
 	} else if (this.code === 'O') {
@@ -60,7 +76,7 @@ Undergrowth.Tile.prototype.setSpecialFlowerInfo = function() {
 	}
 };
 
-Undergrowth.Tile.prototype.getConsoleDisplay = function() {
+UndergrowthTile.prototype.getConsoleDisplay = function() {
 	if (!this.drained) {
 		return this.ownerCode + "" + this.code;
 	} else {
@@ -68,11 +84,11 @@ Undergrowth.Tile.prototype.getConsoleDisplay = function() {
 	}
 };
 
-Undergrowth.Tile.prototype.getImageName = function() {
+UndergrowthTile.prototype.getImageName = function() {
 	return this.ownerCode + "" + this.code;
 };
 
-Undergrowth.Tile.prototype.formsHarmonyWith = function(otherTile) {
+UndergrowthTile.prototype.formsHarmonyWith = function(otherTile) {
 	if (!otherTile) {
 		return false;
 	}
@@ -132,7 +148,7 @@ Undergrowth.Tile.prototype.formsHarmonyWith = function(otherTile) {
 	}
 };
 
-Undergrowth.Tile.prototype.clashesWith = function(otherTile) {
+UndergrowthTile.prototype.clashesWith = function(otherTile) {
 	if (!otherTile) {
 		return false;
 	}
@@ -153,16 +169,16 @@ Undergrowth.Tile.prototype.clashesWith = function(otherTile) {
 		&& this.basicValue === otherTile.basicValue);
 };
 
-Undergrowth.Tile.prototype.getName = function() {
-	return Undergrowth.Tile.getTileName(this.code);
+UndergrowthTile.prototype.getName = function() {
+	return UndergrowthTile.getTileName(this.code);
 };
 
-Undergrowth.Tile.prototype.getCopy = function() {
-	return new Undergrowth.Tile(this.code, this.ownerCode);
+UndergrowthTile.prototype.getCopy = function() {
+	return new UndergrowthTile(this.code, this.ownerCode);
 };
 
 
-Undergrowth.Tile.getTileName = function(tileCode) {
+UndergrowthTile.getTileName = function(tileCode) {
 	var name = "";
 	
 	if (tileCode.length > 1) {

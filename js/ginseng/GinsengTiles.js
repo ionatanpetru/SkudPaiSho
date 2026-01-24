@@ -1,5 +1,34 @@
+import {
+  DRAGON_CANCELS_ABILITIES,
+  GINSENG_1_POINT_0,
+  GINSENG_2_POINT_0,
+  LION_TURTLE_ABILITY_ANYWHERE,
+  gameOptionEnabled,
+} from '../GameOptions';
+import { RED, WHITE } from '../skud-pai-sho/SkudPaiShoTile';
+import {
+  TrifleAbilityName,
+  TrifleAbilityTriggerType,
+  TrifleAbilityType,
+  TrifleActivationRequirement,
+  TrifleCaptureType,
+  TrifleMovementDirection,
+  TrifleMovementRestriction,
+  TrifleMovementType,
+  TriflePromptTargetType,
+  TrifleRecordTilePointType,
+  TrifleTargetPromptId,
+  TrifleTargetType,
+  TrifleTileCategory,
+  TrifleTileInfo,
+  TrifleTileTeam
+} from '../trifle/TrifleTileInfo';
+import { TrifleTileType } from '../trifle/TrifleTiles';
+import { clearObject } from '../GameData';
+import { defineGinsengTilesV2 } from './GinsengTilesV2';
+import { setCurrentTileNames } from '../trifle/PaiShoGamesTileMetadata';
 
-Ginseng.TileCodes = {
+export var GinsengTileCodes = {
 	WhiteLotus: "L",
 	Koi: "K",
 	Badgermole: "B",
@@ -11,58 +40,59 @@ Ginseng.TileCodes = {
 	Wheel: "W"
 };
 
-Ginseng.TileType = {
+export var GinsengTileType = {
 	originalBender: "originalBender"
 };
 
-Ginseng.TilePileNames = {
+export var GinsengTilePileNames = {
 	banish: "banish"
 };
 
-Ginseng.GinsengTiles = {};
-Ginseng.TileInfo = {};
+export var GinsengTiles = {};
+export var GinsengTileInfo = {};
 
-Ginseng.TileInfo.initializeTrifleData = function() {
-	Ginseng.TileInfo.setTileNames();
+GinsengTileInfo.initializeTrifleData = function() {
+	GinsengTileInfo.setTileNames();
 
-	Trifle.TileInfo.initializeTrifleData();
+	TrifleTileInfo.initializeTrifleData();
 
 	if (gameOptionEnabled(GINSENG_2_POINT_0) || !gameOptionEnabled(GINSENG_1_POINT_0)) {
-		Ginseng.TileInfo.defineGinsengTilesV2();
+		defineGinsengTilesV2();
 	} else {
-		Ginseng.TileInfo.defineGinsengTiles();
+		GinsengTileInfo.defineGinsengTiles();
 	}
 };
 
-Ginseng.TileInfo.setTileNames = function() {
+GinsengTileInfo.setTileNames = function() {
 	/* Set tile names that do not match thier keys in TileCodes */
 	var tileNames = {};
 
-	tileNames[Ginseng.TileCodes.WhiteLotus] = "White Lotus";
-	tileNames[Ginseng.TileCodes.Bison] = "Flying Bison";
-	tileNames[Ginseng.TileCodes.LionTurtle] = "Lion Turtle";
+	tileNames[GinsengTileCodes.WhiteLotus] = "White Lotus";
+	tileNames[GinsengTileCodes.Bison] = "Flying Bison";
+	tileNames[GinsengTileCodes.LionTurtle] = "Lion Turtle";
 
-	PaiShoGames.currentTileNames = tileNames;
+	setCurrentTileNames(tileNames);
 };
 
-Ginseng.TileInfo.defineGinsengTiles = function() {
-	var GinsengTiles = {};
+GinsengTileInfo.defineGinsengTiles = function() {
+	// var GinsengTiles = {};
+	clearObject(GinsengTiles);
 
-	GinsengTiles[Ginseng.TileCodes.WhiteLotus] = {
+	GinsengTiles[GinsengTileCodes.WhiteLotus] = {
 		available: true,
-		types: [Ginseng.TileCodes.WhiteLotus],
+		types: [GinsengTileCodes.WhiteLotus],
 		movements: [
 			{
-				type: Trifle.MovementType.jumpSurroundingTiles,
-				jumpDirections: [Trifle.MovementDirection.diagonal],
-				targetTeams: [Trifle.TileTeam.friendly, Trifle.TileTeam.enemy],
+				type: TrifleMovementType.jumpSurroundingTiles,
+				jumpDirections: [TrifleMovementDirection.diagonal],
+				targetTeams: [TrifleTileTeam.friendly, TrifleTileTeam.enemy],
 				distance: 99,
 				restrictions: [
 					{
-						type: Trifle.MovementRestriction.restrictMovementOntoRecordedTilePoint,
-						recordTilePointType: Trifle.RecordTilePointType.startPoint,
-						targetTileCode: Ginseng.TileCodes.WhiteLotus,
-						targetTeams: [Trifle.TileTeam.enemy]
+						type: TrifleMovementRestriction.restrictMovementOntoRecordedTilePoint,
+						recordTilePointType: TrifleRecordTilePointType.startPoint,
+						targetTileCode: GinsengTileCodes.WhiteLotus,
+						targetTeams: [TrifleTileTeam.enemy]
 					}
 				]
 			}
@@ -70,40 +100,40 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 		abilities: [
 			{
 				title: "Harmony",
-				type: Trifle.AbilityName.protectFromCapture,
+				type: TrifleAbilityName.protectFromCapture,
 				triggers: [
 					{
-						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsInLineOfSight,
-						targetTeams: [Trifle.TileTeam.friendly],
-						targetTileCodes: [Ginseng.TileCodes.Ginseng]
+						triggerType: TrifleAbilityTriggerType.whileTargetTileIsInLineOfSight,
+						targetTeams: [TrifleTileTeam.friendly],
+						targetTileCodes: [GinsengTileCodes.Ginseng]
 					}
 				],
-				targetTypes: [Trifle.TargetType.thisTile]
+				targetTypes: [TrifleTargetType.thisTile]
 			},
 			{
 				title: "Remember Start Point",
-				type: Trifle.AbilityName.recordTilePoint,
+				type: TrifleAbilityName.recordTilePoint,
 				priority: 1,
 				triggers: [
 					{
-						triggerType: Trifle.AbilityTriggerType.whenDeployed,
-						targetTileTypes: [Trifle.TileCategory.thisTile]
+						triggerType: TrifleAbilityTriggerType.whenDeployed,
+						targetTileTypes: [TrifleTileCategory.thisTile]
 					}
 				],
-				targetTypes: [Trifle.TargetType.triggerTargetTiles],
-				recordTilePointType: Trifle.RecordTilePointType.startPoint
+				targetTypes: [TrifleTargetType.triggerTargetTiles],
+				recordTilePointType: TrifleRecordTilePointType.startPoint
 			},
 			{
-				type: Trifle.AbilityName.moveTileToRecordedPoint,
+				type: TrifleAbilityName.moveTileToRecordedPoint,
 				priority: 1,
 				triggers: [
 					{
-						triggerType: Trifle.AbilityTriggerType.whenCapturedByTargetTile,
-						targetTileTypes: [Trifle.TileCategory.allTileTypes]
+						triggerType: TrifleAbilityTriggerType.whenCapturedByTargetTile,
+						targetTileTypes: [TrifleTileCategory.allTileTypes]
 					}
 				],
-				targetTypes: [Trifle.TargetType.thisTile],
-				recordedPointType: Trifle.RecordTilePointType.startPoint
+				targetTypes: [TrifleTargetType.thisTile],
+				recordedPointType: TrifleRecordTilePointType.startPoint
 			}
 		],
 		textLines: [
@@ -119,16 +149,16 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 		]
 	};
 
-	GinsengTiles[Ginseng.TileCodes.Koi] = {
+	GinsengTiles[GinsengTileCodes.Koi] = {
 		available: true,
-		types: [Ginseng.TileType.originalBender],
+		types: [GinsengTileType.originalBender],
 		movements: [
 			{
-				type: Trifle.MovementType.standard,
+				type: TrifleMovementType.standard,
 				distance: 5,
 				captureTypes: [
 					{
-						type: Trifle.CaptureType.all
+						type: TrifleCaptureType.all
 					}
 				]
 			}
@@ -136,46 +166,46 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 		abilities: [
 			{
 				title: "Trap Enemy Tiles",
-				type: Trifle.AbilityName.immobilizeTiles,
+				type: TrifleAbilityName.immobilizeTiles,
 				priority: 3,
 				triggers: [
 					{
-						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsSurrounding,
-						targetTeams: [Trifle.TileTeam.enemy],
-						targetTileTypes: [Trifle.TileCategory.allTileTypes],
+						triggerType: TrifleAbilityTriggerType.whileTargetTileIsSurrounding,
+						targetTeams: [TrifleTileTeam.enemy],
+						targetTileTypes: [TrifleTileCategory.allTileTypes],
 						targetTileBoardPointTypes: [RED, WHITE],
 						activationRequirements: [
 							{
-								type: Trifle.ActivationRequirement.tileIsOnPointOfType,
-								targetTileTypes: [Trifle.TileCategory.thisTile],
+								type: TrifleActivationRequirement.tileIsOnPointOfType,
+								targetTileTypes: [TrifleTileCategory.thisTile],
 								targetPointTypes: [WHITE]
 							}
 						]
 					}
 				],
-				targetTypes: [Trifle.TargetType.triggerTargetTiles]
+				targetTypes: [TrifleTargetType.triggerTargetTiles]
 			},
 			{
 				title: "Prevent Enemy Pushing Trapped Tiles",
-				type: Trifle.AbilityName.cancelAbilitiesTargetingTiles,
+				type: TrifleAbilityName.cancelAbilitiesTargetingTiles,
 				priority: 3,
 				triggers: [
 					{
-						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsSurrounding,
-						targetTeams: [Trifle.TileTeam.enemy],
-						targetTileTypes: [Trifle.TileCategory.allTileTypes],
+						triggerType: TrifleAbilityTriggerType.whileTargetTileIsSurrounding,
+						targetTeams: [TrifleTileTeam.enemy],
+						targetTileTypes: [TrifleTileCategory.allTileTypes],
 						activationRequirements: [
 							{
-								type: Trifle.ActivationRequirement.tileIsOnPointOfType,
-								targetTileTypes: [Trifle.TileCategory.thisTile],
+								type: TrifleActivationRequirement.tileIsOnPointOfType,
+								targetTileTypes: [TrifleTileCategory.thisTile],
 								targetPointTypes: [WHITE]
 							}
 						]
 					}
 				],
-				targetTypes: [Trifle.TargetType.triggerTargetTiles],
-				cancelAbilitiesFromTeam: Trifle.TileTeam.enemy,
-				cancelAbilitiesFromTileCodes: [Ginseng.TileCodes.Bison]
+				targetTypes: [TrifleTargetType.triggerTargetTiles],
+				cancelAbilitiesFromTeam: TrifleTileTeam.enemy,
+				cancelAbilitiesFromTileCodes: [GinsengTileCodes.Bison]
 			}
 		],
 		textLines: [
@@ -190,44 +220,44 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 		]
 	};
 
-	GinsengTiles[Ginseng.TileCodes.Dragon] = {
+	GinsengTiles[GinsengTileCodes.Dragon] = {
 		available: true,
-		types: [Ginseng.TileType.originalBender],
+		types: [GinsengTileType.originalBender],
 		movements: [
 			{
-				type: Trifle.MovementType.standard,
+				type: TrifleMovementType.standard,
 				distance: 5,
 				captureTypes: [
 					{
-						type: Trifle.CaptureType.all
+						type: TrifleCaptureType.all
 					}
 				]
 			}
 		],
 		abilities: [
 			{
-				type: Trifle.AbilityName.captureTargetTiles,
+				type: TrifleAbilityName.captureTargetTiles,
 				triggers: [
 					{
-						triggerType: Trifle.AbilityTriggerType.whenLandsSurroundingTargetTile,
-						targetTeams: [Trifle.TileTeam.enemy],
-						targetTileTypes: [Trifle.TileCategory.allTileTypes],
+						triggerType: TrifleAbilityTriggerType.whenLandsSurroundingTargetTile,
+						targetTeams: [TrifleTileTeam.enemy],
+						targetTileTypes: [TrifleTileCategory.allTileTypes],
 						targetTileBoardPointTypes: [RED, WHITE],
 						activationRequirements: [
 							{
-								type: Trifle.ActivationRequirement.tileIsOnPointOfType,
-								targetTileTypes: [Trifle.TileCategory.thisTile],
+								type: TrifleActivationRequirement.tileIsOnPointOfType,
+								targetTileTypes: [TrifleTileCategory.thisTile],
 								targetPointTypes: [RED]
 							}
 						]
 					},
 					{
-						triggerType: Trifle.AbilityTriggerType.whenActiveMovement,
-						targetTileTypes: [Trifle.TileCategory.thisTile]
+						triggerType: TrifleAbilityTriggerType.whenActiveMovement,
+						targetTileTypes: [TrifleTileCategory.thisTile]
 					}
 				],
-				targetTypes: [Trifle.TargetType.triggerTargetTiles],
-				triggerTypeToTarget: Trifle.AbilityTriggerType.whenLandsSurroundingTargetTile
+				targetTypes: [TrifleTargetType.triggerTargetTiles],
+				triggerTypeToTarget: TrifleAbilityTriggerType.whenLandsSurroundingTargetTile
 			}
 		],
 		textLines: [
@@ -244,64 +274,64 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 		]
 	};
 
-	GinsengTiles[Ginseng.TileCodes.Badgermole] = {
+	GinsengTiles[GinsengTileCodes.Badgermole] = {
 		available: true,
-		types: [Ginseng.TileType.originalBender],
+		types: [GinsengTileType.originalBender],
 		movements: [
 			{
-				type: Trifle.MovementType.standard,
+				type: TrifleMovementType.standard,
 				distance: 5,
 				captureTypes: [
 					{
-						type: Trifle.CaptureType.all
+						type: TrifleCaptureType.all
 					}
 				]
 			}
 		],
 		abilities: [
 			{
-				type: Trifle.AbilityName.protectFromCapture,
+				type: TrifleAbilityName.protectFromCapture,
 				priority: 2,
 				triggers: [
 					{
-						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsSurrounding,
-						targetTeams: [Trifle.TileTeam.friendly],
-						targetTileTypes: [Trifle.TileCategory.allTileTypes],
+						triggerType: TrifleAbilityTriggerType.whileTargetTileIsSurrounding,
+						targetTeams: [TrifleTileTeam.friendly],
+						targetTileTypes: [TrifleTileCategory.allTileTypes],
 						targetTileBoardPointTypes: [RED, WHITE],
 						activationRequirements: [
 							{
-								type: Trifle.ActivationRequirement.tileIsOnPointOfType,
-								targetTileTypes: [Trifle.TileCategory.thisTile],
+								type: TrifleActivationRequirement.tileIsOnPointOfType,
+								targetTileTypes: [TrifleTileCategory.thisTile],
 								targetPointTypes: [WHITE]
 							}
 						]
 					}
 				],
-				targetTypes: [Trifle.TargetType.triggerTargetTiles]
+				targetTypes: [TrifleTargetType.triggerTargetTiles]
 			}
 			/* ,
 			!gameOptionEnabled(BADGERMOLE_NOT_PREVENT_TRAP_PUSH) && {
 				title: "Protect From Enemy Abilities",
-				type: Trifle.AbilityName.cancelAbilitiesTargetingTiles,
+				type: TrifleAbilityName.cancelAbilitiesTargetingTiles,
 				priority: 2,
 				triggers: [
 					{
-						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsSurrounding,
-						targetTeams: [Trifle.TileTeam.friendly],
-						targetTileTypes: [Trifle.TileCategory.allTileTypes],
+						triggerType: TrifleAbilityTriggerType.whileTargetTileIsSurrounding,
+						targetTeams: [TrifleTileTeam.friendly],
+						targetTileTypes: [TrifleTileCategory.allTileTypes],
 						targetTileBoardPointTypes: [RED, WHITE],
 						activationRequirements: [
 							{
-								type: Trifle.ActivationRequirement.tileIsOnPointOfType,
-								targetTileTypes: [Trifle.TileCategory.thisTile],
+								type: TrifleActivationRequirement.tileIsOnPointOfType,
+								targetTileTypes: [TrifleTileCategory.thisTile],
 								targetPointTypes: [WHITE]
 							}
 						]
 					}
 				],
-				targetTypes: [Trifle.TargetType.triggerTargetTiles],
-				targetAbilityTypes: [Trifle.AbilityType.all],
-				cancelAbilitiesFromTeam: Trifle.TileTeam.enemy
+				targetTypes: [TrifleTargetType.triggerTargetTiles],
+				targetAbilityTypes: [TrifleAbilityType.all],
+				cancelAbilitiesFromTeam: TrifleTileTeam.enemy
 			} */
 		],
 		textLines: [
@@ -316,16 +346,16 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 		]
 	};
 
-	GinsengTiles[Ginseng.TileCodes.Bison] = {
+	GinsengTiles[GinsengTileCodes.Bison] = {
 		available: true,
-		types: [Ginseng.TileType.originalBender],
+		types: [GinsengTileType.originalBender],
 		movements: [
 			{
-				type: Trifle.MovementType.standard,
+				type: TrifleMovementType.standard,
 				distance: 5,
 				captureTypes: [
 					{
-						type: Trifle.CaptureType.all
+						type: TrifleCaptureType.all
 					}
 				]
 			}
@@ -333,62 +363,62 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 		abilities: [
 			{
 				title: "Active Bison Push",
-				type: Trifle.AbilityName.moveTargetTile,
+				type: TrifleAbilityName.moveTargetTile,
 				// priority: ?,
 				isPassiveMovement: true,
 				optional: true,
 				neededPromptTargetsInfo: [
 					{
 						title: "pushedTile",
-						promptId: Trifle.TargetPromptId.movedTilePoint,
-						targetType: Trifle.PromptTargetType.boardPoint
+						promptId: TrifleTargetPromptId.movedTilePoint,
+						targetType: TriflePromptTargetType.boardPoint
 					},
 					{
 						title: "pushLanding",
-						promptId: Trifle.TargetPromptId.movedTileDestinationPoint,
-						targetType: Trifle.PromptTargetType.boardPoint
+						promptId: TrifleTargetPromptId.movedTileDestinationPoint,
+						targetType: TriflePromptTargetType.boardPoint
 					}
 				],
 				triggers: [
 					{
-						triggerType: Trifle.AbilityTriggerType.whenLandsSurroundingTargetTile,
-						targetTileTypes: [Trifle.TileCategory.allTileTypes],
+						triggerType: TrifleAbilityTriggerType.whenLandsSurroundingTargetTile,
+						targetTileTypes: [TrifleTileCategory.allTileTypes],
 						targetTileBoardPointTypes: [RED, WHITE],
 						activationRequirements: [
 							{
-								type: Trifle.ActivationRequirement.tileIsOnPointOfType,
-								targetTileTypes: [Trifle.TileCategory.thisTile],
+								type: TrifleActivationRequirement.tileIsOnPointOfType,
+								targetTileTypes: [TrifleTileCategory.thisTile],
 								targetPointTypes: [RED]
 							}
 						]
 					},
 					{
-						triggerType: Trifle.AbilityTriggerType.whenActiveMovement,
-						targetTileTypes: [Trifle.TileCategory.thisTile]
+						triggerType: TrifleAbilityTriggerType.whenActiveMovement,
+						targetTileTypes: [TrifleTileCategory.thisTile]
 					}
 				],
-				targetTypes: [Trifle.TargetType.triggerTargetTiles],
-				triggerTypeToTarget: Trifle.AbilityTriggerType.whenLandsSurroundingTargetTile,
+				targetTypes: [TrifleTargetType.triggerTargetTiles],
+				triggerTypeToTarget: TrifleAbilityTriggerType.whenLandsSurroundingTargetTile,
 				numberOfTargetTiles: 1,
 				promptTargetTitle: "pushedTile",
 				targetTileMovements: [
 					{
-						type: Trifle.MovementType.awayFromTargetTileOrthogonal,
+						type: TrifleMovementType.awayFromTargetTileOrthogonal,
 						distance: 2,
-						targetTileTypes: [Trifle.TileCategory.tileWithAbility],
+						targetTileTypes: [TrifleTileCategory.tileWithAbility],
 						regardlessOfImmobilization: true
 					},
 					{
-						type: Trifle.MovementType.awayFromTargetTileDiagonal,
+						type: TrifleMovementType.awayFromTargetTileDiagonal,
 						distance: 1,
-						targetTileTypes: [Trifle.TileCategory.tileWithAbility],
+						targetTileTypes: [TrifleTileCategory.tileWithAbility],
 						regardlessOfImmobilization: true
 					}
 				]
 			}/* ,
 			{
 				title: "Passive Bison Push",
-				type: Trifle.AbilityName.moveTargetTile,
+				type: TrifleAbilityName.moveTargetTile,
 				// priority: ?,
 				isPassiveMovement: true,
 				optional: true,
@@ -396,46 +426,46 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 				neededPromptTargetsInfo: [
 					{
 						title: "pushedTile",
-						promptId: Trifle.TargetPromptId.movedTilePoint,
-						targetType: Trifle.PromptTargetType.boardPoint
+						promptId: TrifleTargetPromptId.movedTilePoint,
+						targetType: TriflePromptTargetType.boardPoint
 					},
 					{
 						title: "pushLanding",
-						promptId: Trifle.TargetPromptId.movedTileDestinationPoint,
-						targetType: Trifle.PromptTargetType.boardPoint
+						promptId: TrifleTargetPromptId.movedTileDestinationPoint,
+						targetType: TriflePromptTargetType.boardPoint
 					}
 				],
 				triggers: [
 					{
-						triggerType: Trifle.AbilityTriggerType.whenTargetTileLandsSurrounding,
-						targetTeams: [Trifle.TileTeam.friendly],
+						triggerType: TrifleAbilityTriggerType.whenTargetTileLandsSurrounding,
+						targetTeams: [TrifleTileTeam.friendly],
 						activationRequirements: [
 							{
-								type: Trifle.ActivationRequirement.tileIsOnPointOfType,
-								targetTileTypes: [Trifle.TileCategory.thisTile],
+								type: TrifleActivationRequirement.tileIsOnPointOfType,
+								targetTileTypes: [TrifleTileCategory.thisTile],
 								targetPointTypes: [RED]
 							}
 						]
 					},
 					{
-						triggerType: Trifle.AbilityTriggerType.whenActiveMovement,
-						targetTileTypes: [Trifle.TileCategory.allTileTypes]
+						triggerType: TrifleAbilityTriggerType.whenActiveMovement,
+						targetTileTypes: [TrifleTileCategory.allTileTypes]
 					}
 				],
-				targetTypes: [Trifle.TargetType.triggerTargetTiles],
-				triggerTypeToTarget: Trifle.AbilityTriggerType.whenTargetTileLandsSurrounding,
+				targetTypes: [TrifleTargetType.triggerTargetTiles],
+				triggerTypeToTarget: TrifleAbilityTriggerType.whenTargetTileLandsSurrounding,
 				numberOfTargetTiles: 1,
 				promptTargetTitle: "pushedTile",
 				targetTileMovements: [
 					{
-						type: Trifle.MovementType.awayFromTargetTileOrthogonal,
+						type: TrifleMovementType.awayFromTargetTileOrthogonal,
 						distance: 2,
-						targetTileTypes: [Trifle.TileCategory.tileWithAbility]
+						targetTileTypes: [TrifleTileCategory.tileWithAbility]
 					},
 					{
-						type: Trifle.MovementType.awayFromTargetTileDiagonal,
+						type: TrifleMovementType.awayFromTargetTileDiagonal,
 						distance: 1,
-						targetTileTypes: [Trifle.TileCategory.tileWithAbility]
+						targetTileTypes: [TrifleTileCategory.tileWithAbility]
 					}
 				]
 			} */
@@ -453,38 +483,38 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 		]
 	};
 
-	GinsengTiles[Ginseng.TileCodes.LionTurtle] = {
+	GinsengTiles[GinsengTileCodes.LionTurtle] = {
 		available: true,
-		types: [Ginseng.TileCodes.LionTurtle],
+		types: [GinsengTileCodes.LionTurtle],
 		movements: [
 			{
-				type: Trifle.MovementType.standard,
+				type: TrifleMovementType.standard,
 				distance: 6,
 				captureTypes: [
 					{
-						type: Trifle.CaptureType.allExcludingCertainTiles,
-						excludedTileCodes: [Ginseng.TileCodes.LionTurtle]
+						type: TrifleCaptureType.allExcludingCertainTiles,
+						excludedTileCodes: [GinsengTileCodes.LionTurtle]
 					}
 				],
 			}
 		],
 		abilities: [
 			{
-				type: Trifle.AbilityName.captureTargetTiles,
+				type: TrifleAbilityName.captureTargetTiles,
 				triggers: [
 					{
-						triggerType: Trifle.AbilityTriggerType.whenLandsAdjacentToTargetTile,
-						targetTeams: [Trifle.TileTeam.enemy],
-						targetTileTypes: [Ginseng.TileType.originalBender],
+						triggerType: TrifleAbilityTriggerType.whenLandsAdjacentToTargetTile,
+						targetTeams: [TrifleTileTeam.enemy],
+						targetTileTypes: [GinsengTileType.originalBender],
 						targetTileBoardPointTypes: !gameOptionEnabled(LION_TURTLE_ABILITY_ANYWHERE) && [RED, WHITE]
 					},
 					{
-						triggerType: Trifle.AbilityTriggerType.whenActiveMovement,
-						targetTileTypes: [Trifle.TileCategory.thisTile]
+						triggerType: TrifleAbilityTriggerType.whenActiveMovement,
+						targetTileTypes: [TrifleTileCategory.thisTile]
 					}
 				],
-				targetTypes: [Trifle.TargetType.triggerTargetTiles],
-				triggerTypeToTarget: Trifle.AbilityTriggerType.whenLandsAdjacentToTargetTile
+				targetTypes: [TrifleTargetType.triggerTargetTiles],
+				triggerTypeToTarget: TrifleAbilityTriggerType.whenLandsAdjacentToTargetTile
 			}
 		],
 		textLines: [
@@ -497,21 +527,21 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 		]
 	};
 
-	GinsengTiles[Ginseng.TileCodes.Wheel] = {
+	GinsengTiles[GinsengTileCodes.Wheel] = {
 		available: true,
-		types: [Trifle.TileType.traveler],
+		types: [TrifleTileType.traveler],
 		movements: [
 			{
-				type: Trifle.MovementType.standard,
+				type: TrifleMovementType.standard,
 				distance: 99,
 				captureTypes: [
 					{
-						type: Trifle.CaptureType.all
+						type: TrifleCaptureType.all
 					}
 				],
 				restrictions: [
 					{
-						type: Trifle.MovementRestriction.mustPreserveDirection
+						type: TrifleMovementRestriction.mustPreserveDirection
 					}
 				]
 			}
@@ -523,39 +553,39 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 		]
 	};
 
-	GinsengTiles[Ginseng.TileCodes.Ginseng] = {
+	GinsengTiles[GinsengTileCodes.Ginseng] = {
 		available: true,
-		types: [Trifle.TileType.flower],
+		types: [TrifleTileType.flower],
 		movements: [
 			{
-				type: Trifle.MovementType.standard,
+				type: TrifleMovementType.standard,
 				distance: 6
 			}
 		],
 		abilities: [
 			{
 				title: "Exchange With Captured Tile",
-				type: Trifle.AbilityName.exchangeWithCapturedTile,
+				type: TrifleAbilityName.exchangeWithCapturedTile,
 				optional: true,
 				neededPromptTargetsInfo: [
 					{
 						title: "exchangedTile",
-						promptId: Trifle.TargetPromptId.chosenCapturedTile,
-						targetType: Trifle.PromptTargetType.capturedTile
+						promptId: TrifleTargetPromptId.chosenCapturedTile,
+						targetType: TriflePromptTargetType.capturedTile
 					}
 				],
 				triggers: [
 					{
-						triggerType: Trifle.AbilityTriggerType.whenTargetTileLandsInTemple,
-						targetTileTypes: [Trifle.TileCategory.thisTile]
+						triggerType: TrifleAbilityTriggerType.whenTargetTileLandsInTemple,
+						targetTileTypes: [TrifleTileCategory.thisTile]
 					},
 					{
-						triggerType: Trifle.AbilityTriggerType.whenActiveMovement,
-						targetTileTypes: [Trifle.TileCategory.thisTile]
+						triggerType: TrifleAbilityTriggerType.whenActiveMovement,
+						targetTileTypes: [TrifleTileCategory.thisTile]
 					}
 				],
-				targetTypes: [Trifle.TargetType.chosenCapturedTile],
-				targetTeams: [Trifle.TileTeam.friendly],
+				targetTypes: [TrifleTargetType.chosenCapturedTile],
+				targetTeams: [TrifleTileTeam.friendly],
 				promptTargetTitle: "exchangedTile"
 			}
 		],
@@ -570,63 +600,63 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 		]
 	};
 
-	GinsengTiles[Ginseng.TileCodes.Orchid] = {
+	GinsengTiles[GinsengTileCodes.Orchid] = {
 		available: true,
-		types: [Trifle.TileType.flower],
+		types: [TrifleTileType.flower],
 		movements: [
 			{
-				type: Trifle.MovementType.standard,
+				type: TrifleMovementType.standard,
 				distance: 6,
 				captureTypes: [
 					{
-						type: Trifle.CaptureType.allExcludingCertainTiles,
-						excludedTileCodes: [Ginseng.TileCodes.WhiteLotus]
+						type: TrifleCaptureType.allExcludingCertainTiles,
+						excludedTileCodes: [GinsengTileCodes.WhiteLotus]
 					}
 				]
 			}
 		],
 		abilities: [
 			{
-				type: Trifle.AbilityName.moveTargetTileToPile,
-				destinationPile: Ginseng.TilePileNames.banish,
+				type: TrifleAbilityName.moveTargetTileToPile,
+				destinationPile: GinsengTilePileNames.banish,
 				triggers: [
 					{
-						triggerType: Trifle.AbilityTriggerType.whenCapturingTargetTile,
-						targetTeams: [Trifle.TileTeam.enemy]
+						triggerType: TrifleAbilityTriggerType.whenCapturingTargetTile,
+						targetTeams: [TrifleTileTeam.enemy]
 					},
 					{
-						triggerType: Trifle.AbilityTriggerType.whenActiveMovement
+						triggerType: TrifleAbilityTriggerType.whenActiveMovement
 					}
 				],
 				targetTypes: [
-					Trifle.TargetType.triggerTargetTiles,
-					Trifle.TargetType.thisTile
+					TrifleTargetType.triggerTargetTiles,
+					TrifleTargetType.thisTile
 				],
-				triggerTypeToTarget: Trifle.AbilityTriggerType.whenCapturingTargetTile
+				triggerTypeToTarget: TrifleAbilityTriggerType.whenCapturingTargetTile
 			},
 			{
 				title: "Exchange With Captured Tile",
-				type: Trifle.AbilityName.exchangeWithCapturedTile,
+				type: TrifleAbilityName.exchangeWithCapturedTile,
 				optional: true,
 				neededPromptTargetsInfo: [
 					{
 						title: "exchangedTile",
-						promptId: Trifle.TargetPromptId.chosenCapturedTile,
-						targetType: Trifle.PromptTargetType.capturedTile
+						promptId: TrifleTargetPromptId.chosenCapturedTile,
+						targetType: TriflePromptTargetType.capturedTile
 					}
 				],
 				triggers: [
 					{
-						triggerType: Trifle.AbilityTriggerType.whenTargetTileLandsInTemple,
-						targetTileTypes: [Trifle.TileCategory.thisTile]
+						triggerType: TrifleAbilityTriggerType.whenTargetTileLandsInTemple,
+						targetTileTypes: [TrifleTileCategory.thisTile]
 					},
 					{
-						triggerType: Trifle.AbilityTriggerType.whenActiveMovement,
-						targetTileTypes: [Trifle.TileCategory.thisTile]
+						triggerType: TrifleAbilityTriggerType.whenActiveMovement,
+						targetTileTypes: [TrifleTileCategory.thisTile]
 					}
 				],
-				targetTypes: [Trifle.TargetType.chosenCapturedTile],
-				targetTeams: [Trifle.TileTeam.friendly],
+				targetTypes: [TrifleTargetType.chosenCapturedTile],
+				targetTeams: [TrifleTileTeam.friendly],
 				promptTargetTitle: "exchangedTile"
 			}
 		],
@@ -642,41 +672,39 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 	};
 
 	/* Apply Capture and Ability Activation Requirements Rules */
-	Ginseng.applyCaptureAndAbilityActivationRequirementRules(GinsengTiles);
+	applyCaptureAndAbilityActivationRequirementRules(GinsengTiles);
 
 	/* if (gameOptionEnabled(CAPTURE_ABILITY_TARGET_1)) {
 		debug("Change Lion Turtle and Dragon abilities");
-		GinsengTiles[Ginseng.TileCodes.Dragon].abilities = [
+		GinsengTiles[GinsengTileCodes.Dragon].abilities = [
 			{
-				type: Trifle.AbilityName.captureTargetTiles,
+				type: TrifleAbilityName.captureTargetTiles,
 				triggers: [
 					{
-						triggerType: Trifle.AbilityTriggerType.whenLandsSurroundingTargetTile,
-						targetTeams: [Trifle.TileTeam.enemy],
-						targetTileTypes: [Trifle.TileCategory.allTileTypes],
+						triggerType: TrifleAbilityTriggerType.whenLandsSurroundingTargetTile,
+						targetTeams: [TrifleTileTeam.enemy],
+						targetTileTypes: [TrifleTileCategory.allTileTypes],
 						activationRequirements: [
 							{
-								type: Trifle.ActivationRequirement.tileIsOnPointOfType,
-								targetTileTypes: [Trifle.TileCategory.thisTile],
+								type: TrifleActivationRequirement.tileIsOnPointOfType,
+								targetTileTypes: [TrifleTileCategory.thisTile],
 								targetPointTypes: [RED]
 							}
 						]
 					},
 					{
-						triggerType: Trifle.AbilityTriggerType.whenActiveMovement,
-						targetTileTypes: [Trifle.TileCategory.thisTile]
+						triggerType: TrifleAbilityTriggerType.whenActiveMovement,
+						targetTileTypes: [TrifleTileCategory.thisTile]
 					}
 				],
-				targetTypes: [Trifle.TargetType.triggerTargetTiles],
-				triggerTypeToTarget: Trifle.AbilityTriggerType.whenLandsSurroundingTargetTile
+				targetTypes: [TrifleTargetType.triggerTargetTiles],
+				triggerTypeToTarget: TrifleAbilityTriggerType.whenLandsSurroundingTargetTile
 			}
 		];
 	} */
-
-	Ginseng.GinsengTiles = GinsengTiles;
 };
 
-Ginseng.applyCaptureAndAbilityActivationRequirementRules = function(GinsengTiles) {
+function applyCaptureAndAbilityActivationRequirementRules(GinsengTiles) {
 	Object.keys(GinsengTiles).forEach(function(key, index) {
 		var tileInfo = GinsengTiles[key];
 		if (tileInfo.movements && tileInfo.movements.length) {
@@ -685,9 +713,9 @@ Ginseng.applyCaptureAndAbilityActivationRequirementRules = function(GinsengTiles
 				if (movementInfo.captureTypes && movementInfo.captureTypes.length) {
 					movementInfo.captureTypes.forEach(function(captureTypeInfo) {
 						var activationRequirement = {
-							type: Trifle.ActivationRequirement.tilesNotInTemple,
-							targetTileCodes: [Ginseng.TileCodes.WhiteLotus],
-							targetTeams: [Trifle.TileTeam.friendly, Trifle.TileTeam.enemy]
+							type: TrifleActivationRequirement.tilesNotInTemple,
+							targetTileCodes: [GinsengTileCodes.WhiteLotus],
+							targetTeams: [TrifleTileTeam.friendly, TrifleTileTeam.enemy]
 						};
 						if (captureTypeInfo.activationRequirements) {
 							captureTypeInfo.activationRequirements.push(activationRequirement);
@@ -700,12 +728,12 @@ Ginseng.applyCaptureAndAbilityActivationRequirementRules = function(GinsengTiles
 				/* Add Movement Restriction For All Tiles Except Lotus: 
 				 * Cannot Move Onto Any Lotus Starting Point
 				 */
-				if (!tileInfo.types.includes(Ginseng.TileCodes.WhiteLotus)) {
+				if (!tileInfo.types.includes(GinsengTileCodes.WhiteLotus)) {
 					var movementRestriction = {
-						type: Trifle.MovementRestriction.restrictMovementOntoRecordedTilePoint,
-						recordTilePointType: Trifle.RecordTilePointType.startPoint,
-						targetTileCode: Ginseng.TileCodes.WhiteLotus,
-						targetTeams: [Trifle.TileTeam.friendly, Trifle.TileTeam.enemy]
+						type: TrifleMovementRestriction.restrictMovementOntoRecordedTilePoint,
+						recordTilePointType: TrifleRecordTilePointType.startPoint,
+						targetTileCode: GinsengTileCodes.WhiteLotus,
+						targetTeams: [TrifleTileTeam.friendly, TrifleTileTeam.enemy]
 					};
 					if (movementInfo.restrictions) {
 						movementInfo.restrictions.push(movementRestriction);
@@ -719,13 +747,13 @@ Ginseng.applyCaptureAndAbilityActivationRequirementRules = function(GinsengTiles
 		if (tileInfo.abilities && tileInfo.abilities.length) {
 			tileInfo.abilities.forEach(function(abilityInfo) {
 				/* Add Ability Activation Requirement: Friendly Lotus Not In A Temple */
-				if (abilityInfo.type !== Trifle.AbilityName.recordTilePoint 
+				if (abilityInfo.type !== TrifleAbilityName.recordTilePoint 
 						&& abilityInfo.triggers && abilityInfo.triggers.length) {
 					abilityInfo.triggers.forEach(function(triggerInfo) {
 						var triggerActivationRequirement = {
-							type: Trifle.ActivationRequirement.tilesNotInTemple,
-							targetTileCodes: [Ginseng.TileCodes.WhiteLotus],
-							targetTeams: [Trifle.TileTeam.friendly]
+							type: TrifleActivationRequirement.tilesNotInTemple,
+							targetTileCodes: [GinsengTileCodes.WhiteLotus],
+							targetTeams: [TrifleTileTeam.friendly]
 						};
 						if (triggerInfo.activationRequirements) {
 							triggerInfo.activationRequirements.push(triggerActivationRequirement);
@@ -743,40 +771,40 @@ Ginseng.applyCaptureAndAbilityActivationRequirementRules = function(GinsengTiles
 		}
 		var protectFromCaptureWhileInTempleAbility = {
 			title: "Protect From Capture While In Temple",
-			type: Trifle.AbilityName.protectFromCapture,
+			type: TrifleAbilityName.protectFromCapture,
 			triggers: [
 				{
-					triggerType: Trifle.AbilityTriggerType.whileInsideTemple,
-					targetTileTypes: [Trifle.TileCategory.thisTile]
+					triggerType: TrifleAbilityTriggerType.whileInsideTemple,
+					targetTileTypes: [TrifleTileCategory.thisTile]
 				}
 			],
-			targetTypes: [Trifle.TargetType.triggerTargetTiles]
+			targetTypes: [TrifleTargetType.triggerTargetTiles]
 		};
 		var protectFromEnemyAbilitiesWhileInTempleAbility = {
 			title: "Protect From Enemy Abilities While In Temple",
-			type: Trifle.AbilityName.cancelAbilitiesTargetingTiles,
+			type: TrifleAbilityName.cancelAbilitiesTargetingTiles,
 			triggers: [
 				{
-					triggerType: Trifle.AbilityTriggerType.whileInsideTemple,
-					targetTileTypes: [Trifle.TileCategory.thisTile]
+					triggerType: TrifleAbilityTriggerType.whileInsideTemple,
+					targetTileTypes: [TrifleTileCategory.thisTile]
 				}
 			],
-			targetTypes: [Trifle.TargetType.triggerTargetTiles],
-			targetAbilityTypes: [Trifle.AbilityType.all],
-			cancelAbilitiesFromTeam: Trifle.TileTeam.enemy
+			targetTypes: [TrifleTargetType.triggerTargetTiles],
+			targetAbilityTypes: [TrifleAbilityType.all],
+			cancelAbilitiesFromTeam: TrifleTileTeam.enemy
 		};
 		var protectFromFriendlyPushAbilitiesWhileInTempleAbility = {
 			title: "Protect From Friendly Push Abilities While In Temple",
-			type: Trifle.AbilityName.cancelAbilitiesTargetingTiles,
+			type: TrifleAbilityName.cancelAbilitiesTargetingTiles,
 			triggers: [
 				{
-					triggerType: Trifle.AbilityTriggerType.whileInsideTemple,
-					targetTileTypes: [Trifle.TileCategory.thisTile]
+					triggerType: TrifleAbilityTriggerType.whileInsideTemple,
+					targetTileTypes: [TrifleTileCategory.thisTile]
 				}
 			],
-			targetTypes: [Trifle.TargetType.triggerTargetTiles],
-			targetAbilityTypes: [Trifle.AbilityType.moveTargetTile],
-			cancelAbilitiesFromTeam: Trifle.TileTeam.friendly
+			targetTypes: [TrifleTargetType.triggerTargetTiles],
+			targetAbilityTypes: [TrifleAbilityType.moveTargetTile],
+			cancelAbilitiesFromTeam: TrifleTileTeam.friendly
 		};
 		tileInfo.abilities.push(protectFromCaptureWhileInTempleAbility);
 		tileInfo.abilities.push(protectFromEnemyAbilitiesWhileInTempleAbility);
@@ -784,4 +812,4 @@ Ginseng.applyCaptureAndAbilityActivationRequirementRules = function(GinsengTiles
 		// ------
 
 	});
-};
+}

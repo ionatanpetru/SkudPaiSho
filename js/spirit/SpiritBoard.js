@@ -1,6 +1,16 @@
 // Spirit Board
 
-function SpiritBoard() {
+import {
+  GATE,
+  NON_PLAYABLE,
+  POSSIBLE_MOVE,
+} from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import { GUEST, HOST, RowAndColumn } from '../CommonNotationObjects';
+import { SpiritBoardPoint } from './SpiritBoardPoint';
+import { debug } from '../GameData';
+import { showBadMoveModal } from '../PaiShoMain';
+
+export function SpiritBoard() {
 	this.size = new RowAndColumn(17, 17);
 	this.cells = this.brandNew();
 
@@ -497,7 +507,7 @@ SpiritBoard.prototype.canMoveTileToPoint = function(player, boardPointStart, boa
 };
 
 SpiritBoard.prototype.getTileMovements = function(boardPoint) {
-	tileMovements = [];
+	var tileMovements = [];
 	this.recursiveAddMovement(tileMovements, boardPoint, 3, 0);
 	return tileMovements;
 };
@@ -526,7 +536,7 @@ SpiritBoard.prototype.getTileMovements = function(boardPoint) {
 		return {}
 	end
 end
-function flower:get_possible_pos()
+export function flower:get_possible_pos()
 	positions={}
 	if self.onboard then
 		if not self.trapped then

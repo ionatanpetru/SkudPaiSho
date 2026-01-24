@@ -1,6 +1,10 @@
 // Coop Solitaire Harmony
 
-Undergrowth.Harmony = function(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn) {
+import { ACCENT_TILE, debug } from '../GameData';
+import { FULL_POINTS_SCORING, gameOptionEnabled } from '../GameOptions';
+import { GUEST, HOST } from '../CommonNotationObjects';
+
+export function UndergrowthHarmony(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn) {
 	this.tile1 = tile1;
 	this.tile1Pos = tile1RowAndColumn;
 	this.tile2 = tile2;
@@ -17,7 +21,7 @@ Undergrowth.Harmony = function(tile1, tile1RowAndColumn, tile2, tile2RowAndColum
 	}
 }
 
-Undergrowth.Harmony.prototype.equals = function(otherHarmony) {
+UndergrowthHarmony.prototype.equals = function(otherHarmony) {
 	if (this.tile1 === otherHarmony.tile1 || this.tile1 === otherHarmony.tile2) {
 		if (this.tile2 === otherHarmony.tile1 || this.tile2 === otherHarmony.tile2) {
 			return true;
@@ -26,7 +30,7 @@ Undergrowth.Harmony.prototype.equals = function(otherHarmony) {
 	return false;
 };
 
-Undergrowth.Harmony.prototype.notAnyOfThese = function(harmonies) {
+UndergrowthHarmony.prototype.notAnyOfThese = function(harmonies) {
 	for (var i = 0; i < harmonies.length; i++) {
 		if (this.equals(harmonies[i])) {
 			return false;
@@ -35,11 +39,11 @@ Undergrowth.Harmony.prototype.notAnyOfThese = function(harmonies) {
 	return true;
 };
 
-Undergrowth.Harmony.prototype.containsTile = function(tile) {
+UndergrowthHarmony.prototype.containsTile = function(tile) {
 	return (this.tile1 === tile || this.tile2 === tile);
 };
 
-Undergrowth.Harmony.prototype.getTileThatIsNotThisOne = function(tile) {
+UndergrowthHarmony.prototype.getTileThatIsNotThisOne = function(tile) {
 	if (this.tile1 === tile) {
 		return this.tile2;
 	} else if (this.tile2 === tile) {
@@ -49,11 +53,11 @@ Undergrowth.Harmony.prototype.getTileThatIsNotThisOne = function(tile) {
 	}
 };
 
-Undergrowth.Harmony.prototype.containsTilePos = function(pos) {
+UndergrowthHarmony.prototype.containsTilePos = function(pos) {
 	return this.tile1Pos.samesies(pos) || this.tile2Pos.samesies(pos);
 };
 
-Undergrowth.Harmony.prototype.getPosThatIsNotThisOne = function(pos) {
+UndergrowthHarmony.prototype.getPosThatIsNotThisOne = function(pos) {
 	if (this.tile1Pos.samesies(pos)) {
 		return this.tile2Pos;
 	} else if(this.tile2Pos.samesies(pos)) {
@@ -63,11 +67,11 @@ Undergrowth.Harmony.prototype.getPosThatIsNotThisOne = function(pos) {
 	}
 };
 
-Undergrowth.Harmony.prototype.getString = function() {
+UndergrowthHarmony.prototype.getString = function() {
 	return this.ownerName + " (" + this.tile1Pos.notationPointString + ")-(" + this.tile2Pos.notationPointString + ")";
 };
 
-Undergrowth.Harmony.prototype.getDirectionForTile = function(tile) {
+UndergrowthHarmony.prototype.getDirectionForTile = function(tile) {
 	if (!this.containsTile(tile)) {
 		return;
 	}
@@ -96,7 +100,7 @@ Undergrowth.Harmony.prototype.getDirectionForTile = function(tile) {
 	}
 };
 
-Undergrowth.Harmony.prototype.crossesCenter = function() {
+UndergrowthHarmony.prototype.crossesCenter = function() {
 	var rowHigh = this.tile1Pos.row;
 	var rowLow = this.tile2Pos.row;
 	if (this.tile1Pos.row < this.tile2Pos.row) {
@@ -125,19 +129,19 @@ Undergrowth.Harmony.prototype.crossesCenter = function() {
 
 
 // HarmonyManager manages list of harmonies
-Undergrowth.HarmonyManager = function() {
+export function UndergrowthHarmonyManager() {
 	this.harmonies = [];
 	this.clashes = [];
 }
 
-Undergrowth.HarmonyManager.prototype.printHarmonies = function() {
+UndergrowthHarmonyManager.prototype.printHarmonies = function() {
 	debug("All Harmonies:");
 	for (var i = 0; i < this.harmonies.length; i++) {
 		debug(this.harmonies[i].getString());
 	}
 };
 
-Undergrowth.HarmonyManager.prototype.getHarmoniesWithThisTile = function(tile) {
+UndergrowthHarmonyManager.prototype.getHarmoniesWithThisTile = function(tile) {
 	var results = [];
 	this.harmonies.forEach(function(harmony) {
 		if (harmony.containsTile(tile)) {
@@ -147,7 +151,7 @@ Undergrowth.HarmonyManager.prototype.getHarmoniesWithThisTile = function(tile) {
 	return results;
 };
 
-Undergrowth.HarmonyManager.prototype.getClashesWithThisTile = function(tile) {
+UndergrowthHarmonyManager.prototype.getClashesWithThisTile = function(tile) {
 	var results = [];
 	this.clashes.forEach(function(harmony) {
 		if (harmony.containsTile(tile)) {
@@ -157,7 +161,7 @@ Undergrowth.HarmonyManager.prototype.getClashesWithThisTile = function(tile) {
 	return results;
 };
 
-Undergrowth.HarmonyManager.prototype.addHarmony = function(harmony) {
+UndergrowthHarmonyManager.prototype.addHarmony = function(harmony) {
 	// Add harmony if it doesn't already exist
 
 	// Does it exist in old set of harmonies?
@@ -175,7 +179,7 @@ Undergrowth.HarmonyManager.prototype.addHarmony = function(harmony) {
 	}
 };
 
-Undergrowth.HarmonyManager.prototype.addHarmonies = function(harmoniesToAdd) {
+UndergrowthHarmonyManager.prototype.addHarmonies = function(harmoniesToAdd) {
 	if (!harmoniesToAdd) {
 		return;
 	}
@@ -185,7 +189,7 @@ Undergrowth.HarmonyManager.prototype.addHarmonies = function(harmoniesToAdd) {
 	}
 };
 
-Undergrowth.HarmonyManager.prototype.addClash = function(harmony) {
+UndergrowthHarmonyManager.prototype.addClash = function(harmony) {
 	// Add harmony if it doesn't already exist
 
 	// Does it exist in old set of harmonies?
@@ -201,7 +205,7 @@ Undergrowth.HarmonyManager.prototype.addClash = function(harmony) {
 	}
 };
 
-Undergrowth.HarmonyManager.prototype.addClashes = function(harmoniesToAdd) {
+UndergrowthHarmonyManager.prototype.addClashes = function(harmoniesToAdd) {
 	if (!harmoniesToAdd) {
 		return;
 	}
@@ -211,12 +215,12 @@ Undergrowth.HarmonyManager.prototype.addClashes = function(harmoniesToAdd) {
 	}
 };
 
-Undergrowth.HarmonyManager.prototype.clearList = function() {
+UndergrowthHarmonyManager.prototype.clearList = function() {
 	this.harmonies = [];
 	this.clashes = [];
 };
 
-Undergrowth.HarmonyManager.prototype.getWinningPlayer = function() {
+UndergrowthHarmonyManager.prototype.getWinningPlayer = function() {
 	if (gameOptionEnabled(FULL_POINTS_SCORING)) {
 		var harmonyPoints = this.getHarmonyPoints(this.harmonies);
 		var clashPoints = this.getHarmonyPoints(this.clashes);
@@ -234,7 +238,7 @@ Undergrowth.HarmonyManager.prototype.getWinningPlayer = function() {
 	}
 };
 
-Undergrowth.HarmonyManager.prototype.getScoreSummaryText = function() {
+UndergrowthHarmonyManager.prototype.getScoreSummaryText = function() {
 	var numHarmonies = this.numHarmonies();
 	var numClashes = this.numClashes();
 
@@ -244,7 +248,7 @@ Undergrowth.HarmonyManager.prototype.getScoreSummaryText = function() {
 	return message;
 };
 
-Undergrowth.HarmonyManager.prototype.getHarmonyPoints = function(harmonyList) {
+UndergrowthHarmonyManager.prototype.getHarmonyPoints = function(harmonyList) {
 	var points = 0;
 	for (var i = 0; i < harmonyList.length; i++) {
 		var harmony = harmonyList[i];
@@ -260,10 +264,10 @@ Undergrowth.HarmonyManager.prototype.getHarmonyPoints = function(harmonyList) {
 	return points;
 };
 
-Undergrowth.HarmonyManager.prototype.numHarmonies = function() {
+UndergrowthHarmonyManager.prototype.numHarmonies = function() {
 	return this.harmonies.length;
 };
 
-Undergrowth.HarmonyManager.prototype.numClashes = function() {
+UndergrowthHarmonyManager.prototype.numClashes = function() {
 	return this.clashes.length;
 };

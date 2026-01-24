@@ -1,5 +1,4 @@
-
-function HexentaflBoardPoint() {
+export function HexentaflBoardPoint() {
 	this.types = [];
 	this.row = -1;
 	this.col = -1;

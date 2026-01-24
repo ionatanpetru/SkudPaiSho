@@ -1,6 +1,24 @@
 // Spirit Actuator
 
-function SpiritActuator(gameContainer, isMobile) {
+import {
+  NON_PLAYABLE,
+  POSSIBLE_MOVE,
+} from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import { SpiritController, SpiritPreferences } from './SpiritController';
+import { SpiritTileManager } from './SpiritTileManager';
+import {
+  clearMessage,
+  gameController,
+  getUserGamePreference,
+  pointClicked,
+  showPointMessage,
+  showTileMessage,
+  unplayedTileClicked
+} from '../PaiShoMain';
+import { createBoardPointDiv, setupPaiShoBoard } from '../ActuatorHelp';
+import { debug } from '../GameData';
+
+export function SpiritActuator(gameContainer, isMobile) {
 	this.gameContainer = gameContainer;
 	this.mobile = isMobile;
 
@@ -93,11 +111,14 @@ SpiritActuator.prototype.addTile = function(tile, mainContainer) {
 	theDiv.setAttribute("id", tile.id);
 
 	if (this.mobile) {
-		theDiv.setAttribute("onclick", "unplayedTileClicked(this); showTileMessage(this);");
+		theDiv.addEventListener('click', () => {
+				unplayedTileClicked(this);
+				showTileMessage(this);
+			});
 	} else {
-		theDiv.setAttribute("onclick", "unplayedTileClicked(this);");
-		theDiv.setAttribute("onmouseover", "showTileMessage(this);");
-		theDiv.setAttribute("onmouseout", "clearMessage();");
+		theDiv.addEventListener('click', () => unplayedTileClicked(this));
+		theDiv.addEventListener('mouseover', () => showTileMessage(this));
+		theDiv.addEventListener('mouseout', clearMessage);
 	}
 
 	container.appendChild(theDiv);
@@ -115,12 +136,18 @@ SpiritActuator.prototype.addBoardPoint = function(boardPoint) {
 		}
 		
 		if (this.mobile) {
-			// Using ontouchstart instead of onclick, to try it out
-			theDiv.setAttribute("ontouchstart", "pointClicked(this); showPointMessage(this);");
+			// Using touchstart instead of click, to try it out
+			theDiv.addEventListener('touchstart', function() {
+				pointClicked(this);
+				showPointMessage(this);
+			});
 		} else {
-			theDiv.setAttribute("onclick", "pointClicked(this);");
-			theDiv.setAttribute("onmouseover", "showPointMessage(this); gameController.showCaptureHelpOnHover(this);");
-			theDiv.setAttribute("onmouseout", "clearMessage();");
+			theDiv.addEventListener('click', function() { pointClicked(this); });
+			theDiv.addEventListener('mouseover', function() {
+				showPointMessage(this);
+				gameController.showCaptureHelpOnHover(this);
+			});
+			theDiv.addEventListener('mouseout', clearMessage);
 		}
 	}
 

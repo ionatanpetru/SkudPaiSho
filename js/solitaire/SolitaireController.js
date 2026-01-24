@@ -1,6 +1,52 @@
 /* Solitaire Pai Sho specific UI interaction logic */
 
-function SolitaireController(gameContainer, isMobile) {
+import {
+  ACCENT_TILE,
+  debug,
+} from '../GameData';
+import {
+  newKnotweedRules,
+  rocksUnwheelable,
+  simpleRocks,
+  simplest,
+} from '../skud-pai-sho/SkudPaiShoRules';
+import {
+  BRAND_NEW,
+  GameType,
+  WAITING_FOR_ENDPOINT,
+  callSubmitMove,
+  createGameIfThatIsOk,
+  currentMoveIndex,
+  finalizeMove,
+  getCurrentPlayer,
+  getGameOptionsMessageElement,
+  getNeutralPointMessage,
+  getRedPointMessage,
+  getRedWhitePointMessage,
+  getWhitePointMessage,
+  myTurn,
+  onlinePlayEnabled,
+  playingOnlineGame,
+  toBullets,
+  toHeading,
+} from '../PaiShoMain';
+import {
+  GATE,
+  NEUTRAL,
+  POSSIBLE_MOVE,
+} from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import { GUEST, HOST, NotationPoint, PLANTING } from '../CommonNotationObjects';
+import { RED, WHITE } from '../skud-pai-sho/SkudPaiShoTile';
+import { SolitaireActuator } from './SolitaireActuator';
+import { SolitaireGameManager } from './SolitaireGameManager';
+import {
+  SolitaireGameNotation,
+  SolitaireNotationBuilder,
+} from './SolitaireGameNotation';
+import { SolitaireTile } from './SolitaireTile';
+import { hostPlayerCode } from '../pai-sho-common/PaiShoPlayerHelp';
+
+export function SolitaireController(gameContainer, isMobile) {
 	this.actuator = new SolitaireActuator(gameContainer, isMobile);
 
 	this.showGameMessageUnderneath = true;
@@ -104,14 +150,17 @@ SolitaireController.prototype.getDefaultHelpMessageText = function() {
 };
 
 SolitaireController.prototype.getAdditionalMessage = function() {
-	var msg = "";
+	const container = document.createElement('span');
 	if (this.gameNotation.moves.length === 0) {
-		msg += getGameOptionsMessageHtml(GameType.SolitairePaiSho.gameOptions);
+		container.appendChild(getGameOptionsMessageElement(GameType.SolitairePaiSho.gameOptions));
 	}
 	if (!this.theGame.getWinner()) {
-		msg += "<br /><strong>" + this.theGame.getWinReason() + "</strong>";
+		container.appendChild(document.createElement('br'));
+		const strong = document.createElement('strong');
+		strong.textContent = this.theGame.getWinReason();
+		container.appendChild(strong);
 	}
-	return msg;
+	return container;
 };
 
 SolitaireController.prototype.unplayedTileClicked = function(tileDiv) {
@@ -309,7 +358,7 @@ SolitaireController.prototype.addTileSummaryToMessageArr = function(message, til
 		message.push("Forms Disharmony with " + clashTile + " and the Orchid");
 	} else {
 		if (tileCode === 'R') {
-			heading = "Accent Tile: Rock";
+			var heading = "Accent Tile: Rock";
 			if (simplest) {
 				message.push("The Rock disrupts Harmonies and cannot be moved by a Wheel.");
 			} else if (rocksUnwheelable) {
@@ -339,8 +388,8 @@ SolitaireController.prototype.addTileSummaryToMessageArr = function(message, til
 			heading = "Accent Tile: Boat";
 			if (simplest || rocksUnwheelable) {
 				message.push("The Boat moves a Flower Tile to a surrounding space or removes an Accent tile.");
-			} else if (rocksUnwheelable) {
-				message.push("The Boat moves a Flower Tile to a surrounding space or removes a Rock or Knotweed tile.");
+			/*} else if (rocksUnwheelable) {
+				message.push("The Boat moves a Flower Tile to a surrounding space or removes a Rock or Knotweed tile."); */
 			} else {
 				message.push("The Boat moves a Flower Tile to a surrounding space or removes a Knotweed tile.");
 			}

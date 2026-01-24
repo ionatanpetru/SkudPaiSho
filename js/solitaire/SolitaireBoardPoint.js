@@ -1,20 +1,33 @@
 // Solitaire Board Point
 
-var NON_PLAYABLE = "Non-Playable";
-var NEUTRAL = "Neutral";
-// var RED = "Red";
-// var WHITE = "White";
-var GATE = "Gate";
+// var NON_PLAYABLE = "Non-Playable";
+// var NEUTRAL = "Neutral";
+// // var RED = "Red";
+// // var WHITE = "White";
+// var GATE = "Gate";
 
-var POSSIBLE_MOVE = "Possible Move";
-var OPEN_GATE = "OPEN GATE";
+// var POSSIBLE_MOVE = "Possible Move";
+// var OPEN_GATE = "OPEN GATE";
 
-var thinDot = "·";
-var thickDot = "•";
-var whiteDot = "◦";
-var gateDot = "⟡";
+// var thinDot = "·";
+// var thickDot = "•";
+// var whiteDot = "◦";
+// var gateDot = "⟡";
 
-function SolitaireBoardPoint() {
+import { ACCENT_TILE, BASIC_FLOWER, SPECIAL_FLOWER } from '../GameData';
+import {
+  GATE,
+  NEUTRAL,
+  NON_PLAYABLE,
+  gateDot,
+  thickDot,
+  thinDot,
+  whiteDot,
+} from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import { GUEST, HOST } from '../CommonNotationObjects';
+import { RED, WHITE } from '../skud-pai-sho/SkudPaiShoTile';
+
+export function SolitaireBoardPoint() {
 	this.types = [];
 	this.row = -1;
 	this.col = -1;

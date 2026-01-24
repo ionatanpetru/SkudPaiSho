@@ -13,7 +13,7 @@ var thickDot = "•";
 var whiteDot = "◦";
 var gateDot = "⟡";
 
-function PlaygroundBoardPoint() {
+export function PlaygroundBoardPoint() {
 	this.types = [];
 	this.row = -1;
 	this.col = -1;

@@ -1,5 +1,6 @@
+import { TrifleTargetHelper } from '../TargetHelper';
 
-Trifle.AllTilesTargetBrain = function(abilityObject) {
+export function TrifleAllTilesTargetBrain(abilityObject) {
 	this.abilityObject = abilityObject;
 	this.board = abilityObject.board;
 
@@ -9,13 +10,13 @@ Trifle.AllTilesTargetBrain = function(abilityObject) {
 	this.setTargets();
 }
 
-Trifle.AllTilesTargetBrain.prototype.setTargets = function() {
+TrifleAllTilesTargetBrain.prototype.setTargets = function() {
 	this.targetTiles = [];
 	this.targetTilePoints = [];
 	
 	var self = this;
 	this.board.forEachBoardPointWithTile(function(boardPointWithTile) {
-		var targetHelper = new Trifle.TargetHelper(self.abilityObject, boardPointWithTile, self);
+		var targetHelper = new TrifleTargetHelper(self.abilityObject, boardPointWithTile, self);
 		if (targetHelper.tileIsTargeted()) {
 			self.targetTiles.push(boardPointWithTile.tile);
 			self.targetTilePoints.push(boardPointWithTile);
@@ -23,7 +24,7 @@ Trifle.AllTilesTargetBrain.prototype.setTargets = function() {
 	});
 
 	this.board.tileManager.getAllTiles().forEach(function(tile) {
-		var targetHelper = new Trifle.TargetHelper(self.abilityObject, null, self, tile);
+		var targetHelper = new TrifleTargetHelper(self.abilityObject, null, self, tile);
 		if (targetHelper.tileIsTargeted()) {
 			self.targetTiles.push(tile);
 		}

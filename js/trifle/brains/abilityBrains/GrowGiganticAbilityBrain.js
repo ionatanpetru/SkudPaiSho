@@ -1,10 +1,10 @@
 
-Trifle.GrowGiganticAbilityBrain = function(abilityObject) {
+export function TrifleGrowGiganticAbilityBrain(abilityObject) {
 	this.abilityObject = abilityObject;
 	this.board = abilityObject.board;
 }
 
-Trifle.GrowGiganticAbilityBrain.prototype.activateAbility = function() {
+TrifleGrowGiganticAbilityBrain.prototype.activateAbility = function() {
 	var targetTilePoints = this.abilityObject.abilityTargetTilePoints;
 
 	// if (this.abilityObject.sourceTilePoint.occupiedByAbility) {	// What's best checks here?

@@ -1,6 +1,9 @@
 // Skud Pai Sho Game Manager
 
-function PlaygroundGameManager(actuator, ignoreActuate, isCopy) {
+import { debug } from '../GameData';
+import { lessBonus, limitedGatesRule, newGatesRule, newSpecialFlowerRules } from '../skud-pai-sho/SkudPaiShoRules';
+
+export function PlaygroundGameManager(actuator, ignoreActuate, isCopy) {
 	this.isCopy = isCopy;
 
 	this.actuator = actuator;

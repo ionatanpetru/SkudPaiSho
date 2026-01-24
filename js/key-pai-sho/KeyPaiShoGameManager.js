@@ -1,12 +1,32 @@
 // Key Pai Sho Game Manager
 
-KeyPaiSho.GameManager = function(actuator, ignoreActuate, isCopy) {
+import { ARRANGING, GUEST, HOST, PLANTING } from '../CommonNotationObjects';
+import { GATE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import { KeyPaiShoBoard } from './KeyPaiShoBoard';
+import { KeyPaiShoTile, KeyPaiShoTileCodes } from './KeyPaiShoTile';
+import { KeyPaiShoTileManager } from './KeyPaiShoTileManager';
+import { PaiShoMarkingManager } from '../pai-sho-common/PaiShoMarkingManager';
+import {
+  SPECIAL_FLOWER,
+  debug,
+} from '../GameData';
+import {
+  lessBonus,
+  limitedGatesRule,
+  newGatesRule,
+  newSpecialFlowerRules,
+} from '../skud-pai-sho/SkudPaiShoRules';
+import { SPECIAL_FLOWERS_BOUNCE, gameOptionEnabled } from '../GameOptions';
+import { getOpponentName } from '../pai-sho-common/PaiShoPlayerHelp';
+import { setGameLogText } from '../PaiShoMain';
+
+export function KeyPaiShoGameManager(actuator, ignoreActuate, isCopy) {
 	this.gameLogText = '';
 	this.isCopy = isCopy;
 
 	this.actuator = actuator;
 
-	this.tileManager = new KeyPaiSho.TileManager();
+	this.tileManager = new KeyPaiShoTileManager();
 	this.markingManager = new PaiShoMarkingManager();
 
 	this.setup(ignoreActuate);
@@ -14,8 +34,8 @@ KeyPaiSho.GameManager = function(actuator, ignoreActuate, isCopy) {
 }
 
 // Set up the game
-KeyPaiSho.GameManager.prototype.setup = function (ignoreActuate) {
-	this.board = new KeyPaiSho.Board();
+KeyPaiShoGameManager.prototype.setup = function (ignoreActuate) {
+	this.board = new KeyPaiShoBoard();
 
 	this.board.setHarmonyMinima(4);	// Default value
 
@@ -28,7 +48,7 @@ KeyPaiSho.GameManager.prototype.setup = function (ignoreActuate) {
 };
 
 // Sends the updated board to the actuator
-KeyPaiSho.GameManager.prototype.actuate = function (moveToAnimate, moveAnimationBeginStep, hideCenterPointTile) {
+KeyPaiShoGameManager.prototype.actuate = function (moveToAnimate, moveAnimationBeginStep, hideCenterPointTile) {
 	if (this.isCopy) {
 		return;
 	}
@@ -36,7 +56,7 @@ KeyPaiSho.GameManager.prototype.actuate = function (moveToAnimate, moveAnimation
 	setGameLogText(this.gameLogText);
 };
 
-KeyPaiSho.GameManager.prototype.runNotationMove = function(move, withActuate, moveAnimationBeginStep) {
+KeyPaiShoGameManager.prototype.runNotationMove = function(move, withActuate, moveAnimationBeginStep) {
 	debug("Running Move(" + (withActuate ? "" : "Not ") + "Actuated): " + move.fullMoveText);
 
 	if (this.centerGateActive && move.player === this.board.getBoardPoint(8, 8).tile.ownerName) {
@@ -86,7 +106,7 @@ KeyPaiSho.GameManager.prototype.runNotationMove = function(move, withActuate, mo
 
 		this.buildPlantingGameLogText(move, tile);
 	} else if (move.moveType === ARRANGING) {
-		moveResults = this.board.moveTile(move.player, move.startPoint, move.endPoint);
+		var moveResults = this.board.moveTile(move.player, move.startPoint, move.endPoint);
 		bonusAllowed = moveResults.bonusAllowed;
 
 		move.capturedTile = moveResults.capturedTile;
@@ -97,7 +117,7 @@ KeyPaiSho.GameManager.prototype.runNotationMove = function(move, withActuate, mo
 			if (move.boatBonusPoint) {
 				this.board.placeTile(tile, move.bonusEndPoint, this.tileManager, move.boatBonusPoint);
 			} else {
-				placeTileResult = this.board.placeTile(tile, move.bonusEndPoint, this.tileManager);
+				var placeTileResult = this.board.placeTile(tile, move.bonusEndPoint, this.tileManager);
 				if (placeTileResult && placeTileResult.tileRemovedWithBoat) {
 					move.tileRemovedWithBoat = placeTileResult.tileRemovedWithBoat;
 				}
@@ -150,15 +170,15 @@ KeyPaiSho.GameManager.prototype.runNotationMove = function(move, withActuate, mo
 	return bonusAllowed;
 };
 
-KeyPaiSho.GameManager.prototype.buildChooseAccentTileGameLogText = function(move) {
+KeyPaiShoGameManager.prototype.buildChooseAccentTileGameLogText = function(move) {
 	this.gameLogText = move.moveNum + move.playerCode + '. '
 		+ move.player + ' chose Accent Tiles ' + move.accentTiles;
 };
-KeyPaiSho.GameManager.prototype.buildPlantingGameLogText = function(move, tile) {
+KeyPaiShoGameManager.prototype.buildPlantingGameLogText = function(move, tile) {
 	this.gameLogText = move.moveNum + move.playerCode + '. '
 		+ move.player + ' Planted ' + tile.getName() + ' at ' + move.endPoint.pointText;
 };
-KeyPaiSho.GameManager.prototype.buildArrangingGameLogText = function(move, moveResults) {
+KeyPaiShoGameManager.prototype.buildArrangingGameLogText = function(move, moveResults) {
 	if (!moveResults) {
 		return "Invalid Move :(";
 	}
@@ -168,11 +188,11 @@ KeyPaiSho.GameManager.prototype.buildArrangingGameLogText = function(move, moveR
 		this.gameLogText += ' to capture ' + getOpponentName(move.player) + '\'s ' + moveResults.capturedTile.getName();
 	}
 	if (moveResults.bonusAllowed && move.hasHarmonyBonus()) {
-		this.gameLogText += ' and used ' + KeyPaiSho.Tile.getTileName(move.bonusTileCode) + ' on Harmony Bonus';
+		this.gameLogText += ' and used ' + KeyPaiShoTile.getTileName(move.bonusTileCode) + ' on Harmony Bonus';
 	}
 };
 
-KeyPaiSho.GameManager.prototype.revealPossibleMovePoints = function(player, boardPoint, ignoreActuate) {
+KeyPaiShoGameManager.prototype.revealPossibleMovePoints = function(player, boardPoint, ignoreActuate) {
 	if (!boardPoint.hasTile()) {
 		return;
 	}
@@ -193,11 +213,11 @@ KeyPaiSho.GameManager.prototype.revealPossibleMovePoints = function(player, boar
 	}
 };
 
-KeyPaiSho.GameManager.prototype.playerMustMoveCenterLotus = function(player) {
+KeyPaiShoGameManager.prototype.playerMustMoveCenterLotus = function(player) {
 	return this.board.playerHasCenterPointGate(player);
 };
 
-KeyPaiSho.GameManager.prototype.hidePossibleMovePoints = function(ignoreActuate, moveToAnimate) {
+KeyPaiShoGameManager.prototype.hidePossibleMovePoints = function(ignoreActuate, moveToAnimate) {
 	this.board.removePossibleMovePoints();
 	this.tileManager.removeSelectedTileFlags();
 
@@ -212,12 +232,12 @@ KeyPaiSho.GameManager.prototype.hidePossibleMovePoints = function(ignoreActuate,
 	}
 };
 
-KeyPaiSho.GameManager.prototype.revealOpenGates = function(player, tile, moveNum, ignoreActuate) {
+KeyPaiShoGameManager.prototype.revealOpenGates = function(player, tile, moveNum, ignoreActuate) {
 	if (this.board.playerControlsLessThanTwoGates(player)
 			&& !this.board.playerHasCenterPointGate(player)) {
 		this.board.setOpenGatePossibleMoves(player, tile);
 
-		if (tile.code === KeyPaiSho.TileCodes.Lotus) {
+		if (tile.code === KeyPaiShoTileCodes.Lotus) {
 			this.board.setCenterPointGatePossibleMove(player, tile);
 		} else {
 			this.board.ensureCenterPointGateNotPossibleMove(player, tile);
@@ -228,7 +248,7 @@ KeyPaiSho.GameManager.prototype.revealOpenGates = function(player, tile, moveNum
 	}
 };
 
-KeyPaiSho.GameManager.prototype.playerCanBonusPlant = function(player) {
+KeyPaiShoGameManager.prototype.playerCanBonusPlant = function(player) {
 	if (!newGatesRule) {
 		return true;
 	}
@@ -244,7 +264,7 @@ KeyPaiSho.GameManager.prototype.playerCanBonusPlant = function(player) {
 	}
 };
 
-KeyPaiSho.GameManager.prototype.revealSpecialFlowerPlacementPoints = function(player, tile) {
+KeyPaiShoGameManager.prototype.revealSpecialFlowerPlacementPoints = function(player, tile) {
 	if (!newSpecialFlowerRules) {
 		this.revealOpenGates(player, tile);
 		return;
@@ -254,25 +274,25 @@ KeyPaiSho.GameManager.prototype.revealSpecialFlowerPlacementPoints = function(pl
 	this.actuate();
 };
 
-KeyPaiSho.GameManager.prototype.revealPossiblePlacementPoints = function(tile) {
+KeyPaiShoGameManager.prototype.revealPossiblePlacementPoints = function(tile) {
 	this.board.revealPossiblePlacementPoints(tile);
 	this.actuate();
 };
 
-KeyPaiSho.GameManager.prototype.revealBoatBonusPoints = function(boardPoint) {
+KeyPaiShoGameManager.prototype.revealBoatBonusPoints = function(boardPoint) {
 	this.board.revealBoatBonusPoints(boardPoint);
 	this.actuate();
 };
 
-KeyPaiSho.GameManager.prototype.aPlayerIsOutOfBasicFlowerTiles = function() {
+KeyPaiShoGameManager.prototype.aPlayerIsOutOfBasicFlowerTiles = function() {
 	return this.tileManager.aPlayerIsOutOfBasicFlowerTiles();
 };
 
-KeyPaiSho.GameManager.prototype.playerHasNotPlayedEitherSpecialTile = function(playerName) {
+KeyPaiShoGameManager.prototype.playerHasNotPlayedEitherSpecialTile = function(playerName) {
 	return this.tileManager.playerHasBothSpecialTilesRemaining(playerName);
 };
 
-KeyPaiSho.GameManager.prototype.getWinner = function() {
+KeyPaiShoGameManager.prototype.getWinner = function() {
 	if (this.board.winners.length === 1) {
 		return this.board.winners[0];
 	} else if (this.board.winners.length > 1) {
@@ -284,7 +304,7 @@ KeyPaiSho.GameManager.prototype.getWinner = function() {
 	}
 };
 
-KeyPaiSho.GameManager.prototype.getWinReason = function() {
+KeyPaiShoGameManager.prototype.getWinReason = function() {
 	if (this.board.winners.length === 1) {
 		return " created a Harmony Ring and won the game!";
 	} else if (this.endGameWinners.length === 1) {
@@ -296,7 +316,7 @@ KeyPaiSho.GameManager.prototype.getWinReason = function() {
 	}
 };
 
-KeyPaiSho.GameManager.prototype.getWinResultTypeCode = function() {
+KeyPaiShoGameManager.prototype.getWinResultTypeCode = function() {
 	if (this.board.winners.length === 1) {
 		return 1;	// Harmony Ring is 1
 	} else if (this.endGameWinners.length === 1) {
@@ -306,8 +326,8 @@ KeyPaiSho.GameManager.prototype.getWinResultTypeCode = function() {
 	}
 };
 
-KeyPaiSho.GameManager.prototype.getCopy = function() {
-	var copyGame = new KeyPaiSho.GameManager(this.actuator, true, true);
+KeyPaiShoGameManager.prototype.getCopy = function() {
+	var copyGame = new KeyPaiShoGameManager(this.actuator, true, true);
 	copyGame.board = this.board.getCopy();
 	copyGame.tileManager = this.tileManager.getCopy();
 	return copyGame;

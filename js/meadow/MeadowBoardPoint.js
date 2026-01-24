@@ -1,5 +1,5 @@
 
-function MeadowBoardPoint() {
+export function MeadowBoardPoint() {
 	this.types = [];
 	this.row = -1;
 	this.col = -1;

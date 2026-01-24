@@ -1,6 +1,15 @@
 /* Adevar Pai Sho Harmony */
 
-function AdevarHarmony(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn) {
+import { AdevarTileType } from './AdevarTile';
+import {
+  GUEST,
+  HOST,
+  NotationPoint,
+  RowAndColumn,
+} from '../CommonNotationObjects';
+import { debug } from '../GameData';
+
+export function AdevarHarmony(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn) {
 	this.tile1 = tile1;
 	this.tile1Pos = new RowAndColumn(tile1RowAndColumn.row, tile1RowAndColumn.col);
 	this.tile2 = tile2;
@@ -141,7 +150,7 @@ AdevarHarmony.prototype.crossesCenter = function() {
 
 
 // HarmonyManager manages list of harmonies
-function AdevarHarmonyManager() {
+export function AdevarHarmonyManager() {
 	this.harmonies = [];
 }
 
@@ -594,7 +603,7 @@ AdevarHarmonyManager.prototype.lookForRings = function(t1, tx, originalChain) {
 	var rings = [];
 	var keepLookingAtTheseHarmonies = [];
 	for (var i = 0; i < this.harmonies.length; i++) {	// Any complete rings?
-		currentChain = originalChain.slice();
+		var currentChain = originalChain.slice();
 		var hx = this.harmonies[i];
 		if (hx.containsTile(t1) && hx.notAnyOfThese(currentChain)) {
 			currentChain.push(hx);

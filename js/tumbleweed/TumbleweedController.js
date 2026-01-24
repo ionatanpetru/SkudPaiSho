@@ -1,5 +1,5 @@
 
-function TumbleweedController(gameContainer, isMobile) {
+export function TumbleweedController(gameContainer, isMobile) {
 	if (!isMobile) {
 		this.additionalTilePileClass = "desktop";
 	} else {
@@ -110,31 +110,60 @@ TumbleweedController.prototype.getDefaultHelpMessageText = function() {
 
 /* Required by Main */
 TumbleweedController.prototype.getAdditionalMessage = function() {
-	var msg = "";
+	const container = document.createElement('span');
 
 	if (!this.theGame.getWinner()) {
 		if (this.gameNotation.moves.length < TumbleweedController.getGameSetupCompleteMoveNumber()) {
-			msg += "To begin a game, the Host places one of the Guest's pieces (red), and then one of their own.";
+			container.appendChild(document.createTextNode('To begin a game, the Host places one of the Guest\'s pieces (red), and then one of their own.'));
 			if (gameOptionEnabled(CHOOSE_NEUTRAL_STACK_SPACE)) {
-				msg += "<br />The Host will then place a neutral settlement of value 2 on the board.";
+				container.appendChild(document.createElement('br'));
+				container.appendChild(document.createTextNode('The Host will then place a neutral settlement of value 2 on the board.'));
 			}
-			msg += "<br />Then the Guest will choose to begin playing or swap the position of the pieces on the board.";
+			container.appendChild(document.createElement('br'));
+			container.appendChild(document.createTextNode('Then the Guest will choose to begin playing or swap the position of the pieces on the board.'));
 			if (this.gameNotation.moves.length === 0) {
-				msg += getGameOptionsMessageHtml(GameType.Tumbleweed.gameOptions);
+				container.appendChild(getGameOptionsMessageElement(GameType.Tumbleweed.gameOptions));
 			}
 		} else if (this.gameNotation.moves.length === TumbleweedController.getGameSetupCompleteMoveNumber() && !gameOptionEnabled(NO_SETUP_PHASE)) {
-			msg += "<br />Make the first move or choose to <span class='skipBonus' onclick='gameController.doSwap();'>swap initial pieces</span><br />";
+			container.appendChild(document.createElement('br'));
+			container.appendChild(document.createTextNode('Make the first move or choose to '));
+
+			const swapSpan = document.createElement('span');
+			swapSpan.className = 'skipBonus';
+			swapSpan.textContent = 'swap initial pieces';
+			swapSpan.onclick = () => gameController.doSwap();
+			container.appendChild(swapSpan);
+
+			container.appendChild(document.createElement('br'));
 		} else if (this.gameNotation.moves.length > TumbleweedController.getGameSetupCompleteMoveNumber()) {
 			if (this.theGame.passInSuccessionCount === 1) {
-				msg += "<br />" + getOpponentName(this.getCurrentPlayer()) + " has passed. Passing now will end the game and total territory will be counted.";
+				container.appendChild(document.createElement('br'));
+				container.appendChild(document.createTextNode(getOpponentName(this.getCurrentPlayer()) + ' has passed. Passing now will end the game and total territory will be counted.'));
 			}
-			msg += "<br /><span class='skipBonus' onclick='gameController.passTurn();'>Pass turn</span><br />";
-			msg += "<br /><span>Host settlements: " + this.theGame.hostScore + "</span>";
-			msg += "<br /><span>Guest settlements: " + this.theGame.guestScore + "</span>";
+			container.appendChild(document.createElement('br'));
+
+			const passSpan = document.createElement('span');
+			passSpan.className = 'skipBonus';
+			passSpan.textContent = 'Pass turn';
+			passSpan.onclick = () => gameController.passTurn();
+			container.appendChild(passSpan);
+
+			container.appendChild(document.createElement('br'));
+			container.appendChild(document.createElement('br'));
+
+			const hostScoreSpan = document.createElement('span');
+			hostScoreSpan.textContent = 'Host settlements: ' + this.theGame.hostScore;
+			container.appendChild(hostScoreSpan);
+
+			container.appendChild(document.createElement('br'));
+
+			const guestScoreSpan = document.createElement('span');
+			guestScoreSpan.textContent = 'Guest settlements: ' + this.theGame.guestScore;
+			container.appendChild(guestScoreSpan);
 		}
 	}
 
-	return msg;
+	return container;
 };
 
 /* Using my own version of this, called directly instead of from Main */

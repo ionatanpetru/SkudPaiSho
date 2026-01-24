@@ -1,6 +1,15 @@
 /* Street Pai Sho Tile */
 
-function StreetTile(ownerCode) {
+import {
+  BONUS_MOVEMENT_5,
+  BONUS_MOVEMENT_BASED_ON_NUM_CAPTIVES,
+  gameOptionEnabled,
+} from '../GameOptions';
+import { GUEST, HOST } from '../CommonNotationObjects';
+import { debug } from '../GameData';
+import { tileIdIncrement } from '../skud-pai-sho/SkudPaiShoTile';
+
+export function StreetTile(ownerCode) {
 	this.code = "L";
 	this.ownerCode = ownerCode;
 	if (this.ownerCode === 'G') {
@@ -10,7 +19,7 @@ function StreetTile(ownerCode) {
 	} else {
 		debug("INCORRECT OWNER CODE");
 	}
-	this.id = tileId++;
+	this.id = tileIdIncrement();
 	this.selectedFromPile = false;
 }
 
@@ -38,7 +47,7 @@ StreetTile.prototype.getMoveDistance = function() {
 StreetTile.prototype.getNumCaptivesInStack = function() {
 	if (this.capturedTile) {
 		return this.capturedTile.getNumCaptivesInStack() + 1;
-	};
+	}
 	return 0;
 };
 

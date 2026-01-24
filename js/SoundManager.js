@@ -1,7 +1,11 @@
+import { peekRandomFromArray } from "./GameData";
+import { LocalSoundStorageManager } from "./LocalStorage";
+import { Base64Binary } from "./base64-binary";
+
 /**
  * Sound Manager
  */
-function SoundManager() {
+export function SoundManager() {
 	this.isUnlocked = false;
 
 	this.webAudioError = false;
@@ -15,7 +19,7 @@ function SoundManager() {
     this.lastIndex = 0;
 	
 	if (typeof webkitAudioContext !== 'undefined') {
-		this.context = new webkitAudioContext();
+		this.context = new window.webkitAudioContext();
 	} else if (typeof AudioContext !== 'undefined') {
 		this.context = new AudioContext();
 	}

@@ -1,6 +1,30 @@
 // Actuator
 
-function SolitaireActuator(gameContainer, isMobile) {
+import {
+  MARKED,
+  NON_PLAYABLE,
+  POSSIBLE_MOVE,
+} from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import {
+  RmbDown,
+  RmbUp,
+  clearMessage,
+  pointClicked,
+  showPointMessage,
+  showTileMessage,
+  unplayedTileClicked,
+} from '../PaiShoMain';
+import { SolitaireController } from './SolitaireController';
+import { SolitaireTileManager } from './SolitaireTileManager';
+import {
+  createBoardArrow,
+  createBoardPointDiv,
+  getSkudTilesSrcPath,
+  setupPaiShoBoard,
+} from '../ActuatorHelp';
+import { debug } from '../GameData';
+
+export function SolitaireActuator(gameContainer, isMobile) {
 	this.gameContainer = gameContainer;
 	this.mobile = isMobile;
 
@@ -101,11 +125,14 @@ SolitaireActuator.prototype.addTile = function(tile, mainContainer) {
 	theDiv.setAttribute("id", tile.id);
 
 	if (this.mobile) {
-		theDiv.setAttribute("onclick", "unplayedTileClicked(this); showTileMessage(this);");
+		theDiv.addEventListener('click', () => {
+				unplayedTileClicked(this);
+				showTileMessage(this);
+			});
 	} else {
-		theDiv.setAttribute("onclick", "unplayedTileClicked(this);");
-		theDiv.setAttribute("onmouseover", "showTileMessage(this);");
-		theDiv.setAttribute("onmouseout", "clearMessage();");
+		theDiv.addEventListener('click', () => unplayedTileClicked(this));
+		theDiv.addEventListener('mouseover', () => showTileMessage(this));
+		theDiv.addEventListener('mouseout', clearMessage);
 	}
 
 	container.appendChild(theDiv);
@@ -134,11 +161,14 @@ SolitaireActuator.prototype.addBoardPoint = function(boardPoint) {
 		}
 		
 		if (this.mobile) {
-			theDiv.setAttribute("onclick", "pointClicked(this); showPointMessage(this);");
+			theDiv.addEventListener('click', function() {
+				pointClicked(this);
+				showPointMessage(this);
+			});
 		} else {
-			theDiv.setAttribute("onclick", "pointClicked(this);");
-			theDiv.setAttribute("onmouseover", "showPointMessage(this);");
-			theDiv.setAttribute("onmouseout", "clearMessage();");
+			theDiv.addEventListener('click', function() { pointClicked(this); });
+			theDiv.addEventListener('mouseover', function() { showPointMessage(this); });
+			theDiv.addEventListener('mouseout', clearMessage);
 			theDiv.addEventListener('mousedown', e => {
 				 // Right Mouse Button
 				if (e.button == 2) {

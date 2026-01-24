@@ -1,6 +1,38 @@
 // Actuator
 
-KeyPaiSho.Actuator = function(gameContainer, isMobile, enableAnimations) {
+import { ACCENT_TILE, debug } from '../GameData';
+import { ARRANGING, PLANTING } from '../CommonNotationObjects';
+import {
+  GATE,
+  MARKED,
+  NON_PLAYABLE,
+  POSSIBLE_MOVE,
+} from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import { KeyPaiShoController } from './KeyPaiShoController';
+import { KeyPaiShoOptions } from './KeyPaiShoOptions';
+import { KeyPaiShoTileManager } from './KeyPaiShoTileManager';
+import { NO_HARMONY_VISUAL_AIDS, gameOptionEnabled } from '../GameOptions';
+import {
+  RmbDown,
+  RmbUp,
+  clearMessage,
+  getUserGamePreference,
+  pieceAnimationLength,
+  piecePlaceAnimation,
+  pointClicked,
+  showPointMessage,
+  showTileMessage,
+  unplayedTileClicked,
+} from '../PaiShoMain';
+import {
+  createBoardArrow,
+  createBoardPointDiv,
+  getSkudTilesSrcPath,
+  isSamePoint,
+  setupPaiShoBoard,
+} from '../ActuatorHelp';
+
+export function KeyPaiShoActuator(gameContainer, isMobile, enableAnimations) {
 	this.gameContainer = gameContainer;
 	this.mobile = isMobile;
 
@@ -8,8 +40,8 @@ KeyPaiSho.Actuator = function(gameContainer, isMobile, enableAnimations) {
 
 	var containers = setupPaiShoBoard(
 		this.gameContainer,
-		KeyPaiSho.Controller.getHostTilesContainerDivs(),
-		KeyPaiSho.Controller.getGuestTilesContainerDivs(),
+		KeyPaiShoController.getHostTilesContainerDivs(),
+		KeyPaiShoController.getGuestTilesContainerDivs(),
 		false,
 		false,
 		true
@@ -21,11 +53,11 @@ KeyPaiSho.Actuator = function(gameContainer, isMobile, enableAnimations) {
 	this.guestTilesContainer = containers.guestTilesContainer;
 }
 
-KeyPaiSho.Actuator.prototype.setAnimationOn = function(isOn) {
+KeyPaiShoActuator.prototype.setAnimationOn = function(isOn) {
 	this.animationOn = isOn;
 };
 
-KeyPaiSho.Actuator.prototype.actuate = function(board, tileManager, markingManager, moveToAnimate, moveAnimationBeginStep, hideCenterPointTile) {
+KeyPaiShoActuator.prototype.actuate = function(board, tileManager, markingManager, moveToAnimate, moveAnimationBeginStep, hideCenterPointTile) {
 	var self = this;
 	this.board = board;
 	// debugStackTrace();
@@ -40,7 +72,7 @@ KeyPaiSho.Actuator.prototype.actuate = function(board, tileManager, markingManag
 	});
 };
 
-KeyPaiSho.Actuator.prototype.htmlify = function(board, tileManager, markingManager, moveToAnimate, moveAnimationBeginStep, hideCenterPointTile) {
+KeyPaiShoActuator.prototype.htmlify = function(board, tileManager, markingManager, moveToAnimate, moveAnimationBeginStep, hideCenterPointTile) {
 	this.clearContainer(this.boardContainer);
 	this.clearContainer(this.arrowContainer);
 
@@ -72,7 +104,7 @@ KeyPaiSho.Actuator.prototype.htmlify = function(board, tileManager, markingManag
 		this.arrowContainer.appendChild(createBoardArrow(arrow[0], arrow[1]));
 	}
 
-	var fullTileSet = new KeyPaiSho.TileManager(true);
+	var fullTileSet = new KeyPaiShoTileManager(true);
 
 	// Go through tile piles and clear containers
 	fullTileSet.hostTiles.forEach(function(tile) {
@@ -91,20 +123,20 @@ KeyPaiSho.Actuator.prototype.htmlify = function(board, tileManager, markingManag
 	});
 };
 
-KeyPaiSho.Actuator.prototype.clearContainer = function (container) {
+KeyPaiShoActuator.prototype.clearContainer = function (container) {
 	while (container.firstChild) {
 		container.removeChild(container.firstChild);
 	}
 };
 
-KeyPaiSho.Actuator.prototype.clearTileContainer = function (tile) {
+KeyPaiShoActuator.prototype.clearTileContainer = function (tile) {
 	var container = document.querySelector("." + tile.getImageName());
 	while (container.firstChild) {
 		container.removeChild(container.firstChild);
 	}
 };
 
-KeyPaiSho.Actuator.prototype.addTile = function(tile, mainContainer) {
+KeyPaiShoActuator.prototype.addTile = function(tile, mainContainer) {
 	var self = this;
 
 	var container = document.querySelector("." + tile.getImageName());
@@ -129,28 +161,31 @@ KeyPaiSho.Actuator.prototype.addTile = function(tile, mainContainer) {
 	theDiv.setAttribute("id", tile.id);
 
 	if (this.mobile) {
-		theDiv.setAttribute("onclick", "unplayedTileClicked(this); showTileMessage(this);");
+		theDiv.addEventListener('click', () => {
+				unplayedTileClicked(this);
+				showTileMessage(this);
+			});
 	} else {
-		theDiv.setAttribute("onclick", "unplayedTileClicked(this);");
-		theDiv.setAttribute("onmouseover", "showTileMessage(this);");
-		theDiv.setAttribute("onmouseout", "clearMessage();");
+		theDiv.addEventListener('click', () => unplayedTileClicked(this));
+		theDiv.addEventListener('mouseover', () => showTileMessage(this));
+		theDiv.addEventListener('mouseout', clearMessage);
 	}
 
 	container.appendChild(theDiv);
 };
 
-KeyPaiSho.Actuator.prototype.getTileSrcPath = function(tile) {
-	if (KeyPaiSho.Controller.isUsingCustomTileDesigns()) {
-		return KeyPaiSho.Controller.getCustomTileDesignsUrl();
+KeyPaiShoActuator.prototype.getTileSrcPath = function(tile) {
+	if (KeyPaiShoController.isUsingCustomTileDesigns()) {
+		return KeyPaiShoController.getCustomTileDesignsUrl();
 	} else {
 		var srcValue = "images/";
-		var gameImgDir = "KeyPaiSho/" + localStorage.getItem(KeyPaiSho.Options.tileDesignTypeKey);
+		var gameImgDir = "KeyPaiSho/" + localStorage.getItem(KeyPaiShoOptions.tileDesignTypeKey);
 		srcValue = srcValue + gameImgDir + "/";
 		return srcValue;
 	}
 };
 
-KeyPaiSho.Actuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate, moveAnimationBeginStep, hideCenterPointTile) {
+KeyPaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate, moveAnimationBeginStep, hideCenterPointTile) {
 	var self = this;
 
 	var theDiv = createBoardPointDiv(boardPoint);
@@ -176,7 +211,7 @@ KeyPaiSho.Actuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 			theDiv.classList.add("possibleMove");
 		} else if (boardPoint.betweenHarmony 
 				&& !gameOptionEnabled(NO_HARMONY_VISUAL_AIDS)
-				&& getUserGamePreference(KeyPaiSho.Controller.hideHarmonyAidsKey) !== "true") {
+				&& getUserGamePreference(KeyPaiShoController.hideHarmonyAidsKey) !== "true") {
 			var boatRemovingPointClassesToAddAfterAnimation = [];
 			if (isAnimationPointOfBoatRemovingAccentTile) {
 				boatRemovingPointClassesToAddAfterAnimation.push("betweenHarmony");
@@ -203,11 +238,14 @@ KeyPaiSho.Actuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 		}
 
 		if (this.mobile) {
-			theDiv.setAttribute("onclick", "pointClicked(this); showPointMessage(this);");
+			theDiv.addEventListener('click', function() {
+				pointClicked(this);
+				showPointMessage(this);
+			});
 		} else {
-			theDiv.setAttribute("onclick", "pointClicked(this);");
-			theDiv.setAttribute("onmouseover", "showPointMessage(this);");
-			theDiv.setAttribute("onmouseout", "clearMessage();");
+			theDiv.addEventListener('click', function() { pointClicked(this); });
+			theDiv.addEventListener('mouseover', function() { showPointMessage(this); });
+			theDiv.addEventListener('mouseout', clearMessage);
 			theDiv.addEventListener('mousedown', e => {
 				 // Right Mouse Button
 				if (e.button == 2) {
@@ -259,7 +297,7 @@ KeyPaiSho.Actuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 
 		if (boardPoint.tile.harmonyOwners 
 				&& !gameOptionEnabled(NO_HARMONY_VISUAL_AIDS)
-				&& getUserGamePreference(KeyPaiSho.Controller.hideHarmonyAidsKey) !== "true") {
+				&& getUserGamePreference(KeyPaiShoController.hideHarmonyAidsKey) !== "true") {
 			if (this.animationOn && (flags.didBonusMove || flags.wasArranged)) {
 				setTimeout(function() {//Delay harmony outline until after a piece has moved
 					for (var i = 0; i < boardPoint.tile.harmonyOwners.length; i++) {
@@ -311,7 +349,7 @@ KeyPaiSho.Actuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 	}
 };
 
-KeyPaiSho.Actuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnimate, moveAnimationBeginStep, theImg, flags) {
+KeyPaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnimate, moveAnimationBeginStep, theImg, flags) {
 	if (!this.animationOn) {
 		return;
 	}
@@ -458,7 +496,7 @@ KeyPaiSho.Actuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 	}, moveAnimationBeginStep === 0 ? pieceAnimationLength : 0);
 };
 
-KeyPaiSho.Actuator.prototype.adjustGatePointLocation = function(boardPoint, theDiv) {
+KeyPaiShoActuator.prototype.adjustGatePointLocation = function(boardPoint, theDiv) {
 	var pointSizeMultiplierX = 34;
 	var pointSizeMultiplierY = pointSizeMultiplierX;
 	var unitString = "px";
@@ -474,7 +512,7 @@ KeyPaiSho.Actuator.prototype.adjustGatePointLocation = function(boardPoint, theD
 	theDiv.style.top = (0.5 * pointSizeMultiplierY) + unitString;
 };
 
-KeyPaiSho.Actuator.prototype.printBoard = function(board) {
+KeyPaiShoActuator.prototype.printBoard = function(board) {
 
 	debug("");
 	var rowNum = 0;

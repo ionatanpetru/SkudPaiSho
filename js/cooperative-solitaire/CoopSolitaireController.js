@@ -1,6 +1,51 @@
 /* Cooperative Solitaire Pai Sho specific UI interaction logic */
 
-function CoopSolitaireController(gameContainer, isMobile) {
+import {
+  ACCENT_TILE,
+  debug,
+} from '../GameData';
+import {
+  newKnotweedRules,
+  rocksUnwheelable,
+  simpleRocks,
+  simplest,
+} from '../skud-pai-sho/SkudPaiShoRules';
+import {
+  BRAND_NEW,
+  GameType,
+  WAITING_FOR_ENDPOINT,
+  callSubmitMove,
+  createGameIfThatIsOk,
+  currentMoveIndex,
+  finalizeMove,
+  getCurrentPlayer,
+  getGameOptionsMessageElement,
+  getNeutralPointMessage,
+  getRedPointMessage,
+  getRedWhitePointMessage,
+  getWhitePointMessage,
+  myTurn,
+  onlinePlayEnabled,
+  playingOnlineGame,
+  toBullets,
+  toHeading,
+} from '../PaiShoMain';
+import {
+  GATE,
+  NEUTRAL,
+  POSSIBLE_MOVE,
+} from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import { GUEST, HOST, NotationPoint, PLANTING } from '../CommonNotationObjects';
+import { RED, WHITE } from '../skud-pai-sho/SkudPaiShoTile';
+import { SolitaireTile } from '../solitaire/SolitaireTile';
+import { CoopSolitaireActuator } from './CoopSolitaireActuator';
+import { CoopSolitaireGameManager } from './CoopSolitaireGameManager';
+import {
+  CoopSolitaireGameNotation,
+  CoopSolitaireNotationBuilder,
+} from './CoopSolitaireGameNotation';
+
+export function CoopSolitaireController(gameContainer, isMobile) {
 	this.actuator = new CoopSolitaireActuator(gameContainer, isMobile);
 
 	this.showGameMessageUnderneath = true;
@@ -71,9 +116,9 @@ CoopSolitaireController.prototype.getDefaultHelpMessageText = function() {
 };
 
 CoopSolitaireController.prototype.getAdditionalMessage = function() {
-	var msg = "";
+	const container = document.createElement('span');
 	if (this.gameNotation.moves.length === 0) {
-		msg += getGameOptionsMessageHtml(GameType.CoopSolitaire.gameOptions);
+		container.appendChild(getGameOptionsMessageElement(GameType.CoopSolitaire.gameOptions));
 	}
 	if (!this.theGame.getWinner()) {
 		var playerName = this.getCurrentPlayer();
@@ -81,10 +126,14 @@ CoopSolitaireController.prototype.getAdditionalMessage = function() {
 		if (playerName === HOST) {
 			typeNotAllowed = "Disharmonies";
 		}
-		msg += "<br />The " + playerName + " is not allowed to form " + typeNotAllowed + ".";
-		msg += "<br /><strong>" + this.theGame.getWinReason() + "</strong>";
+		container.appendChild(document.createElement('br'));
+		container.appendChild(document.createTextNode('The ' + playerName + ' is not allowed to form ' + typeNotAllowed + '.'));
+		container.appendChild(document.createElement('br'));
+		const strong = document.createElement('strong');
+		strong.textContent = this.theGame.getWinReason();
+		container.appendChild(strong);
 	}
-	return msg;
+	return container;
 };
 
 CoopSolitaireController.prototype.unplayedTileClicked = function(tileDiv) {
@@ -274,7 +323,7 @@ CoopSolitaireController.prototype.addTileSummaryToMessageArr = function(message,
 		message.push("Forms Disharmony with " + clashTile + " and the Orchid");
 	} else {
 		if (tileCode === 'R') {
-			heading = "Accent Tile: Rock";
+			var heading = "Accent Tile: Rock";
 			if (simplest) {
 				message.push("The Rock disrupts Harmonies and cannot be moved by a Wheel.");
 			} else if (rocksUnwheelable) {
@@ -304,8 +353,6 @@ CoopSolitaireController.prototype.addTileSummaryToMessageArr = function(message,
 			heading = "Accent Tile: Boat";
 			if (simplest || rocksUnwheelable) {
 				message.push("The Boat moves a Flower Tile to a surrounding space or removes an Accent tile.");
-			} else if (rocksUnwheelable) {
-				message.push("The Boat moves a Flower Tile to a surrounding space or removes a Rock or Knotweed tile.");
 			} else {
 				message.push("The Boat moves a Flower Tile to a surrounding space or removes a Knotweed tile.");
 			}

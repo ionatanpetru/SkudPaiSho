@@ -2,11 +2,22 @@
 
 // --------------------------------------------- // 
 
-var AdevarMoveType = {
+import { AdevarTileCode, AdevarTileType } from './AdevarTile';
+import { BRAND_NEW } from '../PaiShoMain';
+import {
+  DEPLOY,
+  GUEST,
+  HOST,
+  MOVE,
+  NotationPoint,
+} from '../CommonNotationObjects';
+import { debug } from '../GameData';
+
+export var AdevarMoveType = {
 	chooseHiddenTile: "cHT:"
 };
 
-function AdevarNotationMove(text) {
+export function AdevarNotationMove(text) {
 	this.fullMoveText = text;
 	this.analyzeMove();
 }
@@ -102,7 +113,7 @@ AdevarNotationMove.prototype.copyWithoutHiddenDetails = function() {
 
 // --------------------------------------- //
 
-function AdevarNotationBuilder() {
+export function AdevarNotationBuilder() {
 	this.moveType;
 
 	// DEPLOY
@@ -136,7 +147,7 @@ AdevarNotationBuilder.prototype.getNotationMove = function(moveNum, player) {
 
 
 
-function AdevarGameNotation() {
+export function AdevarGameNotation() {
 	this.notationText = "";
 	this.moves = [];
 }

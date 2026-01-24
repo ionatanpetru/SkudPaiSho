@@ -1,6 +1,6 @@
 // Street Pai Sho Game Manager
 
-function StreetGameManager(actuator, ignoreActuate, isCopy) {
+export function StreetGameManager(actuator, ignoreActuate, isCopy) {
 	this.isCopy = isCopy;
 
 	this.actuator = actuator;

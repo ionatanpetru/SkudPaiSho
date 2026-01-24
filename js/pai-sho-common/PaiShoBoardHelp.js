@@ -1,7 +1,10 @@
+import { NON_PLAYABLE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import { RowAndColumn } from '../CommonNotationObjects';
+import { debug } from '../GameData';
 
-var paiShoBoardMaxRowOrCol = 16;
+export var paiShoBoardMaxRowOrCol = 16;
 
-function PaiShoBoardHelper(boardPointClass, size) {
+export function PaiShoBoardHelper(boardPointClass, size) {
 	this.boardPointClass = boardPointClass;
 	this.size = size;
 }

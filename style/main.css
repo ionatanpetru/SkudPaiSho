@@ -4,7 +4,7 @@
   --a-color: var(--color);
   --replay-controls-border-top: 1px solid #2c2c2c;
   --replay-button-background: inherit;
-  --bg-svg-url: url(board_darkmode.svg);
+  --bg-svg-url: url(/style/board_darkmode.svg);
   --header-border-bottom: 1px solid #2c2c2c;
   --modal-content-background-color: #1b1b19;
   --main-modal-close-color-hover: #502;
@@ -27,7 +27,7 @@
   --a-color: var(--color);
   --replay-controls-border-top: 1px solid #2c2c2c;
   --replay-button-background: inherit;
-  --bg-svg-url: url(board_darkmode.svg);
+  --bg-svg-url: url(/style/board_darkmode.svg);
   --header-border-bottom: 1px solid #2c2c2c;
   --modal-content-background-color: #1b1b19;
   --main-modal-close-color-hover: #502;
@@ -47,7 +47,7 @@
   --a-color: var(--color);
   --replay-controls-border-top: none;
   --replay-button-background: #ccc;
-  --bg-svg-url: url(board.svg);
+  --bg-svg-url: url(/board.svg);
   --header-border-bottom: unset;
   --modal-content-background-color: #fefefe;
   --main-modal-close-color-hover: #000;
@@ -382,99 +382,6 @@ div.tab .alertTab, div.tab .alertTab.active {
   stroke-width: 0.1;
   stroke: var(--mark-manager-elements-color);
 }
-/* .game-container.pixelsho .bg-svg {
-  background-image: url(pixelshoboard.png);
-}
-.game-container.pixelsho2 .bg-svg {
-  background-image: url(pixelshoboard2.png);
-}
-.game-container.vescucci .bg-svg {
-  background-image: url(vescucciboard.png);
-}
-.game-container.xiangqi .bg-svg {
-  background-image: url(xiangqiboard.svg);
-}
-.game-container.mayfairBoard .bg-svg {
-  background-image: url(board_mayfair.png);
-}
-.game-container.vescucciBoard .bg-svg {
-  background-image: url(vescucciboard.png);
-}
-.game-container.xiangqiBoard .bg-svg {
-  background-image: url(xiangqiboard.svg);
-}
-.game-container.pixelshoBoard .bg-svg {
-  background-image: url(pixelshoboard.png);
-}
-.game-container.skudShopBoard .bg-svg {
-  background-image: url(SkudBoard.png);
-}
-.game-container.remixBoard .bg-svg {
-  background-image: url(board_remix.png);
-}
-.game-container.airBoard .bg-svg {
-  background-image: url(board_air.png);
-}
-.game-container.airnomadBoard .bg-svg {
-  background-image: url(board_airnomad.png);
-}
-.game-container.earthBoard .bg-svg {
-  background-image: url(board_earth.png);
-}
-.game-container.fireBoard .bg-svg {
-  background-image: url(board_fire.png);
-}
-.game-container.waterBoard .bg-svg {
-  background-image: url(board_water.png);
-}
-.game-container.nickBoard .bg-svg {
-  background-image: url(board_nick.png);
-}
-.game-container.nickoffsetBoard .bg-svg {
-  background-image: url(board_nick_original.png);
-}
-.game-container.owlBoard .bg-svg {
-  background-image: url(board_owl.png);
-}
-.game-container.metalBoard .bg-svg {
-  background-image: url(board_metal.png);
-}
-.game-container.whitethreadBoard .bg-svg {
-  background-image: url(board_whitethread.png);
-}
-.game-container.avatarstateBoard .bg-svg {
-  background-image: url(board_avatarstate.png);
-}
-.game-container.blowtorchBoard .bg-svg {
-  background-image: url(board_blowtorch.png);
-}
-.game-container.checkeredtrainingBoard .bg-svg {
-  background-image: url(board_checkeredoffset.png);
-}
-.game-container.forestBoard .bg-svg {
-  background-image: url(board_forest.png);
-}
-.game-container.azulBoard .bg-svg {
-  background-image: url(board_azul.png);
-}
-.game-container.flowergardenBoard .bg-svg {
-  background-image: url(board_flowergarden.png);
-}
-.game-container.worldmapBoard .bg-svg {
-  background-image: url(board_worldmap.png);
-}
-.game-container.goldengardenBoard .bg-svg {
-  background-image: url(board_goldengarden.png);
-}
-.game-container.nomadicBoard .bg-svg {
-  background-image: url(board_nomadic.png);
-}
-.game-container.nomadicdarkBoard .bg-svg {
-  background-image: url(board_nomadicdark.png);
-}
-.game-container.tggBoard .bg-svg {
-  background-image: url(board_tgg.png);
-} */
 
 figure > div {
   margin: 1em auto;
@@ -847,15 +754,23 @@ figure > div {
   float: left;
 }
 
+/* TODO: Maybe specify which class this applies to so we avoid accidentally applying */
 .tilePileContainer div div {
   display: inline;
   float: left;
   margin-top: 8px;
 }
-
 .tilePileContainer.PaiSho div div {
   width: 34px;
 }
+
+/* Does this help? */
+.gameMessage > div, .gameMessage2 > div {
+  display: block;
+  float: none;
+  width: 100%;
+}
+
 
 .streetTileContainer {
   width: 100%;
@@ -1526,7 +1441,132 @@ input[type=submit] {
   transform: scale(0.9);
 }
 
+/* Yamma */
+#yamma-3d-container {
+  width: 100%;
+  height: 500px;
+  min-height: 400px;
+  border-radius: 8px;
+  overflow: hidden;
+}
 
+#yamma-3d-container canvas {
+  display: block;
+}
+
+.yammaTileContainer {
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+}
+
+.yammaPlayerIndicator {
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.yammaPlayerIndicator.yammaWhite {
+  background: #f5f5f5;
+  color: #333;
+  border: 2px solid #ccc;
+}
+
+.yammaPlayerIndicator.yammaBlue {
+  background: #1e3a5f;
+  color: #fff;
+  border: 2px solid #0d2137;
+}
+
+/* --- Tic Tac Toe Styles --- */
+.tictactoe-board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  width: 300px;
+  height: 300px;
+  margin: 20px auto;
+  background: #333;
+  padding: 4px;
+  border-radius: 8px;
+}
+
+.tictactoe-cell {
+  background: var(--game-background-color, #f5f5dc);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.2s, transform 0.1s;
+  user-select: none;
+}
+
+.tictactoe-cell:hover {
+  background: #e5e5cc;
+}
+
+.tictactoe-cell.empty:hover {
+  background: #d5d5bc;
+}
+
+.tictactoe-cell.mark-x {
+  color: #2563eb;
+}
+
+.tictactoe-cell.mark-o {
+  color: #dc2626;
+}
+
+.tictactoe-cell.last-move {
+  box-shadow: inset 0 0 0 3px #22c55e;
+}
+
+.tictactoe-cell.winning {
+  background: #fef08a;
+  animation: pulse-win 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes pulse-win {
+  from {
+    background: #fef08a;
+  }
+  to {
+    background: #fde047;
+  }
+}
+
+.tictactoe-cell.possible {
+  background: #bbf7d0;
+}
+
+.tictactoeTileContainer {
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+}
+
+.tictactoePlayerIndicator {
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.tictactoePlayerIndicator.tictactoeX {
+  background: #dbeafe;
+  color: #2563eb;
+  border: 2px solid #2563eb;
+}
+
+.tictactoePlayerIndicator.tictactoeO {
+  background: #fee2e2;
+  color: #dc2626;
+  border: 2px solid #dc2626;
+}
 
 /* --- General Dark Mode Styles --- */
 input,

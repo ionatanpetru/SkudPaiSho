@@ -1,6 +1,6 @@
 // MeadowRandomAIv1
 
-function MeadowRandomAIv1() {
+export function MeadowRandomAIv1() {
 	
 }
 

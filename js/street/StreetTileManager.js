@@ -1,6 +1,6 @@
 /* Skud Pai Sho Tile Manager */
 
-function StreetTileManager(forActuating) {
+export function StreetTileManager(forActuating) {
 	if (forActuating) {
 		this.hostTiles = this.loadOneOfEach('H');
 		this.guestTiles = this.loadOneOfEach('G');

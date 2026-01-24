@@ -1,17 +1,30 @@
 /* Skud Pai Sho Notation */
 
-function SkudPaiShoNotationMove(text) {
+import {
+  ARRANGING,
+  GUEST,
+  HOST,
+  NotationPoint,
+  PLANTING,
+} from '../CommonNotationObjects';
+import { BRAND_NEW } from '../PaiShoMain';
+import { SkudPaiShoTile } from './SkudPaiShoTile';
+import { debug } from '../GameData';
+import { sameStart, simpleCanonRules } from './SkudPaiShoRules';
+
+export class SkudPaiShoNotationMove {
+	constructor(text) {
 	this.fullMoveText = text;
 	this.analyzeMove();
 }
 
-SkudPaiShoNotationMove.prototype.analyzeMove = function() {
+	analyzeMove() {
 	this.valid = true;
 
 	// Get move number
-	var parts = this.fullMoveText.split(".");
+	const parts = this.fullMoveText.split(".");
 
-	var moveNumAndPlayer = parts[0];
+	const moveNumAndPlayer = parts[0];
 
 	this.moveNum = parseInt(moveNumAndPlayer.slice(0, -1));
     this.playerCode = moveNumAndPlayer.charAt(moveNumAndPlayer.length - 1);
@@ -23,7 +36,7 @@ SkudPaiShoNotationMove.prototype.analyzeMove = function() {
 		this.player = HOST;
 	}
 
-	var moveText = parts[1];
+	const moveText = parts[1];
 	this.moveTextOnly = moveText;
 
 	// If no move text, ignore and move on to next
@@ -39,7 +52,7 @@ SkudPaiShoNotationMove.prototype.analyzeMove = function() {
 	}
 
 	// If starts with an R or W, then it's Planting
-	var char0 = moveText.charAt(0);
+	const char0 = moveText.charAt(0);
 	if (char0 === 'R' || char0 === 'W') {
 		this.moveType = PLANTING;
 	} else if (char0 === '(') {
@@ -48,7 +61,7 @@ SkudPaiShoNotationMove.prototype.analyzeMove = function() {
 
 	if (this.moveType === PLANTING) {
 		// Planting move stuff
-		var char1 = moveText.charAt(1);
+		const char1 = moveText.charAt(1);
 		this.plantedFlowerType = char0 + "" + char1;
 
 		if (moveText.charAt(2) === '(') {
@@ -67,7 +80,7 @@ SkudPaiShoNotationMove.prototype.analyzeMove = function() {
 		// Arranging move stuff
 
 		// Get the two points from string like: (-8,0)-(-6,3)
-		var parts = moveText.substring(moveText.indexOf('(')+1).split(')-(');
+		const parts = moveText.substring(moveText.indexOf('(')+1).split(')-(');
 
 		// parts.forEach(function(val){console.log(val);});
 
@@ -78,12 +91,12 @@ SkudPaiShoNotationMove.prototype.analyzeMove = function() {
 
 		if (parts[1].includes('+') || parts[1].includes('_')) {
 			// Harmony Bonus!
-			var bonusChar = '+';
+			let bonusChar = '+';
 			if (parts[1].includes('_')) {
 				bonusChar = '_';
 			}
 			// Get only that part:
-			var bonus = parts[1].substring(parts[1].indexOf(bonusChar)+1);
+			const bonus = parts[1].substring(parts[1].indexOf(bonusChar)+1);
 			
 			this.bonusTileCode = bonus.substring(0,bonus.indexOf('('));
 
@@ -95,25 +108,27 @@ SkudPaiShoNotationMove.prototype.analyzeMove = function() {
 			}
 		}
 	}
-};
+	}
 
-SkudPaiShoNotationMove.prototype.hasHarmonyBonus = function() {
+	hasHarmonyBonus() {
 	return typeof this.bonusTileCode !== 'undefined';
-};
+	}
 
-SkudPaiShoNotationMove.prototype.isValidNotation = function() {
+	isValidNotation() {
 	return this.valid;
-};
+	}
 
-SkudPaiShoNotationMove.prototype.equals = function(otherMove) {
+	equals(otherMove) {
 	return this.fullMoveText === otherMove.fullMoveText;
-};
+	}
 
 
 
 // --------------------------------------- //
+}
 
-function SkudPaiShoNotationBuilder() {
+export class SkudPaiShoNotationBuilder {
+	constructor() {
 	// this.moveNum;	// Let's try making this magic
 	// this.player;		// Magic
 	this.moveType;
@@ -132,8 +147,8 @@ function SkudPaiShoNotationBuilder() {
 	this.status = BRAND_NEW;
 }
 
-SkudPaiShoNotationBuilder.prototype.getFirstMoveForHost = function(tileCode) {
-	var builder = new SkudPaiShoNotationBuilder();
+	getFirstMoveForHost(tileCode) {
+	const builder = new SkudPaiShoNotationBuilder();
 	builder.moveType = PLANTING;
 	builder.plantedFlowerType = SkudPaiShoTile.getClashTileCode(tileCode);
 
@@ -143,14 +158,14 @@ SkudPaiShoNotationBuilder.prototype.getFirstMoveForHost = function(tileCode) {
 
 	builder.endPoint = new NotationPoint("0,8");
 	return builder;
-};
+	}
 
-SkudPaiShoNotationBuilder.prototype.getNotationMove = function(moveNum, player) {
-	var bonusChar = '+';
+	getNotationMove(moveNum, player) {
+	const bonusChar = '+';
 	// if (onlinePlayEnabled) {
 	// 	bonusChar = '_';
 	// }
-	var notationLine = moveNum + player.charAt(0) + ".";
+	let notationLine = moveNum + player.charAt(0) + ".";
 	if (this.moveType === ARRANGING) {
 		notationLine += "(" + this.startPoint.pointText + ")-(" + this.endPoint.pointText + ")";
 		if (this.bonusTileCode && this.bonusEndPoint) {
@@ -164,45 +179,49 @@ SkudPaiShoNotationBuilder.prototype.getNotationMove = function(moveNum, player) 
 	}
 	
 	return new SkudPaiShoNotationMove(notationLine);
-};
+	}
 
 // --------------------------------------- //
 
 
+}
 
-function SkudPaiShoGameNotation() {
+export class SkudPaiShoGameNotation {
+	constructor() {
 	this.notationText = "";
 	this.moves = [];
 }
 
-SkudPaiShoGameNotation.prototype.setNotationText = function(text) {
+	setNotationText(text) {
 	this.notationText = text;
 	this.loadMoves();
-};
+	}
 
-SkudPaiShoGameNotation.prototype.addNotationLine = function(text) {
+	addNotationLine(text) {
 	this.notationText += ";" + text.trim();
 	this.loadMoves();
-};
+	}
 
-SkudPaiShoGameNotation.prototype.addMove = function(move) {
+	addMove(move) {
 	if (this.notationText) {
 		this.notationText += ";" + move.fullMoveText;
 	} else {
 		this.notationText = move.fullMoveText;
 	}
 	this.loadMoves();
-};
+	}
 
-SkudPaiShoGameNotation.prototype.removeLastMove = function() {
+	removeLastMove() {
 	this.notationText = this.notationText.substring(0, this.notationText.lastIndexOf(";"));
 	this.loadMoves();
-};
+	}
 
-SkudPaiShoGameNotation.prototype.getPlayerMoveNum = function() {
-	var moveNum = 0;
-	var lastMove = this.moves[this.moves.length-1];
+	getPlayerMoveNum() {
+	let moveNum = 0;
+	const lastMove = this.moves[this.moves.length-1];
 
+	let player;
+	
 	if (lastMove) {
 		moveNum = lastMove.moveNum;
 		// At game beginning:
@@ -218,15 +237,15 @@ SkudPaiShoGameNotation.prototype.getPlayerMoveNum = function() {
 		}
 	}
 	return moveNum;
-};
+	}
 
-SkudPaiShoGameNotation.prototype.getNotationMoveFromBuilder = function(builder) {
+	getNotationMoveFromBuilder(builder) {
 	// Example simple Arranging move: 7G.(8,0)-(7,1)
 
-	var moveNum = 1;
-	var player = GUEST;
+	let moveNum = 1;
+	let player = GUEST;
 
-	var lastMove = this.moves[this.moves.length-1];
+	const lastMove = this.moves[this.moves.length-1];
 
 	if (lastMove) {
 		moveNum = lastMove.moveNum;
@@ -244,11 +263,11 @@ SkudPaiShoGameNotation.prototype.getNotationMoveFromBuilder = function(builder) 
 	}
 
 	return builder.getNotationMove(moveNum, player);
-};
+	}
 
-SkudPaiShoGameNotation.prototype.loadMoves = function() {
+	loadMoves() {
 	this.moves = [];
-	var lines = [];
+	let lines = [];
 	if (this.notationText) {
 		if (this.notationText.includes(';')) {
 			lines = this.notationText.split(";");
@@ -257,10 +276,10 @@ SkudPaiShoGameNotation.prototype.loadMoves = function() {
 		}
 	}
 
-	var self = this;
-	var lastPlayer = HOST;
+	const self = this;
+	let lastPlayer = HOST;
 	lines.forEach(function(line) {
-		var move = new SkudPaiShoNotationMove(line);
+		const move = new SkudPaiShoNotationMove(line);
 		if (move.moveNum === 0 && move.isValidNotation()) {
 			self.moves.push(move);
 		} else if (move.isValidNotation() && move.player !== lastPlayer) {
@@ -270,10 +289,10 @@ SkudPaiShoGameNotation.prototype.loadMoves = function() {
 			debug("the player check is broken?");
 		}
 	});
-};
+	}
 
-SkudPaiShoGameNotation.prototype.getNotationHtml = function() {
-	var lines = [];
+	getNotationHtml() {
+	let lines = [];
 	if (this.notationText) {
 		if (this.notationText.includes(';')) {
 			lines = this.notationText.split(";");
@@ -282,17 +301,17 @@ SkudPaiShoGameNotation.prototype.getNotationHtml = function() {
 		}
 	}
 
-	var notationHtml = "";
+	let notationHtml = "";
 
 	lines.forEach(function (line) {
 		notationHtml += line + "<br />";
 	});
 
 	return notationHtml;
-};
+	}
 
-SkudPaiShoGameNotation.prototype.getNotationForEmail = function() {
-	var lines = [];
+	getNotationForEmail() {
+	let lines = [];
 	if (this.notationText) {
 		if (this.notationText.includes(';')) {
 			lines = this.notationText.split(";");
@@ -301,26 +320,27 @@ SkudPaiShoGameNotation.prototype.getNotationForEmail = function() {
 		}
 	}
 
-	var notationHtml = "";
+	let notationHtml = "";
 
 	lines.forEach(function (line) {
 		notationHtml += line + "[BR]";
 	});
 
 	return notationHtml;
-};
+	}
 
-SkudPaiShoGameNotation.prototype.notationTextForUrl = function() {
-	var str = this.notationText;
+	notationTextForUrl() {
+	const str = this.notationText;
 	return str;
-};
+	}
 
-SkudPaiShoGameNotation.prototype.getLastMoveText = function() {
+	getLastMoveText() {
 	return this.moves[this.moves.length - 1].fullMoveText;
-};
+	}
 
-SkudPaiShoGameNotation.prototype.getLastMoveNumber = function() {
+	getLastMoveNumber() {
 	return this.moves[this.moves.length - 1].moveNum;
-};
+	}
 
 
+}

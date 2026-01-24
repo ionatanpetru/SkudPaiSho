@@ -1,6 +1,10 @@
 // Spirit Pai Sho Tile Manager
 
-function SpiritTileManager() {
+import { GUEST } from '../CommonNotationObjects';
+import { debug } from '../GameData';
+import { SpiritTile } from './SpiritTile';
+
+export function SpiritTileManager() {
 	this.hostTiles = this.loadTileSet('H');
 	this.guestTiles = this.loadTileSet('G');
 }
@@ -37,7 +41,7 @@ SpiritTileManager.prototype.grabTile = function(player, tileCode) {
 	var tile;
 	for (var i = 0; i < tilePile.length; i++) {
 		if (tilePile[i].code === tileCode) {
-			newTileArr = tilePile.splice(i, 1);
+			var newTileArr = tilePile.splice(i, 1);
 			tile = newTileArr[0];
 			break;
 		}

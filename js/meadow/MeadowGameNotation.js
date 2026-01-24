@@ -2,7 +2,7 @@
 
 // --------------------------------------------- // 
 
-function MeadowNotationMove(text) {
+export function MeadowNotationMove(text) {
 	this.fullMoveText = text;
 	this.analyzeMove();
 }
@@ -56,7 +56,7 @@ MeadowNotationMove.prototype.equals = function(otherMove) {
 
 // --------------------------------------- //
 
-function MeadowNotationBuilder() {
+export function MeadowNotationBuilder() {
 	this.piece1;
 	this.deployPoint1;
 	this.piece2
@@ -99,7 +99,7 @@ MeadowNotationBuilder.prototype.moveComplete = function() {
 
 
 
-function MeadowGameNotation() {
+export function MeadowGameNotation() {
 	this.notationText = "";
 	this.moves = [];
 }

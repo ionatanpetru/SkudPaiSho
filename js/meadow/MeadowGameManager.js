@@ -1,5 +1,5 @@
 
-function MeadowGameManager(actuator, ignoreActuate, isCopy) {
+export function MeadowGameManager(actuator, ignoreActuate, isCopy) {
 	this.isCopy = isCopy;
 	this.actuator = actuator;
 

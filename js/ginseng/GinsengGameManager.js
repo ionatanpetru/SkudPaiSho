@@ -1,25 +1,54 @@
 // Ginseng Game Manager
 
-Ginseng.GameManager = function(actuator, ignoreActuate, isCopy) {
+import {
+  DRAW_ACCEPT,
+  GUEST,
+  HOST,
+  MOVE,
+  NotationPoint,
+  RowAndColumn,
+  SETUP,
+} from '../CommonNotationObjects';
+import {
+  GINSENG_1_POINT_0,
+  GINSENG_2_POINT_0,
+  SWAP_BISON_AND_DRAGON,
+  gameOptionEnabled,
+} from '../GameOptions';
+import { GinsengTileCodes } from './GinsengTiles';
+import { GinsengTileManager } from './GinsengTileManager';
+import { PaiShoMarkingManager } from '../pai-sho-common/PaiShoMarkingManager';
+import { TrifleAbilityName } from '../trifle/TrifleTileInfo';
+import { TrifleTile } from '../trifle/TrifleTile';
+import { debug } from '../GameData';
+import {
+  getOpponentName,
+  getPlayerCodeFromName,
+} from '../pai-sho-common/PaiShoPlayerHelp';
+import { setGameLogText } from '../PaiShoMain';
+import { PaiShoGameBoard } from '../trifle/PaiShoGameBoard';
+
+export var GinsengGameManager = function(actuator, ignoreActuate, isCopy) {
 	this.gameLogText = '';
 	this.isCopy = isCopy;
 
 	this.actuator = actuator;
 
-	Trifle.tileId = 1;
-	this.tileManager = new Ginseng.TileManager();
+	// TrifleTileId = 1;
+	TrifleTile.resetTrifleTileId();
+	this.tileManager = new GinsengTileManager();
 	this.markingManager = new PaiShoMarkingManager();
 
 	this.setup(ignoreActuate);
 };
 
-Ginseng.GameManager.prototype.updateActuator = function(newActuator) {
+GinsengGameManager.prototype.updateActuator = function(newActuator) {
 	this.actuator = newActuator;
 };
 
 // Set up the game
-Ginseng.GameManager.prototype.setup = function (ignoreActuate) {
-	this.board = new PaiShoGames.Board(this.tileManager, this.buildAbilityActivationOrder());
+GinsengGameManager.prototype.setup = function (ignoreActuate) {
+	this.board = new PaiShoGameBoard(this.tileManager, this.buildAbilityActivationOrder());
 	this.board.useBannerCaptureSystem = false;
 	this.winners = [];
 	this.hostBannerPlayed = false;
@@ -36,7 +65,7 @@ Ginseng.GameManager.prototype.setup = function (ignoreActuate) {
 };
 
 // Sends the updated board to the actuator
-Ginseng.GameManager.prototype.actuate = function(moveToAnimate, moveDetails) {
+GinsengGameManager.prototype.actuate = function(moveToAnimate, moveDetails) {
 	if (this.isCopy) {
 		return;
 	}
@@ -44,7 +73,7 @@ Ginseng.GameManager.prototype.actuate = function(moveToAnimate, moveDetails) {
 	setGameLogText(this.gameLogText);
 };
 
-Ginseng.GameManager.prototype.runNotationMove = function(move, withActuate, moveAnimationBeginStep_unused, skipAnimation) {
+GinsengGameManager.prototype.runNotationMove = function(move, withActuate, moveAnimationBeginStep_unused, skipAnimation) {
 	debug("Running Move:");
 	debug(move);
 
@@ -94,17 +123,17 @@ Ginseng.GameManager.prototype.runNotationMove = function(move, withActuate, move
 	return neededPromptInfo;
 };
 
-Ginseng.GameManager.prototype.buildMoveGameLogText = function(move, moveDetails) {
+GinsengGameManager.prototype.buildMoveGameLogText = function(move, moveDetails) {
 	var startPoint = new NotationPoint(move.startPoint);
 	var endPoint = new NotationPoint(move.endPoint);
-	var startPointDisplay = Ginseng.NotationAdjustmentFunction(startPoint.rowAndColumn.row, startPoint.rowAndColumn.col);
-	var endPointDisplay = Ginseng.NotationAdjustmentFunction(endPoint.rowAndColumn.row, endPoint.rowAndColumn.col);
+	var startPointDisplay = GinsengNotationAdjustmentFunction(startPoint.rowAndColumn.row, startPoint.rowAndColumn.col);
+	var endPointDisplay = GinsengNotationAdjustmentFunction(endPoint.rowAndColumn.row, endPoint.rowAndColumn.col);
 
 	var moveNumLabel = move.moveNum + "" + getPlayerCodeFromName(move.player);
 
-	this.gameLogText = moveNumLabel + ". " + move.player + ' moved ' + Trifle.Tile.getTileName(moveDetails.movedTile.code) + ' from ' + startPointDisplay + ' to ' + endPointDisplay;
+	this.gameLogText = moveNumLabel + ". " + move.player + ' moved ' + TrifleTile.getTileName(moveDetails.movedTile.code) + ' from ' + startPointDisplay + ' to ' + endPointDisplay;
 	if (moveDetails.capturedTiles && moveDetails.capturedTiles.length > 0) {
-		this.gameLogText += ' and captured ' + getOpponentName(move.player) + '\'s ';// + Trifle.Tile.getTileName(moveDetails.capturedTile.code);
+		this.gameLogText += ' and captured ' + getOpponentName(move.player) + '\'s ';// + TrifleTile.getTileName(moveDetails.capturedTile.code);
 		var first = true;
 		moveDetails.capturedTiles.forEach(capturedTile => {
 			if (!first) {
@@ -112,7 +141,7 @@ Ginseng.GameManager.prototype.buildMoveGameLogText = function(move, moveDetails)
 			} else {
 				first = false;
 			}
-			this.gameLogText += Trifle.Tile.getTileName(capturedTile.code);
+			this.gameLogText += TrifleTile.getTileName(capturedTile.code);
 		});
 	}
 	if (moveDetails.abilityActivationFlags && moveDetails.abilityActivationFlags.tileRecords
@@ -126,7 +155,7 @@ Ginseng.GameManager.prototype.buildMoveGameLogText = function(move, moveDetails)
 			} else {
 				first = false;
 			}
-			this.gameLogText += movedTile.ownerName + "'s " + Trifle.Tile.getTileName(movedTile.code);
+			this.gameLogText += movedTile.ownerName + "'s " + TrifleTile.getTileName(movedTile.code);
 		});
 		this.gameLogText += " moved to captured pile";
 	}
@@ -141,7 +170,7 @@ Ginseng.GameManager.prototype.buildMoveGameLogText = function(move, moveDetails)
 			} else {
 				first = false;
 			}
-			this.gameLogText += movedTile.ownerName + "'s " + Trifle.Tile.getTileName(movedTile.code);
+			this.gameLogText += movedTile.ownerName + "'s " + TrifleTile.getTileName(movedTile.code);
 		});
 		this.gameLogText += " banished";
 	}
@@ -152,12 +181,13 @@ Ginseng.GameManager.prototype.buildMoveGameLogText = function(move, moveDetails)
 			var keyObject = JSON.parse(key);
 			if (promptDataEntry.movedTilePoint && promptDataEntry.movedTileDestinationPoint) {
 				var movedTilePointRowAndCol = promptDataEntry.movedTilePoint.rowAndColumn;
+				// TODO promptDataEntry field work needed
 				var movedTileDestinationRowAndCol = promptDataEntry.movedTileDestinationPoint.rowAndColumn;
 				this.gameLogText += "; Push: ";
-				this.gameLogText += "(" + Ginseng.NotationAdjustmentFunction(movedTilePointRowAndCol.row, movedTilePointRowAndCol.col) + ")-";
-				this.gameLogText += "(" + Ginseng.NotationAdjustmentFunction(movedTileDestinationRowAndCol.row, movedTileDestinationRowAndCol.col) + ")";
+				this.gameLogText += "(" + GinsengNotationAdjustmentFunction(movedTilePointRowAndCol.row, movedTilePointRowAndCol.col) + ")-";
+				this.gameLogText += "(" + GinsengNotationAdjustmentFunction(movedTileDestinationRowAndCol.row, movedTileDestinationRowAndCol.col) + ")";
 			} else if (promptDataEntry.chosenCapturedTile) {
-				this.gameLogText += "; Exchange with: " + Trifle.Tile.getTileName(promptDataEntry.chosenCapturedTile.code);
+				this.gameLogText += "; Exchange with: " + TrifleTile.getTileName(promptDataEntry.chosenCapturedTile.code);
 			} else {
 				this.gameLogText += " Ability?";
 			}
@@ -165,9 +195,9 @@ Ginseng.GameManager.prototype.buildMoveGameLogText = function(move, moveDetails)
 	}
 };
 
-Ginseng.GameManager.prototype.checkForWin = function() {
-	var hostLotusPoints = this.board.getTilePoints(Ginseng.TileCodes.WhiteLotus, HOST);
-	var guestLotusPoints = this.board.getTilePoints(Ginseng.TileCodes.WhiteLotus, GUEST);
+GinsengGameManager.prototype.checkForWin = function() {
+	var hostLotusPoints = this.board.getTilePoints(GinsengTileCodes.WhiteLotus, HOST);
+	var guestLotusPoints = this.board.getTilePoints(GinsengTileCodes.WhiteLotus, GUEST);
 	if (hostLotusPoints.length === 1) {
 		var hostLotusPoint = hostLotusPoints[0];
 		var hostLotusRowAndCol = new RowAndColumn(hostLotusPoint.row, hostLotusPoint.col);
@@ -185,11 +215,11 @@ Ginseng.GameManager.prototype.checkForWin = function() {
 	}
 };
 
-Ginseng.GameManager.prototype.playersAreSelectingTeams = function() {
+GinsengGameManager.prototype.playersAreSelectingTeams = function() {
 	return this.tileManager.playersAreSelectingTeams();
 };
 
-Ginseng.GameManager.prototype.getPlayerTeamSelectionTileCodeList = function(player) {
+GinsengGameManager.prototype.getPlayerTeamSelectionTileCodeList = function(player) {
 	var team = this.tileManager.getPlayerTeam(player);
 	var codeList = [];
 	team.forEach(function(tile){
@@ -198,7 +228,7 @@ Ginseng.GameManager.prototype.getPlayerTeamSelectionTileCodeList = function(play
 	return codeList.toString();
 };
 
-Ginseng.GameManager.prototype.addTileToTeam = function(tile) {
+GinsengGameManager.prototype.addTileToTeam = function(tile) {
 	var addedOk = this.tileManager.addToTeamIfOk(tile);
 	if (addedOk) {
 		this.actuate();
@@ -206,16 +236,16 @@ Ginseng.GameManager.prototype.addTileToTeam = function(tile) {
 	return this.tileManager.playerTeamIsFull(tile.ownerName);
 };
 
-Ginseng.GameManager.prototype.removeTileFromTeam = function(tile) {
+GinsengGameManager.prototype.removeTileFromTeam = function(tile) {
 	this.tileManager.removeTileFromTeam(tile);
 	this.actuate();
 };
 
-Ginseng.GameManager.prototype.hasEnded = function() {
+GinsengGameManager.prototype.hasEnded = function() {
 	return this.getWinResultTypeCode() > 0;
 };
 
-Ginseng.GameManager.prototype.revealPossibleMovePoints = function(boardPoint, ignoreActuate) {
+GinsengGameManager.prototype.revealPossibleMovePoints = function(boardPoint, ignoreActuate) {
 	if (!boardPoint.hasTile()) {
 		return;
 	}
@@ -226,7 +256,7 @@ Ginseng.GameManager.prototype.revealPossibleMovePoints = function(boardPoint, ig
 	}
 };
 
-Ginseng.GameManager.prototype.hidePossibleMovePoints = function(ignoreActuate) {
+GinsengGameManager.prototype.hidePossibleMovePoints = function(ignoreActuate) {
 	this.board.removePossibleMovePoints();
 	this.tileManager.removeSelectedTileFlags();
 	if (!ignoreActuate) {
@@ -234,7 +264,7 @@ Ginseng.GameManager.prototype.hidePossibleMovePoints = function(ignoreActuate) {
 	}
 };
 
-Ginseng.GameManager.prototype.revealDeployPoints = function(tile, ignoreActuate) {
+GinsengGameManager.prototype.revealDeployPoints = function(tile, ignoreActuate) {
 	this.board.setDeployPointsPossibleMoves(tile);
 	
 	if (!ignoreActuate) {
@@ -242,17 +272,17 @@ Ginseng.GameManager.prototype.revealDeployPoints = function(tile, ignoreActuate)
 	}
 };
 
-Ginseng.GameManager.prototype.getWinner = function() {
+GinsengGameManager.prototype.getWinner = function() {
 	if (this.winners.length === 1) {
 		return this.winners[0];
 	}
 };
 
-Ginseng.GameManager.prototype.getWinReason = function() {
+GinsengGameManager.prototype.getWinReason = function() {
 	return " won the game!";
 };
 
-Ginseng.GameManager.prototype.getWinResultTypeCode = function() {
+GinsengGameManager.prototype.getWinResultTypeCode = function() {
 	if (this.winners.length === 1) {
 		return 1;	// Standard win is 1
 	} else if (this.gameHasEndedInDraw) {
@@ -260,18 +290,18 @@ Ginseng.GameManager.prototype.getWinResultTypeCode = function() {
 	}
 };
 
-Ginseng.GameManager.prototype.buildAbilityActivationOrder = function() {
+GinsengGameManager.prototype.buildAbilityActivationOrder = function() {
 	return [
-		Trifle.AbilityName.recordTilePoint,
-		Trifle.AbilityName.moveTileToRecordedPoint,
-		Trifle.AbilityName.cancelAbilities,
-		Trifle.AbilityName.cancelAbilitiesTargetingTiles,
-		Trifle.AbilityName.protectFromCapture,
-		Trifle.AbilityName.moveTargetTile
+		TrifleAbilityName.recordTilePoint,
+		TrifleAbilityName.moveTileToRecordedPoint,
+		TrifleAbilityName.cancelAbilities,
+		TrifleAbilityName.cancelAbilitiesTargetingTiles,
+		TrifleAbilityName.protectFromCapture,
+		TrifleAbilityName.moveTargetTile
 	];
 };
 
-Ginseng.GameManager.prototype.buildAbilitySummaryLines = function() {
+GinsengGameManager.prototype.buildAbilitySummaryLines = function() {
 	var abilitySummaryLines = [];
 	this.board.abilityManager.abilities.forEach((abilityObject) => {
 		if (abilityObject.activated) {
@@ -282,96 +312,96 @@ Ginseng.GameManager.prototype.buildAbilitySummaryLines = function() {
 	return abilitySummaryLines;
 };
 
-Ginseng.GameManager.prototype.doBoardSetup = function(setupNum) {
+GinsengGameManager.prototype.doBoardSetup = function(setupNum) {
 	/* Remove all tiles from board, then set up board. */
 	this.board.forEachBoardPointWithTile(boardPoint => {
 		this.tileManager.putTileBack(boardPoint.removeTile());
 	});
 
-	this.board.placeTile(this.tileManager.grabTile(HOST, Ginseng.TileCodes.WhiteLotus), new NotationPoint("8,0"));
-	var nextTileCode = Ginseng.TileCodes.Koi;
+	this.board.placeTile(this.tileManager.grabTile(HOST, GinsengTileCodes.WhiteLotus), new NotationPoint("8,0"));
+	var nextTileCode = GinsengTileCodes.Koi;
 	if (gameOptionEnabled(GINSENG_2_POINT_0) || !gameOptionEnabled(GINSENG_1_POINT_0)) {
-		nextTileCode = Ginseng.TileCodes.Badgermole;
+		nextTileCode = GinsengTileCodes.Badgermole;
 	}
 	this.board.placeTile(this.tileManager.grabTile(HOST, nextTileCode), new NotationPoint("7,-1"));
 	if (gameOptionEnabled(GINSENG_2_POINT_0) || !gameOptionEnabled(GINSENG_1_POINT_0)) {
-		nextTileCode = Ginseng.TileCodes.Dragon;
+		nextTileCode = GinsengTileCodes.Dragon;
 	}
 	if (setupNum === 1 || gameOptionEnabled(SWAP_BISON_AND_DRAGON)) {
-		nextTileCode = Ginseng.TileCodes.Bison;
+		nextTileCode = GinsengTileCodes.Bison;
 	} else {
-		nextTileCode = Ginseng.TileCodes.Dragon;
+		nextTileCode = GinsengTileCodes.Dragon;
 	}
 	this.board.placeTile(this.tileManager.grabTile(HOST, nextTileCode), new NotationPoint("7,1"));
-	nextTileCode = Ginseng.TileCodes.Badgermole;
+	nextTileCode = GinsengTileCodes.Badgermole;
 	if (gameOptionEnabled(GINSENG_2_POINT_0) || !gameOptionEnabled(GINSENG_1_POINT_0)) {
-		nextTileCode = Ginseng.TileCodes.Koi;
+		nextTileCode = GinsengTileCodes.Koi;
 	}
 	this.board.placeTile(this.tileManager.grabTile(HOST, nextTileCode), new NotationPoint("6,-2"));
 	if (gameOptionEnabled(GINSENG_2_POINT_0) || !gameOptionEnabled(GINSENG_1_POINT_0)) {
-		nextTileCode = Ginseng.TileCodes.Bison;
+		nextTileCode = GinsengTileCodes.Bison;
 	}
 	if (setupNum === 1 || gameOptionEnabled(SWAP_BISON_AND_DRAGON)) {
-		nextTileCode = Ginseng.TileCodes.Dragon;
+		nextTileCode = GinsengTileCodes.Dragon;
 	} else {
-		nextTileCode = Ginseng.TileCodes.Bison;
+		nextTileCode = GinsengTileCodes.Bison;
 	}
 	this.board.placeTile(this.tileManager.grabTile(HOST, nextTileCode), new NotationPoint("6,2"));
-	this.board.placeTile(this.tileManager.grabTile(HOST, Ginseng.TileCodes.LionTurtle), new NotationPoint("4,0"));
-	this.board.placeTile(this.tileManager.grabTile(HOST, Ginseng.TileCodes.Wheel), new NotationPoint("5,-3"));
-	this.board.placeTile(this.tileManager.grabTile(HOST, Ginseng.TileCodes.Wheel), new NotationPoint("5,3"));
-	this.board.placeTile(this.tileManager.grabTile(HOST, Ginseng.TileCodes.Ginseng), new NotationPoint("4,-4"));
-	this.board.placeTile(this.tileManager.grabTile(HOST, Ginseng.TileCodes.Ginseng), new NotationPoint("4,4"));
-	this.board.placeTile(this.tileManager.grabTile(HOST, Ginseng.TileCodes.Orchid), new NotationPoint("4,-5"));
-	this.board.placeTile(this.tileManager.grabTile(HOST, Ginseng.TileCodes.Orchid), new NotationPoint("4,5"));
+	this.board.placeTile(this.tileManager.grabTile(HOST, GinsengTileCodes.LionTurtle), new NotationPoint("4,0"));
+	this.board.placeTile(this.tileManager.grabTile(HOST, GinsengTileCodes.Wheel), new NotationPoint("5,-3"));
+	this.board.placeTile(this.tileManager.grabTile(HOST, GinsengTileCodes.Wheel), new NotationPoint("5,3"));
+	this.board.placeTile(this.tileManager.grabTile(HOST, GinsengTileCodes.Ginseng), new NotationPoint("4,-4"));
+	this.board.placeTile(this.tileManager.grabTile(HOST, GinsengTileCodes.Ginseng), new NotationPoint("4,4"));
+	this.board.placeTile(this.tileManager.grabTile(HOST, GinsengTileCodes.Orchid), new NotationPoint("4,-5"));
+	this.board.placeTile(this.tileManager.grabTile(HOST, GinsengTileCodes.Orchid), new NotationPoint("4,5"));
 
-	this.board.placeTile(this.tileManager.grabTile(GUEST, Ginseng.TileCodes.WhiteLotus), new NotationPoint("-8,0"));
-	nextTileCode = Ginseng.TileCodes.Koi;
+	this.board.placeTile(this.tileManager.grabTile(GUEST, GinsengTileCodes.WhiteLotus), new NotationPoint("-8,0"));
+	nextTileCode = GinsengTileCodes.Koi;
 	if (gameOptionEnabled(GINSENG_2_POINT_0) || !gameOptionEnabled(GINSENG_1_POINT_0)) {
-		nextTileCode = Ginseng.TileCodes.Badgermole;
+		nextTileCode = GinsengTileCodes.Badgermole;
 	}
 	this.board.placeTile(this.tileManager.grabTile(GUEST, nextTileCode), new NotationPoint("-7,1"));
 	if (setupNum === 1 || gameOptionEnabled(SWAP_BISON_AND_DRAGON)) {
-		nextTileCode = Ginseng.TileCodes.Bison;
+		nextTileCode = GinsengTileCodes.Bison;
 	} else {
-		nextTileCode = Ginseng.TileCodes.Dragon;
+		nextTileCode = GinsengTileCodes.Dragon;
 	}
 	if (gameOptionEnabled(GINSENG_2_POINT_0) || !gameOptionEnabled(GINSENG_1_POINT_0)) {
-		nextTileCode = Ginseng.TileCodes.Dragon;
+		nextTileCode = GinsengTileCodes.Dragon;
 	}
 	this.board.placeTile(this.tileManager.grabTile(GUEST, nextTileCode), new NotationPoint("-7,-1"));
-	nextTileCode = Ginseng.TileCodes.Badgermole;
+	nextTileCode = GinsengTileCodes.Badgermole;
 	if (gameOptionEnabled(GINSENG_2_POINT_0) || !gameOptionEnabled(GINSENG_1_POINT_0)) {
-		nextTileCode = Ginseng.TileCodes.Koi;
+		nextTileCode = GinsengTileCodes.Koi;
 	}
 	this.board.placeTile(this.tileManager.grabTile(GUEST, nextTileCode), new NotationPoint("-6,2"));
 	if (setupNum === 1 || gameOptionEnabled(SWAP_BISON_AND_DRAGON)) {
-		nextTileCode = Ginseng.TileCodes.Dragon;
+		nextTileCode = GinsengTileCodes.Dragon;
 	} else {
-		nextTileCode = Ginseng.TileCodes.Bison;
+		nextTileCode = GinsengTileCodes.Bison;
 	}
 	if (gameOptionEnabled(GINSENG_2_POINT_0) || !gameOptionEnabled(GINSENG_1_POINT_0)) {
-		nextTileCode = Ginseng.TileCodes.Bison;
+		nextTileCode = GinsengTileCodes.Bison;
 	}
 	this.board.placeTile(this.tileManager.grabTile(GUEST, nextTileCode), new NotationPoint("-6,-2"));
-	this.board.placeTile(this.tileManager.grabTile(GUEST, Ginseng.TileCodes.LionTurtle), new NotationPoint("-4,0"));
-	this.board.placeTile(this.tileManager.grabTile(GUEST, Ginseng.TileCodes.Wheel), new NotationPoint("-5,-3"));
-	this.board.placeTile(this.tileManager.grabTile(GUEST, Ginseng.TileCodes.Wheel), new NotationPoint("-5,3"));
-	this.board.placeTile(this.tileManager.grabTile(GUEST, Ginseng.TileCodes.Ginseng), new NotationPoint("-4,-4"));
-	this.board.placeTile(this.tileManager.grabTile(GUEST, Ginseng.TileCodes.Ginseng), new NotationPoint("-4,4"));
-	this.board.placeTile(this.tileManager.grabTile(GUEST, Ginseng.TileCodes.Orchid), new NotationPoint("-4,-5"));
-	this.board.placeTile(this.tileManager.grabTile(GUEST, Ginseng.TileCodes.Orchid), new NotationPoint("-4,5"));
+	this.board.placeTile(this.tileManager.grabTile(GUEST, GinsengTileCodes.LionTurtle), new NotationPoint("-4,0"));
+	this.board.placeTile(this.tileManager.grabTile(GUEST, GinsengTileCodes.Wheel), new NotationPoint("-5,-3"));
+	this.board.placeTile(this.tileManager.grabTile(GUEST, GinsengTileCodes.Wheel), new NotationPoint("-5,3"));
+	this.board.placeTile(this.tileManager.grabTile(GUEST, GinsengTileCodes.Ginseng), new NotationPoint("-4,-4"));
+	this.board.placeTile(this.tileManager.grabTile(GUEST, GinsengTileCodes.Ginseng), new NotationPoint("-4,4"));
+	this.board.placeTile(this.tileManager.grabTile(GUEST, GinsengTileCodes.Orchid), new NotationPoint("-4,-5"));
+	this.board.placeTile(this.tileManager.grabTile(GUEST, GinsengTileCodes.Orchid), new NotationPoint("-4,5"));
 };
 
-Ginseng.GameManager.prototype.getCopy = function() {
-	var copyGame = new Ginseng.GameManager(this.actuator, true, true);
+GinsengGameManager.prototype.getCopy = function() {
+	var copyGame = new GinsengGameManager(this.actuator, true, true);
 	copyGame.board = this.board.getCopy();
 	copyGame.tileManager = this.tileManager.getCopy();
 	return copyGame;
 };
 
-Ginseng.NotationAdjustmentFunction = function(row, col) {
+export function GinsengNotationAdjustmentFunction(row, col) {
 	/* Return string displaying point notation for this game */
 	// return "row:" + row + " col:" + col;
 	return new RowAndColumn(col, 16 - row).notationPointString;
-};
+}

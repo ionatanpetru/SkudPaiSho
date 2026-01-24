@@ -1,6 +1,60 @@
 /* Street Pai Sho specific UI interaction logic */
 
-function StreetController(gameContainer, isMobile) {
+import { ACCENT_TILE, debug } from '../GameData';
+import { boatOnlyMoves } from '../skud-pai-sho/SkudPaiShoRules';
+import {
+  ARRANGING,
+  GUEST,
+  HOST,
+  NotationPoint,
+  PLANTING,
+} from '../CommonNotationObjects';
+import {
+  BRAND_NEW,
+  GameType,
+  MOVE_DONE,
+  READY_FOR_BONUS,
+  WAITING_FOR_BOAT_BONUS_POINT,
+  WAITING_FOR_BONUS_ENDPOINT,
+  WAITING_FOR_ENDPOINT,
+  activeAi,
+  activeAi2,
+  callSubmitMove,
+  createGameIfThatIsOk,
+  currentMoveIndex,
+  finalizeMove,
+  gameId,
+  getCurrentPlayer,
+  getGameOptionsMessageElement,
+  getGatePointMessage,
+  getNeutralPointMessage,
+  getRedPointMessage,
+  getRedWhitePointMessage,
+  getWhitePointMessage,
+  myTurn,
+  onlinePlayEnabled,
+  playingOnlineGame,
+  rerunAll,
+  toBullets,
+  userIsLoggedIn,
+} from '../PaiShoMain';
+import {
+  GATE,
+  NEUTRAL,
+  POSSIBLE_MOVE,
+} from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import { ORIGINAL_BOARD_SETUP, gameOptionEnabled } from '../GameOptions';
+import { RED, WHITE } from '../skud-pai-sho/SkudPaiShoTile';
+import { StreetActuator } from './StreetActuator';
+import { StreetGameManager } from './StreetGameManager';
+import {
+  StreetGameNotation,
+  StreetNotationBuilder,
+  StreetNotationMove,
+} from './StreetGameNotation';
+import { StreetTile } from './StreetTile';
+
+export function StreetController(gameContainer, isMobile) {
 	this.actuator = new StreetActuator(gameContainer, isMobile);
 
 	/* Board setup code determines initial tile placement pattern on the board. */
@@ -94,18 +148,25 @@ StreetController.prototype.getDefaultHelpMessageText = function() {
 };
 
 StreetController.prototype.getAdditionalMessage = function() {
-	var msg = "";
-	
+	const container = document.createElement('span');
+
 	if (this.gameNotation.moves.length <= 2) {
 		if (onlinePlayEnabled && gameId <= 0 && userIsLoggedIn()) {
-			msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by making a move. <br />";
+			const joinText = document.createElement('span');
+			joinText.appendChild(document.createTextNode('Click '));
+			const emJoin = document.createElement('em');
+			emJoin.textContent = 'Join Game';
+			joinText.appendChild(emJoin);
+			joinText.appendChild(document.createTextNode(' above to join another player\'s game. Or, you can start a game that other players can join by making a move.'));
+			container.appendChild(joinText);
+			container.appendChild(document.createElement('br'));
 		} else {
-			msg += "Make the first move.";
+			container.appendChild(document.createTextNode('Make the first move.'));
 		}
-		msg += getGameOptionsMessageHtml(GameType.StreetPaiSho.gameOptions);
+		container.appendChild(getGameOptionsMessageElement(GameType.StreetPaiSho.gameOptions));
 	}
 
-	return msg;
+	return container;
 };
 
 StreetController.prototype.unplayedTileClicked = function(tileDiv) {

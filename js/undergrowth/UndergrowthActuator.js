@@ -1,6 +1,35 @@
 // Actuator
 
-Undergrowth.Actuator = function(gameContainer, isMobile, enableAnimations) {
+import { GUEST, HOST, PLANTING } from '../CommonNotationObjects';
+import {
+  MARKED,
+  NON_PLAYABLE,
+  POSSIBLE_MOVE,
+} from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import {
+  RmbDown,
+  RmbUp,
+  clearMessage,
+  pieceAnimationLength,
+  piecePlaceAnimation,
+  pointClicked,
+  showPointMessage,
+  showTileMessage,
+  unplayedTileClicked,
+} from '../PaiShoMain';
+import { UNDERGROWTH_SIMPLE, gameOptionEnabled } from '../GameOptions';
+import { UndergrowthController } from './UndergrowthController';
+import { UndergrowthTileManager } from './UndergrowthTileManager';
+import {
+  createBoardArrow,
+  createBoardPointDiv,
+  getSkudTilesSrcPath,
+  isSamePoint,
+  setupPaiShoBoard,
+} from '../ActuatorHelp';
+import { debug } from '../GameData';
+
+export function UndergrowthActuator(gameContainer, isMobile, enableAnimations) {
 	this.gameContainer = gameContainer;
 	this.mobile = isMobile;
 
@@ -8,8 +37,8 @@ Undergrowth.Actuator = function(gameContainer, isMobile, enableAnimations) {
 
 	var containers = setupPaiShoBoard(
 		this.gameContainer, 
-		Undergrowth.Controller.getHostTilesContainerDivs(),
-		Undergrowth.Controller.getGuestTilesContainerDivs(), 
+		UndergrowthController.getHostTilesContainerDivs(),
+		UndergrowthController.getGuestTilesContainerDivs(), 
 		false
 	);
 
@@ -19,11 +48,11 @@ Undergrowth.Actuator = function(gameContainer, isMobile, enableAnimations) {
 	this.guestTilesContainer = containers.guestTilesContainer;
 }
 
-Undergrowth.Actuator.prototype.setAnimationOn = function(isOn) {
+UndergrowthActuator.prototype.setAnimationOn = function(isOn) {
 	this.animationOn = isOn;
 };
 
-Undergrowth.Actuator.prototype.actuate = function(board, theGame, markingManager, moveToAnimate, moveAnimationBeginStep) {
+UndergrowthActuator.prototype.actuate = function(board, theGame, markingManager, moveToAnimate, moveAnimationBeginStep) {
 	var self = this;
 
 	if (!moveAnimationBeginStep) {
@@ -38,7 +67,7 @@ Undergrowth.Actuator.prototype.actuate = function(board, theGame, markingManager
 	});
 };
 
-Undergrowth.Actuator.prototype.htmlify = function(board, theGame, markingManager, moveToAnimate, moveAnimationBeginStep) {
+UndergrowthActuator.prototype.htmlify = function(board, theGame, markingManager, moveToAnimate, moveAnimationBeginStep) {
 	this.clearContainer(this.boardContainer);
 	this.clearContainer(this.arrowContainer);
 
@@ -63,7 +92,7 @@ Undergrowth.Actuator.prototype.htmlify = function(board, theGame, markingManager
 		this.arrowContainer.appendChild(createBoardArrow(arrow[0], arrow[1]));
 	}
 
-	var fullTileSet = new Undergrowth.TileManager(true);
+	var fullTileSet = new UndergrowthTileManager(true);
 
 	// Go through tile piles and clear containers
 	fullTileSet.hostTiles.forEach(function(tile) {
@@ -82,20 +111,20 @@ Undergrowth.Actuator.prototype.htmlify = function(board, theGame, markingManager
 	});
 };
 
-Undergrowth.Actuator.prototype.clearContainer = function (container) {
+UndergrowthActuator.prototype.clearContainer = function (container) {
 	while (container.firstChild) {
 		container.removeChild(container.firstChild);
 	}
 };
 
-Undergrowth.Actuator.prototype.clearTileContainer = function (tile) {
+UndergrowthActuator.prototype.clearTileContainer = function (tile) {
 	var container = document.querySelector("." + tile.getImageName());
 	while (container.firstChild) {
 		container.removeChild(container.firstChild);
 	}
 };
 
-Undergrowth.Actuator.prototype.addTile = function(tile, mainContainer) {
+UndergrowthActuator.prototype.addTile = function(tile, mainContainer) {
 	var self = this;
 
 	var container = document.querySelector("." + tile.getImageName());
@@ -124,17 +153,20 @@ Undergrowth.Actuator.prototype.addTile = function(tile, mainContainer) {
 	theDiv.setAttribute("id", tile.id);
 
 	if (this.mobile) {
-		theDiv.setAttribute("onclick", "unplayedTileClicked(this); showTileMessage(this);");
+		theDiv.addEventListener('click', () => {
+				unplayedTileClicked(theDiv);
+				showTileMessage(theDiv);
+			});
 	} else {
-		theDiv.setAttribute("onclick", "unplayedTileClicked(this);");
-		theDiv.setAttribute("onmouseover", "showTileMessage(this);");
-		theDiv.setAttribute("onmouseout", "clearMessage();");
+		theDiv.addEventListener('click', () => unplayedTileClicked(theDiv));
+		theDiv.addEventListener('mouseover', () => showTileMessage(theDiv));
+		theDiv.addEventListener('mouseout', clearMessage);
 	}
 
 	container.appendChild(theDiv);
 };
 
-Undergrowth.Actuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate, moveAnimationBeginStep) {
+UndergrowthActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate, moveAnimationBeginStep) {
 	var self = this;
 
 	var theDiv = createBoardPointDiv(boardPoint);
@@ -157,11 +189,11 @@ Undergrowth.Actuator.prototype.addBoardPoint = function(boardPoint, moveToAnimat
 		}
 		
 		if (this.mobile) {
-			theDiv.setAttribute("onclick", "pointClicked(this); showPointMessage(this);");
+			theDiv.addEventListener("click", () => {pointClicked(theDiv); showPointMessage(theDiv);});
 		} else {
-			theDiv.setAttribute("onclick", "pointClicked(this);");
-			theDiv.setAttribute("onmouseover", "showPointMessage(this);");
-			theDiv.setAttribute("onmouseout", "clearMessage();");
+			theDiv.addEventListener("click", () =>{pointClicked(theDiv);});
+			theDiv.addEventListener("mouseover", () => {showPointMessage(theDiv);});
+			theDiv.addEventListener('mouseout', clearMessage);
 			theDiv.addEventListener('mousedown', e => {
 				 // Right Mouse Button
 				if (e.button == 2) {
@@ -237,7 +269,7 @@ Undergrowth.Actuator.prototype.addBoardPoint = function(boardPoint, moveToAnimat
 	}
 };
 
-Undergrowth.Actuator.prototype.getPointCapturedMoveStepInfo = function(boardPoint, moveToAnimate) {
+UndergrowthActuator.prototype.getPointCapturedMoveStepInfo = function(boardPoint, moveToAnimate) {
 	var capturedStepInfo;
 	if (moveToAnimate.capturedTiles1Info && moveToAnimate.capturedTiles1Info.length) {
 		moveToAnimate.capturedTiles1Info.forEach(function(capturedTileInfo) {
@@ -266,7 +298,7 @@ Undergrowth.Actuator.prototype.getPointCapturedMoveStepInfo = function(boardPoin
 	return capturedStepInfo;
 };
 
-Undergrowth.Actuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnimate, moveAnimationBeginStep, theImg, flags) {
+UndergrowthActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnimate, moveAnimationBeginStep, theImg, flags) {
 	if (!this.animationOn) {
 		return;
 	}
