@@ -2,6 +2,7 @@
 import { TrifleBoardPoint } from './TrifleBoardPoint';
 import { TrifleTileType } from './TrifleTiles';
 import { debugOn } from '../GameData';
+import { getCurrentTileMetadata } from './PaiShoGamesTileMetadata';
 
 export const TrifleTileCategory = {
 	thisTile: "thisTile",
@@ -377,7 +378,7 @@ TrifleTileInfo.defineAbilityTypes = function () {
 TrifleTileInfo.getReadableDescription = function(tileCode) {
 	var tileHtml = "";
 
-	var tileInfo = PaiShoGames.currentTileMetadata[tileCode];
+	var tileInfo = getCurrentTileMetadata()[tileCode];
 
 	if (tileInfo.textLines && !debugOn) {
 		tileInfo.textLines.forEach(function(textLine) {

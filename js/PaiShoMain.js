@@ -4872,15 +4872,15 @@ export function setSidenavNewGameSection() {
 
 export function closeGame() {
 	if (gameDevOn) {
-		// setGameController(GameType.Trifle.id);
+		setGameController(GameType.Trifle.id);
 		// setGameController(GameType.BeyondTheMaps.id);
 		// // REMOVE THIS
 		// addGameOption(EDGES_MOVE_4_2);
 		// addGameOption(EDGES_12x12_GAME);
 		// ----
 
-		setGameController(GameType.Undergrowth.id);
-		addGameOption(UNDERGROWTH_SIMPLE);
+		// setGameController(GameType.Undergrowth.id);
+		// addGameOption(UNDERGROWTH_SIMPLE);
 
 		return;
 	}

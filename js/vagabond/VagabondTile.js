@@ -2,6 +2,7 @@
 
 import { GUEST, HOST } from '../CommonNotationObjects';
 import { debug } from '../GameData';
+import { gameOptionEnabled, V_DOUBLE_MOVE_DISTANCE } from '../GameOptions';
 import { tileIdIncrement } from '../skud-pai-sho/SkudPaiShoTile';
 
 export var VagabondTileCodes = {
