@@ -6,7 +6,8 @@
 		"html2canvas": "^1.4.1",
 		"jquery": "^3.7.1",
 		"lz-string": "^1.5.0",
-		"package.json": "^2.0.1"
+		"package.json": "^2.0.1",
+		"three": "^0.182.0"
 	},
 	"name": "skud-pai-sho",
 	"description": "The Garden Gate - the home of Pai Sho. Play online and learn more at [The Garden Gate - SkudPaiSho.com](https://skudpaisho.com).",

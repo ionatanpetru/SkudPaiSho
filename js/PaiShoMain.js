@@ -112,6 +112,7 @@ import { StreetController } from './street/StreetController';
 import { TrifleController } from './trifle/TrifleController';
 import { TumbleweedController } from './tumbleweed/TumbleweedController';
 import { UndergrowthController } from './undergrowth/UndergrowthController';
+import { YammaController } from './yamma/YammaController';
 import { VagabondController } from "./vagabond/VagabondController";
 import * as WelcomeTutorial from './WelcomeTutorial';
 import * as TournamentManager from './TournamentManager';
@@ -3417,6 +3418,16 @@ export const GameType = {
 			GODAI_BOARD_ZONES,
 			GODAI_EMPTY_TILE,
 		]
+	},
+	Yamma: {
+		id: 100,
+		name: "Yamma",
+		desc: "Yamma",
+		color: "var(--othercolor)",
+		description: "A 3D four-in-a-row game with cubes viewed from three perspectives.",
+		coverImg: "hexagon.png",
+		rulesUrl: "https://boardgamegeek.com/boardgame/388435/yamma",
+		gameOptions: []
 	}
 };
 
@@ -3495,7 +3506,10 @@ export function getGameControllerForGameType(gameTypeId) {
 			break;
 		case GameType.GodaiPaiSho.id:
 			controller = new GodaiController(gameContainerDiv, isMobile)
-			break
+			break;
+		case GameType.Yamma.id:
+			controller = new YammaController(gameContainerDiv, isMobile);
+			break;
 		default:
 			debug("Game Controller unavailable.");
 	}
