@@ -20,6 +20,7 @@ import {
 	WAITING_FOR_ENDPOINT
 } from '../PaiShoMain';
 import { YammaActuator } from './YammaActuator';
+import { PLAYER } from './YammaBoard';
 import { YammaGameManager } from './YammaGameManager';
 import {
 	YammaGameNotation,
@@ -32,10 +33,11 @@ export class YammaController {
 		this.isMobile = isMobile;
 
 		// Create actuator with slot click callback
+		// Callback receives (row, col, level, rotation) - rotation is undefined on first click
 		this.actuator = new YammaActuator(
 			gameContainer,
 			isMobile,
-			(row, col, level) => this.slotClicked(row, col, level),
+			(row, col, level, rotation) => this.slotClicked(row, col, level, rotation),
 			this.getHostTilesContainerDivs(),
 			this.getGuestTilesContainerDivs()
 		);
@@ -94,6 +96,7 @@ export class YammaController {
 		}
 
 		this.actuator.clearPossibleMoves();
+		this.actuator.cancelRotationSelection();
 		rerunAll();
 	}
 
@@ -107,13 +110,15 @@ export class YammaController {
 			"<ul>" +
 			"<li>Players take turns placing cubes on available slots</li>" +
 			"<li>Cubes stack in a triangular pyramid - when 3 cubes form a triangle, a new slot appears above</li>" +
-			"<li>Each cube shows your color from the front and opponent's from other angles</li>" +
-			"<li>The board can be rotated to view from different angles</li>" +
-			"<li>Win by aligning 4 cubes of your color in a row</li>" +
+			"<li>Each cube shows your color from 2 of the 3 viewing angles, and opponent's color from the third</li>" +
+			"<li>After clicking a slot, choose a rotation to decide which angle shows opponent's color</li>" +
+			"<li>Win by aligning 4 cubes of your color in a row from any viewing angle</li>" +
 			"</ul>" +
 			"<p><strong>Controls:</strong></p>" +
 			"<ul>" +
-			"<li>Click a slot marker to place a cube</li>" +
+			"<li>Click a slot marker to select placement position</li>" +
+			"<li>Click one of the 3 preview cubes to choose rotation and place</li>" +
+			"<li>Click elsewhere to cancel rotation selection</li>" +
 			"<li>Drag to rotate the view</li>" +
 			"<li>Scroll to zoom in/out</li>" +
 			"</ul>";
@@ -127,6 +132,8 @@ export class YammaController {
 			const angleNames = ['Front', 'Left', 'Right'];
 			const angleName = angleNames[this.theGame.winningAngle] || '';
 			container.textContent = `${winnerText} wins! (4-in-a-row from ${angleName} view)`;
+		} else if (this.actuator.pendingMove) {
+			container.textContent = 'Click a preview cube to choose rotation, or click elsewhere to cancel.';
 		} else if (this.gameNotation.moves.length === 0) {
 			container.textContent = 'Click a slot on the board to place your first cube.';
 		}
@@ -134,7 +141,7 @@ export class YammaController {
 		return container;
 	}
 
-	slotClicked(row, col, level) {
+	slotClicked(row, col, level, rotation) {
 		if (this.theGame.hasEnded()) {
 			return;
 		}
@@ -150,9 +157,16 @@ export class YammaController {
 			return;
 		}
 
-		// Build the move
-		this.notationBuilder.setPoint(row, col, level);
-		this.completeMove();
+		// If rotation is provided, complete the move with that rotation
+		if (rotation !== undefined) {
+			this.notationBuilder.setPoint(row, col, level, rotation);
+			this.completeMove();
+			return;
+		}
+
+		// No rotation provided - show rotation selection UI
+		const playerColor = this.getCurrentPlayer() === HOST ? PLAYER.WHITE : PLAYER.BLUE;
+		this.actuator.showRotationSelection(row, col, level, playerColor);
 	}
 
 	// Required for compatibility with Main's pointClicked

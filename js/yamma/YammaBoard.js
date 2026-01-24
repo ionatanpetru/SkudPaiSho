@@ -34,11 +34,12 @@ export const CubeFaceOrientation = {
 };
 
 export class YammaCube {
-	constructor(owner, row, col, level = 0) {
+	constructor(owner, row, col, level = 0, rotation = 0) {
 		this.owner = owner;
 		this.row = row;
 		this.col = col;
 		this.level = level;
+		this.rotation = rotation; // 0, 1, or 2 (120° increments)
 
 		// For compatibility with old code that uses x, y, z
 		this.x = row;
@@ -46,9 +47,28 @@ export class YammaCube {
 		this.z = level;
 
 		// Which color shows from each of 3 viewing directions
-		this.frontFace = owner;
-		this.leftFace = owner === PLAYER.WHITE ? PLAYER.BLUE : PLAYER.WHITE;
-		this.rightFace = owner === PLAYER.WHITE ? PLAYER.BLUE : PLAYER.WHITE;
+		// For 2:1 ratio: owner sees their color from 2 angles, opponent's from 1
+		// Rotation determines which view shows the opponent's color:
+		// - rotation 0: Right view shows opponent
+		// - rotation 1: Front view shows opponent
+		// - rotation 2: Left view shows opponent
+		const opponent = owner === PLAYER.WHITE ? PLAYER.BLUE : PLAYER.WHITE;
+
+		// Default: Front and Left show owner, Right shows opponent
+		// Rotation shifts which view shows opponent's color
+		const faces = [owner, owner, opponent]; // [Front, Left, Right] for rotation 0
+		// Rotate the array based on rotation value
+		// rotation 1: opponent moves to Front -> [opponent, owner, owner]
+		// rotation 2: opponent moves to Left -> [owner, opponent, owner]
+		const rotatedFaces = [
+			faces[(0 + rotation) % 3],
+			faces[(1 + rotation) % 3],
+			faces[(2 + rotation) % 3]
+		];
+
+		this.frontFace = rotatedFaces[0];
+		this.leftFace = rotatedFaces[1];
+		this.rightFace = rotatedFaces[2];
 	}
 
 	getFaceColor(viewAngle) {
@@ -146,12 +166,12 @@ export class YammaBoard {
 		return this.hasSupport(row, col, level);
 	}
 
-	placeCube(row, col, level, player) {
+	placeCube(row, col, level, player, rotation = 0) {
 		if (!this.canPlaceCube(row, col, level)) {
 			return null;
 		}
 
-		const cube = new YammaCube(player, row, col, level);
+		const cube = new YammaCube(player, row, col, level, rotation);
 		this.levels[level][row][col] = cube;
 
 		return cube;
@@ -356,10 +376,7 @@ export class YammaBoard {
 				for (let col = 0; col <= row; col++) {
 					const cube = this.levels[level][row][col];
 					if (cube) {
-						const cubeCopy = new YammaCube(cube.owner, cube.row, cube.col, cube.level);
-						cubeCopy.frontFace = cube.frontFace;
-						cubeCopy.leftFace = cube.leftFace;
-						cubeCopy.rightFace = cube.rightFace;
+						const cubeCopy = new YammaCube(cube.owner, cube.row, cube.col, cube.level, cube.rotation);
 						copy.levels[level][row][col] = cubeCopy;
 					}
 				}

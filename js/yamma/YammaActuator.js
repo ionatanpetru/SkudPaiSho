@@ -55,6 +55,14 @@ export class YammaActuator {
 		// Store current board for reference
 		this.currentBoard = null;
 
+		// Rotation selection state
+		this.pendingMove = null; // { row, col, level }
+		this.previewGroup = null;
+		this.previewMesh = null; // Single preview cube at the board position
+		this.selectedRotation = 0; // Currently selected/hovered rotation
+		this.currentPlayerColor = PLAYER.WHITE; // Updated when showing rotation selection
+		this.rotationPanel = null; // DOM element for rotation selection UI
+
 		this.initialized = false;
 
 		this.initialize();
@@ -74,6 +82,10 @@ export class YammaActuator {
 		container.style.height = '500px';
 		container.style.position = 'relative';
 		bcontainer.appendChild(container);
+
+		// Create rotation selection panel (initially hidden)
+		this.rotationPanel = this.createRotationPanel();
+		container.appendChild(this.rotationPanel);
 
 		// Create view panels container (3 perspective views)
 		const viewsContainer = document.createElement('div');
@@ -165,11 +177,13 @@ export class YammaActuator {
 		this.cubesGroup = new THREE.Group();
 		this.slotsGroup = new THREE.Group();
 		this.highlightGroup = new THREE.Group();
+		this.previewGroup = new THREE.Group();
 
 		this.scene.add(this.boardGroup);
 		this.boardGroup.add(this.slotsGroup);
 		this.boardGroup.add(this.cubesGroup);
 		this.boardGroup.add(this.highlightGroup);
+		this.boardGroup.add(this.previewGroup);
 
 		// Create the triangular board base
 		this.createBoardBase();
@@ -208,20 +222,215 @@ export class YammaActuator {
 		this.scene.add(fillLight);
 	}
 
+	/**
+	 * Create the rotation selection panel UI.
+	 * This panel appears on the side when a slot is clicked, allowing the player
+	 * to choose cube rotation before confirming placement.
+	 */
+	createRotationPanel() {
+		const panel = document.createElement('div');
+		panel.id = 'yamma-rotation-panel';
+		panel.style.cssText = `
+			position: absolute;
+			right: 10px;
+			top: 50%;
+			transform: translateY(-50%);
+			background: rgba(30, 30, 50, 0.95);
+			border: 2px solid #4a4a6a;
+			border-radius: 8px;
+			padding: 15px;
+			display: none;
+			flex-direction: column;
+			gap: 10px;
+			z-index: 100;
+			min-width: 140px;
+		`;
+
+		// Title
+		const title = document.createElement('div');
+		title.style.cssText = `
+			color: #fff;
+			font-size: 14px;
+			font-weight: bold;
+			text-align: center;
+			margin-bottom: 5px;
+		`;
+		title.textContent = 'Choose Rotation';
+		panel.appendChild(title);
+
+		// Subtitle explaining the colors
+		const subtitle = document.createElement('div');
+		subtitle.style.cssText = `
+			color: #aaa;
+			font-size: 11px;
+			text-align: center;
+			margin-bottom: 10px;
+		`;
+		subtitle.textContent = 'Pick which view shows opponent color';
+		panel.appendChild(subtitle);
+
+		// Rotation options container
+		const optionsContainer = document.createElement('div');
+		optionsContainer.style.cssText = `
+			display: flex;
+			flex-direction: column;
+			gap: 8px;
+		`;
+
+		const viewLabels = ['Right', 'Front', 'Left'];
+		this.rotationButtons = [];
+
+		for (let i = 0; i < 3; i++) {
+			const btn = document.createElement('button');
+			btn.style.cssText = `
+				padding: 10px 15px;
+				background: #3a3a5a;
+				border: 2px solid #5a5a7a;
+				border-radius: 5px;
+				color: #fff;
+				cursor: pointer;
+				font-size: 13px;
+				transition: all 0.2s;
+			`;
+			btn.textContent = `${viewLabels[i]} = Opponent`;
+			btn.dataset.rotation = i;
+
+			btn.addEventListener('mouseenter', () => {
+				this.onRotationHover(i);
+				btn.style.background = '#4a4a7a';
+				btn.style.borderColor = '#7a7aaa';
+			});
+
+			btn.addEventListener('mouseleave', () => {
+				if (this.selectedRotation !== i) {
+					btn.style.background = '#3a3a5a';
+					btn.style.borderColor = '#5a5a7a';
+				}
+			});
+
+			btn.addEventListener('click', () => {
+				this.selectRotation(i);
+			});
+
+			optionsContainer.appendChild(btn);
+			this.rotationButtons.push(btn);
+		}
+
+		panel.appendChild(optionsContainer);
+
+		// Buttons container
+		const buttonsContainer = document.createElement('div');
+		buttonsContainer.style.cssText = `
+			display: flex;
+			gap: 8px;
+			margin-top: 10px;
+		`;
+
+		// Confirm button
+		const confirmBtn = document.createElement('button');
+		confirmBtn.style.cssText = `
+			flex: 1;
+			padding: 10px;
+			background: #2a6a2a;
+			border: none;
+			border-radius: 5px;
+			color: #fff;
+			cursor: pointer;
+			font-size: 13px;
+			font-weight: bold;
+		`;
+		confirmBtn.textContent = 'Confirm';
+		confirmBtn.addEventListener('click', () => this.confirmRotationSelection());
+		buttonsContainer.appendChild(confirmBtn);
+
+		// Cancel button
+		const cancelBtn = document.createElement('button');
+		cancelBtn.style.cssText = `
+			flex: 1;
+			padding: 10px;
+			background: #6a2a2a;
+			border: none;
+			border-radius: 5px;
+			color: #fff;
+			cursor: pointer;
+			font-size: 13px;
+		`;
+		cancelBtn.textContent = 'Cancel';
+		cancelBtn.addEventListener('click', () => this.cancelRotationSelection());
+		buttonsContainer.appendChild(cancelBtn);
+
+		panel.appendChild(buttonsContainer);
+
+		return panel;
+	}
+
+	/**
+	 * Handle hovering over a rotation option - update preview.
+	 */
+	onRotationHover(rotation) {
+		this.selectedRotation = rotation;
+		this.updatePreviewCube();
+		this.updateRotationButtonStyles();
+	}
+
+	/**
+	 * Select a rotation option (clicking the button).
+	 */
+	selectRotation(rotation) {
+		this.selectedRotation = rotation;
+		this.updatePreviewCube();
+		this.updateRotationButtonStyles();
+	}
+
+	/**
+	 * Update the visual styles of rotation buttons to show selection.
+	 */
+	updateRotationButtonStyles() {
+		for (let i = 0; i < this.rotationButtons.length; i++) {
+			const btn = this.rotationButtons[i];
+			if (i === this.selectedRotation) {
+				btn.style.background = '#4a4a7a';
+				btn.style.borderColor = '#9a9aca';
+			} else {
+				btn.style.background = '#3a3a5a';
+				btn.style.borderColor = '#5a5a7a';
+			}
+		}
+	}
+
+	/**
+	 * Confirm the rotation selection and complete the move.
+	 */
+	confirmRotationSelection() {
+		if (!this.pendingMove) return;
+
+		const { row, col, level } = this.pendingMove;
+		const rotation = this.selectedRotation;
+
+		this.clearRotationSelection();
+
+		if (this.onSlotClick) {
+			this.onSlotClick(row, col, level, rotation);
+		}
+	}
+
 	createBoardBase() {
 		// Create a triangular board base
 		// Oriented so apex (row 0) is at back, wide base (row 4) is at front
 		const triangleShape = new THREE.Shape();
 
-		// Calculate triangle dimensions
-		const size = this.baseRows * this.slotSpacing;
-		const height = (this.baseRows - 1) * this.slotSpacing * 0.866;
+		// Calculate triangle dimensions for equilateral triangle
+		// The slots span (baseRows - 1) gaps horizontally at the base
+		const padding = 0.5;
+		const baseWidth = (this.baseRows - 1) * this.slotSpacing + padding * 2;
+		// For equilateral triangle: height = base * sqrt(3) / 2
+		const height = baseWidth * Math.sqrt(3) / 2;
 
 		// Triangle vertices: apex at back (positive z), base at front (negative z)
 		// In Shape coordinates (x, y), y becomes z after rotation
 		triangleShape.moveTo(0, height / 2);              // Apex at back
-		triangleShape.lineTo(-size / 2, -height / 2);     // Front left
-		triangleShape.lineTo(size / 2, -height / 2);      // Front right
+		triangleShape.lineTo(-baseWidth / 2, -height / 2);     // Front left
+		triangleShape.lineTo(baseWidth / 2, -height / 2);      // Front right
 		triangleShape.closePath();
 
 		const extrudeSettings = {
@@ -389,34 +598,214 @@ export class YammaActuator {
 		});
 
 		// Face order in Three.js BoxGeometry: +X, -X, +Y, -Y, +Z, -Z
-		// For a corner-balanced cube, we want 3 faces of one color sharing a corner
-		// and 3 faces of the other color sharing the opposite corner.
-		// Adjacent faces alternate colors: if +X is white, then +Y and +Z are blue, etc.
+		//
+		// For a cube balanced on its corner, 3 faces meet at each corner.
+		// Corner (+1,+1,+1) is shared by faces: +X, +Y, +Z (indices 0, 2, 4)
+		// Corner (-1,-1,-1) is shared by faces: -X, -Y, -Z (indices 1, 3, 5)
+		//
+		// When balanced on the (-1,-1,-1) corner (opponent color), the (+1,+1,+1)
+		// corner (owner color) points up. From horizontal viewing angles you see
+		// 2 faces from the top corner and 1 from the bottom = 2:1 ratio.
 		let materials;
 		if (cube.owner === PLAYER.WHITE) {
-			// White on +X, -Y, +Z (share one corner)
-			// Blue on -X, +Y, -Z (share opposite corner)
-			materials = [whiteMat, blueMat, blueMat, whiteMat, whiteMat, blueMat];
+			// White on +X, +Y, +Z (top corner when balanced)
+			// Blue on -X, -Y, -Z (bottom corner when balanced)
+			materials = [whiteMat, blueMat, whiteMat, blueMat, whiteMat, blueMat];
 		} else {
-			// Blue on +X, -Y, +Z
-			// White on -X, +Y, -Z
-			materials = [blueMat, whiteMat, whiteMat, blueMat, blueMat, whiteMat];
+			// Blue on +X, +Y, +Z
+			// White on -X, -Y, -Z
+			materials = [blueMat, whiteMat, blueMat, whiteMat, blueMat, whiteMat];
 		}
 
 		const mesh = new THREE.Mesh(geometry, materials);
 
-		// To balance a cube on its corner:
-		// 1. Use YXZ rotation order so Y rotation is applied FIRST
-		// 2. Rotate 45° around Y to align diagonal with view axis
-		// 3. Tilt by arctan(√2) ≈ 54.74° around X to balance on corner
+		// To balance a cube on its corner with point straight up:
+		// With 'YXZ' order, transforms apply as: Rz first, then Rx, then Ry
+		// 1. Rz(45°) - align cube diagonal with view
+		// 2. Rx(-35.26°) - tilt backward to balance on corner, point up
+		// 3. Ry(rotation * 120°) - spin around vertical for player's choice
 		mesh.rotation.order = 'YXZ';
-		mesh.rotation.y = Math.PI / 4;  // 45° - aligns corner forward
-		mesh.rotation.x = Math.atan(Math.sqrt(2));  // ~54.74° - tilts onto corner
+		mesh.rotation.z = Math.PI / 4;  // 45° - align diagonal
+		mesh.rotation.x = -Math.atan(1 / Math.sqrt(2));  // -35.26° - tilt onto corner
+		mesh.rotation.y = (cube.rotation || 0) * (Math.PI * 2 / 3);  // Player's spin
 
 		mesh.castShadow = true;
 		mesh.receiveShadow = true;
 
 		return mesh;
+	}
+
+	/**
+	 * Create a preview cube mesh for rotation selection.
+	 * Shows which faces will be which color based on the rotation choice.
+	 *
+	 * @param {string} playerColor - PLAYER.WHITE or PLAYER.BLUE
+	 * @param {number} rotation - 0, 1, or 2 (determines which view shows opponent color)
+	 * @param {boolean} highlighted - Whether this preview is currently selected
+	 */
+	createPreviewCubeMesh(playerColor, rotation, highlighted = false) {
+		const size = this.cubeSize * 0.9; // Slightly smaller for preview
+
+		const geometry = new THREE.BoxGeometry(size, size, size);
+
+		// Create materials
+		const whiteMat = new THREE.MeshStandardMaterial({
+			color: highlighted ? 0xffffff : 0xf5f5f5,
+			roughness: 0.3,
+			metalness: 0.1,
+			transparent: true,
+			opacity: highlighted ? 1.0 : 0.8
+		});
+		const blueMat = new THREE.MeshStandardMaterial({
+			color: highlighted ? 0x2a4a7f : 0x1e3a5f,
+			roughness: 0.3,
+			metalness: 0.1,
+			transparent: true,
+			opacity: highlighted ? 1.0 : 0.8
+		});
+
+		// Face order: +X, -X, +Y, -Y, +Z, -Z
+		// Corner (+1,+1,+1) = +X, +Y, +Z (indices 0, 2, 4) - owner's color
+		// Corner (-1,-1,-1) = -X, -Y, -Z (indices 1, 3, 5) - opponent's color
+		//
+		// Rotation determines which viewing angle shows opponent's color:
+		// - rotation 0: Right view shows opponent (default)
+		// - rotation 1: Front view shows opponent
+		// - rotation 2: Left view shows opponent
+		let materials;
+		if (playerColor === PLAYER.WHITE) {
+			materials = [whiteMat, blueMat, whiteMat, blueMat, whiteMat, blueMat];
+		} else {
+			materials = [blueMat, whiteMat, blueMat, whiteMat, blueMat, whiteMat];
+		}
+
+		const mesh = new THREE.Mesh(geometry, materials);
+
+		// Apply corner-balanced rotation with point straight up
+		// With 'YXZ' order, transforms apply as: Rz first, then Rx, then Ry
+		mesh.rotation.order = 'YXZ';
+		mesh.rotation.z = Math.PI / 4;  // 45° - align diagonal
+		mesh.rotation.x = -Math.atan(1 / Math.sqrt(2));  // -35.26° - tilt onto corner
+		mesh.rotation.y = rotation * (Math.PI * 2 / 3);  // Player's spin
+
+		mesh.castShadow = true;
+		mesh.receiveShadow = true;
+
+		return mesh;
+	}
+
+	/**
+	 * Show rotation selection UI for a pending move.
+	 * Shows a side panel with rotation options and a preview cube at the board position.
+	 *
+	 * @param {number} row - Board row
+	 * @param {number} col - Board column
+	 * @param {number} level - Board level
+	 * @param {string} playerColor - PLAYER.WHITE or PLAYER.BLUE
+	 */
+	showRotationSelection(row, col, level, playerColor) {
+		this.clearRotationSelection();
+
+		this.pendingMove = { row, col, level };
+		this.currentPlayerColor = playerColor;
+		this.selectedRotation = 0;
+
+		// Show the rotation panel
+		if (this.rotationPanel) {
+			this.rotationPanel.style.display = 'flex';
+		}
+
+		// Update button styles for initial selection
+		this.updateRotationButtonStyles();
+
+		// Create initial preview cube at the board position
+		this.updatePreviewCube();
+
+		// Add a semi-transparent highlight on the selected slot
+		this.highlightPosition(row, col, level, 0xffff00);
+	}
+
+	/**
+	 * Update the preview cube at the board position based on selected rotation.
+	 */
+	updatePreviewCube() {
+		if (!this.pendingMove) return;
+
+		// Remove existing preview
+		if (this.previewMesh) {
+			this.previewGroup.remove(this.previewMesh);
+			if (this.previewMesh.geometry) this.previewMesh.geometry.dispose();
+			if (this.previewMesh.material) {
+				if (Array.isArray(this.previewMesh.material)) {
+					this.previewMesh.material.forEach(m => m.dispose());
+				} else {
+					this.previewMesh.material.dispose();
+				}
+			}
+			this.previewMesh = null;
+		}
+
+		const { row, col, level } = this.pendingMove;
+		const pos = this.getWorldPosition(row, col, level);
+
+		// Create new preview cube with selected rotation
+		this.previewMesh = this.createPreviewCubeMesh(this.currentPlayerColor, this.selectedRotation, true);
+		this.previewMesh.position.set(pos.x, pos.y, pos.z);
+
+		this.previewGroup.add(this.previewMesh);
+	}
+
+	/**
+	 * Clear the rotation selection UI.
+	 */
+	clearRotationSelection() {
+		// Hide the rotation panel
+		if (this.rotationPanel) {
+			this.rotationPanel.style.display = 'none';
+		}
+
+		// Remove preview mesh
+		if (this.previewMesh) {
+			this.previewGroup.remove(this.previewMesh);
+			if (this.previewMesh.geometry) this.previewMesh.geometry.dispose();
+			if (this.previewMesh.material) {
+				if (Array.isArray(this.previewMesh.material)) {
+					this.previewMesh.material.forEach(m => m.dispose());
+				} else {
+					this.previewMesh.material.dispose();
+				}
+			}
+			this.previewMesh = null;
+		}
+
+		// Clear any remaining preview group children
+		while (this.previewGroup.children.length > 0) {
+			const child = this.previewGroup.children[0];
+			this.previewGroup.remove(child);
+			if (child.geometry) child.geometry.dispose();
+			if (child.material) {
+				if (Array.isArray(child.material)) {
+					child.material.forEach(m => m.dispose());
+				} else {
+					child.material.dispose();
+				}
+			}
+		}
+
+		this.pendingMove = null;
+		this.selectedRotation = 0;
+
+		// Clear the highlight
+		while (this.highlightGroup.children.length > 0) {
+			this.highlightGroup.remove(this.highlightGroup.children[0]);
+		}
+	}
+
+	/**
+	 * Cancel the current rotation selection and return to normal state.
+	 */
+	cancelRotationSelection() {
+		this.clearRotationSelection();
 	}
 
 	setupEventListeners(container) {
@@ -439,6 +828,21 @@ export class YammaActuator {
 			this.mouse.y = -((clientY - rect.top) / rect.height) * 2 + 1;
 
 			this.raycaster.setFromCamera(this.mouse, this.camera);
+
+			// If rotation selection is active, clicking on the 3D view (not the panel) cancels it
+			// unless clicking on a slot to start a new selection
+			if (this.pendingMove) {
+				const slotIntersects = this.raycaster.intersectObjects(this.slotMeshes);
+				if (slotIntersects.length === 0) {
+					// Clicked on empty space - cancel rotation selection
+					this.cancelRotationSelection();
+					return;
+				}
+				// Clicking on a different slot will cancel current and start new selection
+				// (handled below in slot click logic)
+			}
+
+			// Check for slot clicks
 			const intersects = this.raycaster.intersectObjects(this.slotMeshes);
 
 			if (intersects.length > 0) {
