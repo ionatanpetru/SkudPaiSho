@@ -110,17 +110,18 @@ export class YammaController {
 			"<ul>" +
 			"<li>Players take turns placing cubes on available slots</li>" +
 			"<li>Cubes stack in a triangular pyramid - when 3 cubes form a triangle, a new slot appears above</li>" +
-			"<li>Each cube shows your color from 2 of the 3 viewing angles, and opponent's color from the third</li>" +
-			"<li>After clicking a slot, choose a rotation to decide which angle shows opponent's color</li>" +
+			"<li>Each cube has 3 white faces and 3 blue faces at opposite corners</li>" +
+			"<li>When placed, you see 2 faces of one color and 1 of the other from each viewing angle</li>" +
+			"<li>Use the rotation arrows to orient your cube before confirming placement</li>" +
 			"<li>Win by aligning 4 cubes of your color in a row from any viewing angle</li>" +
 			"</ul>" +
 			"<p><strong>Controls:</strong></p>" +
 			"<ul>" +
 			"<li>Click a slot marker to select placement position</li>" +
-			"<li>Click one of the 3 preview cubes to choose rotation and place</li>" +
-			"<li>Click elsewhere to cancel rotation selection</li>" +
-			"<li>Drag to rotate the view</li>" +
-			"<li>Scroll to zoom in/out</li>" +
+			"<li>Click the arrows to rotate the cube preview</li>" +
+			"<li>Click the green button to confirm placement</li>" +
+			"<li>Click elsewhere to cancel</li>" +
+			"<li>Drag to rotate the view, scroll to zoom</li>" +
 			"</ul>";
 	}
 
@@ -133,7 +134,7 @@ export class YammaController {
 			const angleName = angleNames[this.theGame.winningAngle] || '';
 			container.textContent = `${winnerText} wins! (4-in-a-row from ${angleName} view)`;
 		} else if (this.actuator.pendingMove) {
-			container.textContent = 'Click a preview cube to choose rotation, or click elsewhere to cancel.';
+			container.textContent = 'Use arrows to rotate, then click the green button to place.';
 		} else if (this.gameNotation.moves.length === 0) {
 			container.textContent = 'Click a slot on the board to place your first cube.';
 		}

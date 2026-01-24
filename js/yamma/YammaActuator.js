@@ -61,7 +61,7 @@ export class YammaActuator {
 		this.previewMesh = null; // Single preview cube at the board position
 		this.selectedRotation = 0; // Currently selected/hovered rotation
 		this.currentPlayerColor = PLAYER.WHITE; // Updated when showing rotation selection
-		this.rotationPanel = null; // DOM element for rotation selection UI
+		this.rotationArrowsGroup = null; // 3D arrows for rotation control
 
 		this.initialized = false;
 
@@ -82,10 +82,6 @@ export class YammaActuator {
 		container.style.height = '500px';
 		container.style.position = 'relative';
 		bcontainer.appendChild(container);
-
-		// Create rotation selection panel (initially hidden)
-		this.rotationPanel = this.createRotationPanel();
-		container.appendChild(this.rotationPanel);
 
 		// Create view panels container (3 perspective views)
 		const viewsContainer = document.createElement('div');
@@ -185,6 +181,9 @@ export class YammaActuator {
 		this.boardGroup.add(this.highlightGroup);
 		this.boardGroup.add(this.previewGroup);
 
+		// Create rotation arrows for preview cube interaction
+		this.createRotationArrows();
+
 		// Create the triangular board base
 		this.createBoardBase();
 
@@ -223,179 +222,125 @@ export class YammaActuator {
 	}
 
 	/**
-	 * Create the rotation selection panel UI.
-	 * This panel appears on the side when a slot is clicked, allowing the player
-	 * to choose cube rotation before confirming placement.
+	 * Create 3D rotation arrows that orbit around the preview cube.
+	 * Left arrow rotates counter-clockwise, right arrow rotates clockwise.
 	 */
-	createRotationPanel() {
-		const panel = document.createElement('div');
-		panel.id = 'yamma-rotation-panel';
-		panel.style.cssText = `
-			position: absolute;
-			right: 10px;
-			top: 50%;
-			transform: translateY(-50%);
-			background: rgba(30, 30, 50, 0.95);
-			border: 2px solid #4a4a6a;
-			border-radius: 8px;
-			padding: 15px;
-			display: none;
-			flex-direction: column;
-			gap: 10px;
-			z-index: 100;
-			min-width: 140px;
-		`;
+	createRotationArrows() {
+		this.rotationArrowsGroup = new THREE.Group();
 
-		// Title
-		const title = document.createElement('div');
-		title.style.cssText = `
-			color: #fff;
-			font-size: 14px;
-			font-weight: bold;
-			text-align: center;
-			margin-bottom: 5px;
-		`;
-		title.textContent = 'Choose Rotation';
-		panel.appendChild(title);
+		// Create curved arrow shapes for left and right rotation
+		this.leftArrow = this.createArrowMesh('left');
+		this.rightArrow = this.createArrowMesh('right');
+		this.confirmButton = this.createConfirmMesh();
 
-		// Subtitle explaining the colors
-		const subtitle = document.createElement('div');
-		subtitle.style.cssText = `
-			color: #aaa;
-			font-size: 11px;
-			text-align: center;
-			margin-bottom: 10px;
-		`;
-		subtitle.textContent = 'Pick which view shows opponent color';
-		panel.appendChild(subtitle);
+		this.rotationArrowsGroup.add(this.leftArrow);
+		this.rotationArrowsGroup.add(this.rightArrow);
+		this.rotationArrowsGroup.add(this.confirmButton);
 
-		// Rotation options container
-		const optionsContainer = document.createElement('div');
-		optionsContainer.style.cssText = `
-			display: flex;
-			flex-direction: column;
-			gap: 8px;
-		`;
+		this.rotationArrowsGroup.visible = false;
+		this.previewGroup.add(this.rotationArrowsGroup);
+	}
 
-		const viewLabels = ['Right', 'Front', 'Left'];
-		this.rotationButtons = [];
+	/**
+	 * Create an arrow mesh for rotation control.
+	 */
+	createArrowMesh(direction) {
+		// Create a curved arrow shape
+		const arrowGroup = new THREE.Group();
 
-		for (let i = 0; i < 3; i++) {
-			const btn = document.createElement('button');
-			btn.style.cssText = `
-				padding: 10px 15px;
-				background: #3a3a5a;
-				border: 2px solid #5a5a7a;
-				border-radius: 5px;
-				color: #fff;
-				cursor: pointer;
-				font-size: 13px;
-				transition: all 0.2s;
-			`;
-			btn.textContent = `${viewLabels[i]} = Opponent`;
-			btn.dataset.rotation = i;
+		// Arrow arc
+		const arcRadius = this.cubeSize * 1.2;
+		const arcGeometry = new THREE.TorusGeometry(arcRadius, 0.06, 8, 16, Math.PI * 0.6);
+		const arcMaterial = new THREE.MeshStandardMaterial({
+			color: direction === 'left' ? 0x4488ff : 0x44ff88,
+			emissive: direction === 'left' ? 0x2244aa : 0x22aa44,
+			emissiveIntensity: 0.3
+		});
+		const arc = new THREE.Mesh(arcGeometry, arcMaterial);
 
-			btn.addEventListener('mouseenter', () => {
-				this.onRotationHover(i);
-				btn.style.background = '#4a4a7a';
-				btn.style.borderColor = '#7a7aaa';
-			});
+		// Arrow head (cone)
+		const headGeometry = new THREE.ConeGeometry(0.15, 0.3, 8);
+		const headMaterial = new THREE.MeshStandardMaterial({
+			color: direction === 'left' ? 0x4488ff : 0x44ff88,
+			emissive: direction === 'left' ? 0x2244aa : 0x22aa44,
+			emissiveIntensity: 0.3
+		});
+		const head = new THREE.Mesh(headGeometry, headMaterial);
 
-			btn.addEventListener('mouseleave', () => {
-				if (this.selectedRotation !== i) {
-					btn.style.background = '#3a3a5a';
-					btn.style.borderColor = '#5a5a7a';
-				}
-			});
-
-			btn.addEventListener('click', () => {
-				this.selectRotation(i);
-			});
-
-			optionsContainer.appendChild(btn);
-			this.rotationButtons.push(btn);
+		// Position arrow head at end of arc
+		if (direction === 'left') {
+			arc.rotation.x = Math.PI / 2;
+			arc.rotation.z = Math.PI * 0.2;
+			head.position.set(-arcRadius * 0.95, 0, arcRadius * 0.3);
+			head.rotation.z = Math.PI * 0.7;
+			arrowGroup.position.x = -this.cubeSize * 0.3;
+		} else {
+			arc.rotation.x = Math.PI / 2;
+			arc.rotation.z = -Math.PI * 0.2;
+			head.position.set(arcRadius * 0.95, 0, arcRadius * 0.3);
+			head.rotation.z = -Math.PI * 0.7;
+			arrowGroup.position.x = this.cubeSize * 0.3;
 		}
 
-		panel.appendChild(optionsContainer);
+		arrowGroup.add(arc);
+		arrowGroup.add(head);
+		arrowGroup.position.y = this.cubeSize * 0.5;
 
-		// Buttons container
-		const buttonsContainer = document.createElement('div');
-		buttonsContainer.style.cssText = `
-			display: flex;
-			gap: 8px;
-			margin-top: 10px;
-		`;
+		// Store direction for click detection
+		arrowGroup.userData = { type: 'rotationArrow', direction };
+		arc.userData = { type: 'rotationArrow', direction };
+		head.userData = { type: 'rotationArrow', direction };
 
-		// Confirm button
-		const confirmBtn = document.createElement('button');
-		confirmBtn.style.cssText = `
-			flex: 1;
-			padding: 10px;
-			background: #2a6a2a;
-			border: none;
-			border-radius: 5px;
-			color: #fff;
-			cursor: pointer;
-			font-size: 13px;
-			font-weight: bold;
-		`;
-		confirmBtn.textContent = 'Confirm';
-		confirmBtn.addEventListener('click', () => this.confirmRotationSelection());
-		buttonsContainer.appendChild(confirmBtn);
-
-		// Cancel button
-		const cancelBtn = document.createElement('button');
-		cancelBtn.style.cssText = `
-			flex: 1;
-			padding: 10px;
-			background: #6a2a2a;
-			border: none;
-			border-radius: 5px;
-			color: #fff;
-			cursor: pointer;
-			font-size: 13px;
-		`;
-		cancelBtn.textContent = 'Cancel';
-		cancelBtn.addEventListener('click', () => this.cancelRotationSelection());
-		buttonsContainer.appendChild(cancelBtn);
-
-		panel.appendChild(buttonsContainer);
-
-		return panel;
+		return arrowGroup;
 	}
 
 	/**
-	 * Handle hovering over a rotation option - update preview.
+	 * Create a confirm button mesh (checkmark).
 	 */
-	onRotationHover(rotation) {
-		this.selectedRotation = rotation;
-		this.updatePreviewCube();
-		this.updateRotationButtonStyles();
+	createConfirmMesh() {
+		const group = new THREE.Group();
+
+		// Create a simple sphere as confirm button
+		const geometry = new THREE.SphereGeometry(0.25, 16, 16);
+		const material = new THREE.MeshStandardMaterial({
+			color: 0x44aa44,
+			emissive: 0x228822,
+			emissiveIntensity: 0.4
+		});
+		const sphere = new THREE.Mesh(geometry, material);
+
+		// Add a checkmark using lines
+		const checkMaterial = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 2 });
+		const checkPoints = [
+			new THREE.Vector3(-0.1, 0, 0.26),
+			new THREE.Vector3(-0.02, -0.08, 0.26),
+			new THREE.Vector3(0.12, 0.1, 0.26)
+		];
+		const checkGeometry = new THREE.BufferGeometry().setFromPoints(checkPoints);
+		const checkLine = new THREE.Line(checkGeometry, checkMaterial);
+
+		group.add(sphere);
+		group.add(checkLine);
+		group.position.set(0, -this.cubeSize * 1.0, 0);
+
+		group.userData = { type: 'confirmButton' };
+		sphere.userData = { type: 'confirmButton' };
+
+		return group;
 	}
 
 	/**
-	 * Select a rotation option (clicking the button).
+	 * Rotate the preview cube by one step (120°) in the given direction.
 	 */
-	selectRotation(rotation) {
-		this.selectedRotation = rotation;
-		this.updatePreviewCube();
-		this.updateRotationButtonStyles();
-	}
+	rotatePreview(direction) {
+		if (!this.pendingMove) return;
 
-	/**
-	 * Update the visual styles of rotation buttons to show selection.
-	 */
-	updateRotationButtonStyles() {
-		for (let i = 0; i < this.rotationButtons.length; i++) {
-			const btn = this.rotationButtons[i];
-			if (i === this.selectedRotation) {
-				btn.style.background = '#4a4a7a';
-				btn.style.borderColor = '#9a9aca';
-			} else {
-				btn.style.background = '#3a3a5a';
-				btn.style.borderColor = '#5a5a7a';
-			}
+		if (direction === 'left') {
+			this.selectedRotation = (this.selectedRotation + 2) % 3; // -1 mod 3
+		} else {
+			this.selectedRotation = (this.selectedRotation + 1) % 3;
 		}
+		this.updatePreviewCube();
 	}
 
 	/**
@@ -710,16 +655,15 @@ export class YammaActuator {
 		this.currentPlayerColor = playerColor;
 		this.selectedRotation = 0;
 
-		// Show the rotation panel
-		if (this.rotationPanel) {
-			this.rotationPanel.style.display = 'flex';
-		}
-
-		// Update button styles for initial selection
-		this.updateRotationButtonStyles();
-
 		// Create initial preview cube at the board position
 		this.updatePreviewCube();
+
+		// Show and position the rotation arrows
+		if (this.rotationArrowsGroup) {
+			const pos = this.getWorldPosition(row, col, level);
+			this.rotationArrowsGroup.position.set(pos.x, pos.y, pos.z);
+			this.rotationArrowsGroup.visible = true;
+		}
 
 		// Add a semi-transparent highlight on the selected slot
 		this.highlightPosition(row, col, level, 0xffff00);
@@ -759,9 +703,9 @@ export class YammaActuator {
 	 * Clear the rotation selection UI.
 	 */
 	clearRotationSelection() {
-		// Hide the rotation panel
-		if (this.rotationPanel) {
-			this.rotationPanel.style.display = 'none';
+		// Hide the rotation arrows
+		if (this.rotationArrowsGroup) {
+			this.rotationArrowsGroup.visible = false;
 		}
 
 		// Remove preview mesh
@@ -776,20 +720,6 @@ export class YammaActuator {
 				}
 			}
 			this.previewMesh = null;
-		}
-
-		// Clear any remaining preview group children
-		while (this.previewGroup.children.length > 0) {
-			const child = this.previewGroup.children[0];
-			this.previewGroup.remove(child);
-			if (child.geometry) child.geometry.dispose();
-			if (child.material) {
-				if (Array.isArray(child.material)) {
-					child.material.forEach(m => m.dispose());
-				} else {
-					child.material.dispose();
-				}
-			}
 		}
 
 		this.pendingMove = null;
@@ -829,17 +759,40 @@ export class YammaActuator {
 
 			this.raycaster.setFromCamera(this.mouse, this.camera);
 
-			// If rotation selection is active, clicking on the 3D view (not the panel) cancels it
-			// unless clicking on a slot to start a new selection
-			if (this.pendingMove) {
+			// If rotation selection is active, check for arrow/confirm clicks first
+			if (this.pendingMove && this.rotationArrowsGroup && this.rotationArrowsGroup.visible) {
+				// Get all meshes from the rotation arrows group
+				const arrowMeshes = [];
+				this.rotationArrowsGroup.traverse((obj) => {
+					if (obj.isMesh) arrowMeshes.push(obj);
+				});
+
+				const arrowIntersects = this.raycaster.intersectObjects(arrowMeshes, true);
+				if (arrowIntersects.length > 0) {
+					const clicked = arrowIntersects[0].object;
+					// Walk up to find userData
+					let obj = clicked;
+					while (obj && !obj.userData?.type) {
+						obj = obj.parent;
+					}
+
+					if (obj?.userData?.type === 'rotationArrow') {
+						this.rotatePreview(obj.userData.direction);
+						return;
+					}
+					if (obj?.userData?.type === 'confirmButton') {
+						this.confirmRotationSelection();
+						return;
+					}
+				}
+
+				// Check if clicking on a slot to start new selection
 				const slotIntersects = this.raycaster.intersectObjects(this.slotMeshes);
 				if (slotIntersects.length === 0) {
 					// Clicked on empty space - cancel rotation selection
 					this.cancelRotationSelection();
 					return;
 				}
-				// Clicking on a different slot will cancel current and start new selection
-				// (handled below in slot click logic)
 			}
 
 			// Check for slot clicks
