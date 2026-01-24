@@ -543,23 +543,23 @@ export class YammaActuator {
 		});
 
 		// Face order in Three.js BoxGeometry: +X, -X, +Y, -Y, +Z, -Z
+		// Indices:                            0    1    2    3    4    5
 		//
-		// For a cube balanced on its corner, 3 faces meet at each corner.
-		// Corner (+1,+1,+1) is shared by faces: +X, +Y, +Z (indices 0, 2, 4)
-		// Corner (-1,-1,-1) is shared by faces: -X, -Y, -Z (indices 1, 3, 5)
+		// Physical cube structure: Two pairs of opposite faces are same color,
+		// one pair is different. This forces the 2+1 pattern at corners.
+		// - +Y/-Y = same color (player's color)
+		// - +Z/-Z = same color (opponent's color)
+		// - +X/-X = different (player/opponent)
 		//
-		// When balanced on the (-1,-1,-1) corner (opponent color), the (+1,+1,+1)
-		// corner (owner color) points up. From horizontal viewing angles you see
-		// 2 faces from the top corner and 1 from the bottom = 2:1 ratio.
+		// Top corner (+1,+1,+1) = +X, +Y, +Z = player, player, opponent = 2+1
+		// Bottom corner (-1,-1,-1) = -X, -Y, -Z = opponent, player, opponent = 1+2
 		let materials;
 		if (cube.owner === PLAYER.WHITE) {
-			// White on +X, +Y, +Z (top corner when balanced)
-			// Blue on -X, -Y, -Z (bottom corner when balanced)
-			materials = [whiteMat, blueMat, whiteMat, blueMat, whiteMat, blueMat];
+			// +Y/-Y = white/white, +Z/-Z = blue/blue, +X/-X = white/blue
+			materials = [whiteMat, blueMat, whiteMat, whiteMat, blueMat, blueMat];
 		} else {
-			// Blue on +X, +Y, +Z
-			// White on -X, -Y, -Z
-			materials = [blueMat, whiteMat, blueMat, whiteMat, blueMat, whiteMat];
+			// +Y/-Y = blue/blue, +Z/-Z = white/white, +X/-X = blue/white
+			materials = [blueMat, whiteMat, blueMat, blueMat, whiteMat, whiteMat];
 		}
 
 		const mesh = new THREE.Mesh(geometry, materials);
@@ -609,19 +609,22 @@ export class YammaActuator {
 			opacity: highlighted ? 1.0 : 0.8
 		});
 
-		// Face order: +X, -X, +Y, -Y, +Z, -Z
-		// Corner (+1,+1,+1) = +X, +Y, +Z (indices 0, 2, 4) - owner's color
-		// Corner (-1,-1,-1) = -X, -Y, -Z (indices 1, 3, 5) - opponent's color
+		// Face order: +X, -X, +Y, -Y, +Z, -Z (indices 0-5)
 		//
-		// Rotation determines which viewing angle shows opponent's color:
-		// - rotation 0: Right view shows opponent (default)
-		// - rotation 1: Front view shows opponent
-		// - rotation 2: Left view shows opponent
+		// Physical cube: Two pairs of opposite faces are same color.
+		// - +Y/-Y = player's color (same)
+		// - +Z/-Z = opponent's color (same)
+		// - +X/-X = player/opponent (different)
+		//
+		// Top corner (+1,+1,+1) = player, player, opponent = 2+1
+		// Bottom corner (-1,-1,-1) = opponent, player, opponent = 1+2
 		let materials;
 		if (playerColor === PLAYER.WHITE) {
-			materials = [whiteMat, blueMat, whiteMat, blueMat, whiteMat, blueMat];
+			// +Y/-Y = white/white, +Z/-Z = blue/blue, +X/-X = white/blue
+			materials = [whiteMat, blueMat, whiteMat, whiteMat, blueMat, blueMat];
 		} else {
-			materials = [blueMat, whiteMat, blueMat, whiteMat, blueMat, whiteMat];
+			// +Y/-Y = blue/blue, +Z/-Z = white/white, +X/-X = blue/white
+			materials = [blueMat, whiteMat, blueMat, blueMat, whiteMat, whiteMat];
 		}
 
 		const mesh = new THREE.Mesh(geometry, materials);
