@@ -209,66 +209,128 @@ export class YammaBoard {
 		return { x, y, z };
 	}
 
+	/**
+	 * Check for a winner from a specific viewing angle.
+	 *
+	 * This works by:
+	 * 1. Building a 2D projected view (triangular grid) for this angle
+	 * 2. Each cell shows the first visible cube's face color from that direction
+	 * 3. Checking the 2D view for 4-in-a-row
+	 */
 	checkWinFromAngle(viewAngle) {
-		const cubes = this.getAllCubes();
+		// Build the 2D projected view for this angle
+		const view = this.buildProjectedView(viewAngle);
 
-		const colorPositions = { [PLAYER.WHITE]: [], [PLAYER.BLUE]: [] };
-
-		for (const cube of cubes) {
-			const color = cube.getFaceColor(viewAngle);
-			if (colorPositions[color]) {
-				colorPositions[color].push(cube);
-			}
-		}
-
-		for (const color of [PLAYER.WHITE, PLAYER.BLUE]) {
-			const positions = colorPositions[color];
-			if (positions.length >= 4 && this.hasFourInARow(positions)) {
-				return color;
-			}
-		}
-
-		return null;
+		// Check for 4-in-a-row in the 2D triangular grid
+		const result = this.checkFourInARowInView(view);
+		return result;
 	}
 
-	hasFourInARow(cubes) {
-		const posSet = new Set();
-		for (const cube of cubes) {
-			posSet.add(`${cube.row},${cube.col},${cube.level}`);
+	/**
+	 * Build a 2D projected view of the pyramid from a viewing angle.
+	 *
+	 * Returns a triangular grid (5 rows) where each cell contains the
+	 * face color ('white', 'blue', or null) visible from that angle.
+	 */
+	buildProjectedView(viewAngle) {
+		const view = [];
+
+		for (let row = 0; row < this.baseRows; row++) {
+			view[row] = [];
+			for (let col = 0; col <= row; col++) {
+				view[row][col] = this.getVisibleColorAt(row, col, viewAngle);
+			}
 		}
 
-		// Direction vectors for triangular grid
-		const directions = [
-			// Within same level:
-			{ dRow: 0, dCol: 1, dLevel: 0 },   // Along row
-			{ dRow: 1, dCol: 0, dLevel: 0 },   // Down-left
-			{ dRow: 1, dCol: 1, dLevel: 0 },   // Down-right
-			// Across levels (edges of tetrahedron):
-			{ dRow: 0, dCol: 0, dLevel: 1 },   // Straight up
-			{ dRow: -1, dCol: 0, dLevel: 1 },  // Up-left edge
-			{ dRow: -1, dCol: -1, dLevel: 1 }, // Up-right edge
-		];
+		return view;
+	}
 
-		for (const cube of cubes) {
-			for (const dir of directions) {
-				let count = 1;
-				let r = cube.row + dir.dRow;
-				let c = cube.col + dir.dCol;
-				let l = cube.level + dir.dLevel;
+	/**
+	 * Get the color visible at a projected (row, col) position from a viewing angle.
+	 *
+	 * Traces through the pyramid from the viewing direction and returns
+	 * the face color of the first cube encountered.
+	 */
+	getVisibleColorAt(projRow, projCol, viewAngle) {
+		// Check from front (highest level) to back (level 0)
+		// The exact mapping depends on the viewing angle
 
-				while (posSet.has(`${r},${c},${l}`)) {
-					count++;
-					if (count >= 4) {
-						return true;
-					}
-					r += dir.dRow;
-					c += dir.dCol;
-					l += dir.dLevel;
+		for (let level = this.maxLevels - 1; level >= 0; level--) {
+			const maxRowAtLevel = this.baseRows - level - 1;
+
+			// Transform projected coordinates to board coordinates based on view angle
+			let checkRow, checkCol;
+
+			if (viewAngle === 0) {
+				// Front view: direct mapping
+				checkRow = projRow;
+				checkCol = projCol;
+			} else if (viewAngle === 1) {
+				// Left view: rotate 120° counterclockwise
+				// In triangular coordinates, this swaps axes
+				checkRow = projCol;
+				checkCol = projRow - projCol;
+			} else {
+				// Right view: rotate 120° clockwise
+				checkRow = projRow - projCol;
+				checkCol = projCol;
+			}
+
+			// Check if this position exists at this level and has a cube
+			if (checkRow >= 0 && checkRow <= maxRowAtLevel &&
+				checkCol >= 0 && checkCol <= checkRow) {
+				const cube = this.getCubeAt(checkRow, checkCol, level);
+				if (cube) {
+					return cube.getFaceColor(viewAngle);
 				}
 			}
 		}
 
-		return false;
+		return null; // No cube visible at this position
+	}
+
+	/**
+	 * Check a 2D projected view for 4-in-a-row.
+	 *
+	 * In a triangular grid, there are 3 line directions:
+	 * - Horizontal (along row): (row, col) -> (row, col+1)
+	 * - Down-left diagonal: (row, col) -> (row+1, col)
+	 * - Down-right diagonal: (row, col) -> (row+1, col+1)
+	 */
+	checkFourInARowInView(view) {
+		// Direction vectors for triangular grid lines
+		const directions = [
+			{ dRow: 0, dCol: 1 },   // Horizontal (along row)
+			{ dRow: 1, dCol: 0 },   // Down-left diagonal
+			{ dRow: 1, dCol: 1 },   // Down-right diagonal
+		];
+
+		for (let row = 0; row < this.baseRows; row++) {
+			for (let col = 0; col <= row; col++) {
+				const color = view[row][col];
+				if (!color) continue; // Empty cell
+
+				// Check each direction from this cell
+				for (const dir of directions) {
+					let count = 1;
+					let r = row + dir.dRow;
+					let c = col + dir.dCol;
+
+					// Count consecutive same-color cells
+					while (r < this.baseRows && c >= 0 && c <= r &&
+						   view[r] && view[r][c] === color) {
+						count++;
+						if (count >= 4) {
+							return color; // Found 4-in-a-row!
+						}
+						r += dir.dRow;
+						c += dir.dCol;
+					}
+				}
+			}
+		}
+
+		return null; // No 4-in-a-row found
 	}
 
 	checkWinner() {
