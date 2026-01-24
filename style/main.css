@@ -1479,6 +1479,95 @@ input[type=submit] {
   border: 2px solid #0d2137;
 }
 
+/* --- Tic Tac Toe Styles --- */
+.tictactoe-board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  width: 300px;
+  height: 300px;
+  margin: 20px auto;
+  background: #333;
+  padding: 4px;
+  border-radius: 8px;
+}
+
+.tictactoe-cell {
+  background: var(--game-background-color, #f5f5dc);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.2s, transform 0.1s;
+  user-select: none;
+}
+
+.tictactoe-cell:hover {
+  background: #e5e5cc;
+}
+
+.tictactoe-cell.empty:hover {
+  background: #d5d5bc;
+}
+
+.tictactoe-cell.mark-x {
+  color: #2563eb;
+}
+
+.tictactoe-cell.mark-o {
+  color: #dc2626;
+}
+
+.tictactoe-cell.last-move {
+  box-shadow: inset 0 0 0 3px #22c55e;
+}
+
+.tictactoe-cell.winning {
+  background: #fef08a;
+  animation: pulse-win 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes pulse-win {
+  from {
+    background: #fef08a;
+  }
+  to {
+    background: #fde047;
+  }
+}
+
+.tictactoe-cell.possible {
+  background: #bbf7d0;
+}
+
+.tictactoeTileContainer {
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+}
+
+.tictactoePlayerIndicator {
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.tictactoePlayerIndicator.tictactoeX {
+  background: #dbeafe;
+  color: #2563eb;
+  border: 2px solid #2563eb;
+}
+
+.tictactoePlayerIndicator.tictactoeO {
+  background: #fee2e2;
+  color: #dc2626;
+  border: 2px solid #dc2626;
+}
+
 /* --- General Dark Mode Styles --- */
 input,
 textarea {

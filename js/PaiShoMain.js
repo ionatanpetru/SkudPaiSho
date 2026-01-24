@@ -113,6 +113,7 @@ import { TrifleController } from './trifle/TrifleController';
 import { TumbleweedController } from './tumbleweed/TumbleweedController';
 import { UndergrowthController } from './undergrowth/UndergrowthController';
 import { YammaController } from './yamma/YammaController';
+import { TicTacToeController } from './tictactoe/TicTacToeController';
 import { VagabondController } from "./vagabond/VagabondController";
 import * as WelcomeTutorial from './WelcomeTutorial';
 import * as TournamentManager from './TournamentManager';
@@ -3428,6 +3429,16 @@ export const GameType = {
 		coverImg: "hexagon.png",
 		rulesUrl: "https://boardgamegeek.com/boardgame/388435/yamma",
 		gameOptions: []
+	},
+	TicTacToe: {
+		id: 101,
+		name: "Tic Tac Toe",
+		desc: "Tic Tac Toe",
+		color: "var(--othercolor)",
+		description: "The classic game of Xs and Os. Get three in a row to win!",
+		coverImg: "hexagon.png",
+		rulesUrl: "https://en.wikipedia.org/wiki/Tic-tac-toe",
+		gameOptions: []
 	}
 };
 
@@ -3509,6 +3520,9 @@ export function getGameControllerForGameType(gameTypeId) {
 			break;
 		case GameType.Yamma.id:
 			controller = new YammaController(gameContainerDiv, isMobile);
+			break;
+		case GameType.TicTacToe.id:
+			controller = new TicTacToeController(gameContainerDiv, isMobile);
 			break;
 		default:
 			debug("Game Controller unavailable.");
