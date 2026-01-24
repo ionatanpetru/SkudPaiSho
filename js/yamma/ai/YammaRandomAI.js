@@ -24,12 +24,15 @@ YammaRandomAI.prototype.getMove = function(game, moveNum) {
 
 	for (var i = 0; i < possiblePositions.length; i++) {
 		var pos = possiblePositions[i];
-		var notationBuilder = new YammaNotationBuilder();
-		notationBuilder.setPoint(pos.row, pos.col, pos.level);
+		// Add all 3 rotation options for each position
+		for (var rotation = 0; rotation < 3; rotation++) {
+			var notationBuilder = new YammaNotationBuilder();
+			notationBuilder.setPoint(pos.row, pos.col, pos.level, rotation);
 
-		var move = notationBuilder.getMove(this.player);
-		if (move) {
-			moves.push(move);
+			var move = notationBuilder.getMove(this.player);
+			if (move) {
+				moves.push(move);
+			}
 		}
 	}
 

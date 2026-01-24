@@ -1,8 +1,9 @@
 /**
  * YammaGameNotation - Handles move notation for saving/loading games
  *
- * Uses triangular grid coordinates: row, col, level
- * Format: "H:row,col,level" or "G:row,col,level"
+ * Uses triangular grid coordinates: row, col, level, rotation
+ * Format: "H:row,col,level,rotation" or "G:row,col,level,rotation"
+ * Rotation is optional (defaults to 0) for backwards compatibility
  */
 
 import { GUEST, HOST } from '../CommonNotationObjects';
@@ -14,6 +15,7 @@ export class YammaNotationMove {
 		this.row = 0;
 		this.col = 0;
 		this.level = 0;
+		this.rotation = 0; // 0, 1, or 2 for 120° increments
 
 		// For backwards compatibility with old code
 		this.x = 0;
@@ -26,7 +28,8 @@ export class YammaNotationMove {
 	}
 
 	parse(notation) {
-		// Format: "H:row,col,level" or "G:row,col,level" (e.g., "H:2,1,0")
+		// Format: "H:row,col,level,rotation" (e.g., "H:2,1,0,1")
+		// Rotation is optional for backwards compatibility
 		const parts = notation.split(':');
 		if (parts.length !== 2) return;
 
@@ -37,6 +40,7 @@ export class YammaNotationMove {
 			this.row = parseInt(coords[0], 10);
 			this.col = parseInt(coords[1], 10);
 			this.level = coords.length >= 3 ? parseInt(coords[2], 10) : 0;
+			this.rotation = coords.length >= 4 ? parseInt(coords[3], 10) : 0;
 
 			// Keep x, y, z in sync for compatibility
 			this.x = this.row;
@@ -47,7 +51,7 @@ export class YammaNotationMove {
 
 	toString() {
 		const playerCode = this.player === HOST ? 'H' : 'G';
-		return `${playerCode}:${this.row},${this.col},${this.level}`;
+		return `${playerCode}:${this.row},${this.col},${this.level},${this.rotation}`;
 	}
 }
 
@@ -57,13 +61,19 @@ export class YammaNotationBuilder {
 		this.row = null;
 		this.col = null;
 		this.level = null;
+		this.rotation = 0;
 	}
 
-	setPoint(row, col, level) {
+	setPoint(row, col, level, rotation = 0) {
 		this.row = row;
 		this.col = col;
 		this.level = level;
+		this.rotation = rotation;
 		this.status = 'READY';
+	}
+
+	setRotation(rotation) {
+		this.rotation = rotation % 3;
 	}
 
 	isReady() {
@@ -78,6 +88,7 @@ export class YammaNotationBuilder {
 		move.row = this.row;
 		move.col = this.col;
 		move.level = this.level;
+		move.rotation = this.rotation;
 		move.x = this.row;
 		move.y = this.col;
 		move.z = this.level;
@@ -90,6 +101,7 @@ export class YammaNotationBuilder {
 		this.row = null;
 		this.col = null;
 		this.level = null;
+		this.rotation = 0;
 	}
 }
 

@@ -37,9 +37,13 @@ export class YammaActuator {
 		// Board configuration for triangular pyramid
 		this.baseRows = 5;
 		this.maxLevels = 5;
-		this.slotSpacing = 1.2;
+		// Spacing between cube centers on same level
+		this.slotSpacing = 1.1;
 		this.cubeSize = 0.8;
-		this.levelHeight = 0.8;
+		// For a corner-balanced cube, center height = cubeSize * √3 / 2
+		this.cubeHalfHeight = this.cubeSize * Math.sqrt(3) / 2;
+		// Height between stacking levels (cube bottom corner to cube bottom corner)
+		this.levelHeight = this.cubeSize * 0.6;
 
 		// Raycaster for mouse interaction
 		this.raycaster = new THREE.Raycaster();
@@ -301,6 +305,7 @@ export class YammaActuator {
 	 * For triangular pyramid stacking:
 	 * - Base level positions form a triangular grid
 	 * - Upper level positions sit at the centroid of their 3 supporting cubes
+	 * - Corner-balanced cubes have their center at cubeHalfHeight above the bottom corner
 	 */
 	getWorldPosition(row, col, level) {
 		const spacing = this.slotSpacing;
@@ -326,7 +331,7 @@ export class YammaActuator {
 
 			return {
 				x,
-				y: this.cubeSize * 0.5,
+				y: this.cubeHalfHeight,
 				z: z - baseCenterZ
 			};
 		} else {
@@ -338,7 +343,7 @@ export class YammaActuator {
 
 			return {
 				x: (support1.x + support2.x + support3.x) / 3,
-				y: level * this.levelHeight + this.cubeSize * 0.5,
+				y: level * this.levelHeight + this.cubeHalfHeight,
 				z: (support1.z + support2.z + support3.z) / 3
 			};
 		}
@@ -358,8 +363,8 @@ export class YammaActuator {
 		const slot = new THREE.Mesh(slotGeometry, slotMaterial);
 		const pos = this.getWorldPosition(row, col, level);
 
-		// Position slightly above the cube level
-		slot.position.set(pos.x, pos.y - this.cubeSize * 0.4, pos.z);
+		// Position at the bottom corner where the cube would balance
+		slot.position.set(pos.x, pos.y - this.cubeHalfHeight + 0.1, pos.z);
 		slot.userData = { row, col, level, type: 'slot' };
 
 		return slot;
@@ -368,7 +373,7 @@ export class YammaActuator {
 	createCubeMesh(cube) {
 		const size = this.cubeSize;
 
-		// Create cube geometry - rotated to sit on corner
+		// Create cube geometry
 		const geometry = new THREE.BoxGeometry(size, size, size);
 
 		// Create materials for each face
@@ -383,19 +388,30 @@ export class YammaActuator {
 			metalness: 0.1
 		});
 
-		// Face order: +X, -X, +Y, -Y, +Z, -Z
+		// Face order in Three.js BoxGeometry: +X, -X, +Y, -Y, +Z, -Z
+		// For a corner-balanced cube, we want 3 faces of one color sharing a corner
+		// and 3 faces of the other color sharing the opposite corner.
+		// Adjacent faces alternate colors: if +X is white, then +Y and +Z are blue, etc.
 		let materials;
 		if (cube.owner === PLAYER.WHITE) {
-			materials = [whiteMat, whiteMat, blueMat, blueMat, whiteMat, whiteMat];
+			// White on +X, -Y, +Z (share one corner)
+			// Blue on -X, +Y, -Z (share opposite corner)
+			materials = [whiteMat, blueMat, blueMat, whiteMat, whiteMat, blueMat];
 		} else {
-			materials = [blueMat, blueMat, whiteMat, whiteMat, blueMat, blueMat];
+			// Blue on +X, -Y, +Z
+			// White on -X, +Y, -Z
+			materials = [blueMat, whiteMat, whiteMat, blueMat, blueMat, whiteMat];
 		}
 
 		const mesh = new THREE.Mesh(geometry, materials);
 
-		// Rotate to sit on corner
-		mesh.rotation.x = Math.atan(1 / Math.sqrt(2));
-		mesh.rotation.y = Math.PI / 4;
+		// To balance a cube on its corner:
+		// 1. Use YXZ rotation order so Y rotation is applied FIRST
+		// 2. Rotate 45° around Y to align diagonal with view axis
+		// 3. Tilt by arctan(√2) ≈ 54.74° around X to balance on corner
+		mesh.rotation.order = 'YXZ';
+		mesh.rotation.y = Math.PI / 4;  // 45° - aligns corner forward
+		mesh.rotation.x = Math.atan(Math.sqrt(2));  // ~54.74° - tilts onto corner
 
 		mesh.castShadow = true;
 		mesh.receiveShadow = true;
@@ -681,7 +697,7 @@ export class YammaActuator {
 	highlightPosition(row, col, level, color) {
 		const pos = this.getWorldPosition(row, col, level);
 
-		const geometry = new THREE.RingGeometry(0.35, 0.45, 32);
+		const geometry = new THREE.RingGeometry(0.4, 0.52, 32);
 		const material = new THREE.MeshBasicMaterial({
 			color: color,
 			side: THREE.DoubleSide,
@@ -690,7 +706,8 @@ export class YammaActuator {
 		});
 		const ring = new THREE.Mesh(geometry, material);
 		ring.rotation.x = -Math.PI / 2;
-		ring.position.set(pos.x, pos.y - this.cubeSize * 0.35, pos.z);
+		// Position at the bottom corner point
+		ring.position.set(pos.x, pos.y - this.cubeHalfHeight + 0.15, pos.z);
 		this.highlightGroup.add(ring);
 	}
 
