@@ -71,6 +71,39 @@ export class YammaActuator {
 		container.style.position = 'relative';
 		bcontainer.appendChild(container);
 
+		// Create view panels container (3 perspective views)
+		const viewsContainer = document.createElement('div');
+		viewsContainer.id = 'yamma-views-container';
+		viewsContainer.style.display = 'flex';
+		viewsContainer.style.justifyContent = 'space-around';
+		viewsContainer.style.padding = '10px';
+		viewsContainer.style.backgroundColor = '#1a1a2e';
+
+		this.viewCanvases = [];
+		const viewLabels = ['Front View', 'Left View', 'Right View'];
+		for (let i = 0; i < 3; i++) {
+			const viewWrapper = document.createElement('div');
+			viewWrapper.style.textAlign = 'center';
+
+			const label = document.createElement('div');
+			label.textContent = viewLabels[i];
+			label.style.color = '#aaa';
+			label.style.marginBottom = '5px';
+			label.style.fontSize = '12px';
+			viewWrapper.appendChild(label);
+
+			const canvas = document.createElement('canvas');
+			canvas.width = 150;
+			canvas.height = 130;
+			canvas.style.backgroundColor = '#2a2a3e';
+			canvas.style.borderRadius = '5px';
+			this.viewCanvases.push(canvas);
+			viewWrapper.appendChild(canvas);
+
+			viewsContainer.appendChild(viewWrapper);
+		}
+		bcontainer.appendChild(viewsContainer);
+
 		// Create tile pile container with game messages (standard structure)
 		const tilePileContainer = createDivWithClass('tilePileContainer');
 
@@ -173,16 +206,18 @@ export class YammaActuator {
 
 	createBoardBase() {
 		// Create a triangular board base
+		// Oriented so apex (row 0) is at back, wide base (row 4) is at front
 		const triangleShape = new THREE.Shape();
 
-		// Calculate triangle vertices (equilateral triangle)
+		// Calculate triangle dimensions
 		const size = this.baseRows * this.slotSpacing;
-		const height = size * Math.sqrt(3) / 2;
+		const height = (this.baseRows - 1) * this.slotSpacing * 0.866;
 
-		// Triangle vertices centered on origin
-		triangleShape.moveTo(0, -height / 3);  // Bottom vertex
-		triangleShape.lineTo(-size / 2, height * 2 / 3);  // Top left
-		triangleShape.lineTo(size / 2, height * 2 / 3);   // Top right
+		// Triangle vertices: apex at back (positive z), base at front (negative z)
+		// In Shape coordinates (x, y), y becomes z after rotation
+		triangleShape.moveTo(0, height / 2);              // Apex at back
+		triangleShape.lineTo(-size / 2, -height / 2);     // Front left
+		triangleShape.lineTo(size / 2, -height / 2);      // Front right
 		triangleShape.closePath();
 
 		const extrudeSettings = {
@@ -262,27 +297,51 @@ export class YammaActuator {
 	 * row: 0 to (baseRows - level - 1)
 	 * col: 0 to row
 	 * level: 0 to (baseRows - 1)
+	 *
+	 * For triangular pyramid stacking:
+	 * - Base level positions form a triangular grid
+	 * - Upper level positions sit at the centroid of their 3 supporting cubes
 	 */
 	getWorldPosition(row, col, level) {
 		const spacing = this.slotSpacing;
 
-		// Triangular grid layout:
-		// - Each row is offset horizontally based on row number
-		// - Y (depth in world) increases with row
-		// - X position depends on col, centered within the row
+		if (level === 0) {
+			// Base level: standard triangular grid
+			// Row 0 has 1 position (apex of triangle at back)
+			// Row 4 has 5 positions (base of triangle at front)
 
-		// At higher levels, the triangle is smaller and shifted toward center
-		const rowOffset = row * spacing * 0.5;
-		const levelOffset = level * spacing * 0.33;
+			// Flip the z-axis so row 0 is at back, row 4 is at front
+			const maxRow = this.baseRows - 1;
+			const flippedRow = maxRow - row;
 
-		const x = col * spacing - rowOffset + levelOffset;
-		const z = row * spacing * 0.866 + levelOffset; // 0.866 = sqrt(3)/2 for equilateral triangle
-		const y = level * this.levelHeight + this.cubeSize * 0.5;
+			// X position: centered within the row
+			const rowOffset = row * spacing * 0.5;
+			const x = col * spacing - rowOffset;
 
-		// Center the base triangle
-		const baseCenterZ = (this.baseRows - 1) * spacing * 0.866 / 2;
+			// Z position: flipped so larger rows are at front (negative z)
+			const z = -flippedRow * spacing * 0.866;
 
-		return { x, y, z: z - baseCenterZ };
+			// Center the triangle
+			const baseCenterZ = -maxRow * spacing * 0.866 / 2;
+
+			return {
+				x,
+				y: this.cubeSize * 0.5,
+				z: z - baseCenterZ
+			};
+		} else {
+			// Upper levels: position at centroid of the 3 supporting cubes
+			// Support positions at level-1: (row, col), (row+1, col), (row+1, col+1)
+			const support1 = this.getWorldPosition(row, col, level - 1);
+			const support2 = this.getWorldPosition(row + 1, col, level - 1);
+			const support3 = this.getWorldPosition(row + 1, col + 1, level - 1);
+
+			return {
+				x: (support1.x + support2.x + support3.x) / 3,
+				y: level * this.levelHeight + this.cubeSize * 0.5,
+				z: (support1.z + support2.z + support3.z) / 3
+			};
+		}
 	}
 
 	createSlotMesh(row, col, level) {
@@ -479,6 +538,144 @@ export class YammaActuator {
 		if (winner && winningAngle !== null) {
 			// TODO: Implement winning line highlight for triangular grid
 		}
+
+		// Draw the 2D perspective views
+		this.drawPerspectiveViews(board);
+	}
+
+	/**
+	 * Draw 2D projections of the pyramid from each of the 3 viewing angles.
+	 * Each view shows what color you'd see looking through each "column" of positions.
+	 */
+	drawPerspectiveViews(board) {
+		if (!this.viewCanvases || this.viewCanvases.length < 3) return;
+
+		const viewAngles = [0, 1, 2]; // Front, Left, Right
+
+		for (let viewIndex = 0; viewIndex < 3; viewIndex++) {
+			this.drawSingleView(this.viewCanvases[viewIndex], board, viewAngles[viewIndex]);
+		}
+	}
+
+	/**
+	 * Draw a single perspective view of the pyramid.
+	 *
+	 * For each viewing angle, we project the pyramid onto a 2D triangular grid.
+	 * Each cell shows the color of the first cube visible from that angle,
+	 * looking "through" the pyramid from outside.
+	 */
+	drawSingleView(canvas, board, viewAngle) {
+		const ctx = canvas.getContext('2d');
+		const width = canvas.width;
+		const height = canvas.height;
+
+		// Clear canvas
+		ctx.fillStyle = '#2a2a3e';
+		ctx.fillRect(0, 0, width, height);
+
+		// For a triangular pyramid, each view shows a triangular projection
+		// The projection has the same structure as the base: 5 rows
+
+		const cellSize = 20;
+		const startX = width / 2;
+		const startY = 15;
+
+		// Draw the triangular grid for this view
+		for (let row = 0; row < this.baseRows; row++) {
+			for (let col = 0; col <= row; col++) {
+				// Calculate position for this cell in the 2D view
+				const x = startX + (col - row / 2) * cellSize;
+				const y = startY + row * cellSize * 0.866;
+
+				// Find what color is visible at this position from this view angle
+				const visibleColor = this.getVisibleColorAt(board, row, col, viewAngle);
+
+				// Draw the cell
+				ctx.beginPath();
+				ctx.arc(x, y, cellSize * 0.4, 0, Math.PI * 2);
+
+				if (visibleColor === 'white') {
+					ctx.fillStyle = '#f5f5f5';
+					ctx.fill();
+					ctx.strokeStyle = '#ccc';
+					ctx.stroke();
+				} else if (visibleColor === 'blue') {
+					ctx.fillStyle = '#1e3a5f';
+					ctx.fill();
+					ctx.strokeStyle = '#0a1f3a';
+					ctx.stroke();
+				} else {
+					// Empty - draw outline only
+					ctx.strokeStyle = '#444';
+					ctx.stroke();
+				}
+			}
+		}
+
+		// Draw view angle indicator
+		ctx.fillStyle = '#666';
+		ctx.font = '10px sans-serif';
+		ctx.textAlign = 'center';
+		const angleLabels = ['Front', 'Left', 'Right'];
+		ctx.fillText(`Angle: ${angleLabels[viewAngle]}`, width / 2, height - 5);
+	}
+
+	/**
+	 * Get the color visible at a projected (row, col) position from a given view angle.
+	 *
+	 * This traces "inward" through the pyramid from the viewing direction,
+	 * returning the face color of the first cube encountered.
+	 *
+	 * For a triangular pyramid:
+	 * - View 0 (Front): Looking at front face, traces back through levels
+	 * - View 1 (Left): Rotated 120° view
+	 * - View 2 (Right): Rotated 240° view
+	 */
+	getVisibleColorAt(board, projRow, projCol, viewAngle) {
+		// For each projected position, we check positions at all levels
+		// The "depth" order depends on view angle
+
+		// For front view (angle 0): check from high level to low level
+		// The front-most cube at a projected position is the one we see
+
+		// Simplified model: For view angle 0, the projection (row, col) maps directly
+		// to board positions. Check all levels from top to bottom.
+
+		// For other angles, we need to transform coordinates
+		// This is a simplified approximation - real 3D projection would be more complex
+
+		for (let level = this.maxLevels - 1; level >= 0; level--) {
+			const rows = this.baseRows - level;
+
+			// Transform coordinates based on view angle
+			let checkRow, checkCol;
+
+			if (viewAngle === 0) {
+				// Front view: direct mapping
+				checkRow = projRow;
+				checkCol = projCol;
+			} else if (viewAngle === 1) {
+				// Left view: rotate coordinates (approximate transformation)
+				// Looking from the left, columns become rows
+				checkRow = projCol;
+				checkCol = projRow - projCol;
+			} else {
+				// Right view: rotate other direction
+				checkRow = projRow - projCol;
+				checkCol = projCol;
+			}
+
+			// Check if transformed position is valid and has a cube
+			if (checkRow >= 0 && checkRow < rows && checkCol >= 0 && checkCol <= checkRow) {
+				const cube = board.getCubeAt(checkRow, checkCol, level);
+				if (cube) {
+					// Return the face color for this viewing angle
+					return cube.getFaceColor(viewAngle);
+				}
+			}
+		}
+
+		return null; // No cube visible
 	}
 
 	highlightPosition(row, col, level, color) {
