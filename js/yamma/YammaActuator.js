@@ -373,6 +373,79 @@ export class YammaActuator {
 
 		// Add triangular grid lines for base level
 		this.createTriangularGrid();
+
+		// Add "Front", "Left", "Right" labels along board edges
+		this.createEdgeLabels();
+	}
+
+	/**
+	 * Create text labels for each edge of the triangular board.
+	 */
+	createEdgeLabels() {
+		const labelHeight = 0.1;
+		const offset = 1.2; // Distance from edge
+
+		// Calculate board dimensions
+		const maxRow = this.baseRows - 1;
+
+		// Get corner positions
+		const frontLeft = this.getWorldPosition(maxRow, 0, 0);
+		const frontRight = this.getWorldPosition(maxRow, maxRow, 0);
+		const apex = this.getWorldPosition(0, 0, 0);
+
+		// Front label (along the front edge, between frontLeft and frontRight)
+		// Front edge is the base of triangle (larger row numbers = more negative z)
+		const frontLabel = this.createTextSprite('Front');
+		frontLabel.position.set(
+			(frontLeft.x + frontRight.x) / 2,
+			labelHeight,
+			frontLeft.z + offset * 1.2
+		);
+		this.boardGroup.add(frontLabel);
+
+		// Left label (along left edge, between apex and frontLeft)
+		const leftLabel = this.createTextSprite('Left');
+		leftLabel.position.set(
+			(apex.x + frontLeft.x) / 2 - offset * 0.8,
+			labelHeight,
+			(apex.z + frontLeft.z) / 2 - offset * 0.5
+		);
+		this.boardGroup.add(leftLabel);
+
+		// Right label (along right edge, between apex and frontRight)
+		const rightLabel = this.createTextSprite('Right');
+		rightLabel.position.set(
+			(apex.x + frontRight.x) / 2 + offset * 0.8,
+			labelHeight,
+			(apex.z + frontRight.z) / 2 - offset * 0.5
+		);
+		this.boardGroup.add(rightLabel);
+	}
+
+	/**
+	 * Create a text sprite that always faces the camera.
+	 */
+	createTextSprite(text) {
+		const canvas = document.createElement('canvas');
+		const context = canvas.getContext('2d');
+		canvas.width = 128;
+		canvas.height = 64;
+
+		context.fillStyle = 'rgba(0, 0, 0, 0)';
+		context.fillRect(0, 0, canvas.width, canvas.height);
+
+		context.font = 'bold 32px Arial';
+		context.textAlign = 'center';
+		context.textBaseline = 'middle';
+		context.fillStyle = '#aaaaaa';
+		context.fillText(text, canvas.width / 2, canvas.height / 2);
+
+		const texture = new THREE.CanvasTexture(canvas);
+		const spriteMaterial = new THREE.SpriteMaterial({ map: texture });
+		const sprite = new THREE.Sprite(spriteMaterial);
+		sprite.scale.set(1.5, 0.75, 1);
+
+		return sprite;
 	}
 
 	createTriangularGrid() {
@@ -512,7 +585,7 @@ export class YammaActuator {
 			metalness: 0.1
 		});
 		const blueMat = new THREE.MeshStandardMaterial({
-			color: 0x1e3a5f,
+			color: 0x2a5599,
 			roughness: 0.3,
 			metalness: 0.1
 		});
@@ -577,7 +650,7 @@ export class YammaActuator {
 			opacity: highlighted ? 1.0 : 0.8
 		});
 		const blueMat = new THREE.MeshStandardMaterial({
-			color: highlighted ? 0x2a4a7f : 0x1e3a5f,
+			color: highlighted ? 0x3a6ab0 : 0x2a5599,
 			roughness: 0.3,
 			metalness: 0.1,
 			transparent: true,
