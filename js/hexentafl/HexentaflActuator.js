@@ -2,7 +2,12 @@ import { FIVE_SIDED_BOARD, gameOptionEnabled } from "../GameOptions";
 import { HexentaflBoardPoint } from './HexentaflBoardPoint';
 import { POSSIBLE_MOVE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
 import { createDivWithClass, createDivWithId, removeChildren } from "../ActuatorHelp";
-import { gameController } from '../PaiShoMain';
+import {
+  clearMessage,
+  gameController,
+  pointClicked,
+  showPointMessage,
+} from '../PaiShoMain';
 
 /* Create boardContainer, hostTilesContainer, and guestTilesContainer */
 export class HexentaflActuator {
@@ -122,13 +127,14 @@ export class HexentaflActuator {
 
 			if (boardPoint.types.includes(HexentaflBoardPoint.Types.normal)) {
 				if (this.isMobile) {
-					theDiv.setAttribute("onclick", "gameController.pointClicked(this); showPointMessage(this);");
+					theDiv.addEventListener('click', function() {
+						gameController.pointClicked(this);
+						showPointMessage(this);
+					});
 				} else {
-					theDiv.setAttribute("onclick", "pointClicked(this);");
-					theDiv.setAttribute("onmouseover", "showPointMessage(this);");
-
-					var onmouseoutText = "clearMessage();";
-					theDiv.setAttribute("onmouseout", onmouseoutText);
+					theDiv.addEventListener('click', function() { pointClicked(this); });
+					theDiv.addEventListener('mouseover', function() { showPointMessage(this); });
+					theDiv.addEventListener('mouseout', clearMessage);
 				}
 				if (boardPoint.types.includes(POSSIBLE_MOVE)) {
 					theDiv.classList.add("possibleMove");

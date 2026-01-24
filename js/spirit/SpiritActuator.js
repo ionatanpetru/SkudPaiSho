@@ -8,7 +8,10 @@ import { SpiritController, SpiritPreferences } from './SpiritController';
 import { SpiritTileManager } from './SpiritTileManager';
 import {
   clearMessage,
+  gameController,
   getUserGamePreference,
+  pointClicked,
+  showPointMessage,
   showTileMessage,
   unplayedTileClicked
 } from '../PaiShoMain';
@@ -133,11 +136,17 @@ SpiritActuator.prototype.addBoardPoint = function(boardPoint) {
 		}
 		
 		if (this.mobile) {
-			// Using ontouchstart instead of onclick, to try it out
-			theDiv.setAttribute("ontouchstart", "pointClicked(this); showPointMessage(this);");
+			// Using touchstart instead of click, to try it out
+			theDiv.addEventListener('touchstart', function() {
+				pointClicked(this);
+				showPointMessage(this);
+			});
 		} else {
-			theDiv.setAttribute("onclick", "pointClicked(this);");
-			theDiv.setAttribute("onmouseover", "showPointMessage(this); gameController.showCaptureHelpOnHover(this);");
+			theDiv.addEventListener('click', function() { pointClicked(this); });
+			theDiv.addEventListener('mouseover', function() {
+				showPointMessage(this);
+				gameController.showCaptureHelpOnHover(this);
+			});
 			theDiv.addEventListener('mouseout', clearMessage);
 		}
 	}

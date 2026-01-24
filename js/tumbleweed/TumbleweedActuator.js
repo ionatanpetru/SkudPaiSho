@@ -1,3 +1,14 @@
+import { createDivWithClass, createDivWithId, removeChildren } from "../ActuatorHelp";
+import { GUEST, HOST } from "../CommonNotationObjects";
+import { gameOptionEnabled, HEXHEX_11, HEXHEX_6, TUMPLETORE } from "../GameOptions";
+import {
+	clearMessage,
+	gameController,
+	pointClicked,
+	showPointMessage,
+} from "../PaiShoMain";
+import { POSSIBLE_MOVE } from "../skud-pai-sho/SkudPaiShoBoardPoint";
+import { TumbleweedBoardPoint } from "./TumbleweedBoardPoint";
 
 /* Create boardContainer, hostTilesContainer, and guestTilesContainer */
 export function TumbleweedActuator(gameContainer, isMobile, hostTilesContainerDivs, guestTilesContainerDivs) {
@@ -127,10 +138,13 @@ TumbleweedActuator.prototype.addBoardPoint = function(rowDiv, boardPoint, lastMo
 				theDiv.classList.add("lastPlayed");
 			}
 			if (this.isMobile) {
-				theDiv.setAttribute("onclick", "gameController.pointClicked(this); showPointMessage(this);");
+				theDiv.addEventListener('click', function() {
+					gameController.pointClicked(this);
+					showPointMessage(this);
+				});
 			} else {
-				theDiv.setAttribute("onclick", "pointClicked(this);");
-				theDiv.setAttribute("onmouseover", "showPointMessage(this);");
+				theDiv.addEventListener('click', function() { pointClicked(this); });
+				theDiv.addEventListener('mouseover', function() { showPointMessage(this); });
 				theDiv.addEventListener('mouseout', clearMessage);
 			}
 			if (boardPoint.types.includes(POSSIBLE_MOVE)) {

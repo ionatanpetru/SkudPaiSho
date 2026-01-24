@@ -168,7 +168,10 @@ export class VagabondActuator {
 			}
 
 			if (this.mobile) {
-				theDiv.setAttribute("onclick", "pointClicked(this); showPointMessage(this);");
+				theDiv.addEventListener('click', function() {
+					pointClicked(this);
+					showPointMessage(this);
+				});
 			} else {
 				theDiv.addEventListener("click", () => { pointClicked(theDiv); });
 				theDiv.addEventListener("mouseover", () => { showPointMessage(theDiv); });

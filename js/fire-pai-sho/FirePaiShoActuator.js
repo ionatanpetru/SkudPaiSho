@@ -24,6 +24,8 @@ import {
   getUserGamePreference,
   pieceAnimationLength,
   piecePlaceAnimation,
+  pointClicked,
+  showPointMessage,
   showTileMessage,
   unplayedTileClicked,
 } from '../PaiShoMain';
@@ -316,10 +318,13 @@ FirePaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 		}
 
 		if (this.mobile) {
-			theDiv.setAttribute("onclick", "pointClicked(this); showPointMessage(this);");
+			theDiv.addEventListener('click', function() {
+				pointClicked(this);
+				showPointMessage(this);
+			});
 		} else {
-			theDiv.setAttribute("onclick", "pointClicked(this);");
-			theDiv.setAttribute("onmouseover", "showPointMessage(this);");
+			theDiv.addEventListener('click', function() { pointClicked(this); });
+			theDiv.addEventListener('mouseover', function() { showPointMessage(this); });
 			theDiv.addEventListener('mouseout', clearMessage);
 			theDiv.addEventListener('mousedown', e => {
 				 // Right Mouse Button

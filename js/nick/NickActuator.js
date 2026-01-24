@@ -16,6 +16,8 @@ import {
 	RmbUp,
 	clearMessage,
 	pieceAnimationLength,
+	pointClicked,
+	showPointMessage,
 	showTileMessage,
 	unplayedTileClicked,
 } from '../PaiShoMain';
@@ -167,11 +169,14 @@ export class NickActuator {
 		}
 		if (clickable) {
 			if (this.mobile) {
-				theDiv.setAttribute("onclick", "unplayedTileClicked(this); showTileMessage(this);");
+				theDiv.addEventListener('click', function() {
+					unplayedTileClicked(this);
+					showTileMessage(this);
+				});
 			} else {
-				theDiv.setAttribute("onclick", "unplayedTileClicked(this);");
-				theDiv.setAttribute("onmouseover", "showTileMessage(this);");
-				theDiv.setAttribute("onmouseout", "clearMessage();");
+				theDiv.addEventListener('click', function() { unplayedTileClicked(this); });
+				theDiv.addEventListener('mouseover', function() { showTileMessage(this); });
+				theDiv.addEventListener('mouseout', clearMessage);
 			}
 		}
 
@@ -231,11 +236,14 @@ export class NickActuator {
 		theDiv.setAttribute("id", tile.id);
 
 		if (this.mobile) {
-			theDiv.setAttribute("onclick", "unplayedTileClicked(this); showTileMessage(this);");
+			theDiv.addEventListener('click', function() {
+				unplayedTileClicked(this);
+				showTileMessage(this);
+			});
 		} else {
-			theDiv.setAttribute("onclick", "unplayedTileClicked(this);");
-			theDiv.setAttribute("onmouseover", "showTileMessage(this);");
-			theDiv.setAttribute("onmouseout", "clearMessage();");
+			theDiv.addEventListener('click', function() { unplayedTileClicked(this); });
+			theDiv.addEventListener('mouseover', function() { showTileMessage(this); });
+			theDiv.addEventListener('mouseout', clearMessage);
 		}
 
 		container.appendChild(theDiv);
@@ -267,11 +275,14 @@ export class NickActuator {
 			}
 			
 			if (this.mobile) {
-				theDiv.setAttribute("onclick", "pointClicked(this); showPointMessage(this);");
+				theDiv.addEventListener('click', function() {
+					pointClicked(this);
+					showPointMessage(this);
+				});
 			} else {
-				theDiv.setAttribute("onclick", "pointClicked(this);");
-				theDiv.setAttribute("onmouseover", "showPointMessage(this);");
-				theDiv.setAttribute("onmouseout", "clearMessage();");
+				theDiv.addEventListener('click', function() { pointClicked(this); });
+				theDiv.addEventListener('mouseover', function() { showPointMessage(this); });
+				theDiv.addEventListener('mouseout', clearMessage);
 				theDiv.addEventListener('mousedown', (e) => {
 					 // Right Mouse Button
 					if (e.button == 2) {
