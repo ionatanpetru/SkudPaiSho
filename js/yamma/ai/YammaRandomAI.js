@@ -25,7 +25,7 @@ YammaRandomAI.prototype.getMove = function(game, moveNum) {
 	for (var i = 0; i < possiblePositions.length; i++) {
 		var pos = possiblePositions[i];
 		var notationBuilder = new YammaNotationBuilder();
-		notationBuilder.setPoint(pos.x, pos.y, pos.z);
+		notationBuilder.setPoint(pos.row, pos.col, pos.level);
 
 		var move = notationBuilder.getMove(this.player);
 		if (move) {

@@ -1,5 +1,8 @@
 /**
  * YammaGameNotation - Handles move notation for saving/loading games
+ *
+ * Uses triangular grid coordinates: row, col, level
+ * Format: "H:row,col,level" or "G:row,col,level"
  */
 
 import { GUEST, HOST } from '../CommonNotationObjects';
@@ -8,6 +11,11 @@ export class YammaNotationMove {
 	constructor(notation) {
 		this.fullNotation = notation;
 		this.player = null;
+		this.row = 0;
+		this.col = 0;
+		this.level = 0;
+
+		// For backwards compatibility with old code
 		this.x = 0;
 		this.y = 0;
 		this.z = 0;
@@ -18,7 +26,7 @@ export class YammaNotationMove {
 	}
 
 	parse(notation) {
-		// Format: "H:x,y,z" or "G:x,y,z" (e.g., "H:2,3,0")
+		// Format: "H:row,col,level" or "G:row,col,level" (e.g., "H:2,1,0")
 		const parts = notation.split(':');
 		if (parts.length !== 2) return;
 
@@ -26,35 +34,40 @@ export class YammaNotationMove {
 
 		const coords = parts[1].split(',');
 		if (coords.length >= 2) {
-			this.x = parseInt(coords[0], 10);
-			this.y = parseInt(coords[1], 10);
-			this.z = coords.length >= 3 ? parseInt(coords[2], 10) : 0;
+			this.row = parseInt(coords[0], 10);
+			this.col = parseInt(coords[1], 10);
+			this.level = coords.length >= 3 ? parseInt(coords[2], 10) : 0;
+
+			// Keep x, y, z in sync for compatibility
+			this.x = this.row;
+			this.y = this.col;
+			this.z = this.level;
 		}
 	}
 
 	toString() {
 		const playerCode = this.player === HOST ? 'H' : 'G';
-		return `${playerCode}:${this.x},${this.y},${this.z}`;
+		return `${playerCode}:${this.row},${this.col},${this.level}`;
 	}
 }
 
 export class YammaNotationBuilder {
 	constructor() {
 		this.status = 'BRAND_NEW';
-		this.x = null;
-		this.y = null;
-		this.z = null;
+		this.row = null;
+		this.col = null;
+		this.level = null;
 	}
 
-	setPoint(x, y, z) {
-		this.x = x;
-		this.y = y;
-		this.z = z;
+	setPoint(row, col, level) {
+		this.row = row;
+		this.col = col;
+		this.level = level;
 		this.status = 'READY';
 	}
 
 	isReady() {
-		return this.status === 'READY' && this.x !== null && this.y !== null && this.z !== null;
+		return this.status === 'READY' && this.row !== null && this.col !== null && this.level !== null;
 	}
 
 	getMove(player) {
@@ -62,18 +75,21 @@ export class YammaNotationBuilder {
 
 		const move = new YammaNotationMove();
 		move.player = player;
-		move.x = this.x;
-		move.y = this.y;
-		move.z = this.z;
+		move.row = this.row;
+		move.col = this.col;
+		move.level = this.level;
+		move.x = this.row;
+		move.y = this.col;
+		move.z = this.level;
 		move.fullNotation = move.toString();
 		return move;
 	}
 
 	reset() {
 		this.status = 'BRAND_NEW';
-		this.x = null;
-		this.y = null;
-		this.z = null;
+		this.row = null;
+		this.col = null;
+		this.level = null;
 	}
 }
 

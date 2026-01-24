@@ -1,5 +1,12 @@
 /**
- * YammaActuator - Three.js 3D rendering for Yamma pyramid
+ * YammaActuator - Three.js 3D rendering for Yamma triangular pyramid
+ *
+ * Renders a tetrahedron (triangular pyramid) structure:
+ * - Level 0 (base): 5 rows (15 positions)
+ * - Level 1: 4 rows (10 positions)
+ * - Level 2: 3 rows (6 positions)
+ * - Level 3: 2 rows (3 positions)
+ * - Level 4: 1 row (1 position - apex)
  */
 
 import * as THREE from 'three';
@@ -27,12 +34,12 @@ export class YammaActuator {
 		this.slotsGroup = null;
 		this.highlightGroup = null;
 
-		// Board configuration
-		this.baseGridSize = 5;
-		this.maxHeight = 5;
+		// Board configuration for triangular pyramid
+		this.baseRows = 5;
+		this.maxLevels = 5;
 		this.slotSpacing = 1.2;
 		this.cubeSize = 0.8;
-		this.levelHeight = 0.7; // Height between levels
+		this.levelHeight = 0.8;
 
 		// Raycaster for mouse interaction
 		this.raycaster = new THREE.Raycaster();
@@ -127,7 +134,7 @@ export class YammaActuator {
 		this.boardGroup.add(this.cubesGroup);
 		this.boardGroup.add(this.highlightGroup);
 
-		// Create the board base
+		// Create the triangular board base
 		this.createBoardBase();
 
 		// Event listeners
@@ -165,81 +172,136 @@ export class YammaActuator {
 	}
 
 	createBoardBase() {
-		// Create a wooden-looking board base
-		const boardSize = this.baseGridSize * this.slotSpacing + 1;
-		const baseGeometry = new THREE.BoxGeometry(boardSize, 0.3, boardSize);
+		// Create a triangular board base
+		const triangleShape = new THREE.Shape();
+
+		// Calculate triangle vertices (equilateral triangle)
+		const size = this.baseRows * this.slotSpacing;
+		const height = size * Math.sqrt(3) / 2;
+
+		// Triangle vertices centered on origin
+		triangleShape.moveTo(0, -height / 3);  // Bottom vertex
+		triangleShape.lineTo(-size / 2, height * 2 / 3);  // Top left
+		triangleShape.lineTo(size / 2, height * 2 / 3);   // Top right
+		triangleShape.closePath();
+
+		const extrudeSettings = {
+			depth: 0.3,
+			bevelEnabled: false
+		};
+
+		const baseGeometry = new THREE.ExtrudeGeometry(triangleShape, extrudeSettings);
+		baseGeometry.rotateX(-Math.PI / 2);
+
 		const baseMaterial = new THREE.MeshStandardMaterial({
 			color: 0x8B4513,
 			roughness: 0.8,
 			metalness: 0.1
 		});
 		const baseMesh = new THREE.Mesh(baseGeometry, baseMaterial);
-		baseMesh.position.y = -0.2;
+		baseMesh.position.y = -0.3;
 		baseMesh.receiveShadow = true;
 		this.boardGroup.add(baseMesh);
 
-		// Add grid lines for base level
+		// Add triangular grid lines for base level
+		this.createTriangularGrid();
+	}
+
+	createTriangularGrid() {
 		const gridMaterial = new THREE.LineBasicMaterial({ color: 0x5a3a1a });
-		const offset = this.getBaseOffset();
 
-		for (let i = 0; i < this.baseGridSize; i++) {
-			// Horizontal lines
-			const hPoints = [
-				new THREE.Vector3(-offset, 0.01, i * this.slotSpacing - offset),
-				new THREE.Vector3((this.baseGridSize - 1) * this.slotSpacing - offset, 0.01, i * this.slotSpacing - offset)
-			];
-			const hGeometry = new THREE.BufferGeometry().setFromPoints(hPoints);
-			const hLine = new THREE.Line(hGeometry, gridMaterial);
-			this.boardGroup.add(hLine);
+		// Draw lines connecting base level positions
+		for (let row = 0; row < this.baseRows; row++) {
+			const points = [];
+			for (let col = 0; col <= row; col++) {
+				const pos = this.getWorldPosition(row, col, 0);
+				points.push(new THREE.Vector3(pos.x, 0.01, pos.z));
+			}
+			if (points.length > 1) {
+				const geometry = new THREE.BufferGeometry().setFromPoints(points);
+				const line = new THREE.Line(geometry, gridMaterial);
+				this.boardGroup.add(line);
+			}
+		}
 
-			// Vertical lines
-			const vPoints = [
-				new THREE.Vector3(i * this.slotSpacing - offset, 0.01, -offset),
-				new THREE.Vector3(i * this.slotSpacing - offset, 0.01, (this.baseGridSize - 1) * this.slotSpacing - offset)
-			];
-			const vGeometry = new THREE.BufferGeometry().setFromPoints(vPoints);
-			const vLine = new THREE.Line(vGeometry, gridMaterial);
-			this.boardGroup.add(vLine);
+		// Draw diagonal lines (left edge of triangles)
+		for (let col = 0; col < this.baseRows; col++) {
+			const points = [];
+			for (let row = col; row < this.baseRows; row++) {
+				const pos = this.getWorldPosition(row, col, 0);
+				points.push(new THREE.Vector3(pos.x, 0.01, pos.z));
+			}
+			if (points.length > 1) {
+				const geometry = new THREE.BufferGeometry().setFromPoints(points);
+				const line = new THREE.Line(geometry, gridMaterial);
+				this.boardGroup.add(line);
+			}
+		}
+
+		// Draw diagonal lines (right edge of triangles)
+		for (let startRow = 0; startRow < this.baseRows; startRow++) {
+			const points = [];
+			let row = startRow;
+			let col = 0;
+			while (row < this.baseRows && col <= row) {
+				const pos = this.getWorldPosition(row, col, 0);
+				points.push(new THREE.Vector3(pos.x, 0.01, pos.z));
+				row++;
+				col++;
+			}
+			if (points.length > 1) {
+				const geometry = new THREE.BufferGeometry().setFromPoints(points);
+				const line = new THREE.Line(geometry, gridMaterial);
+				this.boardGroup.add(line);
+			}
 		}
 	}
 
-	getBaseOffset() {
-		return (this.baseGridSize - 1) * this.slotSpacing / 2;
-	}
-
 	/**
-	 * Get world position for a grid position at a given level
-	 * Higher levels are offset by 0.5 spacing units
+	 * Get world position for triangular grid coordinates
+	 * row: 0 to (baseRows - level - 1)
+	 * col: 0 to row
+	 * level: 0 to (baseRows - 1)
 	 */
-	getWorldPosition(x, y, z) {
-		const baseOffset = this.getBaseOffset();
-		// Each level is offset by 0.5 grid units
-		const levelOffset = z * 0.5 * this.slotSpacing;
+	getWorldPosition(row, col, level) {
+		const spacing = this.slotSpacing;
 
-		return {
-			worldX: x * this.slotSpacing - baseOffset + levelOffset,
-			worldY: z * this.levelHeight + this.cubeSize * 0.5,
-			worldZ: y * this.slotSpacing - baseOffset + levelOffset
-		};
+		// Triangular grid layout:
+		// - Each row is offset horizontally based on row number
+		// - Y (depth in world) increases with row
+		// - X position depends on col, centered within the row
+
+		// At higher levels, the triangle is smaller and shifted toward center
+		const rowOffset = row * spacing * 0.5;
+		const levelOffset = level * spacing * 0.33;
+
+		const x = col * spacing - rowOffset + levelOffset;
+		const z = row * spacing * 0.866 + levelOffset; // 0.866 = sqrt(3)/2 for equilateral triangle
+		const y = level * this.levelHeight + this.cubeSize * 0.5;
+
+		// Center the base triangle
+		const baseCenterZ = (this.baseRows - 1) * spacing * 0.866 / 2;
+
+		return { x, y, z: z - baseCenterZ };
 	}
 
-	createSlotMesh(x, y, z) {
-		// Use different geometries/colors for different levels
+	createSlotMesh(row, col, level) {
+		// Use hexagon shape for triangular grid slots
 		const slotGeometry = new THREE.CylinderGeometry(0.15, 0.15, 0.08, 6);
 		const levelColors = [0x4a3520, 0x5a4530, 0x6a5540, 0x7a6550, 0x8a7560];
 		const slotMaterial = new THREE.MeshStandardMaterial({
-			color: levelColors[z] || 0x4a3520,
+			color: levelColors[level] || 0x4a3520,
 			roughness: 0.9,
 			transparent: true,
 			opacity: 0.8
 		});
 
 		const slot = new THREE.Mesh(slotGeometry, slotMaterial);
-		const pos = this.getWorldPosition(x, y, z);
+		const pos = this.getWorldPosition(row, col, level);
 
 		// Position slightly above the cube level
-		slot.position.set(pos.worldX, pos.worldY - this.cubeSize * 0.4, pos.worldZ);
-		slot.userData = { x, y, z, type: 'slot' };
+		slot.position.set(pos.x, pos.y - this.cubeSize * 0.4, pos.z);
+		slot.userData = { row, col, level, type: 'slot' };
 
 		return slot;
 	}
@@ -308,7 +370,7 @@ export class YammaActuator {
 				const slot = intersects[0].object;
 				if (slot.userData && slot.userData.type === 'slot') {
 					if (this.onSlotClick) {
-						this.onSlotClick(slot.userData.x, slot.userData.y, slot.userData.z);
+						this.onSlotClick(slot.userData.row, slot.userData.col, slot.userData.level);
 					}
 				}
 			}
@@ -394,33 +456,33 @@ export class YammaActuator {
 		const cubes = board.getAllCubes();
 		for (const cube of cubes) {
 			const mesh = this.createCubeMesh(cube);
-			const pos = this.getWorldPosition(cube.x, cube.y, cube.z);
+			const pos = this.getWorldPosition(cube.row, cube.col, cube.level);
 
-			mesh.position.set(pos.worldX, pos.worldY, pos.worldZ);
+			mesh.position.set(pos.x, pos.y, pos.z);
 			this.cubesGroup.add(mesh);
 		}
 
 		// Create slot markers for all possible moves
 		const possibleMoves = board.getPossibleMoves();
 		for (const move of possibleMoves) {
-			const slot = this.createSlotMesh(move.x, move.y, move.z);
+			const slot = this.createSlotMesh(move.row, move.col, move.level);
 			this.slotsGroup.add(slot);
 			this.slotMeshes.push(slot);
 		}
 
 		// Highlight last move
 		if (lastMove) {
-			this.highlightPosition(lastMove.x, lastMove.y, lastMove.z, 0x44ff44);
+			this.highlightPosition(lastMove.row, lastMove.col, lastMove.level, 0x44ff44);
 		}
 
 		// Highlight winning line if game is won
 		if (winner && winningAngle !== null) {
-			this.highlightWinningLine(board, winningAngle);
+			// TODO: Implement winning line highlight for triangular grid
 		}
 	}
 
-	highlightPosition(x, y, z, color) {
-		const pos = this.getWorldPosition(x, y, z);
+	highlightPosition(row, col, level, color) {
+		const pos = this.getWorldPosition(row, col, level);
 
 		const geometry = new THREE.RingGeometry(0.35, 0.45, 32);
 		const material = new THREE.MeshBasicMaterial({
@@ -431,80 +493,16 @@ export class YammaActuator {
 		});
 		const ring = new THREE.Mesh(geometry, material);
 		ring.rotation.x = -Math.PI / 2;
-		ring.position.set(pos.worldX, pos.worldY - this.cubeSize * 0.35, pos.worldZ);
+		ring.position.set(pos.x, pos.y - this.cubeSize * 0.35, pos.z);
 		this.highlightGroup.add(ring);
-	}
-
-	highlightWinningLine(board, winningAngle) {
-		const projection = board.getProjection(winningAngle);
-		const directions = [
-			{ dx: 1, dy: 0 },
-			{ dx: 0, dy: 1 },
-			{ dx: 1, dy: 1 },
-			{ dx: 1, dy: -1 }
-		];
-
-		for (let x = 0; x < this.baseGridSize; x++) {
-			for (let y = 0; y < this.baseGridSize; y++) {
-				const color = projection[x][y];
-				if (!color) continue;
-
-				for (const dir of directions) {
-					const line = this.getWinningLine(projection, x, y, dir.dx, dir.dy, color);
-					if (line) {
-						for (const pos of line) {
-							// Find the actual cube at this position to get its z
-							const cube = this.findTopCubeAt(pos.x, pos.y);
-							const z = cube ? cube.z : 0;
-							this.highlightPosition(pos.x, pos.y, z, 0xffff00);
-						}
-						return;
-					}
-				}
-			}
-		}
-	}
-
-	findTopCubeAt(x, y) {
-		if (!this.currentBoard) return null;
-
-		// Find the highest cube at this x,y projection
-		// Since cubes at higher levels are offset, we need to check differently
-		// For now, check if there's a cube at the base level
-		for (let z = this.maxHeight - 1; z >= 0; z--) {
-			const cube = this.currentBoard.getCubeAt(x, y, z);
-			if (cube) return cube;
-		}
-		return null;
-	}
-
-	getWinningLine(projection, startX, startY, dx, dy, color) {
-		const line = [];
-		let x = startX;
-		let y = startY;
-
-		while (x >= 0 && x < this.baseGridSize && y >= 0 && y < this.baseGridSize) {
-			if (projection[x][y] === color) {
-				line.push({ x, y });
-				if (line.length >= 4) {
-					return line;
-				}
-			} else {
-				break;
-			}
-			x += dx;
-			y += dy;
-		}
-
-		return null;
 	}
 
 	showPossibleMoves(moves) {
 		for (const slot of this.slotMeshes) {
 			const isMatch = moves.some(m =>
-				m.x === slot.userData.x &&
-				m.y === slot.userData.y &&
-				m.z === slot.userData.z
+				m.row === slot.userData.row &&
+				m.col === slot.userData.col &&
+				m.level === slot.userData.level
 			);
 			if (isMatch) {
 				slot.userData.highlighted = true;

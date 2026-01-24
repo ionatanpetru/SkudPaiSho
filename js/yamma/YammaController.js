@@ -35,7 +35,7 @@ export class YammaController {
 		this.actuator = new YammaActuator(
 			gameContainer,
 			isMobile,
-			(x, y, z) => this.slotClicked(x, y, z),
+			(row, col, level) => this.slotClicked(row, col, level),
 			this.getHostTilesContainerDivs(),
 			this.getGuestTilesContainerDivs()
 		);
@@ -100,14 +100,14 @@ export class YammaController {
 	getDefaultHelpMessageText() {
 		return "<h4>Yamma</h4>" +
 			"<p>Inspired by Khanat Sadomwattana's Yamma, this is a 3D four-in-a-row game " +
-			"with pyramid stacking.</p>" +
+			"played on a triangular pyramid (tetrahedron).</p>" +
 			"<p><strong>Objective:</strong> Be the first to get 4-in-a-row of your color " +
-			"when viewed from the front perspective.</p>" +
+			"when viewed from any of the three perspectives.</p>" +
 			"<p><strong>How to Play:</strong></p>" +
 			"<ul>" +
 			"<li>Players take turns placing cubes on available slots</li>" +
-			"<li>Cubes can stack - when 4 cubes form a 2x2 square, a new slot appears above</li>" +
-			"<li>Each cube shows your color from the front view</li>" +
+			"<li>Cubes stack in a triangular pyramid - when 3 cubes form a triangle, a new slot appears above</li>" +
+			"<li>Each cube shows your color from the front and opponent's from other angles</li>" +
 			"<li>The board can be rotated to view from different angles</li>" +
 			"<li>Win by aligning 4 cubes of your color in a row</li>" +
 			"</ul>" +
@@ -134,7 +134,7 @@ export class YammaController {
 		return container;
 	}
 
-	slotClicked(x, y, z) {
+	slotClicked(row, col, level) {
 		if (this.theGame.hasEnded()) {
 			return;
 		}
@@ -146,12 +146,12 @@ export class YammaController {
 		}
 
 		// Check if this is a valid move
-		if (!this.theGame.board.canPlaceCube(x, y, z)) {
+		if (!this.theGame.board.canPlaceCube(row, col, level)) {
 			return;
 		}
 
 		// Build the move
-		this.notationBuilder.setPoint(x, y, z);
+		this.notationBuilder.setPoint(row, col, level);
 		this.completeMove();
 	}
 

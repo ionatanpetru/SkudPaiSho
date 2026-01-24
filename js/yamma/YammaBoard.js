@@ -1,19 +1,24 @@
 /**
- * YammaBoard - Represents the 3D pyramid game board state
+ * YammaBoard - Represents the 3D triangular pyramid game board state
  *
- * Yamma is a 3D four-in-a-row game.
+ * Yamma is a 3D four-in-a-row game played on a triangular pyramid (tetrahedron).
  * Cubes show 3 faces from 3 different viewing angles.
  * Each cube has 3 white sides and 3 blue sides.
  *
- * Pyramid structure:
- * - Level 0: 5x5 grid (25 positions)
- * - Level 1: 4x4 grid (16 positions) - cubes rest in valleys between level 0 cubes
- * - Level 2: 3x3 grid (9 positions)
- * - Level 3: 2x2 grid (4 positions)
- * - Level 4: 1x1 grid (1 position) - top of pyramid
+ * Triangular Pyramid structure:
+ * - Level 0 (base): Triangle with 5 rows (15 positions: 1+2+3+4+5)
+ * - Level 1: Triangle with 4 rows (10 positions)
+ * - Level 2: Triangle with 3 rows (6 positions)
+ * - Level 3: Triangle with 2 rows (3 positions)
+ * - Level 4: Triangle with 1 row (1 position - apex)
  *
- * A cube at level z position (x,y) needs 4 cubes below at level z-1:
- * positions (x,y), (x+1,y), (x,y+1), (x+1,y+1)
+ * Coordinates: (row, col, level) where:
+ * - row: 0 to (baseRows - level - 1)
+ * - col: 0 to row
+ * - level: 0 to (baseRows - 1)
+ *
+ * A cube at level z position (row, col) needs 3 cubes below at level z-1:
+ * - (row, col), (row+1, col), (row+1, col+1)
  */
 
 export const PLAYER = {
@@ -22,19 +27,23 @@ export const PLAYER = {
 	NEUTRAL: 'neutral'
 };
 
-// Cube face colors - opposite faces have same color
 export const CubeFaceOrientation = {
-	FRONT: 0,  // Facing the "front" view angle
-	LEFT: 1,   // Facing the "left" view angle
-	RIGHT: 2   // Facing the "right" view angle
+	FRONT: 0,
+	LEFT: 1,
+	RIGHT: 2
 };
 
 export class YammaCube {
-	constructor(owner, x, y, z = 0) {
+	constructor(owner, row, col, level = 0) {
 		this.owner = owner;
-		this.x = x;
-		this.y = y;
-		this.z = z; // Height level
+		this.row = row;
+		this.col = col;
+		this.level = level;
+
+		// For compatibility with old code that uses x, y, z
+		this.x = row;
+		this.y = col;
+		this.z = level;
 
 		// Which color shows from each of 3 viewing directions
 		this.frontFace = owner;
@@ -43,7 +52,7 @@ export class YammaCube {
 	}
 
 	getFaceColor(viewAngle) {
-		switch(viewAngle) {
+		switch (viewAngle) {
 			case 0: return this.frontFace;
 			case 1: return this.leftFace;
 			case 2: return this.rightFace;
@@ -54,13 +63,12 @@ export class YammaCube {
 
 export class YammaBoard {
 	constructor() {
-		// Base grid size
-		this.baseGridSize = 5;
-		// Maximum height (levels 0-4)
-		this.maxHeight = 5;
+		// Base triangle has 5 rows
+		this.baseRows = 5;
+		// Maximum levels (0 to 4)
+		this.maxLevels = 5;
 
-		// levels[z][x][y] = cube or null
-		// Each level has a grid of size (baseGridSize - z)
+		// levels[z][row][col] = cube or null
 		this.levels = [];
 
 		this.initializeBoard();
@@ -68,88 +76,94 @@ export class YammaBoard {
 
 	initializeBoard() {
 		this.levels = [];
-		for (let z = 0; z < this.maxHeight; z++) {
-			const gridSize = this.getGridSizeAtLevel(z);
-			this.levels[z] = [];
-			for (let x = 0; x < gridSize; x++) {
-				this.levels[z][x] = [];
-				for (let y = 0; y < gridSize; y++) {
-					this.levels[z][x][y] = null;
+		for (let level = 0; level < this.maxLevels; level++) {
+			const rows = this.getRowsAtLevel(level);
+			this.levels[level] = [];
+			for (let row = 0; row < rows; row++) {
+				this.levels[level][row] = [];
+				for (let col = 0; col <= row; col++) {
+					this.levels[level][row][col] = null;
 				}
 			}
 		}
 	}
 
-	getGridSizeAtLevel(z) {
-		return this.baseGridSize - z;
+	getRowsAtLevel(level) {
+		return this.baseRows - level;
 	}
 
-	isValidPosition(x, y, z) {
-		if (z < 0 || z >= this.maxHeight) {
+	getPositionCountAtLevel(level) {
+		const rows = this.getRowsAtLevel(level);
+		return (rows * (rows + 1)) / 2;
+	}
+
+	isValidPosition(row, col, level) {
+		if (level < 0 || level >= this.maxLevels) {
 			return false;
 		}
-		const gridSize = this.getGridSizeAtLevel(z);
-		return x >= 0 && x < gridSize && y >= 0 && y < gridSize;
+		const rows = this.getRowsAtLevel(level);
+		if (row < 0 || row >= rows) {
+			return false;
+		}
+		if (col < 0 || col > row) {
+			return false;
+		}
+		return true;
 	}
 
-	getCubeAt(x, y, z) {
-		if (!this.isValidPosition(x, y, z)) {
+	getCubeAt(row, col, level) {
+		if (!this.isValidPosition(row, col, level)) {
 			return null;
 		}
-		return this.levels[z][x][y];
+		return this.levels[level][row][col];
 	}
 
-	hasSupport(x, y, z) {
-		if (z === 0) {
-			return true; // Ground level always has support
+	hasSupport(row, col, level) {
+		if (level === 0) {
+			return true;
 		}
 
-		// Need 4 cubes at level z-1 to form a valley
-		// A cube at level z position (x,y) needs support from:
-		// level z-1 positions: (x,y), (x+1,y), (x,y+1), (x+1,y+1)
+		// A cube at level z, position (row, col) needs 3 cubes at level z-1:
+		// (row, col), (row+1, col), (row+1, col+1)
 		const supports = [
-			this.getCubeAt(x, y, z - 1),
-			this.getCubeAt(x + 1, y, z - 1),
-			this.getCubeAt(x, y + 1, z - 1),
-			this.getCubeAt(x + 1, y + 1, z - 1)
+			this.getCubeAt(row, col, level - 1),
+			this.getCubeAt(row + 1, col, level - 1),
+			this.getCubeAt(row + 1, col + 1, level - 1)
 		];
 
-		// All 4 must be present
 		return supports.every(cube => cube !== null);
 	}
 
-	canPlaceCube(x, y, z) {
-		if (!this.isValidPosition(x, y, z)) {
+	canPlaceCube(row, col, level) {
+		if (!this.isValidPosition(row, col, level)) {
 			return false;
 		}
 
-		// Position must be empty
-		if (this.getCubeAt(x, y, z) !== null) {
+		if (this.getCubeAt(row, col, level) !== null) {
 			return false;
 		}
 
-		// Must have support
-		return this.hasSupport(x, y, z);
+		return this.hasSupport(row, col, level);
 	}
 
-	placeCube(x, y, z, player) {
-		if (!this.canPlaceCube(x, y, z)) {
+	placeCube(row, col, level, player) {
+		if (!this.canPlaceCube(row, col, level)) {
 			return null;
 		}
 
-		const cube = new YammaCube(player, x, y, z);
-		this.levels[z][x][y] = cube;
+		const cube = new YammaCube(player, row, col, level);
+		this.levels[level][row][col] = cube;
 
 		return cube;
 	}
 
 	getAllCubes() {
 		const cubes = [];
-		for (let z = 0; z < this.maxHeight; z++) {
-			const gridSize = this.getGridSizeAtLevel(z);
-			for (let x = 0; x < gridSize; x++) {
-				for (let y = 0; y < gridSize; y++) {
-					const cube = this.levels[z][x][y];
+		for (let level = 0; level < this.maxLevels; level++) {
+			const rows = this.getRowsAtLevel(level);
+			for (let row = 0; row < rows; row++) {
+				for (let col = 0; col <= row; col++) {
+					const cube = this.levels[level][row][col];
 					if (cube) {
 						cubes.push(cube);
 					}
@@ -162,12 +176,12 @@ export class YammaBoard {
 	getPossibleMoves() {
 		const moves = [];
 
-		for (let z = 0; z < this.maxHeight; z++) {
-			const gridSize = this.getGridSizeAtLevel(z);
-			for (let x = 0; x < gridSize; x++) {
-				for (let y = 0; y < gridSize; y++) {
-					if (this.canPlaceCube(x, y, z)) {
-						moves.push({ x, y, z });
+		for (let level = 0; level < this.maxLevels; level++) {
+			const rows = this.getRowsAtLevel(level);
+			for (let row = 0; row < rows; row++) {
+				for (let col = 0; col <= row; col++) {
+					if (this.canPlaceCube(row, col, level)) {
+						moves.push({ row, col, level, x: row, y: col, z: level });
 					}
 				}
 			}
@@ -177,118 +191,86 @@ export class YammaBoard {
 	}
 
 	/**
-	 * Get the world position for a cube at grid position (x, y, z)
-	 * Upper levels are offset to sit in the valleys between lower cubes
+	 * Convert triangular coordinates to world position for 3D rendering
 	 */
-	getWorldPosition(x, y, z, slotSpacing = 1.2) {
-		// Each level is offset by 0.5 grid units in both x and y
-		const worldX = (x + 0.5 * z) * slotSpacing;
-		const worldY = (y + 0.5 * z) * slotSpacing;
-		return { worldX, worldY };
+	getWorldPosition(row, col, level, spacing = 1.2) {
+		// For triangular grid:
+		// - x position depends on col, offset by row to center triangle
+		// - z position (depth) depends on row
+		// - y position (height) depends on level
+
+		const rowOffset = row * spacing * 0.5;
+		const levelOffset = level * spacing * 0.33;
+
+		const x = col * spacing - rowOffset + levelOffset;
+		const z = row * spacing * 0.866 + levelOffset; // 0.866 = sqrt(3)/2
+		const y = level * spacing * 0.8;
+
+		return { x, y, z };
 	}
 
-	/**
-	 * Check for 4-in-a-row from a specific viewing angle
-	 * For pyramid stacking, we need to check the visible faces from each angle
-	 */
 	checkWinFromAngle(viewAngle) {
-		const projection = this.getProjection(viewAngle);
-		return this.checkWinIn2D(projection);
-	}
+		const cubes = this.getAllCubes();
 
-	/**
-	 * Project the 3D pyramid to 2D from a viewing angle
-	 * Each position shows the topmost visible face color
-	 */
-	getProjection(viewAngle) {
-		// For the base grid, check what's visible at each position
-		// Higher cubes obscure lower ones
-		const projection = [];
+		const colorPositions = { [PLAYER.WHITE]: [], [PLAYER.BLUE]: [] };
 
-		for (let x = 0; x < this.baseGridSize; x++) {
-			projection[x] = [];
-			for (let y = 0; y < this.baseGridSize; y++) {
-				projection[x][y] = null;
+		for (const cube of cubes) {
+			const color = cube.getFaceColor(viewAngle);
+			if (colorPositions[color]) {
+				colorPositions[color].push(cube);
 			}
 		}
 
-		// Go through all cubes and project them onto the base grid
-		// Higher z values will overwrite lower ones at the same projected position
-		for (let z = 0; z < this.maxHeight; z++) {
-			const gridSize = this.getGridSizeAtLevel(z);
-			for (let x = 0; x < gridSize; x++) {
-				for (let y = 0; y < gridSize; y++) {
-					const cube = this.getCubeAt(x, y, z);
-					if (cube) {
-						// Project this cube onto the base grid
-						// For simplicity, we'll use the cube's own grid position
-						// In a full implementation, the projection would depend on view angle
-						const projX = x;
-						const projY = y;
-
-						if (projX < this.baseGridSize && projY < this.baseGridSize) {
-							projection[projX][projY] = cube.getFaceColor(viewAngle);
-						}
-					}
-				}
-			}
-		}
-
-		return projection;
-	}
-
-	/**
-	 * Check for 4-in-a-row in a 2D projection
-	 */
-	checkWinIn2D(projection) {
-		const size = this.baseGridSize;
-		const directions = [
-			{ dx: 1, dy: 0 },  // Horizontal
-			{ dx: 0, dy: 1 },  // Vertical
-			{ dx: 1, dy: 1 },  // Diagonal down-right
-			{ dx: 1, dy: -1 }  // Diagonal up-right
-		];
-
-		for (let x = 0; x < size; x++) {
-			for (let y = 0; y < size; y++) {
-				const startColor = projection[x][y];
-				if (!startColor) continue;
-
-				for (const dir of directions) {
-					if (this.checkLine(projection, x, y, dir.dx, dir.dy, startColor)) {
-						return startColor;
-					}
-				}
+		for (const color of [PLAYER.WHITE, PLAYER.BLUE]) {
+			const positions = colorPositions[color];
+			if (positions.length >= 4 && this.hasFourInARow(positions)) {
+				return color;
 			}
 		}
 
 		return null;
 	}
 
-	checkLine(projection, startX, startY, dx, dy, color) {
-		let count = 0;
-		let x = startX;
-		let y = startY;
+	hasFourInARow(cubes) {
+		const posSet = new Set();
+		for (const cube of cubes) {
+			posSet.add(`${cube.row},${cube.col},${cube.level}`);
+		}
 
-		while (x >= 0 && x < this.baseGridSize && y >= 0 && y < this.baseGridSize) {
-			if (projection[x][y] === color) {
-				count++;
-				if (count >= 4) {
-					return true;
+		// Direction vectors for triangular grid
+		const directions = [
+			// Within same level:
+			{ dRow: 0, dCol: 1, dLevel: 0 },   // Along row
+			{ dRow: 1, dCol: 0, dLevel: 0 },   // Down-left
+			{ dRow: 1, dCol: 1, dLevel: 0 },   // Down-right
+			// Across levels (edges of tetrahedron):
+			{ dRow: 0, dCol: 0, dLevel: 1 },   // Straight up
+			{ dRow: -1, dCol: 0, dLevel: 1 },  // Up-left edge
+			{ dRow: -1, dCol: -1, dLevel: 1 }, // Up-right edge
+		];
+
+		for (const cube of cubes) {
+			for (const dir of directions) {
+				let count = 1;
+				let r = cube.row + dir.dRow;
+				let c = cube.col + dir.dCol;
+				let l = cube.level + dir.dLevel;
+
+				while (posSet.has(`${r},${c},${l}`)) {
+					count++;
+					if (count >= 4) {
+						return true;
+					}
+					r += dir.dRow;
+					c += dir.dCol;
+					l += dir.dLevel;
 				}
-			} else {
-				break;
 			}
-			x += dx;
-			y += dy;
 		}
 
 		return false;
 	}
 
-	/**
-	 * Check for winner from all 3 viewing angles
-	 */
 	checkWinner() {
 		for (let angle = 0; angle < 3; angle++) {
 			const winner = this.checkWinFromAngle(angle);
@@ -299,9 +281,6 @@ export class YammaBoard {
 		return null;
 	}
 
-	/**
-	 * Check if the game is a draw (no moves possible with no winner)
-	 */
 	isBoardFull() {
 		return this.getPossibleMoves().length === 0;
 	}
@@ -309,17 +288,17 @@ export class YammaBoard {
 	getCopy() {
 		const copy = new YammaBoard();
 
-		for (let z = 0; z < this.maxHeight; z++) {
-			const gridSize = this.getGridSizeAtLevel(z);
-			for (let x = 0; x < gridSize; x++) {
-				for (let y = 0; y < gridSize; y++) {
-					const cube = this.levels[z][x][y];
+		for (let level = 0; level < this.maxLevels; level++) {
+			const rows = this.getRowsAtLevel(level);
+			for (let row = 0; row < rows; row++) {
+				for (let col = 0; col <= row; col++) {
+					const cube = this.levels[level][row][col];
 					if (cube) {
-						const cubeCopy = new YammaCube(cube.owner, cube.x, cube.y, cube.z);
+						const cubeCopy = new YammaCube(cube.owner, cube.row, cube.col, cube.level);
 						cubeCopy.frontFace = cube.frontFace;
 						cubeCopy.leftFace = cube.leftFace;
 						cubeCopy.rightFace = cube.rightFace;
-						copy.levels[z][x][y] = cubeCopy;
+						copy.levels[level][row][col] = cubeCopy;
 					}
 				}
 			}

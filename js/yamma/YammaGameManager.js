@@ -36,10 +36,10 @@ export class YammaGameManager {
 		// }
 
 		const color = this.getPlayerColor(move.player);
-		const cube = this.board.placeCube(move.x, move.y, move.z, color);
+		const cube = this.board.placeCube(move.row, move.col, move.level, color);
 
 		if (cube) {
-			this.lastMove = { x: move.x, y: move.y, z: move.z };
+			this.lastMove = { row: move.row, col: move.col, level: move.level };
 			this.moveCount++;
 
 			// Check for winner
