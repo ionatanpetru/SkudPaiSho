@@ -554,11 +554,13 @@ export class GodaiBoard {
     }
 
     /**
+     * Minifier-safe implementation: uses unique const variables and nested if statements
+     * instead of && with recursive calls to prevent Terser optimization issues
      * Taken from VagabondBoard.js
-     * @param {GodaiBoardPoint} bpStart 
-     * @param {GodaiBoardPoint} bpEnd 
-     * @param {number} numMoves 
-     * @param {GodaiBoardPoint} trueStartingBP In case we're using board zones, we'll need to check if the path they want is Mountain -> River -> Neutral 
+     * @param {GodaiBoardPoint} bpStart
+     * @param {GodaiBoardPoint} bpEnd
+     * @param {number} numMoves
+     * @param {GodaiBoardPoint} trueStartingBP In case we're using board zones, we'll need to check if the path they want is Mountain -> River -> Neutral
      */
     _pathFound(bpStart, bpEnd, numMoves, trueStartingBP) {
         if (!bpStart || !bpEnd) {
@@ -566,65 +568,82 @@ export class GodaiBoard {
         }
 
         if (bpStart.isType(NON_PLAYABLE) || bpEnd.isType(NON_PLAYABLE)) {
-            return false // Paths must be through playable points
+            return false
         }
 
-        if (bpStart.row === bpEnd.row && bpStart.col === bpEnd.col) {
-            return false // Moving to the same point, very funny
+        let startRow = bpStart.row
+        let startCol = bpStart.col
+        let endRow = bpEnd.row
+        let endCol = bpEnd.col
+
+        if (startRow === endRow && startCol === endCol) {
+            return false // Moving to the same point
         }
 
         if (numMoves <= 0) {
-            return false // No more recursiveness
+            return false
         }
 
-        let minMoves = Math.abs(bpStart.row - bpEnd.row) + Math.abs(bpStart.col - bpEnd.col)
+        let minMoves = Math.abs(startRow - endRow) + Math.abs(startCol - endCol)
         if (minMoves === 1) {
-            return this._couldStepIntoNext(bpStart, bpEnd, trueStartingBP) // Only one space away
+            return this._couldStepIntoNext(bpStart, bpEnd, trueStartingBP)
         }
 
-        // Check move UP
-        let nextRow = bpStart.row - 1
-        if (nextRow >= 0) {
-            let nextPoint = this.cells[nextRow][bpStart.col]
-            if (!nextPoint.hasTile()
-                && this._couldStepIntoNext(bpStart, nextPoint, trueStartingBP)
-                && this._pathFound(nextPoint, bpEnd, numMoves - 1, trueStartingBP)) {
-                return true
+        let movesLeft = numMoves - 1
+
+        // Check UP - nested if instead of &&
+        let upRow = startRow - 1
+        if (upRow >= 0) {
+            let upPoint = this.cells[upRow][startCol]
+            if (!upPoint.hasTile()) {
+                if (this._couldStepIntoNext(bpStart, upPoint, trueStartingBP)) {
+                    if (this._pathFound(upPoint, bpEnd, movesLeft, trueStartingBP)) {
+                        return true
+                    }
+                }
             }
         }
 
-        // Check move DOWN
-        nextRow = bpStart.row + 1
-        if (nextRow < 17) {
-            let nextPoint = this.cells[nextRow][bpStart.col]
-            if (!nextPoint.hasTile()
-                && this._couldStepIntoNext(bpStart, nextPoint, trueStartingBP)
-                && this._pathFound(nextPoint, bpEnd, numMoves - 1, trueStartingBP)) {
-                return true
+        // Check DOWN
+        let downRow = startRow + 1
+        if (downRow < 17) {
+            let downPoint = this.cells[downRow][startCol]
+            if (!downPoint.hasTile()) {
+                if (this._couldStepIntoNext(bpStart, downPoint, trueStartingBP)) {
+                    if (this._pathFound(downPoint, bpEnd, movesLeft, trueStartingBP)) {
+                        return true
+                    }
+                }
             }
         }
 
-        // Check move LEFT
-        let nextCol = bpStart.col - 1
-        if (nextCol >= 0) {
-            let nextPoint = this.cells[bpStart.row][nextCol]
-            if (!nextPoint.hasTile()
-                && this._couldStepIntoNext(bpStart, nextPoint, trueStartingBP)
-                && this._pathFound(nextPoint, bpEnd, numMoves - 1, trueStartingBP)) {
-                return true
+        // Check LEFT
+        let leftCol = startCol - 1
+        if (leftCol >= 0) {
+            let leftPoint = this.cells[startRow][leftCol]
+            if (!leftPoint.hasTile()) {
+                if (this._couldStepIntoNext(bpStart, leftPoint, trueStartingBP)) {
+                    if (this._pathFound(leftPoint, bpEnd, movesLeft, trueStartingBP)) {
+                        return true
+                    }
+                }
             }
         }
 
-        // Check move LEFT
-        nextCol = bpStart.col + 1
-        if (nextCol < 17) {
-            let nextPoint = this.cells[bpStart.row][nextCol]
-            if (!nextPoint.hasTile()
-                && this._couldStepIntoNext(bpStart, nextPoint, trueStartingBP)
-                && this._pathFound(nextPoint, bpEnd, numMoves - 1, trueStartingBP)) {
-                return true
+        // Check RIGHT
+        let rightCol = startCol + 1
+        if (rightCol < 17) {
+            let rightPoint = this.cells[startRow][rightCol]
+            if (!rightPoint.hasTile()) {
+                if (this._couldStepIntoNext(bpStart, rightPoint, trueStartingBP)) {
+                    if (this._pathFound(rightPoint, bpEnd, movesLeft, trueStartingBP)) {
+                        return true
+                    }
+                }
             }
         }
+
+        return false
     }
 
     /**

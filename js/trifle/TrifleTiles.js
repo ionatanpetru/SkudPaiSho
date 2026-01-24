@@ -18,7 +18,7 @@ import {
 } from './TrifleTileInfo';
 import { clearObject } from '../GameData';
 
-export var TrifleTileCodes = {
+export const TrifleTileCodes = {
 	/* Spirit */
 	// SpiritBanner: "SpiritBanner",
 	// BaboonSpirit: "BaboonSpirit",
@@ -73,7 +73,7 @@ export var TrifleTileCodes = {
 	Saffron: "Saffron"
 };
 
-export var TrifleTileType = {
+export const TrifleTileType = {
 	banner: "Banner",
 	animal: "Animal",
 	flower: "Flower",
@@ -82,7 +82,7 @@ export var TrifleTileType = {
 	traveler: "Traveler"
 };
 
-export var TrifleTileIdentifier = {
+export const TrifleTileIdentifier = {
 	air: "Air",
 	water: "Water",
 	earth: "Earth",

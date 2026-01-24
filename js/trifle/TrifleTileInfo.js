@@ -3,7 +3,7 @@ import { TrifleBoardPoint } from './TrifleBoardPoint';
 import { TrifleTileType } from './TrifleTiles';
 import { debugOn } from '../GameData';
 
-export var TrifleTileCategory = {
+export const TrifleTileCategory = {
 	thisTile: "thisTile",
 	allButThisTile: "allButThisTile",
 	allTileTypes: "allTileTypes",
@@ -12,7 +12,7 @@ export var TrifleTileCategory = {
 	tileWithAbility: "tileWithAbility"
 };
 
-export var TrifleTargetType = {
+export const TrifleTargetType = {
 	thisTile: "thisTile",			// 
 	allTileTypes: "allTileTypes",	//
 	landingTile: "landingTile",		//
@@ -22,17 +22,17 @@ export var TrifleTargetType = {
 	chosenCapturedTile: "chosenCapturedTile"
 }
 
-export var TrifleDeployType = {
+export const TrifleDeployType = {
 	anywhere: "anywhere",
 	temple: "temple",
 	adjacentToTemple: "adjacentToTemple"
 };
 
-export var TrifleSpecialDeployType = {
+export const TrifleSpecialDeployType = {
 	withinFriendlyTileZone: "withinFriendlyTileZone"
 };
 
-export var TrifleMovementType = {
+export const TrifleMovementType = {
 	standard: "standard",
 	diagonal: "diagonal",
 	orthAndDiag: "orthAndDiag",
@@ -48,12 +48,12 @@ export var TrifleMovementType = {
 	jumpSurroundingTiles: "jumpSurroundingTiles"
 };
 
-export var TrifleMovementDirection = {
+export const TrifleMovementDirection = {
 	orthogonal: "orthogonal",
 	diagonal: "diagonal"
 };
 
-export var TrifleMovementRestriction = {
+export const TrifleMovementRestriction = {
 	// restrictedByOpponentTileZones: "restrictedByOpponentTileZones",
 	// immobilizedByAdjacentOpponentTile: "immobilizedByAdjacentOpponentTile", // unused
 	// immobilizedByOpponentTileZones: "immobilizedByOpponentTileZones",
@@ -62,13 +62,13 @@ export var TrifleMovementRestriction = {
 	restrictMovementOntoRecordedTilePoint: "restrictMovementOntoRecordedTilePoint"
 };
 
-export var TrifleMovementAbility = {
+export const TrifleMovementAbility = {
 	// carry: "carry", // For future
 	jumpOver: "jumpOver",
 	chargeCapture: "chargeCapture"
 };
 
-export var TrifleMoveDirection = {
+export const TrifleMoveDirection = {
 	any: "any",	/* Any direction starts movement */
 	straight: "straight",
 	turn: "turn",
@@ -76,19 +76,19 @@ export var TrifleMoveDirection = {
 	right: "right"
 }
 
-export var TrifleCaptureType = {
+export const TrifleCaptureType = {
 	none: "none",
 	all: "all",
 	tilesTargetedByAbility: "tilesTargetedByAbility",
 	allExcludingCertainTiles: "allExcludingCertainTiles"
 };
 
-export var TrifleActivationRequirement = {
+export const TrifleActivationRequirement = {
 	tilesNotInTemple: "tilesNotInTemple",
 	tileIsOnPointOfType: "tileIsOnPointOfType"
 };
 
-export var TrifleZoneAbility = {
+export const TrifleZoneAbility = {
 	canceledWhenInTemple: "canceledWhenInTemple", // Note: Too specific, how to split up to *dynamicize*?
 	protectFriendlyTilesFromCapture: "protectFriendlyTilesFromCapture", // Too specific, can be ProtectTilesFromCapture and have a target tiles metadata
 	// immobilizesOpponentTiles: "immobilizesOpponentTiles", // Outdated, replaced by ImmobilizesTiles
@@ -98,7 +98,7 @@ export var TrifleZoneAbility = {
 	captureLandingTiles: "captureLandingTiles" // unused?
 }
 
-export var TrifleBoardPresenceAbility = {
+export const TrifleBoardPresenceAbility = {
 	increaseFriendlyTileMovementDistance: "increaseFriendlyTileMovementDistance",	// TODO replace with Ability.grantBonusMovement
 	// spawnAdditionalCopies: "spawnAdditionalCopies",	// TODO,
 	canBeCapturedByFriendlyTiles: "canBeCapturedByFriendlyTiles",
@@ -106,15 +106,15 @@ export var TrifleBoardPresenceAbility = {
 	// captureProtection: "captureProtection"
 }
 
-export var TrifleSpawnLocation = {
+export const TrifleSpawnLocation = {
 	adjacent: "adjacent"
 };
 
-export var TrifleAttributeType = {
+export const TrifleAttributeType = {
 	gigantic: "gigantic"
 }
 
-export var TrifleAbilityName = {
+export const TrifleAbilityName = {
 	captureTargetTiles: "captureTargetTiles",
 	removeEffects: "removeEffects",
 	protectFromCapture: "protectFromCapture",
@@ -139,17 +139,17 @@ export var TrifleAbilityName = {
 	exchangeWithCapturedTile: "exchangeWithCapturedTile"
 };
 
-export var TrifleAbilityType = {
+export const TrifleAbilityType = {
 	all: "all",
 	protection: "protection"
 };
 
-export var TrifleAbilityCategory = {
+export const TrifleAbilityCategory = {
 	instant: "instant",
 	ongoing: "ongoing"
 };
 
-export var TrifleAbilitiesByCategory = {};
+export const TrifleAbilitiesByCategory = {};
 TrifleAbilitiesByCategory[TrifleAbilityCategory.instant] = [
 	TrifleAbilityName.captureTargetTiles,
 	TrifleAbilityName.moveTargetTile,
@@ -159,11 +159,11 @@ TrifleAbilitiesByCategory[TrifleAbilityCategory.instant] = [
 	TrifleAbilityName.exchangeWithCapturedTile
 ];
 
-export var TrifleAbilityPriorityLevel = {
+export const TrifleAbilityPriorityLevel = {
 	highest: "highest"
 };
 
-export var TrifleAbilityTriggerType = {
+export const TrifleAbilityTriggerType = {
 	whenCapturedByTargetTile: "whenCapturedByTargetTile",
 	whenCapturingTargetTile: "whenCapturingTargetTile",
 	whenTargetTileLandsInZone: "whenTargetTileLandsInZone",
@@ -185,34 +185,34 @@ export var TrifleAbilityTriggerType = {
 	whenTargetTileLandsInTemple: "whenTargetTileLandsInTemple"
 };
 
-export var TriflePromptTargetType = {
+export const TriflePromptTargetType = {
 	boardPoint: "boardPoint",
 	tilePile: "tilePile",
 	capturedTile: "capturedTile"
 };
 
-export var TrifleTargetPromptId = {
+export const TrifleTargetPromptId = {
 	movedTilePoint: "movedTilePoint",
 	movedTileDestinationPoint: "movedTileDestinationPoint",
 	chosenCapturedTile: "chosenCapturedTile"
 };
 
-export var TrifleTileTeam = {
+export const TrifleTileTeam = {
 	friendly: "friendly",
 	enemy: "enemy"
 };
 
-export var TrifleRecordTilePointType = {
+export const TrifleRecordTilePointType = {
 	startPoint: "startPoint"
 };
 
-export var TrifleAbilitiesForType = {};
+export let TrifleAbilitiesForType = {};
 
-export var TrifleAbilityTypes = {};
+export let TrifleAbilityTypes = {};
 
-export var TrifleTiles = {};
+export const TrifleTiles = {};
 
-export var TrifleTileInfo = {};
+export const TrifleTileInfo = {};
 
 TrifleTileInfo.tileIsBanner = function(tileInfo) {
 	return tileInfo && tileInfo.types && tileInfo.types.includes(TrifleTileType.banner);

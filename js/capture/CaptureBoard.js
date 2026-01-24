@@ -721,11 +721,15 @@ CaptureBoard.prototype.pathFound = function(boardPointStart, boardPointEnd, numM
 	}
 };
 
+// Minifier-safe implementation: uses nested if statements instead of && with recursive calls
 CaptureBoard.prototype.ableToReachCheck = function(nextRow, nextCol, boardPointEnd, numMoves) {
 	if (nextCol >= 0 && nextCol < 17 && nextRow >= 0 && nextRow < 17) {
 		var nextPoint = this.cells[nextRow][nextCol];
-		if (!nextPoint.hasTile() && this.pathFound(nextPoint, boardPointEnd, numMoves - 1)) {
-			return true; // Yay!
+		if (!nextPoint.hasTile()) {
+			var movesLeft = numMoves - 1;
+			if (this.pathFound(nextPoint, boardPointEnd, movesLeft)) {
+				return true;
+			}
 		}
 	}
 	return false;

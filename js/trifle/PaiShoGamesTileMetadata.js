@@ -1,8 +1,8 @@
 /* Pai Sho Games Tile Metadata */
 
-export var currentTileMetadata = {};
-export var currentTileCodes = {};
-export var currentTileNames = {};
+export let currentTileMetadata = {};
+export let currentTileCodes = {};
+export let currentTileNames = {};
 
 export function setCurrentTileMetadata(newTileMetadata) {
 	currentTileMetadata = newTileMetadata;
@@ -24,4 +24,3 @@ export function setCurrentTileNames(newTileNames) {
 export function getCurrentTileNames() {
 	return currentTileNames;
 }
-

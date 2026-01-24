@@ -1220,64 +1220,82 @@ FirePaiShoBoard.prototype.verifyAbleToReach = function(boardPointStart, boardPoi
   return this.pathFound(boardPointStart, boardPointEnd, numMoves);
 };
 
+// Minifier-safe implementation: uses unique const variables and nested if statements
+// instead of && with recursive calls to prevent Terser optimization issues
 FirePaiShoBoard.prototype.pathFound = function(boardPointStart, boardPointEnd, numMoves) {
   if (!boardPointStart || !boardPointEnd) {
-    return false; // start or end point not given
+    return false;
   }
 
   if (boardPointStart.isType(NON_PLAYABLE) || boardPointEnd.isType(NON_PLAYABLE)) {
-  	return false;	// Paths must be through playable points
+    return false;
   }
 
-  if (boardPointStart.row === boardPointEnd.row && boardPointStart.col === boardPointEnd.col) {
-    return true; // Yay! start point equals end point
+  var startRow = boardPointStart.row;
+  var startCol = boardPointStart.col;
+  var endRow = boardPointEnd.row;
+  var endCol = boardPointEnd.col;
+
+  if (startRow === endRow && startCol === endCol) {
+    return true;
   }
   if (numMoves <= 0) {
-    return false; // No more moves left
+    return false;
   }
-  
-  // Idea: Get min num moves necessary!
-  var minMoves = Math.abs(boardPointStart.row - boardPointEnd.row) + Math.abs(boardPointStart.col - boardPointEnd.col);
-  
+
+  var minMoves = Math.abs(startRow - endRow) + Math.abs(startCol - endCol);
   if (minMoves === 1) {
-    return true; // Yay! Only 1 space away (and remember, numMoves is more than 0)
+    return true;
   }
 
-  // Check moving UP
-  var nextRow = boardPointStart.row - 1;
-  if (nextRow >= 0) {
-    var nextPoint = this.cells[nextRow][boardPointStart.col];
-    if (!nextPoint.hasTile() && this.pathFound(nextPoint, boardPointEnd, numMoves - 1)) {
-      return true; // Yay!
+  // Use unique const variables for each direction
+  var upRow = startRow - 1;
+  var downRow = startRow + 1;
+  var leftCol = startCol - 1;
+  var rightCol = startCol + 1;
+  var movesLeft = numMoves - 1;
+
+  // Check UP - nested if instead of &&
+  if (upRow >= 0) {
+    var upPoint = this.cells[upRow][startCol];
+    if (!upPoint.hasTile()) {
+      if (this.pathFound(upPoint, boardPointEnd, movesLeft)) {
+        return true;
+      }
     }
   }
 
-  // Check moving DOWN
-  nextRow = boardPointStart.row + 1;
-  if (nextRow < 17) {
-    var nextPoint = this.cells[nextRow][boardPointStart.col];
-    if (!nextPoint.hasTile() && this.pathFound(nextPoint, boardPointEnd, numMoves - 1)) {
-      return true; // Yay!
+  // Check DOWN
+  if (downRow < 17) {
+    var downPoint = this.cells[downRow][startCol];
+    if (!downPoint.hasTile()) {
+      if (this.pathFound(downPoint, boardPointEnd, movesLeft)) {
+        return true;
+      }
     }
   }
 
-  // Check moving LEFT
-  var nextCol = boardPointStart.col - 1;
-  if (nextCol >= 0) {
-    var nextPoint = this.cells[boardPointStart.row][nextCol];
-    if (!nextPoint.hasTile() && this.pathFound(nextPoint, boardPointEnd, numMoves - 1)) {
-      return true; // Yay!
+  // Check LEFT
+  if (leftCol >= 0) {
+    var leftPoint = this.cells[startRow][leftCol];
+    if (!leftPoint.hasTile()) {
+      if (this.pathFound(leftPoint, boardPointEnd, movesLeft)) {
+        return true;
+      }
     }
   }
 
-  // Check moving RIGHT
-  nextCol = boardPointStart.col + 1;
-  if (nextCol < 17) {
-    var nextPoint = this.cells[boardPointStart.row][nextCol];
-    if (!nextPoint.hasTile() && this.pathFound(nextPoint, boardPointEnd, numMoves - 1)) {
-      return true; // Yay!
+  // Check RIGHT
+  if (rightCol < 17) {
+    var rightPoint = this.cells[startRow][rightCol];
+    if (!rightPoint.hasTile()) {
+      if (this.pathFound(rightPoint, boardPointEnd, movesLeft)) {
+        return true;
+      }
     }
   }
+
+  return false;
 };
 
 FirePaiShoBoard.prototype.rowBuffedByRock = function(rowNum) {
