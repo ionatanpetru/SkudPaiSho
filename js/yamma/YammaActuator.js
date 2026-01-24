@@ -35,8 +35,8 @@ export class YammaActuator {
 		this.highlightGroup = null;
 
 		// Board configuration for triangular pyramid
-		this.baseRows = 5;
-		this.maxLevels = 5;
+		this.baseRows = 6;
+		this.maxLevels = 6;
 		// Spacing between cube centers on same level
 		this.slotSpacing = 1.1;
 		this.cubeSize = 0.8;
@@ -145,8 +145,8 @@ export class YammaActuator {
 		const width = container.clientWidth || 800;
 		const height = container.clientHeight || 500;
 		this.camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-		this.camera.position.set(8, 10, 8);
-		this.camera.lookAt(0, 1, 0);
+		this.camera.position.set(10, 12, 10);
+		this.camera.lookAt(0, 1.5, 1);
 
 		// Renderer
 		this.renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -161,9 +161,9 @@ export class YammaActuator {
 		this.controls.enableDamping = true;
 		this.controls.dampingFactor = 0.05;
 		this.controls.minDistance = 5;
-		this.controls.maxDistance = 25;
+		this.controls.maxDistance = 30;
 		this.controls.maxPolarAngle = Math.PI / 2.1;
-		this.controls.target.set(0, 1, 0);
+		this.controls.target.set(0, 1.5, 1);
 
 		// Lighting
 		this.setupLighting();
@@ -242,56 +242,31 @@ export class YammaActuator {
 	}
 
 	/**
-	 * Create an arrow mesh for rotation control.
+	 * Create a simple arrow (triangle) for rotation control.
 	 */
 	createArrowMesh(direction) {
-		// Create a curved arrow shape
-		const arrowGroup = new THREE.Group();
+		const isLeft = direction === 'left';
 
-		// Arrow arc
-		const arcRadius = this.cubeSize * 1.2;
-		const arcGeometry = new THREE.TorusGeometry(arcRadius, 0.06, 8, 16, Math.PI * 0.6);
-		const arcMaterial = new THREE.MeshStandardMaterial({
-			color: direction === 'left' ? 0x4488ff : 0x44ff88,
-			emissive: direction === 'left' ? 0x2244aa : 0x22aa44,
-			emissiveIntensity: 0.3
+		// Simple cone pointing left or right
+		const geometry = new THREE.ConeGeometry(0.25, 0.4, 3);
+		const material = new THREE.MeshStandardMaterial({
+			color: 0x44aaff,
+			emissive: 0x2266aa,
+			emissiveIntensity: 0.4
 		});
-		const arc = new THREE.Mesh(arcGeometry, arcMaterial);
+		const arrow = new THREE.Mesh(geometry, material);
 
-		// Arrow head (cone)
-		const headGeometry = new THREE.ConeGeometry(0.15, 0.3, 8);
-		const headMaterial = new THREE.MeshStandardMaterial({
-			color: direction === 'left' ? 0x4488ff : 0x44ff88,
-			emissive: direction === 'left' ? 0x2244aa : 0x22aa44,
-			emissiveIntensity: 0.3
-		});
-		const head = new THREE.Mesh(headGeometry, headMaterial);
+		// Rotate cone to point horizontally (left or right)
+		arrow.rotation.z = isLeft ? Math.PI / 2 : -Math.PI / 2;
 
-		// Position arrow head at end of arc
-		if (direction === 'left') {
-			arc.rotation.x = Math.PI / 2;
-			arc.rotation.z = Math.PI * 0.2;
-			head.position.set(-arcRadius * 0.95, 0, arcRadius * 0.3);
-			head.rotation.z = Math.PI * 0.7;
-			arrowGroup.position.x = -this.cubeSize * 0.3;
-		} else {
-			arc.rotation.x = Math.PI / 2;
-			arc.rotation.z = -Math.PI * 0.2;
-			head.position.set(arcRadius * 0.95, 0, arcRadius * 0.3);
-			head.rotation.z = -Math.PI * 0.7;
-			arrowGroup.position.x = this.cubeSize * 0.3;
-		}
-
-		arrowGroup.add(arc);
-		arrowGroup.add(head);
-		arrowGroup.position.y = this.cubeSize * 0.5;
+		// Position on either side of the cube
+		arrow.position.x = isLeft ? -this.cubeSize * 1.0 : this.cubeSize * 1.0;
+		arrow.position.y = this.cubeSize * 0.3;
 
 		// Store direction for click detection
-		arrowGroup.userData = { type: 'rotationArrow', direction };
-		arc.userData = { type: 'rotationArrow', direction };
-		head.userData = { type: 'rotationArrow', direction };
+		arrow.userData = { type: 'rotationArrow', direction };
 
-		return arrowGroup;
+		return arrow;
 	}
 
 	/**
@@ -742,10 +717,21 @@ export class YammaActuator {
 	}
 
 	setupEventListeners(container) {
+		// Track pointer position to distinguish clicks from drags
+		let pointerDownPos = null;
+		const DRAG_THRESHOLD = 5; // pixels
+
+		const onPointerDown = (event) => {
+			const clientX = event.touches ? event.touches[0].clientX : event.clientX;
+			const clientY = event.touches ? event.touches[0].clientY : event.clientY;
+			pointerDownPos = { x: clientX, y: clientY };
+		};
+
+		container.addEventListener('mousedown', onPointerDown);
+		container.addEventListener('touchstart', onPointerDown);
+
 		// Click/tap handler
 		const onPointerUp = (event) => {
-			event.preventDefault();
-
 			const rect = this.renderer.domElement.getBoundingClientRect();
 			let clientX, clientY;
 
@@ -755,6 +741,18 @@ export class YammaActuator {
 			} else {
 				clientX = event.clientX;
 				clientY = event.clientY;
+			}
+
+			// Check if this was a drag (not a click)
+			const wasDrag = pointerDownPos && (
+				Math.abs(clientX - pointerDownPos.x) > DRAG_THRESHOLD ||
+				Math.abs(clientY - pointerDownPos.y) > DRAG_THRESHOLD
+			);
+			pointerDownPos = null;
+
+			// If it was a drag, don't process as a click
+			if (wasDrag) {
+				return;
 			}
 
 			this.mouse.x = ((clientX - rect.left) / rect.width) * 2 - 1;

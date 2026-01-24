@@ -83,10 +83,10 @@ export class YammaCube {
 
 export class YammaBoard {
 	constructor() {
-		// Base triangle has 5 rows
-		this.baseRows = 5;
-		// Maximum levels (0 to 4)
-		this.maxLevels = 5;
+		// Base triangle has 6 rows (6 slots per side)
+		this.baseRows = 6;
+		// Maximum levels (0 to 5)
+		this.maxLevels = 6;
 
 		// levels[z][row][col] = cube or null
 		this.levels = [];
