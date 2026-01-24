@@ -3428,6 +3428,9 @@ export const GameType = {
 		gameOptions: [
 			GODAI_BOARD_ZONES,
 			GODAI_EMPTY_TILE,
+		],
+		usersWithAccess: [
+			'SkudPaiSho',
 		]
 	},
 	Yamma: {
@@ -3438,7 +3441,10 @@ export const GameType = {
 		description: "A 3D four-in-a-row game with cubes viewed from three perspectives.",
 		coverImg: "hexagon.png",
 		rulesUrl: "https://boardgamegeek.com/boardgame/388435/yamma",
-		gameOptions: []
+		gameOptions: [],
+		usersWithAccess: [
+			'SkudPaiSho',
+		]
 	},
 	TicTacToe: {
 		id: 101,
@@ -3448,7 +3454,10 @@ export const GameType = {
 		description: "The classic game of Xs and Os. Get three in a row to win!",
 		coverImg: "hexagon.png",
 		rulesUrl: "https://en.wikipedia.org/wiki/Tic-tac-toe",
-		gameOptions: []
+		gameOptions: [],
+		usersWithAccess: [
+			'SkudPaiSho',
+		]
 	}
 };
 
