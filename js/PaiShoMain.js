@@ -96,7 +96,7 @@ import { Giveaway } from "./util/Giveaway";
 import { GinsengController } from './ginseng/GinsengController';
 import { GodaiController } from './godai/GodaiController';
 import { HexentaflController } from './hexentafl/HexentaflController';
-import { HonoraryTitleChecker } from './honorary-titles/HonoraryTitleChecker';
+// HonoraryTitleChecker moved to GameStats module
 import { KeyPaiShoController } from './key-pai-sho/KeyPaiShoController';
 import { LocalStorage } from "./LocalStorage";
 import { MeadowController } from './meadow/MeadowController';
@@ -172,6 +172,7 @@ import {
 import { buildLoginModalContentElement } from './ui/LoginModal';
 import NickController from './nick/NickController';
 import { viewGameRankingsClicked } from './PaiShoMain';
+import * as GameStats from './GameStats';
 
 
 export const QueryString = (() => {
@@ -509,6 +510,15 @@ window.requestAnimationFrame(function() {
 	localStorage = new LocalStorage().storage;
 
 	soundManager = new SoundManager();
+
+	// Initialize GameStats module
+	GameStats.initGameStats({
+		onlinePlayEngine,
+		getLoginToken,
+		getUsername,
+		showModalElem,
+		closeModal
+	});
 
 	/* Dark Mode Preferences (dark mode now default) */
 	if (!localStorage.getItem("data-theme")) {
@@ -6053,148 +6063,10 @@ export {
 	toggleBooleanPreference
 } from './UserPreferences';
 
-export function show2020GameStats(showWins) {
-	onlinePlayEngine.get2020CompletedGameStats(
-		getLoginToken(),
-		(results) => {
-			if (results) {
-				let resultData = {};
-				try {
-					resultData = JSON.parse(results);
-				} catch (error) {
-					debug("Error parsing info");
-					closeModal();
-					showModalElem("Error", document.createTextNode("Error getting stats info."));
-					return;
-				}
-
-				if (resultData.stats) {
-					const container = document.createElement('div');
-					container.appendChild(document.createTextNode(getUsername() + "'s total completed games against other players:"));
-					container.appendChild(document.createElement('br'));
-
-					const stats = resultData.stats;
-
-					for (let i = 0; i < stats.length; i++) {
-						const totalWins = stats[i].totalWins ? stats[i].totalWins : 0;
-						const winPercent = Math.round(totalWins / stats[i].totalGamesCompleted * 100);
-						container.appendChild(document.createElement('br'));
-						if (showWins) {
-							let winOrWins = "wins";
-							if (totalWins === 1) {
-								winOrWins = "win";
-							}
-							container.appendChild(document.createTextNode(stats[i].gameType + ": " + stats[i].totalGamesCompleted + " (" + totalWins + " " + winOrWins + ", " + winPercent + "%)"));
-						} else {
-							container.appendChild(document.createTextNode(stats[i].gameType + ": " + stats[i].totalGamesCompleted));
-						}
-					}
-
-					if (!showWins) {
-						container.appendChild(document.createElement('br'));
-						container.appendChild(document.createElement('br'));
-						const showWinsSpan = document.createElement('span');
-						showWinsSpan.classList.add('skipBonus');
-						showWinsSpan.textContent = 'Show number of wins for each game';
-						showWinsSpan.onclick = () => show2020GameStats(true);
-						container.appendChild(showWinsSpan);
-					}
-
-					showModalElem("2020 Completed Games Stats", container);
-				}
-			}
-		}
-	);
-}
-
-export function showGameStats(showWins) {
-	onlinePlayEngine.getCompletedGameStats(
-		getLoginToken(),
-		(results) => {
-			if (results) {
-				let resultData = {};
-				try {
-					resultData = JSON.parse(results);
-				} catch (error) {
-					debug("Error parsing info");
-					closeModal();
-					showModalElem("Error", document.createTextNode("Error getting stats info."));
-					return;
-				}
-
-				if (resultData.stats) {
-					const container = document.createElement('div');
-					container.appendChild(document.createTextNode(getUsername() + "'s total completed games against other players:"));
-					container.appendChild(document.createElement('br'));
-
-					const stats = resultData.stats;
-
-					let totalGamesTally = 0;
-
-					for (let i = 0; i < stats.length; i++) {
-						if (stats[i].gameType !== 'Pai Sho Playground') {
-							totalGamesTally += stats[i].totalGamesCompleted;
-						}
-						const totalWins = stats[i].totalWins ? stats[i].totalWins : 0;
-						const winPercent = Math.round(totalWins / stats[i].totalGamesCompleted * 100);
-						container.appendChild(document.createElement('br'));
-						if (showWins) {
-							let winOrWins = "wins";
-							if (totalWins === 1) {
-								winOrWins = "win";
-							}
-							container.appendChild(document.createTextNode(stats[i].gameType + ": " + stats[i].totalGamesCompleted + " (" + totalWins + " " + winOrWins + ", " + winPercent + "%)"));
-						} else {
-							container.appendChild(document.createTextNode(stats[i].gameType + ": " + stats[i].totalGamesCompleted));
-						}
-					}
-
-					container.appendChild(document.createElement('br'));
-					container.appendChild(document.createElement('br'));
-					container.appendChild(document.createTextNode("Total games (excluding Playground): " + totalGamesTally));
-
-					container.appendChild(document.createElement('br'));
-					container.appendChild(document.createElement('br'));
-					const titleSpan = document.createElement('span');
-					titleSpan.innerHTML = getHonoraryTitleMessage(stats, totalGamesTally);
-					container.appendChild(titleSpan);
-
-					container.appendChild(document.createElement('br'));
-					container.appendChild(document.createTextNode("You can use this honorary title at "));
-					const discordLink = document.createElement('a');
-					discordLink.href = 'https://skudpaisho.com/discord';
-					discordLink.target = '_blank';
-					discordLink.textContent = 'The Garden Gate Discord';
-					container.appendChild(discordLink);
-					container.appendChild(document.createTextNode(". "));
-					const infoLink = document.createElement('a');
-					infoLink.href = 'https://discord.com/channels/380904760556912641/1160675521496105143/1160675598813896735';
-					infoLink.target = '_blank';
-					infoLink.textContent = 'See Honorary Title information here.';
-					container.appendChild(infoLink);
-
-					if (!showWins) {
-						container.appendChild(document.createElement('br'));
-						container.appendChild(document.createElement('br'));
-						const showWinsSpan = document.createElement('span');
-						showWinsSpan.classList.add('skipBonus');
-						showWinsSpan.textContent = 'Show number of wins for each game';
-						showWinsSpan.onclick = () => showGameStats(true);
-						container.appendChild(showWinsSpan);
-					}
-
-					showModalElem("Completed Games Stats", container);
-				}
-			}
-		}
-	);
-}
-
-export function getHonoraryTitleMessage(gameStats) {
-	const titleChecker = new HonoraryTitleChecker(gameStats);
-	const message = "Honorary Title achieved: <strong>" + titleChecker.getTitleAchieved() + "</strong>";
-	return message;
-}
+// Re-export game stats functions from GameStats module
+export const show2020GameStats = GameStats.show2020GameStats;
+export const showGameStats = GameStats.showGameStats;
+export const getHonoraryTitleMessage = GameStats.getHonoraryTitleMessage;
 
 export function getShortUrl(urlToShorten, callback) {
 	return getTinyUrl(urlToShorten, (tinyUrl) => {
