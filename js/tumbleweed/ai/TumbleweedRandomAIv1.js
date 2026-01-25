@@ -1,7 +1,7 @@
 /* Tumbleweed Random AI */
 
+import { removeRandomFromArray } from '../../GameData';
 import { TumbleweedNotationBuilder } from '../TumbleweedGameNotation';
-import { removeRandomFromArray } from '../../PaiShoMain';
 
 export class TumbleweedRandomAIv1 {
 	constructor() {

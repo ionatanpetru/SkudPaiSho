@@ -4,7 +4,7 @@ import { CRUMBLEWEED, gameOptionEnabled, HEXHEX_11, HEXHEX_6, NO_REINFORCEMENT, 
 import { POSSIBLE_MOVE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
 import { getOpponentName } from '../pai-sho-common/PaiShoPlayerHelp';
 import { GUEST, HOST } from '../CommonNotationObjects';
-import { copyArray } from '../PaiShoMain';
+import { copyArray } from '../GameData';
 
 const TumbleweedDirections = {
 	UP_RIGHT: 1,
