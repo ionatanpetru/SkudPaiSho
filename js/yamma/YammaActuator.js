@@ -860,16 +860,36 @@ export class YammaActuator {
 					}
 				}
 
-				// Check if clicking on a slot to start new selection
+				// Check if clicking on a slot
 				const slotIntersects = this.raycaster.intersectObjects(this.slotMeshes);
 				if (slotIntersects.length === 0) {
 					// Clicked on empty space - cancel rotation selection
 					this.cancelRotationSelection();
 					return;
 				}
+
+				// A slot was clicked while rotation selection is active
+				const clickedSlot = slotIntersects[0].object;
+				if (clickedSlot.userData && clickedSlot.userData.type === 'slot') {
+					const { row, col, level } = this.pendingMove;
+					const clickedRow = clickedSlot.userData.row;
+					const clickedCol = clickedSlot.userData.col;
+					const clickedLevel = clickedSlot.userData.level;
+
+					if (clickedRow === row && clickedCol === col && clickedLevel === level) {
+						// Clicked the same slot - confirm the move
+						this.confirmRotationSelection();
+					} else {
+						// Clicked a different slot - switch selection to that slot
+						if (this.onSlotClick) {
+							this.onSlotClick(clickedRow, clickedCol, clickedLevel);
+						}
+					}
+				}
+				return;
 			}
 
-			// Check for slot clicks
+			// Check for slot clicks (no rotation selection active)
 			const intersects = this.raycaster.intersectObjects(this.slotMeshes);
 
 			if (intersects.length > 0) {
