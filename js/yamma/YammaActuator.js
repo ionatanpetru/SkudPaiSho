@@ -89,7 +89,7 @@ export class YammaActuator {
 		viewsContainer.style.display = 'flex';
 		viewsContainer.style.justifyContent = 'space-around';
 		viewsContainer.style.padding = '10px';
-		viewsContainer.style.backgroundColor = '#1a1a2e';
+		viewsContainer.style.backgroundColor = '#3d4a5c';
 
 		this.viewCanvases = [];
 		const viewLabels = ['Front View', 'Left View', 'Right View'];
@@ -99,15 +99,15 @@ export class YammaActuator {
 
 			const label = document.createElement('div');
 			label.textContent = viewLabels[i];
-			label.style.color = '#aaa';
+			label.style.color = '#ddd';
 			label.style.marginBottom = '5px';
 			label.style.fontSize = '12px';
 			viewWrapper.appendChild(label);
 
 			const canvas = document.createElement('canvas');
 			canvas.width = 150;
-			canvas.height = 130;
-			canvas.style.backgroundColor = '#2a2a3e';
+			canvas.height = 95;
+			canvas.style.backgroundColor = '#4a5568';
 			canvas.style.borderRadius = '5px';
 			this.viewCanvases.push(canvas);
 			viewWrapper.appendChild(canvas);
@@ -139,7 +139,7 @@ export class YammaActuator {
 
 		// Scene
 		this.scene = new THREE.Scene();
-		this.scene.background = new THREE.Color(0x1a1a2e);
+		this.scene.background = new THREE.Color(0x3d4a5c);
 
 		// Camera
 		const width = container.clientWidth || 800;
@@ -197,12 +197,12 @@ export class YammaActuator {
 	}
 
 	setupLighting() {
-		// Ambient light
-		const ambient = new THREE.AmbientLight(0xffffff, 0.5);
+		// Ambient light - brighter for better visibility
+		const ambient = new THREE.AmbientLight(0xffffff, 0.7);
 		this.scene.add(ambient);
 
-		// Main directional light
-		const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+		// Main directional light - brighter
+		const dirLight = new THREE.DirectionalLight(0xffffff, 1.0);
 		dirLight.position.set(10, 20, 10);
 		dirLight.castShadow = true;
 		dirLight.shadow.mapSize.width = 2048;
@@ -215,8 +215,8 @@ export class YammaActuator {
 		dirLight.shadow.camera.bottom = -15;
 		this.scene.add(dirLight);
 
-		// Fill light
-		const fillLight = new THREE.DirectionalLight(0xffffff, 0.3);
+		// Fill light - brighter to reduce shadows
+		const fillLight = new THREE.DirectionalLight(0xffffff, 0.5);
 		fillLight.position.set(-5, 10, -5);
 		this.scene.add(fillLight);
 	}
@@ -554,12 +554,13 @@ export class YammaActuator {
 	createSlotMesh(row, col, level) {
 		// Use hexagon shape for triangular grid slots - larger for easier clicking
 		const slotGeometry = new THREE.CylinderGeometry(0.25, 0.25, 0.08, 6);
-		const levelColors = [0x4a3520, 0x5a4530, 0x6a5540, 0x7a6550, 0x8a7560];
+		// Brighter golden/tan colors for each level
+		const levelColors = [0xd4a574, 0xdeb887, 0xe8c89a, 0xf2d8ad, 0xfce8c0];
 		const slotMaterial = new THREE.MeshStandardMaterial({
-			color: levelColors[level] || 0x4a3520,
-			roughness: 0.9,
+			color: levelColors[level] || 0xd4a574,
+			roughness: 0.7,
 			transparent: true,
-			opacity: 0.6
+			opacity: 0.7
 		});
 
 		const slot = new THREE.Mesh(slotGeometry, slotMaterial);
@@ -578,14 +579,14 @@ export class YammaActuator {
 		// Create cube geometry
 		const geometry = new THREE.BoxGeometry(size, size, size);
 
-		// Create materials for each face
+		// Create materials for each face - bright and distinct colors
 		const whiteMat = new THREE.MeshStandardMaterial({
-			color: 0xf5f5f5,
+			color: 0xffffff,
 			roughness: 0.3,
 			metalness: 0.1
 		});
 		const blueMat = new THREE.MeshStandardMaterial({
-			color: 0x2a5599,
+			color: 0x3b82f6,
 			roughness: 0.3,
 			metalness: 0.1
 		});
@@ -641,16 +642,16 @@ export class YammaActuator {
 
 		const geometry = new THREE.BoxGeometry(size, size, size);
 
-		// Create materials
+		// Create materials - bright colors for preview
 		const whiteMat = new THREE.MeshStandardMaterial({
-			color: highlighted ? 0xffffff : 0xf5f5f5,
+			color: 0xffffff,
 			roughness: 0.3,
 			metalness: 0.1,
 			transparent: true,
 			opacity: highlighted ? 1.0 : 0.8
 		});
 		const blueMat = new THREE.MeshStandardMaterial({
-			color: highlighted ? 0x3a6ab0 : 0x2a5599,
+			color: highlighted ? 0x60a5fa : 0x3b82f6,
 			roughness: 0.3,
 			metalness: 0.1,
 			transparent: true,
@@ -1039,8 +1040,8 @@ export class YammaActuator {
 		const width = canvas.width;
 		const height = canvas.height;
 
-		// Clear canvas
-		ctx.fillStyle = '#2a2a3e';
+		// Clear canvas with brighter background
+		ctx.fillStyle = '#4a5568';
 		ctx.fillRect(0, 0, width, height);
 
 		// For a triangular pyramid, each view shows a triangular projection
@@ -1072,25 +1073,25 @@ export class YammaActuator {
 				ctx.closePath();
 
 				if (visibleColor === 'white') {
-					ctx.fillStyle = '#f5f5f5';
+					ctx.fillStyle = '#ffffff';
 					ctx.fill();
-					ctx.strokeStyle = '#ccc';
+					ctx.strokeStyle = '#e0e0e0';
 					ctx.stroke();
 				} else if (visibleColor === 'blue') {
-					ctx.fillStyle = '#1e3a5f';
+					ctx.fillStyle = '#3b82f6';
 					ctx.fill();
-					ctx.strokeStyle = '#0a1f3a';
+					ctx.strokeStyle = '#2563eb';
 					ctx.stroke();
 				} else {
 					// Empty - draw outline only
-					ctx.strokeStyle = '#444';
+					ctx.strokeStyle = '#6b7280';
 					ctx.stroke();
 				}
 			}
 		}
 
 		// Draw view angle indicator
-		ctx.fillStyle = '#666';
+		ctx.fillStyle = '#d1d5db';
 		ctx.font = '10px sans-serif';
 		ctx.textAlign = 'center';
 		const angleLabels = ['Front', 'Left', 'Right'];
