@@ -904,7 +904,10 @@ export class YammaActuator {
 		};
 
 		container.addEventListener('click', onPointerUp);
-		container.addEventListener('touchend', onPointerUp);
+		container.addEventListener('touchend', (event) => {
+			event.preventDefault(); // Prevent synthetic click event on mobile
+			onPointerUp(event);
+		});
 
 		// Hover effect
 		const onPointerMove = (event) => {

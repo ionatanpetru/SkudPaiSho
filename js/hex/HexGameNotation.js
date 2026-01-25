@@ -191,4 +191,8 @@ export class HexGameNotation {
 	getNotationMoveFromBuilder(builder, player) {
 		return builder.getMove(player);
 	}
+
+	notationTextForUrl() {
+		return this.notationText;
+	}
 }
