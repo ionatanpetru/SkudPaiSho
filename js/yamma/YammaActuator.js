@@ -1069,60 +1069,11 @@ export class YammaActuator {
 
 	/**
 	 * Get the color visible at a projected (row, col) position from a given view angle.
-	 *
-	 * This traces "inward" through the pyramid from the viewing direction,
-	 * returning the face color of the first cube encountered.
-	 *
-	 * For a triangular pyramid:
-	 * - View 0 (Front): Looking at front face, traces back through levels
-	 * - View 1 (Left): Rotated 120° view
-	 * - View 2 (Right): Rotated 240° view
+	 * Delegates to the board's implementation which handles the coordinate transforms
+	 * and face mapping correctly.
 	 */
 	getVisibleColorAt(board, projRow, projCol, viewAngle) {
-		// For each projected position, we check positions at all levels
-		// The "depth" order depends on view angle
-
-		// For front view (angle 0): check from high level to low level
-		// The front-most cube at a projected position is the one we see
-
-		// Simplified model: For view angle 0, the projection (row, col) maps directly
-		// to board positions. Check all levels from top to bottom.
-
-		// For other angles, we need to transform coordinates
-		// This is a simplified approximation - real 3D projection would be more complex
-
-		for (let level = this.maxLevels - 1; level >= 0; level--) {
-			const rows = this.baseRows - level;
-
-			// Transform coordinates based on view angle
-			let checkRow, checkCol;
-
-			if (viewAngle === 0) {
-				// Front view: direct mapping
-				checkRow = projRow;
-				checkCol = projCol;
-			} else if (viewAngle === 1) {
-				// Left view: rotate coordinates (approximate transformation)
-				// Looking from the left, columns become rows
-				checkRow = projCol;
-				checkCol = projRow - projCol;
-			} else {
-				// Right view: rotate other direction
-				checkRow = projRow - projCol;
-				checkCol = projCol;
-			}
-
-			// Check if transformed position is valid and has a cube
-			if (checkRow >= 0 && checkRow < rows && checkCol >= 0 && checkCol <= checkRow) {
-				const cube = board.getCubeAt(checkRow, checkCol, level);
-				if (cube) {
-					// Return the face color for this viewing angle
-					return cube.getFaceColor(viewAngle);
-				}
-			}
-		}
-
-		return null; // No cube visible
+		return board.getVisibleColorAt(projRow, projCol, viewAngle);
 	}
 
 	highlightPosition(row, col, level, color) {

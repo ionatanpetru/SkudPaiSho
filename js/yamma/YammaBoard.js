@@ -270,15 +270,21 @@ export class YammaBoard {
 	 *
 	 * Traces through the pyramid from the viewing direction and returns
 	 * the face color of the first cube encountered.
+	 *
+	 * The pyramid has 3 faces visible from 3 viewing angles (Front=0, Left=1, Right=2).
+	 * Each view is a 120° rotation from the others. We trace from the surface
+	 * into the pyramid to find the first cube along the viewing ray.
 	 */
 	getVisibleColorAt(projRow, projCol, viewAngle) {
 		// Check from front (highest level) to back (level 0)
-		// The exact mapping depends on the viewing angle
+		// The coordinate transformation depends on the viewing angle and level
 
 		for (let level = this.maxLevels - 1; level >= 0; level--) {
 			const maxRowAtLevel = this.baseRows - level - 1;
 
 			// Transform projected coordinates to board coordinates based on view angle
+			// Each view is a 120° rotation, and the transform must account for
+			// the triangle size at each level
 			let checkRow, checkCol;
 
 			if (viewAngle === 0) {
@@ -286,14 +292,15 @@ export class YammaBoard {
 				checkRow = projRow;
 				checkCol = projCol;
 			} else if (viewAngle === 1) {
-				// Left view: rotate 120° counterclockwise
-				// In triangular coordinates, this swaps axes
-				checkRow = projCol;
-				checkCol = projRow - projCol;
+				// Left view: 120° counterclockwise rotation
+				// Inverse transform: (vr, vc) → (vc + maxRow - vr, maxRow - vr)
+				checkRow = projCol + maxRowAtLevel - projRow;
+				checkCol = maxRowAtLevel - projRow;
 			} else {
-				// Right view: rotate 120° clockwise
-				checkRow = projRow - projCol;
-				checkCol = projCol;
+				// Right view: 120° clockwise rotation (= 240° CCW)
+				// Inverse transform: (vr, vc) → (maxRow - vc, vr - vc)
+				checkRow = maxRowAtLevel - projCol;
+				checkCol = projRow - projCol;
 			}
 
 			// Check if this position exists at this level and has a cube
@@ -301,7 +308,10 @@ export class YammaBoard {
 				checkCol >= 0 && checkCol <= checkRow) {
 				const cube = this.getCubeAt(checkRow, checkCol, level);
 				if (cube) {
-					return cube.getFaceColor(viewAngle);
+					// The face visible from each view angle is offset by 2
+					// (Front view sees what cube calls "right", Left sees "front", Right sees "left")
+					const faceIndex = (viewAngle + 2) % 3;
+					return cube.getFaceColor(faceIndex);
 				}
 			}
 		}
