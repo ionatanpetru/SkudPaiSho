@@ -1,167 +1,175 @@
 
-export function TumbleweedGameManager(actuator, ignoreActuate, isCopy) {
-	this.isCopy = isCopy;
-	this.actuator = actuator;
+import { TumbleweedBoard } from './TumbleweedBoard';
+import { TumbleweedBoardPoint } from './TumbleweedBoardPoint';
+import { CHOOSE_NEUTRAL_STACK_SPACE, gameOptionEnabled, HEXHEX_11, HEXHEX_6, NO_SETUP_PHASE, TUMBLE_6 } from '../GameOptions';
+import { GUEST, HOST } from '../CommonNotationObjects';
+import { debug } from '../GameData';
 
-	this.hostScore = 0;
-	this.guestScore = 0;
+export class TumbleweedGameManager {
+	constructor(actuator, ignoreActuate, isCopy) {
+		this.isCopy = isCopy;
+		this.actuator = actuator;
 
-	this.endOfGame = false;
-	
-	this.setup(ignoreActuate);
-}
+		this.hostScore = 0;
+		this.guestScore = 0;
 
-TumbleweedGameManager.prototype.setup = function(ignoreActuate) {
-	this.board = new TumbleweedBoard();
+		this.endOfGame = false;
 
-	if (!gameOptionEnabled(CHOOSE_NEUTRAL_STACK_SPACE) && !gameOptionEnabled(NO_SETUP_PHASE)) {
-		var neutralSettlementNotationPoint = "h8";
-		if (gameOptionEnabled(HEXHEX_11)) {
-			neutralSettlementNotationPoint = "k11";
-		} else if (gameOptionEnabled(HEXHEX_6)) {
-			neutralSettlementNotationPoint = "f6";
+		this.setup(ignoreActuate);
+	}
+
+	setup(ignoreActuate) {
+		this.board = new TumbleweedBoard();
+
+		if (!gameOptionEnabled(CHOOSE_NEUTRAL_STACK_SPACE) && !gameOptionEnabled(NO_SETUP_PHASE)) {
+			var neutralSettlementNotationPoint = "h8";
+			if (gameOptionEnabled(HEXHEX_11)) {
+				neutralSettlementNotationPoint = "k11";
+			} else if (gameOptionEnabled(HEXHEX_6)) {
+				neutralSettlementNotationPoint = "f6";
+			}
+			this.board.createNeutralSettlement(neutralSettlementNotationPoint, 2);
 		}
-		this.board.createNeutralSettlement(neutralSettlementNotationPoint, 2);
-	}
 
-	this.passInSuccessionCount = 0;
-
-	if (!ignoreActuate) {
-		this.actuate();
-	}
-};
-
-TumbleweedGameManager.prototype.actuate = function (move) {
-	if (this.isCopy) {
-		return;
-	}
-	this.actuator.actuate(this.board, move);
-};
-
-/* Required by Main */
-TumbleweedGameManager.prototype.runNotationMove = function(move, withActuate, isHalfMove) {
-	debug("Running Move: " + move.fullMoveText);
-
-	if (move.swap) {
-		this.board.doInitialSwap();
-	} else if (move.passTurn) {
-		this.passInSuccessionCount++;
-	} else if (move.initialPlacementForPlayer) {
-		initialSettlementValue = 1;
-		if (move.initialPlacementForPlayer === "NEUTRAL") {
-			initialSettlementValue = 2;
-		}
-		this.board.placeSettlement(move.initialPlacementForPlayer, move.deployPoint, initialSettlementValue);
-	} else if (move.deployPoint) {
-		this.board.placeSettlement(move.player, move.deployPoint);
-	}
-
-	if (!move.passTurn) {
 		this.passInSuccessionCount = 0;
+
+		if (!ignoreActuate) {
+			this.actuate();
+		}
 	}
 
-	this.calculateScores();
-
-	if (this.passInSuccessionCount === 2 || this.board.allSpacesSettled()
-		|| (gameOptionEnabled(TUMBLE_6) && this.board.getPointWithStackOfSizeAtLeast(6))) {
-		// both players passed, end of game
-		this.endOfGame = true;
+	actuate(move) {
+		if (this.isCopy) {
+			return;
+		}
+		this.actuator.actuate(this.board, move);
 	}
 
-	if (withActuate) {
-		this.actuate(move);
+	/* Required by Main */
+	runNotationMove(move, withActuate, isHalfMove) {
+		debug("Running Move: " + move.fullMoveText);
+
+		if (move.swap) {
+			this.board.doInitialSwap();
+		} else if (move.passTurn) {
+			this.passInSuccessionCount++;
+		} else if (move.initialPlacementForPlayer) {
+			var initialSettlementValue = 1;
+			if (move.initialPlacementForPlayer === "NEUTRAL") {
+				initialSettlementValue = 2;
+			}
+			this.board.placeSettlement(move.initialPlacementForPlayer, move.deployPoint, initialSettlementValue);
+		} else if (move.deployPoint) {
+			this.board.placeSettlement(move.player, move.deployPoint);
+		}
+
+		if (!move.passTurn) {
+			this.passInSuccessionCount = 0;
+		}
+
+		this.calculateScores();
+
+		if (this.passInSuccessionCount === 2 || this.board.allSpacesSettled()
+			|| (gameOptionEnabled(TUMBLE_6) && this.board.getPointWithStackOfSizeAtLeast(6))) {
+			// both players passed, end of game
+			this.endOfGame = true;
+		}
+
+		if (withActuate) {
+			this.actuate(move);
+		}
 	}
-};
 
-TumbleweedGameManager.prototype.calculateScores = function() {
-	this.hostScore = this.board.countSettlements(HOST);
-	this.guestScore = this.board.countSettlements(GUEST);
+	calculateScores() {
+		this.hostScore = this.board.countSettlements(HOST);
+		this.guestScore = this.board.countSettlements(GUEST);
 
-	debug("HOST Score: " + this.hostScore);
-	debug("GUEST Score: " + this.guestScore);
-};
-
-TumbleweedGameManager.prototype.calculateTotalControlledSpaces = function() {
-	this.hostTotalControlledScore = this.board.countTotalControlledSpaces(HOST);
-	this.guestTotalControlledSCore = this.board.countTotalControlledSpaces(GUEST);
-
-	this.hostTotalControlledScore += this.hostScore;
-	this.guestTotalControlledSCore += this.guestScore;
-};
-
-TumbleweedGameManager.prototype.revealPossibleInitialPlacementPoints = function(ignoreActuate) {
-	this.board.setInitialPlacementPossibleMoves();
-
-	if (!ignoreActuate) {
-		this.actuate();
+		debug("HOST Score: " + this.hostScore);
+		debug("GUEST Score: " + this.guestScore);
 	}
-};
 
-TumbleweedGameManager.prototype.revealPossibleSettlePoints = function(player, ignoreActuate) {
-	this.board.setSettlePointsPossibleMoves(player);
+	calculateTotalControlledSpaces() {
+		this.hostTotalControlledScore = this.board.countTotalControlledSpaces(HOST);
+		this.guestTotalControlledSCore = this.board.countTotalControlledSpaces(GUEST);
 
-	if (!ignoreActuate) {
-		this.actuate();
+		this.hostTotalControlledScore += this.hostScore;
+		this.guestTotalControlledSCore += this.guestScore;
 	}
-};
 
-TumbleweedGameManager.prototype.hidePossibleSettlePoints = function(ignoreActuate) {
-	this.board.removePossibleMovePoints();
-	
-	if (!ignoreActuate) {
-		this.actuate();
+	revealPossibleInitialPlacementPoints(ignoreActuate) {
+		this.board.setInitialPlacementPossibleMoves();
+
+		if (!ignoreActuate) {
+			this.actuate();
+		}
 	}
-};
 
-TumbleweedGameManager.prototype.hasEnded = function() {
-	return this.getWinResultTypeCode() > 0;
-};
+	revealPossibleSettlePoints(player, ignoreActuate) {
+		this.board.setSettlePointsPossibleMoves(player);
 
-/* Required by Main */
-TumbleweedGameManager.prototype.getWinner = function() {
-	if (this.endOfGame) {
+		if (!ignoreActuate) {
+			this.actuate();
+		}
+	}
+
+	hidePossibleSettlePoints(ignoreActuate) {
+		this.board.removePossibleMovePoints();
+
+		if (!ignoreActuate) {
+			this.actuate();
+		}
+	}
+
+	hasEnded() {
+		return this.getWinResultTypeCode() > 0;
+	}
+
+	/* Required by Main */
+	getWinner() {
+		if (this.endOfGame) {
+			if (gameOptionEnabled(TUMBLE_6) && this.board.getPointWithStackOfSizeAtLeast(6)) {
+				return this.board.getPointWithStackOfSizeAtLeast(6).getSettlementOwner();
+			}
+			this.calculateTotalControlledSpaces();
+			if (this.hostTotalControlledScore > this.guestTotalControlledSCore) {
+				return HOST;
+			} else if (this.guestTotalControlledSCore > this.hostTotalControlledScore) {
+				return GUEST;
+			} else {
+				return "BOTH players";
+			}
+		}
+	}
+
+	/* Required by Main */
+	getWinReason() {
 		if (gameOptionEnabled(TUMBLE_6) && this.board.getPointWithStackOfSizeAtLeast(6)) {
-			return this.board.getPointWithStackOfSizeAtLeast(6).getSettlementOwner();
+			return " won the game with a settlement of 6";
 		}
-		this.calculateTotalControlledSpaces();
-		if (this.hostTotalControlledScore > this.guestTotalControlledSCore) {
-			return HOST;
-		} else if (this.guestTotalControlledSCore > this.hostTotalControlledScore) {
-			return GUEST;
-		} else {
-			return "BOTH players";
+		var winnerScore = this.hostTotalControlledScore > this.guestTotalControlledSCore ? this.hostTotalControlledScore : this.guestTotalControlledSCore;
+		return " won the game with a score of " + winnerScore
+			+ "<br /><span>Host settlements: " + this.hostScore + "</span>"
+			+ "<br /><span>Host total controlled: " + this.hostTotalControlledScore + "</span>"
+			+ "<br /><span>Guest settlements: " + this.guestScore + "</span>"
+			+ "<br /><span>Guest total controlled: " + this.guestTotalControlledSCore + "</span>";
+	}
+
+	getWinResultTypeCode() {
+		if (this.getWinner()) {
+			return 1;
 		}
 	}
-};
 
-/* Required by Main */
-TumbleweedGameManager.prototype.getWinReason = function() {
-	if (gameOptionEnabled(TUMBLE_6) && this.board.getPointWithStackOfSizeAtLeast(6)) {
-		return " won the game with a settlement of 6";
+	getCopy() {
+		var copyGame = new TumbleweedGameManager(this.actuator, true, true);
+		copyGame.board = this.board.getCopy();
+		return copyGame;
 	}
-	var winnerScore = this.hostTotalControlledScore > this.guestTotalControlledSCore ? this.hostTotalControlledScore : this.guestTotalControlledSCore;
-	return " won the game with a score of " + winnerScore
-		+ "<br /><span>Host settlements: " + this.hostScore + "</span>"
-		+ "<br /><span>Host total controlled: " + this.hostTotalControlledScore + "</span>"
-		+ "<br /><span>Guest settlements: " + this.guestScore + "</span>"
-		+ "<br /><span>Guest total controlled: " + this.guestTotalControlledSCore + "</span>";
-};
 
-TumbleweedGameManager.prototype.getWinResultTypeCode = function() {
-	if (this.getWinner()) {
-		return 1;
+	pointIsOpen(npText) {
+		var rowAndCol = TumbleweedBoardPoint.notationPointStringMap[npText];
+		return rowAndCol
+			&& !this.board.cells[rowAndCol.row][rowAndCol.col].hasSettlement()
+			&& this.board.cells[rowAndCol.row][rowAndCol.col].types.includes(TumbleweedBoardPoint.Types.normal);
 	}
-};
-
-TumbleweedGameManager.prototype.getCopy = function() {
-	var copyGame = new TumbleweedGameManager(this.actuator, true, true);
-	copyGame.board = this.board.getCopy();
-	return copyGame;
-};
-
-TumbleweedGameManager.prototype.pointIsOpen = function(npText) {
-	var rowAndCol = TumbleweedBoardPoint.notationPointStringMap[npText];
-	return rowAndCol 
-		&& !this.board.cells[rowAndCol.row][rowAndCol.col].hasSettlement()
-		&& this.board.cells[rowAndCol.row][rowAndCol.col].types.includes(TumbleweedBoardPoint.Types.normal);
-};
+}
