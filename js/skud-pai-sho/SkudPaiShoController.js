@@ -985,7 +985,10 @@ export class SkudPaiShoController {
 	}
 
 	getAiList() {
-		return [new SkudStrategicAI(), new SkudAIv1()];
+		return [
+			// new SkudStrategicAI(), 
+			new SkudAIv1()
+		];
 	}
 
 	getCurrentPlayer() {
