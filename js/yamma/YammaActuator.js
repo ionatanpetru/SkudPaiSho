@@ -552,14 +552,14 @@ export class YammaActuator {
 	}
 
 	createSlotMesh(row, col, level) {
-		// Use hexagon shape for triangular grid slots
-		const slotGeometry = new THREE.CylinderGeometry(0.15, 0.15, 0.08, 6);
+		// Use hexagon shape for triangular grid slots - larger for easier clicking
+		const slotGeometry = new THREE.CylinderGeometry(0.25, 0.25, 0.08, 6);
 		const levelColors = [0x4a3520, 0x5a4530, 0x6a5540, 0x7a6550, 0x8a7560];
 		const slotMaterial = new THREE.MeshStandardMaterial({
 			color: levelColors[level] || 0x4a3520,
 			roughness: 0.9,
 			transparent: true,
-			opacity: 0.8
+			opacity: 0.6
 		});
 
 		const slot = new THREE.Mesh(slotGeometry, slotMaterial);
