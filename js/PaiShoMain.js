@@ -2305,7 +2305,11 @@ export function clearMessage() {
 	// }
 
 	const helpSpan = document.createElement("span");
-	helpSpan.innerHTML = defaultHelpMessageText;
+	if (defaultHelpMessageText instanceof HTMLElement) {
+		helpSpan.appendChild(defaultHelpMessageText);
+	} else {
+		helpSpan.innerHTML = defaultHelpMessageText;
+	}
 	helpTabContentDiv.appendChild(helpSpan);
 
 	const tournamentText = getTournamentText();
@@ -2349,19 +2353,19 @@ export function RmbUp(htmlPoint) {
 export function displayReturnedMessage(messageReturned) {
 	const heading = messageReturned.heading;
 	const message = messageReturned.message;
+	const container = document.createElement('div');
+
 	if (heading) {
-		if (message.length > 1) {
-			setMessage(toHeading(heading) + toBullets(message));
-		} else {
-			setMessage(toHeading(heading) + toMessage(message));
-		}
-	} else {
-		if (message.length > 1) {
-			setMessage(toBullets(message));
-		} else {
-			setMessage(toMessage(message));
-		}
+		container.appendChild(toHeading(heading));
 	}
+
+	if (message.length > 1) {
+		container.appendChild(toBullets(message));
+	} else {
+		container.appendChild(toMessage(message));
+	}
+
+	setMessage(container);
 }
 
 export function showTileMessage(tileDiv) {
@@ -2377,10 +2381,27 @@ export function showPointMessage(htmlPoint) {
 }
 
 export function setMessage(msg) {
-	if (msg === document.getElementById("helpTextContent").innerHTML) {
-		clearMessage();
+	const helpTextContent = document.getElementById("helpTextContent");
+
+	if (msg instanceof HTMLElement) {
+		// Clear existing content
+		while (helpTextContent.firstChild) {
+			helpTextContent.removeChild(helpTextContent.firstChild);
+		}
+		// Add tournament text if any
+		const tournamentText = getTournamentText();
+		if (tournamentText) {
+			const tourSpan = document.createElement('span');
+			tourSpan.innerHTML = tournamentText;
+			helpTextContent.appendChild(tourSpan);
+		}
+		helpTextContent.appendChild(msg);
 	} else {
-		document.getElementById("helpTextContent").innerHTML = getTournamentText() + msg;
+		if (msg === helpTextContent.innerHTML) {
+			clearMessage();
+		} else {
+			helpTextContent.innerHTML = getTournamentText() + msg;
+		}
 	}
 }
 
@@ -2400,33 +2421,54 @@ export function getTournamentText() {
 }
 
 export function toHeading(str) {
-	return "<h4>" + str + "</h4>";
+	const h4 = document.createElement('h4');
+	if (str instanceof HTMLElement) {
+		h4.appendChild(str);
+	} else {
+		h4.textContent = str;
+	}
+	return h4;
 }
 
 export function toMessage(paragraphs) {
-	let message = "";
+	const container = document.createElement('span');
 
 	if (paragraphs.length === 1) {
-		return paragraphs[0];
+		const item = paragraphs[0];
+		if (item instanceof HTMLElement) {
+			container.appendChild(item);
+		} else {
+			container.innerHTML = item;
+		}
 	} else if (paragraphs.length > 1) {
-		paragraphs.forEach((str) => {
-			message += "<p>" + str + "</p>";
+		paragraphs.forEach((item) => {
+			const p = document.createElement('p');
+			if (item instanceof HTMLElement) {
+				p.appendChild(item);
+			} else {
+				p.innerHTML = item;
+			}
+			container.appendChild(p);
 		});
 	}
 
-	return message;
+	return container;
 }
 
 export function toBullets(paragraphs) {
-	let message = "<ul>";
+	const ul = document.createElement('ul');
 
-	paragraphs.forEach((str) => {
-		message += "<li>" + str + "</li>";
+	paragraphs.forEach((item) => {
+		const li = document.createElement('li');
+		if (item instanceof HTMLElement) {
+			li.appendChild(item);
+		} else {
+			li.innerHTML = item;
+		}
+		ul.appendChild(li);
 	});
 
-	message += "</ul>";
-
-	return message;
+	return ul;
 }
 
 export function getNeutralPointMessage() {
