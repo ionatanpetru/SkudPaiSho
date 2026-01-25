@@ -1421,6 +1421,7 @@ export function showSignOutModal() {
 
 export function showChangePasswordModal() {
 	const msgContent = document.getElementById('changePasswordModalContentContainer').cloneNode(true);
+	msgContent.style.display = '';
 	showModalElem("Update Password", msgContent);
 }
 
@@ -2595,7 +2596,7 @@ export function showModalElem(headingText, modalMessageElement, onlyCloseByClick
 	const span = document.getElementsByClassName("myMainModalClose")[0];
 
 	const modalHeading = document.getElementById('modalHeading');
-	modalHeading.innerText = headingText;
+	modalHeading.innerHTML = headingText;
 
 	const modalMessage = document.getElementById('modalMessage');
 	modalMessage.innerHTML = '';
