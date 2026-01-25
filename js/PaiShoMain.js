@@ -4648,8 +4648,9 @@ export function viewGameSeeksClicked() {
 
 const getActiveGamesCountCallback = (count) => {
 	const activeCountDiv = document.getElementById('activeGamesCountDisplay');
-	if (activeCountDiv && Number.isFinite(count)) {
-		activeCountDiv.innerText = count + " games active in the past 24 hours!";
+	const countNum = parseInt(count, 10);
+	if (activeCountDiv && Number.isFinite(countNum)) {
+		activeCountDiv.innerText = countNum + " games active in the past 24 hours!";
 	}
 };
 
