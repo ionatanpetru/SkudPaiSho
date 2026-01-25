@@ -1030,6 +1030,9 @@ export class YammaActuator {
 	 * For each viewing angle, we project the pyramid onto a 2D triangular grid.
 	 * Each cell shows the color of the first cube visible from that angle,
 	 * looking "through" the pyramid from outside.
+	 *
+	 * Cells are drawn as diamond-oriented squares to help visualize adjacency -
+	 * only cells whose sides touch (not corners) count as being "in a row".
 	 */
 	drawSingleView(canvas, board, viewAngle) {
 		const ctx = canvas.getContext('2d');
@@ -1041,25 +1044,32 @@ export class YammaActuator {
 		ctx.fillRect(0, 0, width, height);
 
 		// For a triangular pyramid, each view shows a triangular projection
-		// The projection has the same structure as the base: 5 rows
+		// The projection has the same structure as the base: 6 rows
 
-		const cellSize = 20;
+		const diamondSize = 10; // Half-diagonal of each diamond
 		const startX = width / 2;
-		const startY = 15;
+		const startY = diamondSize + 5;
 
 		// Draw the triangular grid for this view
+		// Spacing set so diamond edges touch (no gaps)
 		for (let row = 0; row < this.baseRows; row++) {
 			for (let col = 0; col <= row; col++) {
 				// Calculate position for this cell in the 2D view
-				const x = startX + (col - row / 2) * cellSize;
-				const y = startY + row * cellSize * 0.866;
+				// Horizontal: 2 * diamondSize between adjacent cells
+				// Vertical: diamondSize between rows (diamonds touch point-to-point)
+				const x = startX + (col - row / 2) * (diamondSize * 2);
+				const y = startY + row * diamondSize;
 
 				// Find what color is visible at this position from this view angle
 				const visibleColor = this.getVisibleColorAt(board, row, col, viewAngle);
 
-				// Draw the cell
+				// Draw diamond-oriented square (rotated 45°)
 				ctx.beginPath();
-				ctx.arc(x, y, cellSize * 0.4, 0, Math.PI * 2);
+				ctx.moveTo(x, y - diamondSize);         // Top
+				ctx.lineTo(x + diamondSize, y);         // Right
+				ctx.lineTo(x, y + diamondSize);         // Bottom
+				ctx.lineTo(x - diamondSize, y);         // Left
+				ctx.closePath();
 
 				if (visibleColor === 'white') {
 					ctx.fillStyle = '#f5f5f5';
