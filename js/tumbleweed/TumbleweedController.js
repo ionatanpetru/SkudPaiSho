@@ -8,6 +8,7 @@ import { getOpponentName, hostPlayerCode } from '../pai-sho-common/PaiShoPlayerH
 import { GUEST, HOST } from '../CommonNotationObjects';
 import { debug } from '../GameData';
 import { TumbleweedRandomAIv1 } from './ai/TumbleweedRandomAIv1';
+import { TumbleweedStrategicAI } from './ai/TumbleweedStrategicAI';
 import { POSSIBLE_MOVE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
 
 export class TumbleweedController {
@@ -337,7 +338,7 @@ export class TumbleweedController {
 
 	/* Required by Main */
 	getAiList() {
-		return [new TumbleweedRandomAIv1()];
+		return [new TumbleweedStrategicAI(), new TumbleweedRandomAIv1()];
 	}
 
 	/* Required by Main */
