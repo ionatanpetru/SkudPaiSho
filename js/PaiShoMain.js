@@ -114,6 +114,7 @@ import { TumbleweedController } from './tumbleweed/TumbleweedController';
 import { UndergrowthController } from './undergrowth/UndergrowthController';
 import { YammaController } from './yamma/YammaController';
 import { TicTacToeController } from './tictactoe/TicTacToeController';
+import { HexController } from './hex/HexController';
 import { VagabondController } from "./vagabond/VagabondController";
 import * as WelcomeTutorial from './WelcomeTutorial';
 import * as TournamentManager from './TournamentManager';
@@ -3477,7 +3478,7 @@ export const GameType = {
 		]
 	},
 	Yamma: {
-		id: 100,
+		id: 22,
 		name: "Yamma",
 		desc: "Yamma",
 		color: "var(--othercolor)",
@@ -3487,13 +3488,26 @@ export const GameType = {
 		gameOptions: []
 	},
 	TicTacToe: {
-		id: 101,
+		id: 23,
 		name: "Tic Tac Toe",
 		desc: "Tic Tac Toe",
 		color: "var(--othercolor)",
 		description: "The classic game of Xs and Os. Get three in a row to win!",
 		coverImg: "hexagon.png",
 		rulesUrl: "https://en.wikipedia.org/wiki/Tic-tac-toe",
+		gameOptions: [],
+		usersWithAccess: [
+			'SkudPaiSho',
+		]
+	},
+	Hex: {
+		id: 24,
+		name: "Hex",
+		desc: "Hex",
+		color: "var(--othercolor)",
+		description: "A classic abstract strategy game. Connect your two opposite edges of the board to win!",
+		coverImg: "hexagon.png",
+		rulesUrl: "https://en.wikipedia.org/wiki/Hex_(board_game)",
 		gameOptions: [],
 		usersWithAccess: [
 			'SkudPaiSho',
@@ -3582,6 +3596,9 @@ export function getGameControllerForGameType(gameTypeId) {
 			break;
 		case GameType.TicTacToe.id:
 			controller = new TicTacToeController(gameContainerDiv, isMobile);
+			break;
+		case GameType.Hex.id:
+			controller = new HexController(gameContainerDiv, isMobile);
 			break;
 		default:
 			debug("Game Controller unavailable.");
