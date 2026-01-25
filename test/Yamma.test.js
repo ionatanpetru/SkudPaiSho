@@ -229,3 +229,69 @@ describe('Yamma Game - Board State', () => {
 		expect(board.canPlaceCube(0, 0, 1)).toBe(true);
 	});
 });
+
+describe('Yamma Game - Win Checking', () => {
+	it('should detect 4-in-a-row horizontally on the base row', () => {
+		const board = new YammaBoard();
+
+		// Place 4 white cubes in a row on row 5 (base row) with rotation 0
+		// With rotation 0, front face shows owner's color, but from Front view
+		// we see the rightFace which shows opponent's color (Blue for White cubes)
+		// So we need to check that 4 Blue appear in a row from Front view
+		board.placeCube(5, 0, 0, PLAYER.BLUE, 0);
+		board.placeCube(5, 1, 0, PLAYER.BLUE, 0);
+		board.placeCube(5, 2, 0, PLAYER.BLUE, 0);
+		board.placeCube(5, 3, 0, PLAYER.BLUE, 0);
+
+		// Check for winner - Blue cubes show White on Front view (rightFace)
+		// So from Front view, positions (5,0), (5,1), (5,2), (5,3) all show White
+		const result = board.checkWinner();
+		expect(result).not.toBeNull();
+		expect(result.winner).toBe(PLAYER.WHITE); // rightFace of Blue cubes = White
+		expect(result.angle).toBe(0); // Front view
+	});
+
+	it('should detect 4-in-a-row diagonally', () => {
+		const board = new YammaBoard();
+
+		// Place 4 white cubes diagonally: (2,0), (3,1), (4,2), (5,3)
+		// These form a down-right diagonal
+		board.placeCube(2, 0, 0, PLAYER.WHITE, 0);
+		board.placeCube(3, 1, 0, PLAYER.WHITE, 0);
+		board.placeCube(4, 2, 0, PLAYER.WHITE, 0);
+		board.placeCube(5, 3, 0, PLAYER.WHITE, 0);
+
+		// From Front view, White cubes show Blue (rightFace)
+		const result = board.checkWinner();
+		expect(result).not.toBeNull();
+		expect(result.winner).toBe(PLAYER.BLUE); // rightFace of White cubes = Blue
+	});
+
+	it('should not detect a winner with only 3 in a row', () => {
+		const board = new YammaBoard();
+
+		// Place only 3 cubes in a row
+		board.placeCube(5, 0, 0, PLAYER.WHITE, 0);
+		board.placeCube(5, 1, 0, PLAYER.WHITE, 0);
+		board.placeCube(5, 2, 0, PLAYER.WHITE, 0);
+
+		const result = board.checkWinner();
+		expect(result).toBeNull();
+	});
+
+	it('should not count diagonal corners as adjacent (only sides touching)', () => {
+		const board = new YammaBoard();
+
+		// Place cubes that only touch at corners, not sides
+		// In the triangular grid, (0,0), (1,0), (2,0), (3,0) is a down-left diagonal
+		// which DOES count (sides touch)
+		// But alternating positions would not form a line
+		board.placeCube(5, 0, 0, PLAYER.WHITE, 0);
+		board.placeCube(5, 2, 0, PLAYER.WHITE, 0);
+		board.placeCube(5, 4, 0, PLAYER.WHITE, 0);
+		// These are not adjacent - there are gaps
+
+		const result = board.checkWinner();
+		expect(result).toBeNull();
+	});
+});

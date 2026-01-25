@@ -3484,10 +3484,7 @@ export const GameType = {
 		description: "A 3D four-in-a-row game with cubes viewed from three perspectives.",
 		coverImg: "hexagon.png",
 		rulesUrl: "https://boardgamegeek.com/boardgame/388435/yamma",
-		gameOptions: [],
-		usersWithAccess: [
-			'SkudPaiSho',
-		]
+		gameOptions: []
 	},
 	TicTacToe: {
 		id: 101,
