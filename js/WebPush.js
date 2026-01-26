@@ -121,16 +121,24 @@ export async function subscribeToPush(loginToken) {
     }
 
     // Ensure service worker is ready
-    if (!swRegistration) {
-        try {
-            swRegistration = await navigator.serviceWorker.ready;
-        } catch (error) {
-            console.error('Service worker not ready:', error);
-            return null;
-        }
+    try {
+        swRegistration = await navigator.serviceWorker.ready;
+        console.log('Service worker ready, state:', swRegistration.active?.state);
+    } catch (error) {
+        console.error('Service worker not ready:', error);
+        return null;
     }
 
     try {
+        // Check for existing subscription first
+        const existingSubscription = await swRegistration.pushManager.getSubscription();
+        if (existingSubscription) {
+            console.log('Using existing push subscription');
+            localStorage.setItem(WEB_PUSH_ENABLED_KEY, 'true');
+            return existingSubscription;
+        }
+
+        console.log('Creating new push subscription with VAPID key...');
         // Subscribe to push manager
         const subscription = await swRegistration.pushManager.subscribe({
             userVisibleOnly: true,
