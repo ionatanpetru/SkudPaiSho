@@ -5,7 +5,7 @@ import { GUEST, HOST } from '../CommonNotationObjects';
 import { ACCENT_TILE, BASIC_FLOWER, copyArray, SPECIAL_FLOWER } from '../GameData';
 import { gameOptionEnabled, OPTION_ANCIENT_OASIS_EXPANSION, OPTION_DOUBLE_ACCENT_TILES, ORIGINAL_BENDER_EXPANSION } from '../GameOptions';
 import { guestPlayerCode, hostPlayerCode } from '../pai-sho-common/PaiShoPlayerHelp';
-import FirePaiShoTile from './FirePaiShoTile';
+import { FirePaiShoTile } from './FirePaiShoTile';
 
 export function FirePaiShoTileManager(forActuating) {
 	if (forActuating) {
