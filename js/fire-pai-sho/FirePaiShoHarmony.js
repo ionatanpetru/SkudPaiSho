@@ -1,9 +1,7 @@
 /* Skud Pai Sho Harmony */
-
-import RowAndColumn from '../common/RowAndColumn.js';
-import NotationPoint from '../common/NotationPoint.js';
-import { debug } from '../common/Debug.js';
-import { HOST, GUEST, completeHarmony } from '../fire-pai-sho/FirePaiShoGameConstants.js';
+import { GUEST, HOST, NotationPoint, RowAndColumn } from '../CommonNotationObjects';
+import { debug } from '../GameData';
+import { completeHarmony } from '../skud-pai-sho/SkudPaiShoRules';
 
 export function FirePaiShoHarmony(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn) {
 	this.tile1 = tile1;
