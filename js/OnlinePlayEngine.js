@@ -76,8 +76,11 @@ export class OnlinePlayEngine {
 			}
 		);
 	}
-	getVerificationCode(callback) {
-		$.get("backend/getVerificationCode.php",
+	verifyCode(code, callback) {
+		$.post("backend/verifyCode.php",
+			{
+				code: code
+			},
 			function(data, status) {
 				if (status === 'success') {
 					callback(data.trim());

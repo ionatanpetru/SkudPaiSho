@@ -446,7 +446,6 @@ export let interval = 0;
 export let emailBeingVerified = "";
 export let usernameBeingVerified = "";
 export let passwordBeingVerified = "";
-export let codeToVerify = 0;
 export let tempUserId;
 export let myGamesList = [];
 export let gameSeekList = [];
@@ -2938,9 +2937,9 @@ export function verifyCodeClicked() {
 	if (usernameBeingVerified && usernameBeingVerified.trim() != ""
 		&& emailBeingVerified && emailBeingVerified.trim() != "") {
 
-		codeToVerify = document.getElementById("verificationCodeInput").value;
+		const codeToVerify = document.getElementById("verificationCodeInput").value;
 		if (codeToVerify && codeToVerify.trim() != "") {
-			onlinePlayEngine.getVerificationCode(verifyCodeCallback);
+			onlinePlayEngine.verifyCode(codeToVerify, verifyCodeCallback);
 		}
 	}
 }
@@ -2981,7 +2980,6 @@ const createDeviceIdCallback = (generatedDeviceId) => {
 	emailBeingVerified = "";
 	usernameBeingVerified = "";
 	tempUserId = null;
-	codeToVerify = 0;
 
 	updateFooter();
 	clearMessage();
@@ -3047,9 +3045,8 @@ export function updatePasswordClicked() {
 	}
 }
 
-// TODO actualCode should be result...
-const verifyCodeCallback = (actualCode) => {
-	if (codeToVerify === actualCode) {
+const verifyCodeCallback = (result) => {
+	if (result === "verified") {
 		if (tempUserId && tempUserId > 0) {
 			createUserCallback(tempUserId);
 		} else {
@@ -3061,7 +3058,6 @@ const verifyCodeCallback = (actualCode) => {
 		emailBeingVerified = "";
 		usernameBeingVerified = "";
 		tempUserId = null;
-		codeToVerify = 0;
 		showModalElem("Validation Failed", document.createTextNode("Validation failed. Please try again."));
 	}
 };
