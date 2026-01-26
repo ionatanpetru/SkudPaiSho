@@ -4,11 +4,11 @@
  */
 
 import $ from 'jquery';
+import { PREF_WEB_PUSH_SUBSCRIPTION, PREF_CHAT_NOTIFICATIONS } from './preferenceTypes';
 
-// Preference type ID for web push subscriptions (matches iOS device tokens at 3)
-const WEB_PUSH_PREF_TYPE_ID = 4;
 const WEB_PUSH_ENABLED_KEY = 'webPushEnabled';
 const WEB_PUSH_SUBSCRIPTION_KEY = 'webPushSubscription';
+const CHAT_NOTIFICATIONS_ENABLED_KEY = 'chatNotificationsEnabled';
 
 // VAPID public key - REPLACE THIS with your generated key from generateVapidKeys.php
 const VAPID_PUBLIC_KEY = 'BAilGVU4jYQKHHZTI8bG_d74-OZxMsyzDNcFLnR3hfwn4CSx1H-L_QmVhup_PZSpxszk3kUmlNHpN8c90wmgZnY';
@@ -147,7 +147,7 @@ export async function subscribeToPush(loginToken) {
             username: loginToken.username,
             userEmail: loginToken.userEmail,
             deviceId: loginToken.deviceId,
-            prefTypeId: WEB_PUSH_PREF_TYPE_ID,
+            prefTypeId: PREF_WEB_PUSH_SUBSCRIPTION,
             value: subscriptionJson
         }, function(data, status) {
             if (status === 'success') {
@@ -215,4 +215,81 @@ export async function saveWebPushSubscriptionIfNeeded(loginToken) {
         // User previously granted permission but subscription expired/missing
         await subscribeToPush(loginToken);
     }
+}
+
+/**
+ * Check if chat notifications are currently enabled
+ */
+export function isChatNotificationsEnabled() {
+    return localStorage.getItem(CHAT_NOTIFICATIONS_ENABLED_KEY) === 'true';
+}
+
+/**
+ * Enable chat notifications
+ * @param {Object} loginToken - Login token from getLoginToken()
+ * @returns {boolean} Success status
+ */
+export async function enableChatNotifications(loginToken) {
+    if (!loginToken || !loginToken.userId) {
+        console.log('Must be logged in to enable chat notifications');
+        return false;
+    }
+
+    return new Promise((resolve) => {
+        $.post("backend/addUserPreferenceValue.php", {
+            userId: loginToken.userId,
+            username: loginToken.username,
+            userEmail: loginToken.userEmail,
+            deviceId: loginToken.deviceId,
+            prefTypeId: PREF_CHAT_NOTIFICATIONS,
+            value: 'true'
+        }, function(data, status) {
+            if (status === 'success') {
+                console.log('Chat notifications enabled');
+                localStorage.setItem(CHAT_NOTIFICATIONS_ENABLED_KEY, 'true');
+                resolve(true);
+            } else {
+                console.error('Failed to enable chat notifications');
+                resolve(false);
+            }
+        }).fail(function() {
+            console.error('Failed to enable chat notifications');
+            resolve(false);
+        });
+    });
+}
+
+/**
+ * Disable chat notifications
+ * @param {Object} loginToken - Login token from getLoginToken()
+ * @returns {boolean} Success status
+ */
+export async function disableChatNotifications(loginToken) {
+    if (!loginToken || !loginToken.userId) {
+        console.log('Must be logged in to disable chat notifications');
+        return false;
+    }
+
+    return new Promise((resolve) => {
+        $.post("backend/addUserPreferenceValue.php", {
+            userId: loginToken.userId,
+            username: loginToken.username,
+            userEmail: loginToken.userEmail,
+            deviceId: loginToken.deviceId,
+            prefTypeId: PREF_CHAT_NOTIFICATIONS,
+            value: 'false'
+        }, function(data, status) {
+            if (status === 'success') {
+                console.log('Chat notifications disabled');
+                localStorage.removeItem(CHAT_NOTIFICATIONS_ENABLED_KEY);
+                resolve(true);
+            } else {
+                console.error('Failed to disable chat notifications');
+                resolve(false);
+            }
+        }).fail(function() {
+            console.error('Failed to disable chat notifications');
+            resolve(false);
+        });
+    });
 }

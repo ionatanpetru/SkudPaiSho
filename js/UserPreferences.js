@@ -21,6 +21,9 @@ import {
 	isWebPushEnabled,
 	subscribeToPush,
 	unsubscribeFromPush,
+	isChatNotificationsEnabled,
+	enableChatNotifications,
+	disableChatNotifications,
 } from './PaiShoMain';
 import { OnboardingFunctions } from './OnBoardingVars';
 import { GameClock } from './util/GameClock';
@@ -216,6 +219,41 @@ export function showPreferences() {
 		pushLabel.textContent = ' Push notifications for opponent moves?';
 		pushDiv.appendChild(pushLabel);
 		container.appendChild(pushDiv);
+
+		// Chat notifications checkbox (only show if push is enabled)
+		const chatDiv = document.createElement('div');
+		chatDiv.style.marginLeft = '20px';
+		const chatCheckbox = document.createElement('input');
+		chatCheckbox.id = 'chatNotificationsCheckBox';
+		chatCheckbox.type = 'checkbox';
+		chatCheckbox.checked = isChatNotificationsEnabled();
+		chatCheckbox.disabled = !isWebPushEnabled();
+		chatCheckbox.onclick = async () => {
+			if (chatCheckbox.checked) {
+				const success = await enableChatNotifications(getLoginToken());
+				if (!success) {
+					chatCheckbox.checked = false;
+				}
+			} else {
+				await disableChatNotifications(getLoginToken());
+			}
+		};
+		chatDiv.appendChild(chatCheckbox);
+		const chatLabel = document.createElement('label');
+		chatLabel.htmlFor = 'chatNotificationsCheckBox';
+		chatLabel.textContent = ' Also notify for chat messages?';
+		chatDiv.appendChild(chatLabel);
+		container.appendChild(chatDiv);
+
+		// Update chat checkbox state when push checkbox changes
+		const originalPushClick = pushCheckbox.onclick;
+		pushCheckbox.onclick = async () => {
+			await originalPushClick();
+			chatCheckbox.disabled = !pushCheckbox.checked;
+			if (!pushCheckbox.checked) {
+				chatCheckbox.checked = false;
+			}
+		};
 	}
 
 	// Minimal ads option

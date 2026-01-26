@@ -155,8 +155,12 @@ import {
 	isWebPushEnabled,
 	subscribeToPush,
 	unsubscribeFromPush,
-	saveWebPushSubscriptionIfNeeded
+	saveWebPushSubscriptionIfNeeded,
+	isChatNotificationsEnabled,
+	enableChatNotifications,
+	disableChatNotifications
 } from './WebPush';
+import { PREF_IOS_DEVICE_TOKEN } from './preferenceTypes';
 import { addEventToElement, setupUiEvents } from './ui/UiSetup';
 import { setupHtmlEventHandlers } from './ui/HtmlEventHandlers';
 import { applyBoardOptionToBgSvg, mobileAndTabletcheck } from "./ActuatorHelp";
@@ -5714,7 +5718,7 @@ export function iOSShake() {
 export function saveDeviceTokenIfNeeded() {
 	const deviceToken = localStorage.getItem(deviceTokenKey);
 	if ((ios || QueryString.appType === 'ios') && deviceToken && userIsLoggedIn()) {
-		onlinePlayEngine.addUserPreferenceValue(getLoginToken(), 3, deviceToken, emptyCallback);
+		onlinePlayEngine.addUserPreferenceValue(getLoginToken(), PREF_IOS_DEVICE_TOKEN, deviceToken, emptyCallback);
 	}
 }
 
@@ -6069,7 +6073,10 @@ export {
 	isPushSupported,
 	isWebPushEnabled,
 	subscribeToPush,
-	unsubscribeFromPush
+	unsubscribeFromPush,
+	isChatNotificationsEnabled,
+	enableChatNotifications,
+	disableChatNotifications
 } from './WebPush';
 
 /* Keyboard shortcuts */
