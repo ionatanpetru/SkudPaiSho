@@ -113,10 +113,9 @@ export async function subscribeToPush(loginToken) {
         return null;
     }
 
-    // Request notification permission
-    const permission = await Notification.requestPermission();
-    if (permission !== 'granted') {
-        console.log('Notification permission denied');
+    // Check notification permission (don't request here - should be done by caller on user gesture)
+    if (Notification.permission !== 'granted') {
+        console.log('Notification permission not granted');
         return null;
     }
 
@@ -131,18 +130,22 @@ export async function subscribeToPush(loginToken) {
 
     try {
         // Check for existing subscription first
-        const existingSubscription = await swRegistration.pushManager.getSubscription();
+        let existingSubscription = await swRegistration.pushManager.getSubscription();
         if (existingSubscription) {
-            console.log('Using existing push subscription');
-            localStorage.setItem(WEB_PUSH_ENABLED_KEY, 'true');
-            return existingSubscription;
+            console.log('Found existing subscription, unsubscribing first to get fresh subscription...');
+            await existingSubscription.unsubscribe();
+            existingSubscription = null;
         }
 
-        console.log('Creating new push subscription with VAPID key...');
+        console.log('Creating new push subscription...');
+        console.log('VAPID key length:', VAPID_PUBLIC_KEY.length);
+        const applicationServerKey = urlBase64ToUint8Array(VAPID_PUBLIC_KEY);
+        console.log('Converted key length:', applicationServerKey.length, '(should be 65)');
+
         // Subscribe to push manager
         const subscription = await swRegistration.pushManager.subscribe({
             userVisibleOnly: true,
-            applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+            applicationServerKey: applicationServerKey
         });
 
         console.log('Push subscription created:', subscription);
@@ -164,6 +167,9 @@ export async function subscribeToPush(loginToken) {
         return subscription;
     } catch (error) {
         console.error('Failed to subscribe to push:', error);
+        console.error('Error name:', error.name);
+        console.error('Error message:', error.message);
+        if (error.stack) console.error('Stack:', error.stack);
         return null;
     }
 }
@@ -201,7 +207,7 @@ export async function initWebPush() {
 }
 
 /**
- * Save web push subscription if user is logged in and not already subscribed
+ * Sync local storage state with actual subscription status
  * Call this after login verification
  * @param {Object} loginToken - Login token from getLoginToken()
  */
@@ -210,12 +216,15 @@ export async function saveWebPushSubscriptionIfNeeded(loginToken) {
         return;
     }
 
-    // Check if already subscribed
+    // Just sync the local storage state with actual subscription status
+    // Don't auto-subscribe - let user explicitly enable via checkbox
     const { isSubscribed } = await getSubscriptionStatus();
 
-    if (!isSubscribed && Notification.permission === 'granted') {
-        // User previously granted permission but subscription expired/missing
-        await subscribeToPush(loginToken);
+    if (isSubscribed) {
+        localStorage.setItem(WEB_PUSH_ENABLED_KEY, 'true');
+    } else {
+        // If not subscribed, clear the enabled flag
+        localStorage.removeItem(WEB_PUSH_ENABLED_KEY);
     }
 }
 
