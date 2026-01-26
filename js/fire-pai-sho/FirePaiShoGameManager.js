@@ -1,5 +1,15 @@
 // Skud Pai Sho Game Manager
 
+import { PaiShoMarkingManager } from "../pai-sho-common/PaiShoMarkingManager";
+import { FirePaiShoTileManager } from "./FirePaiShoTileManager";
+import { FirePaiShoBoard } from './FirePaiShoBoard';
+import { setGameLogText } from "../PaiShoMain";
+import { debug } from "../GameData";
+import { ARRANGING, GUEST, HOST, PLANTING } from "../CommonNotationObjects";
+import { FirePaiShoTile } from "./FirePaiShoTile";
+import { getOpponentName } from "../pai-sho-common/PaiShoPlayerHelp";
+import { lessBonus, limitedGatesRule, newGatesRule, newSpecialFlowerRules } from "../skud-pai-sho/SkudPaiShoRules";
+
 export function FirePaiShoGameManager(actuator, ignoreActuate, isCopy) {
 	this.gameLogText = '';
 	this.isCopy = isCopy;
@@ -43,6 +53,8 @@ FirePaiShoGameManager.prototype.runNotationMove = function(move, withActuate, mo
 	var errorFound = false;
 	var bonusAllowed = false;
 
+	var moveResults = null;
+
 	/** 
 	if (move.moveNum === 0 && move.accentTiles) {
 		var self = this;
@@ -83,6 +95,7 @@ FirePaiShoGameManager.prototype.runNotationMove = function(move, withActuate, mo
 		//console.log("Bonus allowed: " + bonusAllowed);
 		//console.log("Has harmony bonus: " + move.hasHarmonyBonus());
 
+		var placeTileResult = null;
 		
 		if (bonus) {
 			//console.log("about to grab a tile:" + move.playerCode + ", " + move.bonusTileCode);
@@ -304,7 +317,7 @@ FirePaiShoGameManager.prototype.getWinReason = function() {
 		var winnerPlayer = this.endGameWinners[0];
 		var loserPlayer = getOpponentName(winnerPlayer);
 		var winnerHarmonies = this.board.harmonyManager.getNumCrossingMidlinesForPlayer(winnerPlayer);
-		var loserHarmonies = this.board.harmonyManager.getNumCrossingMidlinesForPlayer(loserPlayer);;
+		var loserHarmonies = this.board.harmonyManager.getNumCrossingMidlinesForPlayer(loserPlayer);
 		msg = " won the game with " + winnerHarmonies + " Harmonies crossing the midlines. ";
 		msg += loserPlayer + " finished with " + loserHarmonies + " Harmonies crossing the midlines."
 	} else if (this.board.winners.length === 2) {

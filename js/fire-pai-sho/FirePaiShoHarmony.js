@@ -1,5 +1,10 @@
 /* Skud Pai Sho Harmony */
 
+import RowAndColumn from '../common/RowAndColumn.js';
+import NotationPoint from '../common/NotationPoint.js';
+import { debug } from '../common/Debug.js';
+import { HOST, GUEST, completeHarmony } from '../fire-pai-sho/FirePaiShoGameConstants.js';
+
 export function FirePaiShoHarmony(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn) {
 	this.tile1 = tile1;
 	this.tile1Pos = new RowAndColumn(tile1RowAndColumn.row, tile1RowAndColumn.col);
@@ -713,6 +718,7 @@ FirePaiShoHarmonyManager.prototype.ringsMatch = function(ring1, ring2) {
 FirePaiShoHarmonyManager.prototype.lookForRings = function(t1, tx, originalChain) {
 	var rings = [];
 	var keepLookingAtTheseHarmonies = [];
+	var currentChain;
 	for (var i = 0; i < this.harmonies.length; i++) {	// Any complete rings?
 		currentChain = originalChain.slice();
 		var hx = this.harmonies[i];

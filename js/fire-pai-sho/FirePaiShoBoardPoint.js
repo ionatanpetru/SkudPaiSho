@@ -1,4 +1,9 @@
 // Board Point
+import { GUEST, HOST } from '../CommonNotationObjects';
+import { ACCENT_TILE, BASIC_FLOWER, ORIGINAL_BENDER, SPECIAL_FLOWER } from '../GameData';
+import { GATE, gateDot, NEUTRAL, NON_PLAYABLE, thickDot, thinDot, whiteDot } from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import { RED, WHITE } from '../skud-pai-sho/SkudPaiShoTile';
+
 
 var CENTER = "Center";
 
