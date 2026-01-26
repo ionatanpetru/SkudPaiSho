@@ -40,7 +40,19 @@ rsync -av \
     --exclude='*.map' \
     --exclude='*.DS_Store' \
     --exclude='.gitkeep' \
+    --exclude='sw.js' \
     "$DIST_DIR/" "$DEPLOY_DIR/"
+
+# Copy service worker file (Parcel puts it in a directory, we need it as a file)
+if [ -d "$DIST_DIR/sw.js" ]; then
+    echo -e "${BLUE}📋 Copying service worker...${NC}"
+    cp "$DIST_DIR/sw.js/"* "$DEPLOY_DIR/sw.js" 2>/dev/null || cp "sw.js" "$DEPLOY_DIR/sw.js"
+elif [ -f "$DIST_DIR/sw.js" ]; then
+    cp "$DIST_DIR/sw.js" "$DEPLOY_DIR/sw.js"
+else
+    # Fallback: copy from source
+    cp "sw.js" "$DEPLOY_DIR/sw.js"
+fi
 
 # Count files
 FILE_COUNT=$(find "$DEPLOY_DIR" -type f | wc -l | tr -d ' ')

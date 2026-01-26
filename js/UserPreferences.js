@@ -15,6 +15,12 @@ import {
 	submitMoveData,
 	confirmMoveToSubmit,
 	showModalElem,
+	userIsLoggedIn,
+	getLoginToken,
+	isPushSupported,
+	isWebPushEnabled,
+	subscribeToPush,
+	unsubscribeFromPush,
 } from './PaiShoMain';
 import { OnboardingFunctions } from './OnBoardingVars';
 import { GameClock } from './util/GameClock';
@@ -186,6 +192,31 @@ export function showPreferences() {
 	clockLabel.textContent = ' (Beta) Game Clock enabled?';
 	clockDiv.appendChild(clockLabel);
 	container.appendChild(clockDiv);
+
+	// Web Push notifications checkbox (only show if supported and logged in)
+	if (isPushSupported() && userIsLoggedIn()) {
+		const pushDiv = document.createElement('div');
+		const pushCheckbox = document.createElement('input');
+		pushCheckbox.id = 'webPushCheckBox';
+		pushCheckbox.type = 'checkbox';
+		pushCheckbox.checked = isWebPushEnabled();
+		pushCheckbox.onclick = async () => {
+			if (pushCheckbox.checked) {
+				const subscription = await subscribeToPush(getLoginToken());
+				if (!subscription) {
+					pushCheckbox.checked = false;
+				}
+			} else {
+				await unsubscribeFromPush();
+			}
+		};
+		pushDiv.appendChild(pushCheckbox);
+		const pushLabel = document.createElement('label');
+		pushLabel.htmlFor = 'webPushCheckBox';
+		pushLabel.textContent = ' Push notifications for opponent moves?';
+		pushDiv.appendChild(pushLabel);
+		container.appendChild(pushDiv);
+	}
 
 	// Minimal ads option
 	if (Ads.Options.showAds) {

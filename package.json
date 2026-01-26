@@ -55,6 +55,10 @@
 			"env": {
 				"NODE_ENV": "development"
 			}
+		},
+		{
+			"staticPath": "sw.js",
+			"staticOutPath": "sw.js"
 		}
 	],
 	"repository": {

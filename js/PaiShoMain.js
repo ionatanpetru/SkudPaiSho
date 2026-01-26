@@ -149,6 +149,14 @@ import {
 	notifyMe,
 	notifyThisMessage
 } from './Notifications';
+import {
+	initWebPush,
+	isPushSupported,
+	isWebPushEnabled,
+	subscribeToPush,
+	unsubscribeFromPush,
+	saveWebPushSubscriptionIfNeeded
+} from './WebPush';
 import { addEventToElement, setupUiEvents } from './ui/UiSetup';
 import { setupHtmlEventHandlers } from './ui/HtmlEventHandlers';
 import { applyBoardOptionToBgSvg, mobileAndTabletcheck } from "./ActuatorHelp";
@@ -795,6 +803,8 @@ const initialVerifyLoginCallback = (response) => {
 		startWatchingNumberOfGamesWhereUserTurn();
 		appCaller.alertAppLoaded();
 		userIsSignedInOk = true;
+		// Subscribe to web push notifications if supported
+		saveWebPushSubscriptionIfNeeded(getLoginToken());
 	} else {
 		// Cannot verify user login, forget all current stuff.
 		if (getUsername()) {
@@ -4329,6 +4339,7 @@ export function accountHeaderClicked() {
 		loginClicked();
 	}
 	requestNotificationPermission();
+	initWebPush();
 }
 
 export function loginClicked() {
@@ -6052,6 +6063,14 @@ export {
 	notifyMe,
 	notifyThisMessage
 } from './Notifications';
+
+// Re-exported from WebPush module
+export {
+	isPushSupported,
+	isWebPushEnabled,
+	subscribeToPush,
+	unsubscribeFromPush
+} from './WebPush';
 
 /* Keyboard shortcuts */
 document.onkeyup = function(e) {

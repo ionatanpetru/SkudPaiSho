@@ -1,0 +1,218 @@
+/**
+ * Web Push Notifications Module
+ * Handles service worker registration and push subscription management
+ */
+
+import $ from 'jquery';
+
+// Preference type ID for web push subscriptions (matches iOS device tokens at 3)
+const WEB_PUSH_PREF_TYPE_ID = 4;
+const WEB_PUSH_ENABLED_KEY = 'webPushEnabled';
+const WEB_PUSH_SUBSCRIPTION_KEY = 'webPushSubscription';
+
+// VAPID public key - REPLACE THIS with your generated key from generateVapidKeys.php
+const VAPID_PUBLIC_KEY = 'BAilGVU4jYQKHHZTI8bG_d74-OZxMsyzDNcFLnR3hfwn4CSx1H-L_QmVhup_PZSpxszk3kUmlNHpN8c90wmgZnY';
+
+let swRegistration = null;
+
+/**
+ * Convert base64url-encoded VAPID key to Uint8Array for Push API
+ */
+function urlBase64ToUint8Array(base64String) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding)
+        .replace(/-/g, '+')
+        .replace(/_/g, '/');
+
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+
+    for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+}
+
+/**
+ * Check if push notifications are supported in this browser
+ */
+export function isPushSupported() {
+    return 'serviceWorker' in navigator &&
+           'PushManager' in window &&
+           'Notification' in window;
+}
+
+/**
+ * Check if web push is currently enabled for this user
+ */
+export function isWebPushEnabled() {
+    return localStorage.getItem(WEB_PUSH_ENABLED_KEY) === 'true';
+}
+
+/**
+ * Register the service worker
+ * Call this on app initialization
+ */
+export async function registerServiceWorker() {
+    if (!('serviceWorker' in navigator)) {
+        console.log('Service workers not supported');
+        return null;
+    }
+
+    try {
+        // Use variable to avoid Parcel's static analysis of service worker path
+        const swPath = '/sw.js';
+        swRegistration = await navigator.serviceWorker.register(swPath, {
+            scope: '/'
+        });
+        console.log('Service Worker registered:', swRegistration.scope);
+        return swRegistration;
+    } catch (error) {
+        console.error('Service Worker registration failed:', error);
+        return null;
+    }
+}
+
+/**
+ * Get current push subscription status
+ */
+export async function getSubscriptionStatus() {
+    if (!swRegistration) {
+        try {
+            swRegistration = await navigator.serviceWorker.ready;
+        } catch (error) {
+            return { isSubscribed: false, subscription: null };
+        }
+    }
+
+    try {
+        const subscription = await swRegistration.pushManager.getSubscription();
+        return {
+            isSubscribed: !!subscription,
+            subscription: subscription
+        };
+    } catch (error) {
+        console.error('Error getting subscription status:', error);
+        return { isSubscribed: false, subscription: null };
+    }
+}
+
+/**
+ * Subscribe to push notifications
+ * @param {Object} loginToken - Login token from getLoginToken()
+ * @returns {PushSubscription|null} The subscription or null if failed
+ */
+export async function subscribeToPush(loginToken) {
+    if (!isPushSupported()) {
+        console.log('Push notifications not supported');
+        return null;
+    }
+
+    if (!loginToken || !loginToken.userId) {
+        console.log('Must be logged in to subscribe to push');
+        return null;
+    }
+
+    // Request notification permission
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') {
+        console.log('Notification permission denied');
+        return null;
+    }
+
+    // Ensure service worker is ready
+    if (!swRegistration) {
+        try {
+            swRegistration = await navigator.serviceWorker.ready;
+        } catch (error) {
+            console.error('Service worker not ready:', error);
+            return null;
+        }
+    }
+
+    try {
+        // Subscribe to push manager
+        const subscription = await swRegistration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+        });
+
+        console.log('Push subscription created:', subscription);
+
+        // Save subscription to backend
+        const subscriptionJson = JSON.stringify(subscription.toJSON());
+
+        $.post("backend/addUserPreferenceValue.php", {
+            userId: loginToken.userId,
+            username: loginToken.username,
+            userEmail: loginToken.userEmail,
+            deviceId: loginToken.deviceId,
+            prefTypeId: WEB_PUSH_PREF_TYPE_ID,
+            value: subscriptionJson
+        }, function(data, status) {
+            if (status === 'success') {
+                console.log('Web push subscription saved to server');
+                localStorage.setItem(WEB_PUSH_ENABLED_KEY, 'true');
+                localStorage.setItem(WEB_PUSH_SUBSCRIPTION_KEY, subscriptionJson);
+            } else {
+                console.error('Failed to save subscription to server');
+            }
+        });
+
+        return subscription;
+    } catch (error) {
+        console.error('Failed to subscribe to push:', error);
+        return null;
+    }
+}
+
+/**
+ * Unsubscribe from push notifications
+ */
+export async function unsubscribeFromPush() {
+    const { subscription } = await getSubscriptionStatus();
+
+    if (subscription) {
+        try {
+            await subscription.unsubscribe();
+            console.log('Unsubscribed from push notifications');
+        } catch (error) {
+            console.error('Error unsubscribing:', error);
+        }
+    }
+
+    localStorage.removeItem(WEB_PUSH_ENABLED_KEY);
+    localStorage.removeItem(WEB_PUSH_SUBSCRIPTION_KEY);
+}
+
+/**
+ * Initialize web push system
+ * Call this once on app startup
+ */
+export async function initWebPush() {
+    if (!isPushSupported()) {
+        console.log('Web Push not supported in this browser');
+        return;
+    }
+
+    await registerServiceWorker();
+}
+
+/**
+ * Save web push subscription if user is logged in and not already subscribed
+ * Call this after login verification
+ * @param {Object} loginToken - Login token from getLoginToken()
+ */
+export async function saveWebPushSubscriptionIfNeeded(loginToken) {
+    if (!isPushSupported() || !loginToken || !loginToken.userId) {
+        return;
+    }
+
+    // Check if already subscribed
+    const { isSubscribed } = await getSubscriptionStatus();
+
+    if (!isSubscribed && Notification.permission === 'granted') {
+        // User previously granted permission but subscription expired/missing
+        await subscribeToPush(loginToken);
+    }
+}
