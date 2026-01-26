@@ -53,26 +53,33 @@ self.addEventListener('push', (event) => {
         requireInteraction: false
     };
 
-    // For chat notifications, check if the game is currently open
+    // For chat notifications, suppress if any app window is focused
     if (data.type === 'chat' && data.gameId) {
         event.waitUntil(
             clients.matchAll({ type: 'window', includeUncontrolled: true })
                 .then((clientList) => {
-                    // Check if any window has this game open and is focused
-                    const gameOpenAndFocused = clientList.some(client =>
-                        client.url.includes(`game=${data.gameId}`) && client.focused
+                    const appIsFocused = clientList.some(client =>
+                        client.url.includes(self.location.origin) && client.focused
                     );
 
-                    // Only show notification if game is not open/focused
-                    if (!gameOpenAndFocused) {
+                    if (!appIsFocused) {
                         return self.registration.showNotification(data.title, options);
                     }
                 })
         );
     } else {
-        // Move notifications always show
+        // Move notifications: suppress if any app window is focused
         event.waitUntil(
-            self.registration.showNotification(data.title, options)
+            clients.matchAll({ type: 'window', includeUncontrolled: true })
+                .then((clientList) => {
+                    const appIsFocused = clientList.some(client =>
+                        client.url.includes(self.location.origin) && client.focused
+                    );
+
+                    if (!appIsFocused) {
+                        return self.registration.showNotification(data.title, options);
+                    }
+                })
         );
     }
 });
