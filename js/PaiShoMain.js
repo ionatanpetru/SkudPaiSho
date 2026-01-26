@@ -186,6 +186,7 @@ import { buildLoginModalContentElement } from './ui/LoginModal';
 import NickController from './nick/NickController';
 import { viewGameRankingsClicked } from './PaiShoMain';
 import * as GameStats from './GameStats';
+import { buildSignUpModalContentElement } from './ui/SignUpModal';
 
 
 export const QueryString = (() => {
@@ -615,7 +616,8 @@ window.requestAnimationFrame(function() {
 		url = "https://skudpaisho.com/";
 	}
 
-	if ((url.startsWith("file") || url.includes("localhost")) && !ios && !runningOnAndroid) {
+	// if ((url.startsWith("file") || url.includes("localhost")) && !ios && !runningOnAndroid) {
+	if ((url.startsWith("file")) && !ios && !runningOnAndroid) {
 		onlinePlayEnabled = false;
 	}
 
@@ -4360,7 +4362,7 @@ export function signUpClicked() {
 		msgContent.appendChild(document.createElement('br'));
 		msgContent.appendChild(document.createTextNode("You are currently signed in as " + getUsername()));
 	} else {
-		msgContent = document.getElementById('signUpModalContentContainer').cloneNode(true);
+		msgContent = buildSignUpModalContentElement();
 	}
 
 	showModalElem("Sign Up", msgContent);
