@@ -16,6 +16,7 @@ self.addEventListener('activate', (event) => {
 // Handle incoming push notifications
 self.addEventListener('push', (event) => {
     let data = {
+        type: 'move', // 'move' or 'chat'
         title: 'The Garden Gate',
         body: 'Your opponent made a move!',
         gameId: null,
@@ -46,15 +47,34 @@ self.addEventListener('push', (event) => {
             { action: 'open', title: 'Open Game' },
             { action: 'dismiss', title: 'Dismiss' }
         ],
-        // Use gameId as tag to replace existing notifications for same game
-        tag: data.gameId ? `game-${data.gameId}` : 'move-notification',
+        // Use gameId and type as tag to replace existing notifications
+        tag: data.gameId ? `${data.type}-${data.gameId}` : `${data.type}-notification`,
         renotify: true,
         requireInteraction: false
     };
 
-    event.waitUntil(
-        self.registration.showNotification(data.title, options)
-    );
+    // For chat notifications, check if the game is currently open
+    if (data.type === 'chat' && data.gameId) {
+        event.waitUntil(
+            clients.matchAll({ type: 'window', includeUncontrolled: true })
+                .then((clientList) => {
+                    // Check if any window has this game open and is focused
+                    const gameOpenAndFocused = clientList.some(client =>
+                        client.url.includes(`game=${data.gameId}`) && client.focused
+                    );
+
+                    // Only show notification if game is not open/focused
+                    if (!gameOpenAndFocused) {
+                        return self.registration.showNotification(data.title, options);
+                    }
+                })
+        );
+    } else {
+        // Move notifications always show
+        event.waitUntil(
+            self.registration.showNotification(data.title, options)
+        );
+    }
 });
 
 // Handle notification clicks
