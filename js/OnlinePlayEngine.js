@@ -99,10 +99,13 @@ export class OnlinePlayEngine {
 			}
 		);
 	}
-	updateUserPassword(userId, existingPassword, newPassword, callback) {
+	updateUserPassword(loginToken, existingPassword, newPassword, callback) {
 		$.post("backend/updateUserPassword.php",
 			{
-				userId: userId,
+				userId: loginToken.userId,
+				username: loginToken.username,
+				userEmail: loginToken.userEmail,
+				deviceId: loginToken.deviceId,
 				existingPassword: existingPassword,
 				newPassword: newPassword
 			},

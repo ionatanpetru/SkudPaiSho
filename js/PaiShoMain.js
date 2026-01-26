@@ -3040,7 +3040,7 @@ export function updatePasswordClicked() {
 		const newPassword = document.getElementById("userPasswordInput").value.trim();
 		const passwordCheck = document.getElementById("userPasswordCheckInput").value.trim();
 		if (passwordIsValid(newPassword, passwordCheck)) {
-			onlinePlayEngine.updateUserPassword(getUserId(), existingPassword, newPassword, updatePasswordCallback);
+			onlinePlayEngine.updateUserPassword(getLoginToken(), existingPassword, newPassword, updatePasswordCallback);
 		} else {
 			updatePasswordCallback("fail");
 		}
