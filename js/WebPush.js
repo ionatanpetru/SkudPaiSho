@@ -3,7 +3,7 @@
  * Handles service worker registration and push subscription management
  */
 
-import $ from 'jquery';
+import { onlinePlayEngine } from './PaiShoMain';
 import { PREF_WEB_PUSH_SUBSCRIPTION, PREF_CHAT_NOTIFICATIONS } from './preferenceTypes';
 
 const WEB_PUSH_ENABLED_KEY = 'webPushEnabled';
@@ -142,22 +142,16 @@ export async function subscribeToPush(loginToken) {
         // Save subscription to backend
         const subscriptionJson = JSON.stringify(subscription.toJSON());
 
-        $.post("backend/addUserPreferenceValue.php", {
-            userId: loginToken.userId,
-            username: loginToken.username,
-            userEmail: loginToken.userEmail,
-            deviceId: loginToken.deviceId,
-            prefTypeId: PREF_WEB_PUSH_SUBSCRIPTION,
-            value: subscriptionJson
-        }, function(data, status) {
-            if (status === 'success') {
+        onlinePlayEngine.addUserPreferenceValue(
+            loginToken,
+            PREF_WEB_PUSH_SUBSCRIPTION,
+            subscriptionJson,
+            () => {
                 console.log('Web push subscription saved to server');
                 localStorage.setItem(WEB_PUSH_ENABLED_KEY, 'true');
                 localStorage.setItem(WEB_PUSH_SUBSCRIPTION_KEY, subscriptionJson);
-            } else {
-                console.error('Failed to save subscription to server');
             }
-        });
+        );
 
         return subscription;
     } catch (error) {
@@ -236,26 +230,16 @@ export async function enableChatNotifications(loginToken) {
     }
 
     return new Promise((resolve) => {
-        $.post("backend/addUserPreferenceValue.php", {
-            userId: loginToken.userId,
-            username: loginToken.username,
-            userEmail: loginToken.userEmail,
-            deviceId: loginToken.deviceId,
-            prefTypeId: PREF_CHAT_NOTIFICATIONS,
-            value: 'true'
-        }, function(data, status) {
-            if (status === 'success') {
+        onlinePlayEngine.addUserPreferenceValue(
+            loginToken,
+            PREF_CHAT_NOTIFICATIONS,
+            'true',
+            () => {
                 console.log('Chat notifications enabled');
                 localStorage.setItem(CHAT_NOTIFICATIONS_ENABLED_KEY, 'true');
                 resolve(true);
-            } else {
-                console.error('Failed to enable chat notifications');
-                resolve(false);
             }
-        }).fail(function() {
-            console.error('Failed to enable chat notifications');
-            resolve(false);
-        });
+        );
     });
 }
 
@@ -271,25 +255,15 @@ export async function disableChatNotifications(loginToken) {
     }
 
     return new Promise((resolve) => {
-        $.post("backend/addUserPreferenceValue.php", {
-            userId: loginToken.userId,
-            username: loginToken.username,
-            userEmail: loginToken.userEmail,
-            deviceId: loginToken.deviceId,
-            prefTypeId: PREF_CHAT_NOTIFICATIONS,
-            value: 'false'
-        }, function(data, status) {
-            if (status === 'success') {
+        onlinePlayEngine.addUserPreferenceValue(
+            loginToken,
+            PREF_CHAT_NOTIFICATIONS,
+            'false',
+            () => {
                 console.log('Chat notifications disabled');
                 localStorage.removeItem(CHAT_NOTIFICATIONS_ENABLED_KEY);
                 resolve(true);
-            } else {
-                console.error('Failed to disable chat notifications');
-                resolve(false);
             }
-        }).fail(function() {
-            console.error('Failed to disable chat notifications');
-            resolve(false);
-        });
+        );
     });
 }

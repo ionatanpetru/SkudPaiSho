@@ -205,6 +205,12 @@ export function showPreferences() {
 		pushCheckbox.checked = isWebPushEnabled();
 		pushCheckbox.onclick = async () => {
 			if (pushCheckbox.checked) {
+				// Request permission immediately on user gesture (before any await)
+				const permission = await Notification.requestPermission();
+				if (permission !== 'granted') {
+					pushCheckbox.checked = false;
+					return;
+				}
 				const subscription = await subscribeToPush(getLoginToken());
 				if (!subscription) {
 					pushCheckbox.checked = false;
