@@ -1,5 +1,11 @@
 // Coop Solitaire Notation
 
+import { ARRANGING, GUEST, HOST, NotationPoint, PLANTING } from "../CommonNotationObjects";
+import { debug } from "../GameData";
+import { BRAND_NEW } from "../PaiShoMain";
+import { sameStart, simpleCanonRules } from "../skud-pai-sho/SkudPaiShoRules";
+import { OvergrowthTile } from './OvergrowthTile';
+
 export function OvergrowthNotationMove(text) {
 	this.fullMoveText = text;
 	this.analyzeMove();
@@ -135,7 +141,7 @@ export function OvergrowthNotationBuilder() {
 OvergrowthNotationBuilder.prototype.getFirstMoveForHost = function(tileCode) {
 	var builder = new OvergrowthNotationBuilder();
 	builder.moveType = PLANTING;
-	builder.plantedFlowerType = Tile.getClashTileCode(tileCode);
+	builder.plantedFlowerType = OvergrowthTile.getClashTileCode(tileCode);
 
 	if (simpleCanonRules || sameStart) {
 		builder.plantedFlowerType = tileCode;
@@ -197,6 +203,7 @@ OvergrowthGameNotation.prototype.removeLastMove = function() {
 
 OvergrowthGameNotation.prototype.getPlayerMoveNum = function() {
 	var moveNum = 0;
+	var player = HOST;
 	var lastMove = this.moves[this.moves.length-1];
 
 	if (lastMove) {

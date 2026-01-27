@@ -1,4 +1,31 @@
 /* Overgrowth Pai Sho specific UI interaction logic */
+import { GUEST, HOST, NotationPoint, PLANTING } from '../CommonNotationObjects';
+import { debug } from '../GameData';
+import { GameType } from '../GameType';
+import {
+	BRAND_NEW,
+	callSubmitMove,
+	createGameIfThatIsOk,
+	currentMoveIndex,
+	finalizeMove,
+	getGameOptionsMessageElement,
+	getNeutralPointMessage,
+	getRedPointMessage,
+	getRedWhitePointMessage,
+	getWhitePointMessage,
+	getCurrentPlayer,
+	myTurn,
+	onlinePlayEnabled,
+	playingOnlineGame,
+	toHeading,
+	WAITING_FOR_ENDPOINT,
+} from '../PaiShoMain';
+import { GATE, NEUTRAL, POSSIBLE_MOVE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import { RED, WHITE } from '../skud-pai-sho/SkudPaiShoTile';
+import { OvergrowthActuator } from './OvergrowthActuator';
+import { OvergrowthGameManager } from './OvergrowthGameManager';
+import { OvergrowthGameNotation, OvergrowthNotationBuilder } from './OvergrowthGameNotation';
+import { OvergrowthTile } from './OvergrowthTile';
 
 export function OvergrowthController(gameContainer, isMobile) {
 	this.actuator = new OvergrowthActuator(gameContainer, isMobile);

@@ -1,8 +1,8 @@
 /* Undergrowth Pai Sho specific UI interaction logic */
 
+import { GameType } from '../GameType';
 import {
   BRAND_NEW,
-  GameType,
   READY_FOR_BONUS,
   WAITING_FOR_ENDPOINT,
   callSubmitMove,

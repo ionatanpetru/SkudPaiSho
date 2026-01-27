@@ -1,8 +1,12 @@
 // Solitaire Game Manager
 
-import { ACCENT_TILE, debug } from '../GameData';
 import { PLANTING } from '../CommonNotationObjects';
+import { ACCENT_TILE, debug } from '../GameData';
+import { PaiShoMarkingManager } from '../pai-sho-common/PaiShoMarkingManager';
+import { gameController, getCurrentPlayer, isInReplay } from '../PaiShoMain';
 import { lessBonus, newGatesRule, newSpecialFlowerRules } from '../skud-pai-sho/SkudPaiShoRules';
+import { OvergrowthBoard } from './OvergrowthBoard';
+import { OvergrowthTileManager } from './OvergrowthTileManager';
 
 export function OvergrowthGameManager(actuator, ignoreActuate, isCopy, existingDrawnTile, existingLastDrawnTile) {
 	this.isCopy = isCopy;

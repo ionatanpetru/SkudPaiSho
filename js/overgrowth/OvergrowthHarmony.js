@@ -1,5 +1,9 @@
 // Coop Solitaire Harmony
 
+import { GUEST, HOST } from '../CommonNotationObjects';
+import { ACCENT_TILE, debug } from '../GameData';
+import { FULL_POINTS_SCORING, gameOptionEnabled } from '../GameOptions';
+
 export function OvergrowthHarmony(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn) {
 	this.tile1 = tile1;
 	this.tile1Pos = tile1RowAndColumn;

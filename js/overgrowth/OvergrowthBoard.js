@@ -1,5 +1,14 @@
 // Board
 
+import { GUEST, HOST, RowAndColumn } from '../CommonNotationObjects';
+import { ROCK, WHEEL, KNOTWEED, BOAT } from '../GameData';
+import { PaiShoBoardHelper } from '../pai-sho-common/PaiShoBoardHelp';
+import { GATE, POSSIBLE_MOVE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import { newKnotweedRules } from '../skud-pai-sho/SkudPaiShoRules';
+import { RED, WHITE } from '../skud-pai-sho/SkudPaiShoTile';
+import { OvergrowthBoardPoint } from './OvergrowthBoardPoint';
+import { OvergrowthHarmony, OvergrowthHarmonyManager } from './OvergrowthHarmony';
+
 export function OvergrowthBoard() {
 	this.size = new RowAndColumn(17, 17);
 
