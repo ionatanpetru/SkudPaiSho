@@ -181,7 +181,7 @@ export const GameType = {
 		desc: "Nick Pai Sho",
 		color: "var(--nickcolor)",
 		description: "Advance your lotus to the center of the board and protect it using the four elements and the Avatar.",
-		coverImg: "nick.png",
+		coverImg: "lotus.png",
 		rulesUrl: "https://skudpaisho.com/site/games/nick-pai-sho/",
 		gameOptions: [],
 		noRankedGames: true
@@ -207,7 +207,7 @@ export const GameType = {
 		desc: "Synergy - Co-op Pai Sho",
 		color: "var(--coopsolitairecolor)",
 		description: "Arrange random flowers into position with a partner to achieve the highest score possible.",
-		coverImg: "lotus.png",
+		coverImg: "rose.png",
 		rulesUrl: "https://skudpaisho.com/site/games/cooperative-solitaire-pai-sho/",
 		gameOptions: [
 			LESS_TILES,
@@ -330,8 +330,7 @@ export const GameType = {
 		id: 20,
 		name: "Beyond The Edges of The Maps",
 		desc: "Beyond The Edges of The Maps",
-		// color: "var(--edgescolor)",
-		color: "var(--othercolor)",
+		color: "var(--edgescolor)",
 		description: "Explore the land beyond the maps.",
 		coverImg: "boat.png",
 		rulesUrl: "https://skudpaisho.com/site/games/beyond-the-edges-of-the-maps/",

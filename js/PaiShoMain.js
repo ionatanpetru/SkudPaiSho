@@ -4557,39 +4557,100 @@ function getNewGameEntryForGameType(gameType) {
 			if (small) {
 				newGameElem.classList.add('small');
 			}
-			newGameElem.style.backgroundColor = gameType.color
-			// todo......
-		} else {
-			// return "<div class='newGameEntry'><span class='clickableText' onclick='setGameController(" + gameType.id + "); closeModal();'>" + gameType.desc + "</span><span>&nbsp;-&nbsp;<i class='fa fa-book' aria-hidden='true'></i>&nbsp;</span><a href='" + gameType.rulesUrl + "' target='_blank' class='newGameRulesLink'>Rules</a></div>";
-			// newGameElem.classList.add('newGameEntry');
-			// Create the div element
-			const div = document.createElement("div");
-			div.className = "newGameEntry";
+			newGameElem.style.backgroundColor = gameType.color;
 
-			// Create the span element for clickable text
-			const spanClickableText = document.createElement("span");
-			spanClickableText.className = "clickableText";
-			spanClickableText.textContent = gameType.desc;
-			spanClickableText.onclick = function() {
+			// Image
+			const img = document.createElement('img');
+			img.src = 'style/game-icons/' + gameType.coverImg;
+			img.ondblclick = function() {
 				setGameController(gameType.id);
 				closeModal();
 			};
+			newGameElem.appendChild(img);
 
-			// Create the span element for the icon
-			const spanIcon = document.createElement("span");
-			spanIcon.innerHTML = "&nbsp;-&nbsp;<i class='fa fa-book' aria-hidden='true'></i>&nbsp;";
+			// Title
+			const h3 = document.createElement('h3');
+			h3.textContent = gameType.desc;
+			h3.onclick = function() {
+				setGameController(gameType.id);
+				closeModal();
+			};
+			newGameElem.appendChild(h3);
+
+			// Hidden expandable section
+			const hiddenDiv = document.createElement('div');
+			hiddenDiv.className = 'gameDiv-hidden';
+
+			const rulesSpan = document.createElement('span');
+			rulesSpan.className = 'rulesSpan';
+			rulesSpan.innerHTML = '<i class="fa fa-book" aria-hidden="true"></i>&nbsp;';
+			const rulesLink = document.createElement('a');
+			rulesLink.href = gameType.rulesUrl;
+			rulesLink.target = '_blank';
+			rulesLink.textContent = 'Rules';
+			rulesSpan.appendChild(rulesLink);
+			hiddenDiv.appendChild(rulesSpan);
+
+			const descP = document.createElement('p');
+			descP.textContent = gameType.description;
+			hiddenDiv.appendChild(descP);
+
+			newGameElem.appendChild(hiddenDiv);
+
+			return newGameElem;
+		} else {
+			// Create the card div element
+			const div = document.createElement("div");
+			div.className = "newGameEntry";
+
+			// Resolve the actual color value from CSS variable reference (e.g., "var(--skudcolor)" -> "#c83737")
+			let gameColor = gameType.color;
+			if (gameColor && gameColor.startsWith('var(')) {
+				const varName = gameColor.match(/var\((--[\w-]+)\)/)?.[1];
+				if (varName) {
+					gameColor = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+				}
+			}
+			div.style.setProperty('--game-color', gameColor);
+
+			// Create thumbnail image
+			const thumbnail = document.createElement("img");
+			thumbnail.className = "newGameThumbnail";
+			thumbnail.src = 'style/game-icons/' + gameType.coverImg;
+			thumbnail.alt = gameType.desc;
+
+			// Create content container
+			const contentDiv = document.createElement("div");
+			contentDiv.className = "newGameEntryContent";
+
+			// Create the span element for clickable text
+			const spanClickableText = document.createElement("span");
+			spanClickableText.className = "newGameTitle";
+			spanClickableText.textContent = gameType.desc;
 
 			// Create the anchor element for rules link
 			const anchorRules = document.createElement("a");
 			anchorRules.href = gameType.rulesUrl;
 			anchorRules.target = "_blank";
 			anchorRules.className = "newGameRulesLink";
-			anchorRules.textContent = "Rules";
+			anchorRules.innerHTML = "<i class='fa fa-book' aria-hidden='true'></i> Rules";
+			anchorRules.onclick = function(e) {
+				e.stopPropagation();
+			};
 
-			// Append the elements to the div
-			div.appendChild(spanClickableText);
-			div.appendChild(spanIcon);
-			div.appendChild(anchorRules);
+			// Append text and rules to content
+			contentDiv.appendChild(spanClickableText);
+			contentDiv.appendChild(anchorRules);
+
+			// Append thumbnail and content to card
+			div.appendChild(thumbnail);
+			div.appendChild(contentDiv);
+
+			// Make entire card clickable
+			div.onclick = function() {
+				setGameController(gameType.id);
+				closeModal();
+			};
 
 			return div;
 		}

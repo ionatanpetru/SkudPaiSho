@@ -18,7 +18,31 @@
   --collapsible-content-bg: #282828;
   --collapsible-heading-bg: #333;
   --mark-manager-elements-color: rgba(255, 170, 0, 0.8);
+  --new-game-card-bg: rgba(255, 255, 255, 0.05);
   /* --mark-manager-elements-color: rgba(0, 0, 0, 0.8); */
+
+  /* Game colors */
+  --skudcolor: #c83737;
+  --vagabondcolor: #88bd38;
+  --adevarcolor: #ab6bff;
+  --ginsengcolor: #e69e1a;
+  --capturecolor: #3860ce;
+  --spiritcolor: #1d94da;
+  --streetcolor: #464444;
+  --nickcolor: #5bc6c6;
+  --solitairecolor: #c83737;
+  --coopsolitairecolor: #3cb188;
+  --overgrowthcolor: #1da54a;
+  --undergrowthcolor: #1da54a;
+  --firecolor: #da6f1d;
+  --playgroundcolor: #cc599c;
+  --bloomscolor: #c98ad1;
+  --meadowcolor: #7797ee;
+  --hexcolor: #969595;
+  --tumbleweedcolor: #b99700;
+  --triflecolor: #3eb870;
+  --othercolor: #726d6d;
+  --edgescolor: #1e5631;
 }
 
 [data-theme="dark"] {
@@ -39,6 +63,7 @@
   --input-color: #faf8ef;
   --collapsible-content-bg: #282828;
   --collapsible-heading-bg: #333;
+  --new-game-card-bg: rgba(255, 255, 255, 0.05);
 }
 
 [data-theme="light"] {
@@ -59,6 +84,7 @@
   --input-color: -internal-light-dark-color(black, white);
   --collapsible-content-bg: #E1DFD7;
   --collapsible-heading-bg: #faf8ef;
+  --new-game-card-bg: rgba(0, 0, 0, 0.05);
 }
 
 div {
@@ -152,7 +178,54 @@ hr {
 /* --------------------------------------- */
 
 .newGameEntry {
-  margin: 4px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin: 6px 0;
+  padding: 8px 12px;
+  background: var(--new-game-card-bg);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, padding 0.15s ease, box-shadow 0.2s ease;
+}
+
+.newGameEntry:hover {
+  background: rgba(128, 128, 128, 0.15);
+  box-shadow: inset 4px 0 0 var(--game-color, #888);
+  padding-left: 16px;
+  padding-right: 8px;
+}
+
+.newGameThumbnail {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.newGameEntryContent {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.newGameTitle {
+  font-weight: 600;
+  flex: 1;
+}
+
+.newGameRulesLink {
+  font-size: 0.85em;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.newGameEntry:hover .newGameRulesLink {
+  opacity: 1;
 }
 
 /* Style the tab */
