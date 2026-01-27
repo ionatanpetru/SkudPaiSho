@@ -248,12 +248,12 @@ PlaygroundActuator.prototype.addTile = function(tile, tileContainer, pileName) {
 
 	if (this.mobile) {
 		theDiv.addEventListener('click', () => {
-				unplayedTileClicked(this);
-				showTileMessage(this);
+				unplayedTileClicked(theDiv);
+				showTileMessage(theDiv);
 			});
 	} else {
-		theDiv.addEventListener('click', () => unplayedTileClicked(this));
-		theDiv.addEventListener('mouseover', () => showTileMessage(this));
+		theDiv.addEventListener('click', () => unplayedTileClicked(theDiv));
+		theDiv.addEventListener('mouseover', () => showTileMessage(theDiv));
 		theDiv.addEventListener('mouseout', clearMessage);
 	}
 
