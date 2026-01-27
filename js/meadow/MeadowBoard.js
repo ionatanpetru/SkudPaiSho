@@ -1,3 +1,7 @@
+import { DYNAMIC_GROUP_LIMIT, EIGHT_SIDED_BOARD, FOUR_SIDED_BOARD, gameOptionEnabled, SHORTER_GAME, SIX_SIDED_BOARD } from "../GameOptions";
+import { MeadowBoardPoint } from "./MeadowBoardPoint";
+import { debug } from "../GameData";
+import { getPlayerCodeFromName } from "../pai-sho-common/PaiShoPlayerHelp";
 
 export function MeadowBoard() {
 	this.edgeLength = 5;
@@ -177,7 +181,7 @@ MeadowBoard.prototype.placeTile = function(tile, notationPointString) {
 MeadowBoard.prototype.putTileOnPoint = function(tile, notationPointString) {
 	var rowAndCol = MeadowBoardPoint.notationPointStringMap[notationPointString];
 
-	point = this.cells[rowAndCol.row][rowAndCol.col];
+	let point = this.cells[rowAndCol.row][rowAndCol.col];
 	
 	point.putTile(tile);
 
