@@ -1,15 +1,16 @@
 // Vagabond Board
 
-import {
-  GATE,
-  NON_PLAYABLE,
-  POSSIBLE_MOVE,
-} from '../skud-pai-sho/SkudPaiShoBoardPoint';
 import { GUEST, HOST, RowAndColumn } from '../CommonNotationObjects';
+import { copyArray, debug } from '../GameData';
+import { gameOptionEnabled, V_DOUBLE_MOVE_DISTANCE } from '../GameOptions';
+import { showBadMoveModal } from '../PaiShoMain';
+import {
+	GATE,
+	NON_PLAYABLE,
+	POSSIBLE_MOVE,
+} from '../skud-pai-sho/SkudPaiShoBoardPoint';
 import { VagabondBoardPoint } from './VagabondBoardPoint';
 import { VagabondTileCodes } from './VagabondTile';
-import { copyArray, debug } from '../GameData';
-import { showBadMoveModal } from '../PaiShoMain';
 
 export class VagabondBoard {
 	constructor() {
