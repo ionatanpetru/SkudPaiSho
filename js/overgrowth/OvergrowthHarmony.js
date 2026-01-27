@@ -245,18 +245,21 @@ OvergrowthHarmonyManager.prototype.getWinningPlayer = function() {
 OvergrowthHarmonyManager.prototype.getScoreSummaryText = function() {
 	var numHarmonies = this.numHarmonies();
 	var numClashes = this.numClashes();
-
-	var message = numHarmonies + " Harmonies <br />"
-					+ numClashes + " Disharmonies <br />";
-
 	var harmonyPoints = this.getHarmonyPoints(this.harmonies);
 	var clashPoints = this.getHarmonyPoints(this.clashes);
 
-	message += "<br />" 
-			+ harmonyPoints + " Harmony Points <br />" 
-			+ clashPoints + " Disharmony Points <br />";
+	var container = document.createElement('span');
+	container.appendChild(document.createTextNode(numHarmonies + " Harmonies"));
+	container.appendChild(document.createElement('br'));
+	container.appendChild(document.createTextNode(numClashes + " Disharmonies"));
+	container.appendChild(document.createElement('br'));
+	container.appendChild(document.createElement('br'));
+	container.appendChild(document.createTextNode(harmonyPoints + " Harmony Points"));
+	container.appendChild(document.createElement('br'));
+	container.appendChild(document.createTextNode(clashPoints + " Disharmony Points"));
+	container.appendChild(document.createElement('br'));
 
-	return message;
+	return container;
 };
 
 OvergrowthHarmonyManager.prototype.getHarmonyPoints = function(harmonyList) {

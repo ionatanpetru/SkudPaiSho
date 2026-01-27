@@ -97,16 +97,41 @@ UndergrowthController.prototype.resetMove = function() {
 };
 
 UndergrowthController.prototype.getDefaultHelpMessageText = function() {
-	return "<h4>Undergrowth Pai Sho</h4> <p>A placement game based on the Skud Pai Sho harmony system. Read the <a href='https://skudpaisho.com/site/games/undergrowth-pai-sho/' target='_blank'>rules page</a> to get started. Summary of the rules are below.</p>"
-	+ "<p>Two tiles are placed each turn, except the Host's first turn, where only one tile is placed.</p>"
-	+ "<p>First, Gates are filled. Then tiles are placed elsewhere on the board.</p>"
-	+ "<p>When placing a tile onto the board, tiles are placed on any point where a) the tile forms Harmony with the player’s own tile(s) and b) the placed tile does not interrupt an existing Harmony or Disharmony on the board.</p>"
-	+ "<p>After a tile is placed, remove any tile with two or more Disharmonies from the board.</p>"
-	+ "<p>A player may also pass if they have no available moves.</p>"
-	+ "<p>After the last piece is played or both players pass in succession, the game ends. The player with the most tiles in or touching the Central Gardens on the board wins.</p>"
-	+ "<p>Same/alike tiles form Disharmony with each other.</p>"
-	+ "<p>Tiles in Gates do not form Disharmony.</p>"
-	+ "<p>The Orchid harmonizes with all friendly Flower Tiles, but also forms Disharmony with everything at the same time.</p>";
+	const container = document.createElement('div');
+
+	const h4 = document.createElement('h4');
+	h4.textContent = "Undergrowth Pai Sho";
+	container.appendChild(h4);
+
+	const p1 = document.createElement('p');
+	p1.textContent = "A placement game based on the Skud Pai Sho harmony system. Read the ";
+	const rulesLink = document.createElement('a');
+	rulesLink.href = 'https://skudpaisho.com/site/games/undergrowth-pai-sho/';
+	rulesLink.target = '_blank';
+	rulesLink.textContent = "rules page";
+	p1.appendChild(rulesLink);
+	p1.appendChild(document.createTextNode(" to get started. Summary of the rules are below."));
+	container.appendChild(p1);
+
+	const paragraphs = [
+		"Two tiles are placed each turn, except the Host's first turn, where only one tile is placed.",
+		"First, Gates are filled. Then tiles are placed elsewhere on the board.",
+		"When placing a tile onto the board, tiles are placed on any point where a) the tile forms Harmony with the player's own tile(s) and b) the placed tile does not interrupt an existing Harmony or Disharmony on the board.",
+		"After a tile is placed, remove any tile with two or more Disharmonies from the board.",
+		"A player may also pass if they have no available moves.",
+		"After the last piece is played or both players pass in succession, the game ends. The player with the most tiles in or touching the Central Gardens on the board wins.",
+		"Same/alike tiles form Disharmony with each other.",
+		"Tiles in Gates do not form Disharmony.",
+		"The Orchid harmonizes with all friendly Flower Tiles, but also forms Disharmony with everything at the same time."
+	];
+
+	paragraphs.forEach(text => {
+		const p = document.createElement('p');
+		p.textContent = text;
+		container.appendChild(p);
+	});
+
+	return container;
 };
 
 UndergrowthController.prototype.getAdditionalMessage = function() {

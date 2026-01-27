@@ -98,7 +98,43 @@ OvergrowthController.prototype.resetMove = function() {
 };
 
 OvergrowthController.prototype.getDefaultHelpMessageText = function() {
-	return "<h4>Nature’s Grove: Overgrowth</h4> <p>A competitive variant of Nature’s Grove: Respite.</p><p>Players alternate drawing and placing a tile, following the same placement rules as Respite, with these clarifications:<ul><li>Tiles form harmony or disharmony regardless of whose tile it is</li><li>Like tiles form disharmony (for example, Rose (R3) forms disharmony with Rose (R3))</li></ul></p><p>The game ends when all tiles have been played. The winner is as follows: <ul><li>The Host wins if there are more Harmonies on the board</li><li>The Guest wins if there are more Disharmonies on the board</li></ul></p>";
+	const container = document.createElement('div');
+
+	const h4 = document.createElement('h4');
+	h4.textContent = "Nature's Grove: Overgrowth";
+	container.appendChild(h4);
+
+	const p1 = document.createElement('p');
+	p1.textContent = "A competitive variant of Nature's Grove: Respite.";
+	container.appendChild(p1);
+
+	const p2 = document.createElement('p');
+	p2.textContent = "Players alternate drawing and placing a tile, following the same placement rules as Respite, with these clarifications:";
+	container.appendChild(p2);
+
+	const ul1 = document.createElement('ul');
+	const li1 = document.createElement('li');
+	li1.textContent = "Tiles form harmony or disharmony regardless of whose tile it is";
+	ul1.appendChild(li1);
+	const li2 = document.createElement('li');
+	li2.textContent = "Like tiles form disharmony (for example, Rose (R3) forms disharmony with Rose (R3))";
+	ul1.appendChild(li2);
+	container.appendChild(ul1);
+
+	const p3 = document.createElement('p');
+	p3.textContent = "The game ends when all tiles have been played. The winner is as follows:";
+	container.appendChild(p3);
+
+	const ul2 = document.createElement('ul');
+	const li3 = document.createElement('li');
+	li3.textContent = "The Host wins if there are more Harmonies on the board";
+	ul2.appendChild(li3);
+	const li4 = document.createElement('li');
+	li4.textContent = "The Guest wins if there are more Disharmonies on the board";
+	ul2.appendChild(li4);
+	container.appendChild(ul2);
+
+	return container;
 };
 
 OvergrowthController.prototype.getAdditionalMessage = function() {
@@ -109,7 +145,7 @@ OvergrowthController.prototype.getAdditionalMessage = function() {
 	if (!this.theGame.getWinner()) {
 		container.appendChild(document.createElement('br'));
 		const strong = document.createElement('strong');
-		strong.textContent = this.theGame.getScoreSummary();
+		strong.appendChild(this.theGame.getScoreSummary());
 		container.appendChild(strong);
 	}
 	return container;

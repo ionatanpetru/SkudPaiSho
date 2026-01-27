@@ -157,7 +157,7 @@ SolitaireController.prototype.getAdditionalMessage = function() {
 	if (!this.theGame.getWinner()) {
 		container.appendChild(document.createElement('br'));
 		const strong = document.createElement('strong');
-		strong.textContent = this.theGame.getWinReason();
+		strong.appendChild(this.theGame.getWinReason());
 		container.appendChild(strong);
 	}
 	return container;
