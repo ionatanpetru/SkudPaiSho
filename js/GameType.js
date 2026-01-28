@@ -1,5 +1,6 @@
 import {
 	ADEVAR_LITE,
+	ADEVAR_ONE_VANGUARD,
 	ADEVAR_ROTATE,
 	BISON_GRANTS_FLYING,
 	BONUS_MOVEMENT_5,
@@ -120,7 +121,8 @@ export const GameType = {
 		coverImg: "adevar.png",
 		rulesUrl: "https://skudpaisho.com/site/games/adevar-pai-sho/",
 		gameOptions: [
-			ADEVAR_LITE
+			ADEVAR_LITE,
+			ADEVAR_ONE_VANGUARD
 		],
 		noRankedGames: true
 	},
