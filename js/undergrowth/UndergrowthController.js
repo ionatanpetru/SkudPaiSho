@@ -135,7 +135,7 @@ UndergrowthController.prototype.getDefaultHelpMessageText = function() {
 };
 
 UndergrowthController.prototype.getAdditionalMessage = function() {
-    var msgElement = document.createElement("div");
+    var msgElement = document.createElement("span");
     
     if (this.gameNotation.moves.length === 0) {
         msgElement.appendChild(getGameOptionsMessageElement(GameType.Undergrowth.gameOptions));
@@ -155,7 +155,7 @@ UndergrowthController.prototype.getAdditionalMessage = function() {
         var scoreBr = document.createElement("br");
         msgElement.appendChild(scoreBr);
         var scoreSpan = document.createElement("strong");
-        scoreSpan.textContent = this.theGame.getScoreSummary();
+        scoreSpan.appendChild(this.theGame.getScoreSummary());
         msgElement.appendChild(scoreSpan);
     }
 
@@ -202,7 +202,7 @@ UndergrowthController.prototype.getAdditionalMessage = function() {
         }
     }
 
-    return msgElement.innerHTML;
+    return msgElement;
 };
 
 UndergrowthController.prototype.passTurn = function() {

@@ -104,10 +104,10 @@ UndergrowthActuator.prototype.htmlify = function(board, theGame, markingManager,
 
 	// Go through tile piles and display
 	theGame.tileManager.hostTiles.forEach(function(tile) {
-		self.addTile(tile, this.hostTilesContainer);
+		self.addTile(tile, self.hostTilesContainer);
 	});
 	theGame.tileManager.guestTiles.forEach(function(tile) {
-		self.addTile(tile, this.guestTilesContainer);
+		self.addTile(tile, self.guestTilesContainer);
 	});
 };
 

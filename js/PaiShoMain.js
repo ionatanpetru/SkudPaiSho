@@ -1560,7 +1560,13 @@ export function getAdditionalMessage() {
 		// There is a winner!
 		container.appendChild(document.createElement("br"));
 		const winnerSpan = document.createElement("strong");
-		winnerSpan.textContent = getGameWinner() + getGameWinReason();
+		winnerSpan.appendChild(document.createTextNode(getGameWinner()));
+		const winReason = getGameWinReason();
+		if (typeof winReason === 'string') {
+			winnerSpan.appendChild(document.createTextNode(winReason));
+		} else {
+			winnerSpan.appendChild(winReason);
+		}
 		container.appendChild(winnerSpan);
 	} else if (gameController.gameHasEndedInDraw && gameController.gameHasEndedInDraw()) {
 		container.appendChild(document.createElement("br"));
@@ -1840,7 +1846,13 @@ export function linkShortenCallback(shortUrl, ignoreNoEmail, okToUpdateWinInfo) 
         // There is a winner!
         messageText.appendChild(document.createElement("br"));
         const winnerStrong = document.createElement("strong");
-        winnerStrong.innerText = getGameWinner() + getGameWinReason();
+        winnerStrong.appendChild(document.createTextNode(getGameWinner()));
+        const winReason = getGameWinReason();
+        if (typeof winReason === 'string') {
+            winnerStrong.appendChild(document.createTextNode(winReason));
+        } else {
+            winnerStrong.appendChild(winReason);
+        }
         messageText.appendChild(winnerStrong);
         // Save winner
         if (okToUpdateWinInfo && playingOnlineGame()) {
