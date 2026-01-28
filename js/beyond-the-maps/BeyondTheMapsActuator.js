@@ -145,7 +145,8 @@ export class BeyondTheMapsActuator {
 		}
 	}
 
-	addTile(tile, tileContainer, pileName) {
+	/* Unused? */
+	/* addTile(tile, tileContainer, pileName) {
 		if (!tile) {
 			return;
 		}
@@ -194,7 +195,7 @@ export class BeyondTheMapsActuator {
 			this.tileContainerTileDivs[pileName] = [];
 		}
 		this.tileContainerTileDivs[pileName].push(theDiv);
-	}
+	} */
 
 	getTileSrcPath(tile) {
 		var srcValue = "images/beyond-the-maps/tiles/";
