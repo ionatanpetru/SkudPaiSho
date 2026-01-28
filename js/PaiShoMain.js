@@ -3636,57 +3636,69 @@ function createGameOptionRowStotesTheme(myGame, even) {
 	return gameOptions;
 }
 
-function createGameEntryDefaultTheme(myGame) {
-	const container = document.createElement('div');
+function createGameEntryDefaultTheme(myGame, gameColor) {
 	const gId = parseInt(myGame.gameId);
 	const userIsHost = usernameEquals(myGame.hostUsername);
 	const userIsGuest = usernameEquals(myGame.guestUsername);
 
-	// Create clickable game title
-	const gameDiv = document.createElement('div');
-	gameDiv.className = 'clickableText';
-	gameDiv.onclick = () => {
+	// Create card container
+	const entryDiv = document.createElement('div');
+	entryDiv.classList.add('myGameEntry');
+	if (myGame.isUserTurn) {
+		entryDiv.classList.add('yourTurn');
+	}
+	entryDiv.style.setProperty('--game-color', gameColor);
+	entryDiv.onclick = () => {
 		jumpToGame(gId);
 		closeModal();
 	};
 
-	// Build game display title
+	// Content container
+	const contentDiv = document.createElement('div');
+	contentDiv.classList.add('myGameEntryContent');
+
+	// Players line
+	const playersDiv = document.createElement('div');
+	playersDiv.classList.add('myGamePlayers');
+
 	if (!userIsHost) {
 		if (myGame.hostOnline) {
-			gameDiv.appendChild(createUserOnlineIconElement());
+			playersDiv.appendChild(createUserOnlineIconElement());
 		} else {
-			gameDiv.appendChild(createUserOfflineIconElement());
+			playersDiv.appendChild(createUserOfflineIconElement());
 		}
 	}
-	gameDiv.appendChild(document.createTextNode(myGame.hostUsername));
-	gameDiv.appendChild(document.createTextNode(' vs. '));
+	playersDiv.appendChild(document.createTextNode(myGame.hostUsername));
+	playersDiv.appendChild(document.createTextNode(' vs. '));
 
 	if (!userIsGuest) {
 		if (myGame.guestOnline) {
-			gameDiv.appendChild(createUserOnlineIconElement());
+			playersDiv.appendChild(createUserOnlineIconElement());
 		} else {
-			gameDiv.appendChild(createUserOfflineIconElement());
+			playersDiv.appendChild(createUserOfflineIconElement());
 		}
 	}
-	gameDiv.appendChild(document.createTextNode(myGame.guestUsername));
+	playersDiv.appendChild(document.createTextNode(myGame.guestUsername));
 
 	if (myGame.isUserTurn) {
-		gameDiv.appendChild(document.createTextNode(' (Your turn)'));
+		const turnSpan = document.createElement('span');
+		turnSpan.classList.add('myGameTurnIndicator');
+		turnSpan.textContent = '(Your turn)';
+		playersDiv.appendChild(turnSpan);
 	}
 
-	container.appendChild(gameDiv);
+	contentDiv.appendChild(playersDiv);
 
 	// Add game options
 	for (let i = 0; i < myGame.gameOptions.length; i++) {
 		const optionDiv = document.createElement('div');
-		optionDiv.innerHTML = '&nbsp;&bull;&nbsp;';
-		const em = document.createElement('em');
-		em.textContent = 'Game Option: ' + getGameOptionDescription(myGame.gameOptions[i]);
-		optionDiv.appendChild(em);
-		container.appendChild(optionDiv);
+		optionDiv.classList.add('myGameOption');
+		optionDiv.textContent = '• ' + getGameOptionDescription(myGame.gameOptions[i]);
+		contentDiv.appendChild(optionDiv);
 	}
 
-	return container;
+	entryDiv.appendChild(contentDiv);
+	return entryDiv;
 }
 
 function createClickableDiv(text, onclickFn) {
@@ -3758,23 +3770,51 @@ const showMyGamesCallback = (results) => {
 		} else {
 			// Build divs for default theme
 			let gameTypeHeading = "";
+			let currentSection = null;
+
 			for (const index in myGamesList) {
 				const myGame = myGamesList[index];
+				const gameTypeEntry = getGameTypeEntryFromId(myGame.gameTypeId);
 
-				// Add game type heading if it changed
-				if (myGame.gameTypeDesc !== gameTypeHeading) {
-					if (gameTypeHeading !== "") {
-						container.appendChild(document.createElement('br'));
+				// Resolve the game color
+				let gameColor = gameTypeEntry?.color || 'var(--othercolor)';
+				if (gameColor && gameColor.startsWith('var(')) {
+					const varName = gameColor.match(/var\((--[\w-]+)\)/)?.[1];
+					if (varName) {
+						gameColor = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
 					}
+				}
+
+				// Create new section when game type changes
+				if (myGame.gameTypeDesc !== gameTypeHeading) {
 					gameTypeHeading = myGame.gameTypeDesc;
+
+					currentSection = document.createElement('div');
+					currentSection.classList.add('myGamesSection');
+
+					// Create heading with icon and colored border
 					const headingDiv = document.createElement('div');
-					headingDiv.className = 'modalContentHeading';
-					headingDiv.textContent = gameTypeHeading;
-					container.appendChild(headingDiv);
+					headingDiv.classList.add('joinGameHeading');
+					headingDiv.style.setProperty('--game-color', gameColor);
+
+					if (gameTypeEntry?.coverImg) {
+						const headingIcon = document.createElement('img');
+						headingIcon.classList.add('joinGameHeadingIcon');
+						headingIcon.src = 'style/game-icons/' + gameTypeEntry.coverImg;
+						headingIcon.alt = gameTypeHeading;
+						headingDiv.appendChild(headingIcon);
+					}
+
+					const headingText = document.createElement('span');
+					headingText.textContent = gameTypeHeading;
+					headingDiv.appendChild(headingText);
+
+					currentSection.appendChild(headingDiv);
+					container.appendChild(currentSection);
 				}
 
 				// Add game entry
-				container.appendChild(createGameEntryDefaultTheme(myGame));
+				currentSection.appendChild(createGameEntryDefaultTheme(myGame, gameColor));
 			}
 		}
 	}

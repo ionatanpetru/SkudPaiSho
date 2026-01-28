@@ -392,3 +392,5 @@ assets/fontawesome
 js/PaiShoMain.js.bak
 
 *.js.*
+old_backup
+images_unused

@@ -923,6 +923,62 @@ figure > div {
   object-fit: cover;
 }
 
+/* My Games entries */
+.myGameEntry {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin: 6px 0;
+  padding: 8px 12px;
+  background: var(--new-game-card-bg);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, padding 0.15s ease, box-shadow 0.2s ease;
+}
+
+.myGameEntry:hover {
+  background: rgba(128, 128, 128, 0.15);
+  box-shadow: inset 4px 0 0 var(--game-color, #888);
+  padding-left: 16px;
+  padding-right: 8px;
+}
+
+.myGameEntry.yourTurn {
+  box-shadow: inset 4px 0 0 var(--game-color, #888);
+}
+
+.myGameEntry.yourTurn:hover {
+  box-shadow: inset 6px 0 0 var(--game-color, #888);
+}
+
+.myGameEntryContent {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.myGamePlayers {
+  font-weight: 600;
+}
+
+.myGameTurnIndicator {
+  font-size: 0.85em;
+  opacity: 0.8;
+  margin-left: 8px;
+}
+
+.myGameOption {
+  font-size: 0.85em;
+  opacity: 0.7;
+  margin-top: 2px;
+}
+
+.myGamesSection {
+  margin-bottom: 16px;
+}
+
 .hidden {
   visibility: hidden;
 }
