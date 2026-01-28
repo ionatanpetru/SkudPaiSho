@@ -1,5 +1,12 @@
 /* Pai Sho Playground Board */
 
+import { RowAndColumn } from '../CommonNotationObjects';
+import { debug } from '../GameData';
+import { FULL_GRID, gameOptionEnabled, PLAY_IN_SPACES } from '../GameOptions';
+import { NON_PLAYABLE, POSSIBLE_MOVE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import { PlaygroundBoardPoint } from './PlaygroundBoardPoint';
+import { PlaygroundHarmonyManager } from './PlaygroundHarmony';
+
 export function PlaygroundBoard() {
 	this.size = new RowAndColumn(17, 17);
 
