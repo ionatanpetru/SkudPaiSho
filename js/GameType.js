@@ -326,6 +326,19 @@ export const GameType = {
 		],
 		noRankedGames: true
 	},
+	Paiko: {
+		id: 25,
+		name: "Paiko",
+		desc: "Paiko",
+		color: "var(--paikocolor)",
+		description: "A tactical tile game where you deploy and shift tiles to reach 10 points by controlling territory.",
+		coverImg: "lotus.png",
+		rulesUrl: "https://skudpaisho.com/site/games/paiko/",
+		gameOptions: [],
+		usersWithAccess: [
+			'SkudPaiSho',
+		]
+	},
 	BeyondTheMaps: {
 		id: 20,
 		name: "Beyond The Edges of The Maps",
@@ -460,19 +473,6 @@ export const GameType = {
 		description: "A classic abstract strategy game. Connect your two opposite edges of the board to win!",
 		coverImg: "hexagon.png",
 		rulesUrl: "https://en.wikipedia.org/wiki/Hex_(board_game)",
-		gameOptions: [],
-		usersWithAccess: [
-			'SkudPaiSho',
-		]
-	},
-	Paiko: {
-		id: 25,
-		name: "Paiko",
-		desc: "Paiko",
-		color: "var(--paikocolor)",
-		description: "A tactical tile game where you deploy and shift tiles to reach 10 points by controlling territory.",
-		coverImg: "lotus.png",
-		rulesUrl: "https://skudpaisho.com/site/games/paiko/",
 		gameOptions: [],
 		usersWithAccess: [
 			'SkudPaiSho',
