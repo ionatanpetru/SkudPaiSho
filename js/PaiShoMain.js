@@ -52,6 +52,7 @@ import { UndergrowthController } from './undergrowth/UndergrowthController';
 import { YammaController } from './yamma/YammaController';
 import { TicTacToeController } from './tictactoe/TicTacToeController';
 import { HexController } from './hex/HexController';
+import { PaikoController } from './paiko/PaikoController';
 import { VagabondController } from "./vagabond/VagabondController";
 import * as WelcomeTutorial from './WelcomeTutorial';
 import * as TournamentManager from './TournamentManager';
@@ -3163,6 +3164,9 @@ export function getGameControllerForGameType(gameTypeId) {
 		case GameType.Hex.id:
 			controller = new HexController(gameContainerDiv, isMobile);
 			break;
+		case GameType.Paiko.id:
+			controller = new PaikoController(gameContainerDiv, isMobile);
+			break;
 		default:
 			debug("Game Controller unavailable.");
 	}
@@ -4607,7 +4611,7 @@ export function setSidenavNewGameSection() {
 
 export function closeGame() {
 	if (gameDevOn) {
-		setGameController(GameType.Trifle.id);
+		setGameController(GameType.Paiko.id);
 		// setGameController(GameType.BeyondTheMaps.id);
 		// // REMOVE THIS
 		// addGameOption(EDGES_MOVE_4_2);
