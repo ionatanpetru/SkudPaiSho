@@ -1,5 +1,9 @@
 /* Skud Pai Sho Tile Manager */
 
+import { GUEST, HOST } from '../CommonNotationObjects';
+import { debug } from '../GameData';
+import { StreetTile } from './StreetTile';
+
 export function StreetTileManager(forActuating) {
 	if (forActuating) {
 		this.hostTiles = this.loadOneOfEach('H');
@@ -41,7 +45,7 @@ StreetTileManager.prototype.grabTile = function(player) {
 
 	var tile;
 	for (var i = 0; i < tilePile.length; i++) {
-		newTileArr = tilePile.splice(i, 1);
+		var newTileArr = tilePile.splice(i, 1);
 		tile = newTileArr[0];
 		break;
 	}
