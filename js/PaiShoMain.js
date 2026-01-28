@@ -4116,50 +4116,98 @@ const getGameSeeksCallback = (results) => {
 
 			container.appendChild(table);
 		} else {
+			let currentSection = null;
+
 			for (const index in gameSeekList) {
 				const gameSeek = gameSeekList[index];
+				const gameTypeEntry = getGameTypeEntryFromId(gameSeek.gameTypeId);
+
 				if (
 					gameDevOn
-					|| !getGameTypeEntryFromId(gameSeek.gameTypeId).usersWithAccess
-					|| usernameIsOneOf(getGameTypeEntryFromId(gameSeek.gameTypeId).usersWithAccess)
+					|| !gameTypeEntry.usersWithAccess
+					|| usernameIsOneOf(gameTypeEntry.usersWithAccess)
 				) {
+					// Create new section when game type changes
 					if (gameSeek.gameTypeDesc !== gameTypeHeading) {
-						if (gameTypeHeading !== "") {
-							container.appendChild(document.createElement('br'));
-						}
 						gameTypeHeading = gameSeek.gameTypeDesc;
+
+						// Resolve the game color
+						let gameColor = gameTypeEntry.color || 'var(--othercolor)';
+						if (gameColor && gameColor.startsWith('var(')) {
+							const varName = gameColor.match(/var\((--[\w-]+)\)/)?.[1];
+							if (varName) {
+								gameColor = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+							}
+						}
+
+						currentSection = document.createElement('div');
+						currentSection.classList.add('joinGameSection');
+
+						// Create heading with icon and colored border
 						const headingDiv = document.createElement('div');
-						headingDiv.classList.add('modalContentHeading');
-						headingDiv.textContent = gameTypeHeading;
-						container.appendChild(headingDiv);
+						headingDiv.classList.add('joinGameHeading');
+						headingDiv.style.setProperty('--game-color', gameColor);
+
+						if (gameTypeEntry.coverImg) {
+							const headingIcon = document.createElement('img');
+							headingIcon.classList.add('joinGameHeadingIcon');
+							headingIcon.src = 'style/game-icons/' + gameTypeEntry.coverImg;
+							headingIcon.alt = gameTypeHeading;
+							headingDiv.appendChild(headingIcon);
+						}
+
+						const headingText = document.createElement('span');
+						headingText.textContent = gameTypeHeading;
+						headingDiv.appendChild(headingText);
+
+						currentSection.appendChild(headingDiv);
+						container.appendChild(currentSection);
 					}
 
-					const entryContainer = document.createElement('div');
+					// Resolve the game color for entry hover
+					let entryColor = gameTypeEntry.color || 'var(--othercolor)';
+					if (entryColor && entryColor.startsWith('var(')) {
+						const varName = entryColor.match(/var\((--[\w-]+)\)/)?.[1];
+						if (varName) {
+							entryColor = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+						}
+					}
+
 					const gId = parseInt(gameSeek.gameId);
 
-					const clickableDiv = document.createElement('div');
-					clickableDiv.classList.add('clickableText', 'gameSeekEntry');
-					clickableDiv.onclick = () => acceptGameSeekClicked(gId);
-					clickableDiv.appendChild(document.createTextNode('Host: '));
+					// Create card-style entry
+					const entryDiv = document.createElement('div');
+					entryDiv.classList.add('gameSeekEntry');
+					entryDiv.style.setProperty('--game-color', entryColor);
+					entryDiv.onclick = () => acceptGameSeekClicked(gId);
+
+					// Content container
+					const contentDiv = document.createElement('div');
+					contentDiv.classList.add('gameSeekEntryContent');
+
+					// Host line
+					const hostDiv = document.createElement('div');
+					hostDiv.classList.add('gameSeekHost');
 					const iconSpan = document.createElement('span');
 					iconSpan.innerHTML = gameSeek.hostOnline ? getUserOnlineIcon() : getUserOfflineIcon();
-					clickableDiv.appendChild(iconSpan);
-					let hostText = gameSeek.hostUsername;
+					hostDiv.appendChild(iconSpan);
+					let hostText = ' ' + gameSeek.hostUsername;
 					if (gameSeek.rankedGame) {
 						hostText += ' (' + gameSeek.hostRating + ')';
 					}
-					clickableDiv.appendChild(document.createTextNode(hostText));
-					entryContainer.appendChild(clickableDiv);
+					hostDiv.appendChild(document.createTextNode(hostText));
+					contentDiv.appendChild(hostDiv);
 
+					// Game options
 					for (let i = 0; i < gameSeek.gameOptions.length; i++) {
 						const optionDiv = document.createElement('div');
-						optionDiv.appendChild(document.createTextNode('\u00A0\u2022\u00A0'));
-						const emElem = document.createElement('em');
-						emElem.textContent = 'Game Option: ' + getGameOptionDescription(gameSeek.gameOptions[i]);
-						optionDiv.appendChild(emElem);
-						entryContainer.appendChild(optionDiv);
+						optionDiv.classList.add('gameSeekOption');
+						optionDiv.textContent = '• ' + getGameOptionDescription(gameSeek.gameOptions[i]);
+						contentDiv.appendChild(optionDiv);
 					}
-					container.appendChild(entryContainer);
+
+					entryDiv.appendChild(contentDiv);
+					currentSection.appendChild(entryDiv);
 					gameSeeksDisplayed = true;
 				}
 			}

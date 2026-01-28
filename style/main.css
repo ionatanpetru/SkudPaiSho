@@ -864,7 +864,63 @@ figure > div {
 }
 
 .gameSeekEntry {
-  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin: 6px 0;
+  padding: 8px 12px;
+  background: var(--new-game-card-bg);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, padding 0.15s ease, box-shadow 0.2s ease;
+}
+
+.gameSeekEntry:hover {
+  background: rgba(128, 128, 128, 0.15);
+  box-shadow: inset 4px 0 0 var(--game-color, #888);
+  padding-left: 16px;
+  padding-right: 8px;
+}
+
+.gameSeekEntryContent {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.gameSeekHost {
+  font-weight: 600;
+}
+
+.gameSeekOption {
+  font-size: 0.85em;
+  opacity: 0.7;
+  margin-top: 2px;
+}
+
+.joinGameSection {
+  margin-bottom: 16px;
+}
+
+.joinGameHeading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  font-weight: 600;
+  font-size: 1.1em;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid var(--game-color, #888);
+}
+
+.joinGameHeadingIcon {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  object-fit: cover;
 }
 
 .hidden {
