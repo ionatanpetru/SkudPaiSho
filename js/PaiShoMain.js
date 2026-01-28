@@ -203,7 +203,7 @@ export const tileDesignTypeValues = {
 	custom: "Use Custom Designs"
 };
 
-const paiShoBoardDesignTypeKey = "paiShoBoardDesignTypeKey";
+export const paiShoBoardDesignTypeKey = "paiShoBoardDesignTypeKey";
 export const customBoardUrlKey = "customBoardUrlKey";
 export const customBoardUrlArrayKey = "customBoardUrlArrayKey";
 const defaultBoardDesignKey = "tgg20211007";
@@ -256,7 +256,7 @@ const paiShoBoardDesignTypeValuesDefault = {
 	applycustomboard: "Add Custom Board from URL"
 };
 
-let paiShoBoardDesignTypeValues = {};
+export let paiShoBoardDesignTypeValues = {};
 
 export const svgBoardDesigns = [
 	"lightmode",

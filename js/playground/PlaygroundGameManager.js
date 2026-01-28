@@ -1,9 +1,9 @@
 // Skud Pai Sho Game Manager
 
+import { setBoardImage } from '../ActuatorHelp';
 import { DEPLOY, MOVE } from '../CommonNotationObjects';
 import { debug } from '../GameData';
 import { PaiShoMarkingManager } from '../pai-sho-common/PaiShoMarkingManager';
-import { setBoardImage } from '../PaiShoMain';
 import { lessBonus, limitedGatesRule, newGatesRule, newSpecialFlowerRules } from '../skud-pai-sho/SkudPaiShoRules';
 import { PlaygroundBoard } from './PlaygroundBoard';
 import { PlaygroundMoveType, PlaygroundNotationConstants } from './PlaygroundGameNotation';

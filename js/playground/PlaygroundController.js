@@ -29,7 +29,6 @@ import {
   isAnimationsOn,
   onlinePlayEnabled,
   paiShoBoardDesignTypeKey,
-  paiShoBoardDesignTypeValues,
   playingOnlineGame,
   READY_FOR_BONUS,
   refreshMessage,
@@ -44,6 +43,7 @@ import {
   usernameEquals,
   vagabondTileDesignTypeKey,
   WAITING_FOR_ENDPOINT,
+  paiShoBoardDesignTypeValues,
 } from '../PaiShoMain';
 import { GATE, NEUTRAL, POSSIBLE_MOVE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
 import { RED, WHITE } from '../skud-pai-sho/SkudPaiShoTile';
