@@ -1,4 +1,7 @@
 // Meadow Notation
+import { GUEST, HOST } from '../CommonNotationObjects';
+import { BRAND_NEW } from '../PaiShoMain';
+import { debug } from '../GameData';
 
 // --------------------------------------------- // 
 

@@ -14,6 +14,7 @@ import {
 	createGameIfThatIsOk,
 	currentMoveIndex,
 	finalizeMove,
+	gameController,
 	getCurrentPlayer,
 	getGameOptionsMessageElement,
 	getResetMoveElement,
@@ -80,12 +81,46 @@ BloomsController.prototype.getNewGameNotation = function() {
 
 /* Required by Main */
 BloomsController.prototype.getHostTilesContainerDivs = function() {
-	return "<div class='bloomsTileContainer'><div class='hexagon bloomsTilePileTile bloomsH1 " + this.additionalTilePileClass + "' name='H1' onclick='gameController.unplayedTileClicked(this)'><span></span></div><div class='hexagon bloomsTilePileTile bloomsH2 " + this.additionalTilePileClass + "' name='H2' onclick='gameController.unplayedTileClicked(this)'><span></span></div></div>";
+	const container = document.createElement('div');
+	container.className = 'bloomsTileContainer';
+
+	const tile1 = document.createElement('div');
+	tile1.className = 'hexagon bloomsTilePileTile bloomsH1 ' + this.additionalTilePileClass;
+	tile1.setAttribute('name', 'H1');
+	tile1.addEventListener('click', () => gameController.unplayedTileClicked(tile1));
+	tile1.appendChild(document.createElement('span'));
+	container.appendChild(tile1);
+
+	const tile2 = document.createElement('div');
+	tile2.className = 'hexagon bloomsTilePileTile bloomsH2 ' + this.additionalTilePileClass;
+	tile2.setAttribute('name', 'H2');
+	tile2.addEventListener('click', () => gameController.unplayedTileClicked(tile2));
+	tile2.appendChild(document.createElement('span'));
+	container.appendChild(tile2);
+
+	return container;
 };
 
 /* Required by Main */
 BloomsController.prototype.getGuestTilesContainerDivs = function() {
-	return "<div class='bloomsTileContainer'><div class='hexagon bloomsTilePileTile bloomsG1 " + this.additionalTilePileClass + "' name='G1' onclick='gameController.unplayedTileClicked(this)'><span></span></div><div class='hexagon bloomsTilePileTile bloomsG2 " + this.additionalTilePileClass + "' name='G2' onclick='gameController.unplayedTileClicked(this)'><span></span></div></div>";
+	const container = document.createElement('div');
+	container.className = 'bloomsTileContainer';
+
+	const tile1 = document.createElement('div');
+	tile1.className = 'hexagon bloomsTilePileTile bloomsG1 ' + this.additionalTilePileClass;
+	tile1.setAttribute('name', 'G1');
+	tile1.addEventListener('click', () => gameController.unplayedTileClicked(tile1));
+	tile1.appendChild(document.createElement('span'));
+	container.appendChild(tile1);
+
+	const tile2 = document.createElement('div');
+	tile2.className = 'hexagon bloomsTilePileTile bloomsG2 ' + this.additionalTilePileClass;
+	tile2.setAttribute('name', 'G2');
+	tile2.addEventListener('click', () => gameController.unplayedTileClicked(tile2));
+	tile2.appendChild(document.createElement('span'));
+	container.appendChild(tile2);
+
+	return container;
 };
 
 /* Required by Main */
@@ -126,7 +161,7 @@ BloomsController.prototype.getDefaultHelpMessageText = function() {
 
 /* Required by Main */
 BloomsController.prototype.getAdditionalMessage = function() {
-	var msgElement = document.createElement("div");
+	var msgElement = document.createElement("span");
 
 	if (this.gameNotation.moves.length === 0) {
 		var startText = document.createElement("span");

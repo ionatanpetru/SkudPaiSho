@@ -1,5 +1,10 @@
 /* Fire Pai Sho Notation */
 
+import { ARRANGING, GUEST, HOST, NotationPoint, PLANTING } from "../CommonNotationObjects";
+import { BRAND_NEW } from "../PaiShoMain";
+import { FirePaiShoTile } from "./FirePaiShoTile";
+import { debug } from "../GameData";
+
 export function FirePaiShoNotationMove(text) {
 	this.fullMoveText = text;
 	this.analyzeMove();
@@ -261,7 +266,7 @@ FirePaiShoGameNotation.prototype.getPlayerMoveNum = function() {
 		if (lastMove.player === HOST) {	// Usual
 			moveNum++;
 		} else {
-			player = HOST;
+			// player = HOST;	// Commenting out, not needed? `player` undefined.
 		}
 	}
 	return moveNum;

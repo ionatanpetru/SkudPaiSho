@@ -1,9 +1,63 @@
 /* Playground specific UI interaction logic */
 
+import { AdevarOptions } from '../adevar/AdevarOptions';
+import { CapturePreferences } from '../capture/CaptureController';
+import { DEPLOY, GUEST, HOST, MOVE, NotationPoint } from '../CommonNotationObjects';
+import { debug } from '../GameData';
+import { gameOptionEnabled, SPECTATORS_CAN_PLAY } from '../GameOptions';
 import {
+  BRAND_NEW,
+  buildPreferenceDropdownDiv,
+  callSubmitMove,
   closeModal,
+  createGameIfThatIsOk,
+  currentGameData,
+  currentMoveIndex,
+  finalizeMove,
+  gameController,
+  gameId,
+  GameType,
+  getGatePointMessage,
+  getGameOptionsMessageElement,
+  getNeutralPointMessage,
+  getRedPointMessage,
+  getRedWhitePointMessage,
+  getUsername,
+  getUserGamePreference,
+  getWhitePointMessage,
+  iAmPlayerInCurrentOnlineGame,
+  isAnimationsOn,
+  onlinePlayEnabled,
+  paiShoBoardDesignTypeKey,
+  playingOnlineGame,
+  READY_FOR_BONUS,
+  refreshMessage,
+  rerunAll,
+  setPaiShoBoardOption,
+  setUserGamePreference,
   showModalElem,
+  showReplayControls,
+  tileDesignTypeKey,
+  tileDesignTypeValues,
+  userIsLoggedIn,
+  usernameEquals,
+  vagabondTileDesignTypeKey,
+  WAITING_FOR_ENDPOINT,
+  paiShoBoardDesignTypeValues,
 } from '../PaiShoMain';
+import { GATE, NEUTRAL, POSSIBLE_MOVE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import { RED, WHITE } from '../skud-pai-sho/SkudPaiShoTile';
+import { VagabondController } from '../vagabond/VagabondController';
+import { PlaygroundActuator } from './PlaygroundActuator';
+import { PlaygroundGameManager } from './PlaygroundGameManager';
+import {
+  PlaygroundGameNotation,
+  PlaygroundMoveType,
+  PlaygroundNotationBuilder,
+  PlaygroundNotationConstants,
+  PlaygroundTileFacingDirection,
+} from './PlaygroundGameNotation';
+import { PlaygroundTile } from './PlaygroundTile';
 
 export function PlaygroundController(gameContainer, isMobile) {
 	this.actuator = new PlaygroundActuator(gameContainer, isMobile, isAnimationsOn());

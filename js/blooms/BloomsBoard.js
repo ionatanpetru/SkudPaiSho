@@ -1,4 +1,9 @@
 
+import { EIGHT_SIDED_BOARD, FOUR_SIDED_BOARD, gameOptionEnabled, HEXHEX_10, SHORTER_GAME, SIX_SIDED_BOARD } from '../GameOptions';
+import { BloomsBoardPoint } from './BloomsBoardPoint';
+import { debug } from '../GameData';
+import { getPlayerCodeFromName } from '../pai-sho-common/PaiShoPlayerHelp';
+
 export function BloomsBoard() {
 	this.edgeLength = 5;
 	if (gameOptionEnabled(FOUR_SIDED_BOARD)) {
@@ -179,7 +184,7 @@ BloomsBoard.prototype.placeTile = function(tile, notationPointString) {
 BloomsBoard.prototype.putTileOnPoint = function(tile, notationPointString) {
 	var rowAndCol = BloomsBoardPoint.notationPointStringMap[notationPointString];
 
-	point = this.cells[rowAndCol.row][rowAndCol.col];
+	let point = this.cells[rowAndCol.row][rowAndCol.col];
 	
 	point.putTile(tile);
 

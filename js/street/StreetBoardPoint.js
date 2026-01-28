@@ -1,5 +1,8 @@
 // Board Point
 
+import { GUEST, HOST } from '../CommonNotationObjects';
+import { RED, WHITE } from '../skud-pai-sho/SkudPaiShoTile';
+
 var NON_PLAYABLE = "Non-Playable";
 var NEUTRAL = "Neutral";
 

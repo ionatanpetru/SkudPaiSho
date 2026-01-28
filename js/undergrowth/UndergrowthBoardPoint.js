@@ -13,7 +13,6 @@ import {
 import { GUEST, HOST } from '../CommonNotationObjects';
 import { RED, WHITE } from '../skud-pai-sho/SkudPaiShoTile';
 import { UNDERGROWTH_SIMPLE, gameOptionEnabled } from '../GameOptions';
-import { Undergrowth } from './UndergrowthController';
 
 export function UndergrowthBoardPoint() {
 	this.types = [];

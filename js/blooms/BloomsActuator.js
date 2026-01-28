@@ -54,10 +54,8 @@ export function BloomsActuator(gameContainer, isMobile, hostTilesContainerDivs, 
 	var tilePileContainer = createDivWithClass("tilePileContainer");
 	var gameMessage2 = createDivWithClass("gameMessage2");
 
-	var hostTilesContainerDivs = hostTilesContainerDivs;
-	var guestTilesContainerDivs = guestTilesContainerDivs;
-	hostTilesContainer.innerHTML = hostTilesContainerDivs;
-	guestTilesContainer.innerHTML = guestTilesContainerDivs;
+	hostTilesContainer.appendChild(hostTilesContainerDivs);
+	guestTilesContainer.appendChild(guestTilesContainerDivs);
 
 	tilePileContainer.appendChild(response);
 	tilePileContainer.appendChild(gameMessage);

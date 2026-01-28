@@ -1,0 +1,738 @@
+// Paiko Controller
+// Handles UI interaction for Paiko game
+
+import {
+	GameType,
+	callSubmitMove,
+	createGameIfThatIsOk,
+	currentMoveIndex,
+	finalizeMove,
+	myTurn,
+	onlinePlayEnabled,
+	playingOnlineGame,
+	refreshMessage,
+	rerunAll,
+} from '../PaiShoMain';
+import { DEPLOY, MOVE, GUEST, HOST, NotationPoint } from '../CommonNotationObjects';
+import { PaikoActuator } from './PaikoActuator';
+import { PaikoGameManager } from './PaikoGameManager';
+import { PaikoMoveType, PaikoGamePhase } from './PaikoGameNotation';
+import { PaikoMoveBuilder, PaikoBuilderStatus } from './PaikoMoveBuilder';
+import { TrifleGameNotation } from '../trifle/TrifleGameNotation';
+import { PaikoPointState } from './PaikoBoardPoint';
+import { PaikoTile, PaikoTileFacing, PaikoTileDefinitions, getAllTileCodes } from './PaikoTile';
+import { debug } from '../GameData';
+
+export class PaikoController {
+	constructor(gameContainer, isMobile) {
+		this.actuator = new PaikoActuator(gameContainer, isMobile, true);
+
+		this.resetGameManager();
+		this.resetNotationBuilder();
+		this.resetGameNotation();
+
+		this.isPaiShoGame = false;
+	}
+
+	getGameTypeId() {
+		return GameType.Paiko.id;
+	}
+
+	completeSetup() {
+		rerunAll();
+		this.callActuate();
+	}
+
+	resetGameManager() {
+		this.theGame = new PaikoGameManager(this.actuator);
+	}
+
+	resetNotationBuilder() {
+		this.moveBuilder = new PaikoMoveBuilder();
+	}
+
+	resetMoveBuilder() {
+		this.resetNotationBuilder();
+	}
+
+	resetGameNotation() {
+		this.gameNotation = this.getNewGameNotation();
+	}
+
+	getNewGameNotation() {
+		/* Using TrifleGameNotation as it is generic and JSON-based */
+		return new TrifleGameNotation();
+	}
+
+	static getHostTilesContainerDivs() {
+		const container = document.createElement('div');
+
+		// Host Hand Section
+		const handLabel = document.createElement('span');
+		handLabel.className = 'tileLibraryLabel';
+		handLabel.innerHTML = '<strong>Host Hand</strong>';
+		container.appendChild(handLabel);
+		container.appendChild(document.createElement('br'));
+
+		// Hand tile containers
+		['HSword', 'HBow', 'HEarth', 'HFire'].forEach(className => {
+			const div = document.createElement('div');
+			div.className = className + '-hand';
+			container.appendChild(div);
+			container.appendChild(document.createTextNode(' '));
+		});
+
+		const clearBr1 = document.createElement('br');
+		clearBr1.className = 'clear';
+		container.appendChild(clearBr1);
+
+		['HWater', 'HSai', 'HLotus', 'HAir'].forEach(className => {
+			const div = document.createElement('div');
+			div.className = className + '-hand';
+			container.appendChild(div);
+			container.appendChild(document.createTextNode(' '));
+		});
+
+		const clearBr2 = document.createElement('br');
+		clearBr2.className = 'clear';
+		container.appendChild(clearBr2);
+		container.appendChild(document.createElement('br'));
+
+		// Host Reserve Section
+		const reserveLabel = document.createElement('span');
+		reserveLabel.className = 'tileLibraryLabel';
+		reserveLabel.innerHTML = '<strong>Host Reserve</strong>';
+		container.appendChild(reserveLabel);
+		container.appendChild(document.createElement('br'));
+
+		// Reserve tile containers
+		['HSword', 'HBow', 'HEarth', 'HFire'].forEach(className => {
+			const div = document.createElement('div');
+			div.className = className + '-reserve';
+			container.appendChild(div);
+			container.appendChild(document.createTextNode(' '));
+		});
+
+		const clearBr3 = document.createElement('br');
+		clearBr3.className = 'clear';
+		container.appendChild(clearBr3);
+
+		['HWater', 'HSai', 'HLotus', 'HAir'].forEach(className => {
+			const div = document.createElement('div');
+			div.className = className + '-reserve';
+			container.appendChild(div);
+			container.appendChild(document.createTextNode(' '));
+		});
+
+		const clearBr4 = document.createElement('br');
+		clearBr4.className = 'clear';
+		container.appendChild(clearBr4);
+		container.appendChild(document.createElement('br'));
+
+		// Host Captured Section
+		const capturedLabel = document.createElement('span');
+		capturedLabel.className = 'tileLibraryLabel';
+		capturedLabel.innerHTML = '<strong>Host Captured</strong>';
+		container.appendChild(capturedLabel);
+		container.appendChild(document.createElement('br'));
+
+		const capturedDiv = document.createElement('div');
+		capturedDiv.className = 'H-captured';
+		container.appendChild(capturedDiv);
+
+		return container.innerHTML;
+	}
+
+	static getGuestTilesContainerDivs() {
+		const container = document.createElement('div');
+
+		// Guest Hand Section
+		const handLabel = document.createElement('span');
+		handLabel.className = 'tileLibraryLabel';
+		handLabel.innerHTML = '<strong>Guest Hand</strong>';
+		container.appendChild(handLabel);
+		container.appendChild(document.createElement('br'));
+
+		// Hand tile containers
+		['GSword', 'GBow', 'GEarth', 'GFire'].forEach(className => {
+			const div = document.createElement('div');
+			div.className = className + '-hand';
+			container.appendChild(div);
+			container.appendChild(document.createTextNode(' '));
+		});
+
+		const clearBr1 = document.createElement('br');
+		clearBr1.className = 'clear';
+		container.appendChild(clearBr1);
+
+		['GWater', 'GSai', 'GLotus', 'GAir'].forEach(className => {
+			const div = document.createElement('div');
+			div.className = className + '-hand';
+			container.appendChild(div);
+			container.appendChild(document.createTextNode(' '));
+		});
+
+		const clearBr2 = document.createElement('br');
+		clearBr2.className = 'clear';
+		container.appendChild(clearBr2);
+		container.appendChild(document.createElement('br'));
+
+		// Guest Reserve Section
+		const reserveLabel = document.createElement('span');
+		reserveLabel.className = 'tileLibraryLabel';
+		reserveLabel.innerHTML = '<strong>Guest Reserve</strong>';
+		container.appendChild(reserveLabel);
+		container.appendChild(document.createElement('br'));
+
+		// Reserve tile containers
+		['GSword', 'GBow', 'GEarth', 'GFire'].forEach(className => {
+			const div = document.createElement('div');
+			div.className = className + '-reserve';
+			container.appendChild(div);
+			container.appendChild(document.createTextNode(' '));
+		});
+
+		const clearBr3 = document.createElement('br');
+		clearBr3.className = 'clear';
+		container.appendChild(clearBr3);
+
+		['GWater', 'GSai', 'GLotus', 'GAir'].forEach(className => {
+			const div = document.createElement('div');
+			div.className = className + '-reserve';
+			container.appendChild(div);
+			container.appendChild(document.createTextNode(' '));
+		});
+
+		const clearBr4 = document.createElement('br');
+		clearBr4.className = 'clear';
+		container.appendChild(clearBr4);
+		container.appendChild(document.createElement('br'));
+
+		// Guest Captured Section
+		const capturedLabel = document.createElement('span');
+		capturedLabel.className = 'tileLibraryLabel';
+		capturedLabel.innerHTML = '<strong>Guest Captured</strong>';
+		container.appendChild(capturedLabel);
+		container.appendChild(document.createElement('br'));
+
+		const capturedDiv = document.createElement('div');
+		capturedDiv.className = 'G-captured';
+		container.appendChild(capturedDiv);
+
+		return container.innerHTML;
+	}
+
+	callActuate() {
+		this.theGame.actuate();
+	}
+
+	resetMove() {
+		if (this.moveBuilder.getStatus() === PaikoBuilderStatus.BRAND_NEW) {
+			this.gameNotation.removeLastMove();
+		}
+		rerunAll();
+	}
+
+	getDefaultHelpMessageText() {
+		return `<h4>Paiko</h4>
+			<p>Paiko is a tactical tile game. Win by reaching 10 points!</p>
+			<p><strong>Scoring:</strong></p>
+			<ul>
+				<li>2 points for each tile on opponent's homeground (Red Garden)</li>
+				<li>1 point for each tile on middleground (White Garden)</li>
+			</ul>
+			<p><strong>On your turn:</strong></p>
+			<ul>
+				<li><strong>Deploy</strong> - Place a tile from your hand</li>
+				<li><strong>Shift</strong> - Move a tile up to 2 spaces (non-diagonal)</li>
+				<li><strong>Draw</strong> - Take 3 tiles from your reserve</li>
+			</ul>
+			<p>After your action, capture opponent tiles that are threatened by 2 of your tiles (3 if covered).</p>`;
+	}
+
+	getAdditionalMessage() {
+		const container = document.createElement('span');
+		const gameInfo = this.theGame.getGameInfo();
+
+		// Show rotation options at the very top when selecting facing direction
+		if (this.moveBuilder.getStatus() === PaikoBuilderStatus.SELECTING_ROTATION) {
+			const rotateContainer = document.createElement('p');
+			rotateContainer.innerHTML = '<strong>Select facing direction:</strong> ';
+
+			const directions = [
+				{ name: 'Up', facing: PaikoTileFacing.UP },
+				{ name: 'Right', facing: PaikoTileFacing.RIGHT },
+				{ name: 'Down', facing: PaikoTileFacing.DOWN },
+				{ name: 'Left', facing: PaikoTileFacing.LEFT }
+			];
+
+			const self = this;
+			directions.forEach((d, i) => {
+				if (i > 0) rotateContainer.appendChild(document.createTextNode(' | '));
+				const dirSpan = document.createElement('span');
+				dirSpan.className = 'skipBonus';
+				dirSpan.textContent = d.name;
+				dirSpan.onclick = () => self.selectFacing(d.facing);
+				rotateContainer.appendChild(dirSpan);
+			});
+
+			container.appendChild(rotateContainer);
+		}
+
+		// Setup phase messages
+		if (gameInfo.phase === PaikoGamePhase.HOST_SELECT_7) {
+			const msg = document.createElement('p');
+			msg.innerHTML = `<strong>Setup Phase:</strong> Host, select ${gameInfo.remainingSelection} more tiles from your reserve.`;
+			container.appendChild(msg);
+		} else if (gameInfo.phase === PaikoGamePhase.GUEST_SELECT_9) {
+			const msg = document.createElement('p');
+			msg.innerHTML = `<strong>Setup Phase:</strong> Guest, select ${gameInfo.remainingSelection} more tiles from your reserve.`;
+			container.appendChild(msg);
+		} else if (gameInfo.phase === PaikoGamePhase.HOST_SELECT_1) {
+			const msg = document.createElement('p');
+			msg.innerHTML = `<strong>Setup Phase:</strong> Host, select ${gameInfo.remainingSelection} more tile from your reserve.`;
+			container.appendChild(msg);
+		} else {
+			// Main game - show scores
+			const scores = document.createElement('p');
+			scores.innerHTML = `<strong>Scores:</strong> Host: ${gameInfo.scores.host} | Guest: ${gameInfo.scores.guest}`;
+			container.appendChild(scores);
+
+			// Show action options if not selecting rotation
+			if (this.moveBuilder.getStatus() !== PaikoBuilderStatus.SELECTING_ROTATION && myTurn() && !gameInfo.winner) {
+				const actions = document.createElement('span');
+				actions.innerHTML = '<p><strong>Your turn:</strong> Click a tile in your hand to deploy, click a tile on the board to shift, or click here to <span id="drawAction" class="skipBonus">Draw 3 tiles</span></p>';
+				container.appendChild(actions);
+			}
+		}
+
+		// Winner message
+		if (gameInfo.winner) {
+			const winMsg = document.createElement('p');
+			winMsg.innerHTML = `<strong>${this.theGame.getWinReason()}</strong>`;
+			container.appendChild(winMsg);
+		}
+
+		return container;
+	}
+
+	// Handle clicking on an unplayed tile (from hand or reserve)
+	unplayedTileClicked(tileDiv) {
+		if (!myTurn()) {
+			debug("Not your turn!");
+			return;
+		}
+
+		if (currentMoveIndex !== this.gameNotation.moves.length) {
+			debug("Can only interact if all moves are played.");
+			return;
+		}
+
+		const pileName = tileDiv.getAttribute('data-pileName');
+		const tileCode = tileDiv.getAttribute('data-tileCode');
+		const currentPlayer = this.getCurrentPlayer();
+
+		// Setup phase - selecting tiles for hand
+		if (this.theGame.isSetupPhase()) {
+			const isHostReserve = pileName === 'hostReserve';
+			const isGuestReserve = pileName === 'guestReserve';
+
+			// Validate correct player is selecting
+			if (this.theGame.gamePhase === PaikoGamePhase.HOST_SELECT_7 ||
+				this.theGame.gamePhase === PaikoGamePhase.HOST_SELECT_1) {
+				if (!isHostReserve) {
+					debug("Host must select from Host reserve");
+					return;
+				}
+			} else if (this.theGame.gamePhase === PaikoGamePhase.GUEST_SELECT_9) {
+				if (!isGuestReserve) {
+					debug("Guest must select from Guest reserve");
+					return;
+				}
+			}
+
+			// Build selection move
+			this.moveBuilder.buildSelectMove(currentPlayer, [tileCode]);
+
+			const move = this.moveBuilder.getNotationMove(this.gameNotation);
+			this.theGame.runNotationMove(move);
+			this.gameNotation.addMove(move);
+
+			this.resetNotationBuilder();
+
+			if (playingOnlineGame()) {
+				callSubmitMove();
+			} else {
+				finalizeMove();
+			}
+			return;
+		}
+
+		// Main game - deploying from hand
+		const isHostHand = pileName === 'hostHand';
+		const isGuestHand = pileName === 'guestHand';
+
+		if ((currentPlayer === HOST && !isHostHand) || (currentPlayer === GUEST && !isGuestHand)) {
+			debug("Must deploy from your own hand");
+			return;
+		}
+
+		// Start deploy action
+		this.moveBuilder.setStatus(PaikoBuilderStatus.SELECTING_DEPLOY_LOCATION);
+		this.moveBuilder.setMoveType(DEPLOY);
+		this.moveBuilder.setTileCode(tileCode);
+		this.moveBuilder.setPlayer(currentPlayer);
+
+		// Show possible deployment points
+		const tempTile = new PaikoTile(tileCode, currentPlayer === HOST ? 'H' : 'G');
+		const deployPoints = this.theGame.board.getPossibleDeploymentPoints(currentPlayer, tempTile);
+		this.theGame.board.markPossibleDeploys(deployPoints);
+
+		this.callActuate();
+	}
+
+	// Handle clicking on a board point
+	pointClicked(htmlPoint) {
+		if (this.theGame.getWinner()) {
+			return;
+		}
+
+		if (currentMoveIndex !== this.gameNotation.moves.length) {
+			debug("Can only interact if all moves are played.");
+			return;
+		}
+
+		const npText = htmlPoint.getAttribute('name');
+		const notationPoint = new NotationPoint(npText);
+		const rowCol = notationPoint.rowAndColumn;
+		const boardPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
+		const currentPlayer = this.getCurrentPlayer();
+
+		// Handle based on current builder status
+		if (this.moveBuilder.getStatus() === PaikoBuilderStatus.BRAND_NEW) {
+			if (!myTurn()) {
+				return;
+			}
+
+			// Clicking on own tile starts shift
+			if (boardPoint.hasTile() && boardPoint.tile.ownerName === currentPlayer) {
+				const tile = boardPoint.tile;
+
+				if (!tile.canShift()) {
+					debug("This tile cannot shift");
+					return;
+				}
+
+				this.moveBuilder.setStatus(PaikoBuilderStatus.SELECTING_SHIFT_DESTINATION);
+				this.moveBuilder.setMoveType(MOVE);
+				this.moveBuilder.setStartPoint(notationPoint);
+				this.moveBuilder.setPlayer(currentPlayer);
+
+				// Show possible shift destinations
+				const shiftDestinations = this.theGame.board.getPossibleShiftDestinations(boardPoint, currentPlayer);
+				this.theGame.board.markPossibleMoves(shiftDestinations);
+
+				// Mark selected point
+				boardPoint.addState(PaikoPointState.SELECTED);
+
+				this.callActuate();
+			}
+		} else if (this.moveBuilder.getStatus() === PaikoBuilderStatus.SELECTING_DEPLOY_LOCATION) {
+			// Trying to deploy
+			if (boardPoint.hasState(PaikoPointState.POSSIBLE_DEPLOY)) {
+				this.theGame.board.clearAllPointStates();
+
+				this.moveBuilder.setEndPoint(notationPoint);
+
+				// Check if tile has facing - if so, need to select facing
+				const tempTile = new PaikoTile(this.moveBuilder.getMoveData('tileCode'), currentPlayer === HOST ? 'H' : 'G');
+				if (tempTile.hasFacing()) {
+					this.moveBuilder.setStatus(PaikoBuilderStatus.SELECTING_ROTATION);
+					this.showRotationSelector();
+				} else {
+					this.moveBuilder.setFacing(PaikoTileFacing.UP);
+					this.finalizeDeploy();
+				}
+			} else {
+				// Cancel deploy
+				this.theGame.board.clearAllPointStates();
+				this.resetNotationBuilder();
+				this.callActuate();
+			}
+		} else if (this.moveBuilder.getStatus() === PaikoBuilderStatus.SELECTING_SHIFT_DESTINATION) {
+			if (boardPoint.hasState(PaikoPointState.POSSIBLE_MOVE)) {
+				this.theGame.board.clearAllPointStates();
+
+				this.moveBuilder.setEndPoint(notationPoint);
+
+				// Get the tile being moved
+				const startPoint = this.moveBuilder.getMoveData('startPoint');
+				const startNotationPoint = new NotationPoint(startPoint);
+				const startRowCol = startNotationPoint.rowAndColumn;
+				const startBoardPoint = this.theGame.board.cells[startRowCol.row][startRowCol.col];
+				const tile = startBoardPoint.tile;
+
+				// Check if rotating in place or actually moving
+				const samePoint = startRowCol.row === rowCol.row && startRowCol.col === rowCol.col;
+
+				if (tile.hasFacing()) {
+					this.moveBuilder.setStatus(PaikoBuilderStatus.SELECTING_ROTATION);
+					this.showRotationSelector();
+				} else {
+					if (samePoint) {
+						// Can't rotate non-facing tile in place
+						this.resetNotationBuilder();
+						this.callActuate();
+					} else {
+						this.moveBuilder.setFacing(PaikoTileFacing.UP);
+						this.finalizeShift();
+					}
+				}
+			} else {
+				// Cancel shift
+				this.theGame.board.clearAllPointStates();
+				this.resetNotationBuilder();
+				this.callActuate();
+			}
+		}
+	}
+
+	showRotationSelector() {
+		// Show rotation options in UI by refreshing the message area
+		// The getAdditionalMessage will show the facing direction options
+		refreshMessage();
+	}
+
+	selectFacing(facing) {
+		this.moveBuilder.setFacing(facing);
+
+		if (this.moveBuilder.getMoveType() === DEPLOY) {
+			this.finalizeDeploy();
+		} else if (this.moveBuilder.getMoveType() === MOVE) {
+			// If rotating in place, change move type to ROTATE
+			const startPoint = this.moveBuilder.getMoveData('startPoint');
+			const endPoint = this.moveBuilder.getMoveData('endPoint');
+			if (startPoint === endPoint) {
+				this.moveBuilder.setMoveType(PaikoMoveType.ROTATE);
+			}
+			this.finalizeShift();
+		}
+	}
+
+	finalizeDeploy() {
+		const move = this.moveBuilder.getNotationMove(this.gameNotation);
+
+		// Validate move doesn't capture own tile
+		const gameCopy = this.theGame.getCopy();
+		gameCopy.runNotationMove(move, false);
+		if (!gameCopy.validateMoveDoesntCaptureOwn(this.moveBuilder.getPlayer())) {
+			debug("Move would result in your own tile being captured!");
+			this.resetNotationBuilder();
+			this.callActuate();
+			return;
+		}
+
+		this.theGame.runNotationMove(move);
+		this.gameNotation.addMove(move);
+
+		this.resetNotationBuilder();
+
+		if (onlinePlayEnabled && this.gameNotation.moves.length === 4) {
+			createGameIfThatIsOk(GameType.Paiko.id);
+		} else if (playingOnlineGame()) {
+			callSubmitMove();
+		} else {
+			finalizeMove();
+		}
+	}
+
+	finalizeShift() {
+		const move = this.moveBuilder.getNotationMove(this.gameNotation);
+
+		// Validate move doesn't capture own tile
+		const gameCopy = this.theGame.getCopy();
+		gameCopy.runNotationMove(move, false);
+		if (!gameCopy.validateMoveDoesntCaptureOwn(this.moveBuilder.getPlayer())) {
+			debug("Move would result in your own tile being captured!");
+			this.resetNotationBuilder();
+			this.callActuate();
+			return;
+		}
+
+		this.theGame.runNotationMove(move);
+		this.gameNotation.addMove(move);
+
+		this.resetNotationBuilder();
+
+		if (playingOnlineGame()) {
+			callSubmitMove();
+		} else {
+			finalizeMove();
+		}
+	}
+
+	// Draw action (draw 3 tiles from reserve)
+	drawTiles() {
+		if (!myTurn()) {
+			return;
+		}
+
+		const currentPlayer = this.getCurrentPlayer();
+		const availableTiles = this.theGame.tileManager.getAvailableTileTypes(currentPlayer);
+
+		if (availableTiles.length === 0) {
+			debug("Reserve is empty!");
+			return;
+		}
+
+		// For simplicity, auto-select first 3 available types
+		// In a full implementation, this would open a selector UI
+		const tilesToDraw = availableTiles.slice(0, Math.min(3, availableTiles.length));
+
+		this.moveBuilder.buildDrawMove(currentPlayer, tilesToDraw);
+
+		const move = this.moveBuilder.getNotationMove(this.gameNotation);
+		this.theGame.runNotationMove(move);
+		this.gameNotation.addMove(move);
+
+		this.resetNotationBuilder();
+
+		if (playingOnlineGame()) {
+			callSubmitMove();
+		} else {
+			finalizeMove();
+		}
+	}
+
+	getCurrentPlayer() {
+		// Use the game manager's tracked current player
+		return this.theGame.currentPlayer;
+	}
+
+	getTheMessage(tile, ownerName) {
+		const def = tile.getDefinition();
+		const message = [];
+
+		message.push(`<p><strong>Move Distance:</strong> ${def.moveDistance}</p>`);
+
+		if (def.threatPattern.length > 0) {
+			message.push(`<p><strong>Threatens:</strong> ${def.threatPattern.length} spaces</p>`);
+		}
+
+		if (def.coverPattern.length > 0) {
+			message.push(`<p><strong>Provides cover:</strong> ${def.coverPattern.length} spaces</p>`);
+		}
+
+		if (Object.keys(def.specialRules).length > 0) {
+			const rules = [];
+			if (def.specialRules.reducedMovement) rules.push('Only shifts 1 space');
+			if (def.specialRules.cannotShift) rules.push('Cannot shift');
+			if (def.specialRules.threatensAll) rules.push('Threatens all tiles including own');
+			if (def.specialRules.selfThreatened) rules.push('Captured by 1 threat (2 if covered)');
+			if (def.specialRules.canRedeploy) rules.push('Can redeploy instead of shift');
+			if (def.specialRules.shiftAfterDeploy) rules.push('Can shift after deploy');
+			if (def.specialRules.deployAnywhere) rules.push('Can deploy anywhere');
+			if (def.specialRules.noPoints) rules.push('Gives no victory points');
+			if (def.specialRules.coversSelf) rules.push('Covers itself');
+
+			if (rules.length > 0) {
+				message.push(`<p><strong>Special:</strong> ${rules.join(', ')}</p>`);
+			}
+		}
+
+		return {
+			heading: `${ownerName}'s ${def.name}`,
+			message: message
+		};
+	}
+
+	getTileMessage(tileDiv) {
+		const tileCode = tileDiv.getAttribute('data-tileCode') || tileDiv.getAttribute('name').substring(1);
+		const ownerCode = tileDiv.getAttribute('name').charAt(0);
+
+		const tile = new PaikoTile(tileCode, ownerCode);
+		const ownerName = ownerCode === 'H' ? HOST : GUEST;
+
+		return this.getTheMessage(tile, ownerName);
+	}
+
+	getPointMessage(htmlPoint) {
+		const npText = htmlPoint.getAttribute('name');
+		const notationPoint = new NotationPoint(npText);
+		const rowCol = notationPoint.rowAndColumn;
+		const boardPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
+
+		if (boardPoint.hasTile()) {
+			return this.getTheMessage(boardPoint.tile, boardPoint.tile.ownerName);
+		}
+
+		// Show zone info
+		const zone = boardPoint.zone;
+		let zoneInfo = '';
+		switch (zone) {
+			case 'host_homeground':
+				zoneInfo = 'Host Homeground (Red Garden) - Host tiles here are covered';
+				break;
+			case 'guest_homeground':
+				zoneInfo = 'Guest Homeground (Red Garden) - Guest tiles here are covered';
+				break;
+			case 'middleground':
+				zoneInfo = 'Middleground (White Garden) - 1 point';
+				break;
+			default:
+				zoneInfo = 'Neutral - 0 points';
+		}
+
+		return {
+			heading: 'Board Space',
+			message: [`<p>${zoneInfo}</p>`]
+		};
+	}
+
+	playAiTurn(finalizeMoveCallback) {
+		// AI not implemented yet
+	}
+
+	startAiGame(finalizeMoveCallback) {
+		// AI not implemented yet
+	}
+
+	getAiList() {
+		return [];
+	}
+
+	cleanup() {
+		// Cleanup if needed
+	}
+
+	isSolitaire() {
+		return false;
+	}
+
+	setGameNotation(newGameNotation) {
+		this.gameNotation.setNotationText(newGameNotation);
+	}
+
+	getAdditionalHelpTabDiv() {
+		const settingsDiv = document.createElement('div');
+
+		const heading = document.createElement('h4');
+		heading.innerText = 'Paiko Tiles:';
+		settingsDiv.appendChild(heading);
+
+		// Add tile info
+		const tileInfo = document.createElement('div');
+		getAllTileCodes().forEach(code => {
+			const def = PaikoTileDefinitions[code];
+			const tileDiv = document.createElement('p');
+			tileDiv.innerHTML = `<strong>${def.name}:</strong> Move ${def.moveDistance}, Threatens ${def.threatPattern.length} spaces`;
+			if (def.coverPattern.length > 0) {
+				tileDiv.innerHTML += `, Covers ${def.coverPattern.length} spaces`;
+			}
+			tileInfo.appendChild(tileDiv);
+		});
+		settingsDiv.appendChild(tileInfo);
+
+		return settingsDiv;
+	}
+}

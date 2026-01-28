@@ -1,4 +1,10 @@
 
+import { BloomsBoard } from './BloomsBoard';
+import { debug } from '../GameData';
+import { GUEST, HOST } from '../CommonNotationObjects';
+import { BloomsBoardPoint } from './BloomsBoardPoint';
+import { getOpponentName } from '../pai-sho-common/PaiShoPlayerHelp';
+
 export function BloomsGameManager(actuator, ignoreActuate, isCopy) {
 	this.isCopy = isCopy;
 	this.actuator = actuator;

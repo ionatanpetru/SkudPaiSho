@@ -131,17 +131,49 @@ AdevarController.prototype.getDefaultHelpMessageText = function() {
 		this.hideOrientalLilyHelp();
 	}
 
-	var message = "<h4>Adevăr Pai Sho</h4> <p>Adevăr Pai Sho is a game of strategy, deception, and wit as players sneakily accomplish their hidden objective and take down their opponent's Hidden Tile. Be careful when achieving your objective, because trying to win could be the very thing that makes you lose! ";
-	message += "See the <a href='https://tinyurl.com/AdevarPaiSho4-0-1' target='_blank'>Adevăr rules</a> and <a href='https://tinyurl.com/AdevarQuickGuideDoc4-0-1' target='_blank'>Adevăr Quick Guide</a> for the full rules and more about the game.</p>";
-	message += "<p>Before the game, players each choose a Hidden Tile. The game is won when a player completes the objective given to them by their chosen Hidden Tile or captures their opponent’s Hidden Tile with their corresponding Second Face tile.</p>";
-	message += "<p>On a turn, players either move a tile on the board or call a new tile onto the board.</p>";
+	const container = document.createElement('div');
+
+	const heading = document.createElement('h4');
+	heading.textContent = 'Adevăr Pai Sho';
+	container.appendChild(heading);
+
+	const introPara = document.createElement('p');
+	introPara.appendChild(document.createTextNode('Adevăr Pai Sho is a game of strategy, deception, and wit as players sneakily accomplish their hidden objective and take down their opponent\'s Hidden Tile. Be careful when achieving your objective, because trying to win could be the very thing that makes you lose! See the '));
+	const rulesLink = document.createElement('a');
+	rulesLink.href = 'https://tinyurl.com/AdevarPaiSho4-0-1';
+	rulesLink.target = '_blank';
+	rulesLink.textContent = 'Adevăr rules';
+	introPara.appendChild(rulesLink);
+	introPara.appendChild(document.createTextNode(' and '));
+	const guideLink = document.createElement('a');
+	guideLink.href = 'https://tinyurl.com/AdevarQuickGuideDoc4-0-1';
+	guideLink.target = '_blank';
+	guideLink.textContent = 'Adevăr Quick Guide';
+	introPara.appendChild(guideLink);
+	introPara.appendChild(document.createTextNode(' for the full rules and more about the game.'));
+	container.appendChild(introPara);
+
+	const objectivePara = document.createElement('p');
+	objectivePara.textContent = 'Before the game, players each choose a Hidden Tile. The game is won when a player completes the objective given to them by their chosen Hidden Tile or captures their opponent\'s Hidden Tile with their corresponding Second Face tile.';
+	container.appendChild(objectivePara);
+
+	const turnPara = document.createElement('p');
+	turnPara.textContent = 'On a turn, players either move a tile on the board or call a new tile onto the board.';
+	container.appendChild(turnPara);
+
 	if (this.hoveredOverLily) {
-		message += "<p><img src='images/Adevar/" + localStorage.getItem(AdevarOptions.tileDesignTypeKey) + "/HOrientalLily.png' height=28px width=28px /> See the Oriental Lily garden objectives individually:"
-				+ "<br />Garden A: <span class='skipBonus' onclick='gameController.hideOrientalLilyHelp(); gameController.showOrientalLilyHelp(HOST, 0);'>HOST</span> <span class='skipBonus' onclick='gameController.hideOrientalLilyHelp(); gameController.showOrientalLilyHelp(GUEST, 0);'>GUEST</span>"
-				+ "<br />Garden B: <span class='skipBonus' onclick='gameController.hideOrientalLilyHelp(); gameController.showOrientalLilyHelp(HOST, 1);'>HOST</span> <span class='skipBonus' onclick='gameController.hideOrientalLilyHelp(); gameController.showOrientalLilyHelp(GUEST, 1);'>GUEST</span>"
-				+ "<br />Garden C: <span class='skipBonus' onclick='gameController.hideOrientalLilyHelp(); gameController.showOrientalLilyHelp(HOST, 2);'>HOST</span> <span class='skipBonus' onclick='gameController.hideOrientalLilyHelp(); gameController.showOrientalLilyHelp(GUEST, 2);'>GUEST</span></p>";
+		const lilyPara = document.createElement('p');
+		const lilyImg = document.createElement('img');
+		lilyImg.src = 'images/Adevar/' + localStorage.getItem(AdevarOptions.tileDesignTypeKey) + '/HOrientalLily.png';
+		lilyImg.height = 28;
+		lilyImg.width = 28;
+		lilyPara.appendChild(lilyImg);
+		lilyPara.appendChild(document.createTextNode(' '));
+		lilyPara.appendChild(this.createOrientalLilyGardenLinks());
+		container.appendChild(lilyPara);
 	}
-	return message;
+
+	return container;
 };
 
 AdevarController.prototype.getAdditionalMessage = function() {
@@ -505,6 +537,42 @@ AdevarController.prototype.showOrientalLilyHelp = function(player, gardenIndex) 
 	}
 };
 
+AdevarController.prototype.createOrientalLilyGardenLinks = function() {
+	const self = this;
+	const container = document.createElement('span');
+
+	container.appendChild(document.createElement('br'));
+	container.appendChild(document.createTextNode('See the Oriental Lily garden objectives individually:'));
+
+	const gardens = ['A', 'B', 'C'];
+	gardens.forEach((gardenName, gardenIndex) => {
+		container.appendChild(document.createElement('br'));
+		container.appendChild(document.createTextNode('Garden ' + gardenName + ': '));
+
+		const hostLink = document.createElement('span');
+		hostLink.classList.add('skipBonus');
+		hostLink.textContent = 'HOST';
+		hostLink.onclick = function() {
+			self.hideOrientalLilyHelp();
+			self.showOrientalLilyHelp(HOST, gardenIndex);
+		};
+		container.appendChild(hostLink);
+
+		container.appendChild(document.createTextNode(' '));
+
+		const guestLink = document.createElement('span');
+		guestLink.classList.add('skipBonus');
+		guestLink.textContent = 'GUEST';
+		guestLink.onclick = function() {
+			self.hideOrientalLilyHelp();
+			self.showOrientalLilyHelp(GUEST, gardenIndex);
+		};
+		container.appendChild(guestLink);
+	});
+
+	return container;
+};
+
 AdevarController.prototype.hideOrientalLilyHelp = function() {
 	if (this.lilyHelpOn) {
 		this.theGame.actuator.hideOrientalLilyHighlights();
@@ -514,6 +582,7 @@ AdevarController.prototype.hideOrientalLilyHelp = function() {
 
 AdevarController.prototype.buildHiddenTileObjectiveMessage = function(hiddenTile) {
 	var objective = null;
+	var isOrientalLily = false;
 	this.showLilyHelp = false;
 	switch(hiddenTile.code) {
 		case AdevarTileCode.iris:
@@ -521,16 +590,13 @@ AdevarController.prototype.buildHiddenTileObjectiveMessage = function(hiddenTile
 			break;
 		case AdevarTileCode.orientalLily:
 			objective = "Create one of the three Oriental Lily Garden formations with Basic tiles on your side of the board (see rules, or board highlights for Garden diagrams).";
-			objective += "<br />See the Oriental Lily garden objectives individually:"
-				+ "<br />Garden A: <span class='skipBonus' onclick='gameController.hideOrientalLilyHelp(); gameController.showOrientalLilyHelp(HOST, 0);'>HOST</span> <span class='skipBonus' onclick='gameController.hideOrientalLilyHelp(); gameController.showOrientalLilyHelp(GUEST, 0);'>GUEST</span>"
-				+ "<br />Garden B: <span class='skipBonus' onclick='gameController.hideOrientalLilyHelp(); gameController.showOrientalLilyHelp(HOST, 1);'>HOST</span> <span class='skipBonus' onclick='gameController.hideOrientalLilyHelp(); gameController.showOrientalLilyHelp(GUEST, 1);'>GUEST</span>"
-				+ "<br />Garden C: <span class='skipBonus' onclick='gameController.hideOrientalLilyHelp(); gameController.showOrientalLilyHelp(HOST, 2);'>HOST</span> <span class='skipBonus' onclick='gameController.hideOrientalLilyHelp(); gameController.showOrientalLilyHelp(GUEST, 2);'>GUEST</span>";
+			isOrientalLily = true;
 			this.showLilyHelp = true;
 			this.hoveredOverLily = true;
 			refreshMessage();
 			break;
 		case AdevarTileCode.echeveria:
-			objective = "Capture at least 2 of each of your opponent’s Basic tile types, and have at least 1 of each of your Basic tile types be captured";
+			objective = "Capture at least 2 of each of your opponent's Basic tile types, and have at least 1 of each of your Basic tile types be captured";
 			break;
 		case AdevarTileCode.whiteRose:
 			objective = "Call a Gate touching your opponent's Home Plot";
@@ -558,7 +624,14 @@ AdevarController.prototype.buildHiddenTileObjectiveMessage = function(hiddenTile
 		refreshMessage();
 	} */
 
-	return hiddenTile.getName() + "'s Objective: " + objective;
+	const container = document.createElement('span');
+	container.appendChild(document.createTextNode(hiddenTile.getName() + "'s Objective: " + objective));
+
+	if (isOrientalLily) {
+		container.appendChild(this.createOrientalLilyGardenLinks());
+	}
+
+	return container;
 };
 
 AdevarController.prototype.getPointMessage = function(htmlPoint) {

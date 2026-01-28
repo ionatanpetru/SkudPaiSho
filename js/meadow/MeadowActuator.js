@@ -1,21 +1,21 @@
 /* Create boardContainer, hostTilesContainer, and guestTilesContainer */
 import {
-  EIGHT_SIDED_BOARD,
-  SIX_SIDED_BOARD,
-  gameOptionEnabled,
-} from '../GameOptions';
-import { MeadowBoardPoint } from './MeadowBoardPoint';
-import {
-  createDivWithClass,
-  createDivWithId,
-  removeChildren,
+	createDivWithClass,
+	createDivWithId,
+	removeChildren,
 } from '../ActuatorHelp';
 import {
-  clearMessage,
-  gameController,
-  pointClicked,
-  showPointMessage,
+	EIGHT_SIDED_BOARD,
+	SIX_SIDED_BOARD,
+	gameOptionEnabled,
+} from '../GameOptions';
+import {
+	clearMessage,
+	gameController,
+	pointClicked,
+	showPointMessage,
 } from '../PaiShoMain';
+import { MeadowBoardPoint } from './MeadowBoardPoint';
 
 export function MeadowActuator(gameContainer, isMobile, hostTilesContainerDivs, guestTilesContainerDivs) {
 	this.gameContainer = gameContainer;
@@ -43,10 +43,8 @@ export function MeadowActuator(gameContainer, isMobile, hostTilesContainerDivs, 
 	var tilePileContainer = createDivWithClass("tilePileContainer");
 	var gameMessage2 = createDivWithClass("gameMessage2");
 
-	var hostTilesContainerDivs = hostTilesContainerDivs;
-	var guestTilesContainerDivs = guestTilesContainerDivs;
-	hostTilesContainer.innerHTML = hostTilesContainerDivs;
-	guestTilesContainer.innerHTML = guestTilesContainerDivs;
+	hostTilesContainer.appendChild(hostTilesContainerDivs);
+	guestTilesContainer.appendChild(guestTilesContainerDivs);
 
 	tilePileContainer.appendChild(response);
 	tilePileContainer.appendChild(gameMessage);

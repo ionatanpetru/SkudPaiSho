@@ -27,6 +27,7 @@ import {
 	createGameIfThatIsOk,
 	currentMoveIndex,
 	finalizeMove,
+	gameController,
 	gameId,
 	getCurrentPlayer,
 	getGameOptionsMessageElement,
@@ -734,8 +735,6 @@ FirePaiShoController.prototype.getHelpMessageForTile = function(tile) {
 			heading = "Accent Tile: Boat";
 			if (simplest || rocksUnwheelable) {
 				message.push("The Boat moves a Flower Tile to a surrounding space or removes an Accent tile.");
-			} else if (rocksUnwheelable) {
-				message.push("The Boat moves a Flower Tile to a surrounding space or removes a Rock or Knotweed tile.");
 			} else {
 				message.push("The Boat moves a Flower Tile to a surrounding space or removes a Knotweed tile.");
 			}

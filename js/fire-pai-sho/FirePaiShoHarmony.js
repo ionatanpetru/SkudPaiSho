@@ -1,4 +1,7 @@
 /* Skud Pai Sho Harmony */
+import { GUEST, HOST, NotationPoint, RowAndColumn } from '../CommonNotationObjects';
+import { debug } from '../GameData';
+import { completeHarmony } from '../skud-pai-sho/SkudPaiShoRules';
 
 export function FirePaiShoHarmony(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn) {
 	this.tile1 = tile1;
@@ -713,6 +716,7 @@ FirePaiShoHarmonyManager.prototype.ringsMatch = function(ring1, ring2) {
 FirePaiShoHarmonyManager.prototype.lookForRings = function(t1, tx, originalChain) {
 	var rings = [];
 	var keepLookingAtTheseHarmonies = [];
+	var currentChain;
 	for (var i = 0; i < this.harmonies.length; i++) {	// Any complete rings?
 		currentChain = originalChain.slice();
 		var hx = this.harmonies[i];

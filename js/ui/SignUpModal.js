@@ -4,7 +4,6 @@ export function buildSignUpModalContentElement() {
 	// Create the container div
 	const signUpModalContentContainer = document.createElement('div');
 	signUpModalContentContainer.id = 'signUpModalContentContainer';
-	signUpModalContentContainer.style.display = 'none';
 
 	// Add the first paragraph
 	const paragraph1 = document.createElement('p');

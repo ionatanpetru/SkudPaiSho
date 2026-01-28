@@ -18,7 +18,32 @@
   --collapsible-content-bg: #282828;
   --collapsible-heading-bg: #333;
   --mark-manager-elements-color: rgba(255, 170, 0, 0.8);
+  --new-game-card-bg: rgba(255, 255, 255, 0.05);
   /* --mark-manager-elements-color: rgba(0, 0, 0, 0.8); */
+
+  /* Game colors */
+  --skudcolor: #c83737;
+  --vagabondcolor: #88bd38;
+  --adevarcolor: #ab6bff;
+  --ginsengcolor: #e69e1a;
+  --capturecolor: #3860ce;
+  --spiritcolor: #1d94da;
+  --streetcolor: #464444;
+  --nickcolor: #5bc6c6;
+  --solitairecolor: #c83737;
+  --coopsolitairecolor: #3cb188;
+  --overgrowthcolor: #1da54a;
+  --undergrowthcolor: #1da54a;
+  --firecolor: #da6f1d;
+  --playgroundcolor: #cc599c;
+  --bloomscolor: #c98ad1;
+  --meadowcolor: #7797ee;
+  --hexcolor: #969595;
+  --tumbleweedcolor: #b99700;
+  --triflecolor: #3eb870;
+  --othercolor: #726d6d;
+  --edgescolor: #1e5631;
+  --paikocolor: #da8236;
 }
 
 [data-theme="dark"] {
@@ -39,6 +64,7 @@
   --input-color: #faf8ef;
   --collapsible-content-bg: #282828;
   --collapsible-heading-bg: #333;
+  --new-game-card-bg: rgba(255, 255, 255, 0.05);
 }
 
 [data-theme="light"] {
@@ -59,6 +85,7 @@
   --input-color: -internal-light-dark-color(black, white);
   --collapsible-content-bg: #E1DFD7;
   --collapsible-heading-bg: #faf8ef;
+  --new-game-card-bg: rgba(0, 0, 0, 0.05);
 }
 
 div {
@@ -152,7 +179,55 @@ hr {
 /* --------------------------------------- */
 
 .newGameEntry {
-  margin: 4px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin: 6px 0;
+  padding: 8px 12px;
+  background: var(--new-game-card-bg);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, padding 0.15s ease, box-shadow 0.2s ease;
+}
+
+.newGameEntry:hover {
+  background: rgba(128, 128, 128, 0.15);
+  box-shadow: inset 4px 0 0 var(--game-color, #888);
+  padding-left: 16px;
+  padding-right: 8px;
+}
+
+.newGameThumbnail {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.newGameEntryContent {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.newGameTitle {
+  font-weight: 600;
+  flex: 1;
+}
+
+.newGameRulesLink {
+  font-size: 0.85em;
+  opacity: 0.7;
+  transition: opacity 0.2s ease, margin-right 0.15s ease;
+}
+
+.newGameEntry:hover .newGameRulesLink {
+  opacity: 1;
+  margin-right: 4px;
 }
 
 /* Style the tab */
@@ -639,6 +714,32 @@ figure > div {
   opacity: 0.6;
 }
 
+/* Paiko board zones */
+.paikoHostHomeground {
+  /* background-color: rgba(200, 55, 55, 0.15); */
+}
+.paikoGuestHomeground {
+  /* background-color: rgba(55, 55, 200, 0.15); */
+}
+.paikoMiddleground {
+  /* background-color: rgba(255, 255, 255, 0.1); */
+}
+.paikoBlackedOut {
+  /* background-color: rgba(0, 0, 0, 0.5); */
+}
+.possibleDeploy {
+  box-shadow: 0px 0px 24px 2px #284;
+}
+.selectedPoint {
+  box-shadow: 0px 0px 24px 4px #c6c;
+}
+.hostTile {
+  border: 2px solid rgba(200, 55, 55, 0.5);
+}
+.guestTile {
+  border: 2px solid rgba(55, 55, 200, 0.5);
+}
+
 .selectedFromPile {
   /*box-shadow: 0px 0px 32px #054;*/
   /*box-shadow: 0px 0px 34px #054;*/
@@ -790,7 +891,119 @@ figure > div {
 }
 
 .gameSeekEntry {
-  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin: 6px 0;
+  padding: 8px 12px;
+  background: var(--new-game-card-bg);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, padding 0.15s ease, box-shadow 0.2s ease;
+}
+
+.gameSeekEntry:hover {
+  background: rgba(128, 128, 128, 0.15);
+  box-shadow: inset 4px 0 0 var(--game-color, #888);
+  padding-left: 16px;
+  padding-right: 8px;
+}
+
+.gameSeekEntryContent {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.gameSeekHost {
+  font-weight: 600;
+}
+
+.gameSeekOption {
+  font-size: 0.85em;
+  opacity: 0.7;
+  margin-top: 2px;
+}
+
+.joinGameSection {
+  margin-bottom: 16px;
+}
+
+.joinGameHeading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  font-weight: 600;
+  font-size: 1.1em;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid var(--game-color, #888);
+}
+
+.joinGameHeadingIcon {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+/* My Games entries */
+.myGameEntry {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin: 6px 0;
+  padding: 8px 12px;
+  background: var(--new-game-card-bg);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, padding 0.15s ease, box-shadow 0.2s ease;
+}
+
+.myGameEntry:hover {
+  background: rgba(128, 128, 128, 0.15);
+  box-shadow: inset 4px 0 0 var(--game-color, #888);
+  padding-left: 16px;
+  padding-right: 8px;
+}
+
+.myGameEntry.yourTurn {
+  box-shadow: inset 4px 0 0 var(--game-color, #888);
+}
+
+.myGameEntry.yourTurn:hover {
+  box-shadow: inset 6px 0 0 var(--game-color, #888);
+}
+
+.myGameEntryContent {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.myGamePlayers {
+  font-weight: 600;
+}
+
+.myGameTurnIndicator {
+  font-size: 0.85em;
+  opacity: 0.8;
+  margin-left: 8px;
+}
+
+.myGameOption {
+  font-size: 0.85em;
+  opacity: 0.7;
+  margin-top: 2px;
+}
+
+.myGamesSection {
+  margin-bottom: 16px;
 }
 
 .hidden {

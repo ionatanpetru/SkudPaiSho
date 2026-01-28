@@ -1,8 +1,12 @@
 // Solitaire Game Manager
 
-import { ACCENT_TILE, debug } from '../GameData';
 import { PLANTING } from '../CommonNotationObjects';
+import { ACCENT_TILE, debug } from '../GameData';
+import { PaiShoMarkingManager } from '../pai-sho-common/PaiShoMarkingManager';
+import { gameController, getCurrentPlayer, isInReplay } from '../PaiShoMain';
 import { lessBonus, newGatesRule, newSpecialFlowerRules } from '../skud-pai-sho/SkudPaiShoRules';
+import { OvergrowthBoard } from './OvergrowthBoard';
+import { OvergrowthTileManager } from './OvergrowthTileManager';
 
 export function OvergrowthGameManager(actuator, ignoreActuate, isCopy, existingDrawnTile, existingLastDrawnTile) {
 	this.isCopy = isCopy;
@@ -184,19 +188,24 @@ OvergrowthGameManager.prototype.getWinner = function() {
 };
 
 OvergrowthGameManager.prototype.getWinReason = function() {
-	var msg = "";
+	var container = document.createElement('span');
 	if (this.getWinner()) {
-		msg += " won the game!";
+		container.appendChild(document.createTextNode(" won the game!"));
 	}
-	return msg + "<br /><br />" + this.board.harmonyManager.getScoreSummaryText();
+	container.appendChild(document.createElement('br'));
+	container.appendChild(document.createElement('br'));
+	container.appendChild(this.board.harmonyManager.getScoreSummaryText());
+	return container;
 };
 
 OvergrowthGameManager.prototype.getScoreSummary = function() {
 	var tilesLeft = this.tileManager.guestTiles.length;
-	return "<br />"
-		+ this.board.harmonyManager.getScoreSummaryText()
-		+ "<br />"
-		+ tilesLeft + " tiles remaining.";
+	var container = document.createElement('span');
+	container.appendChild(document.createElement('br'));
+	container.appendChild(this.board.harmonyManager.getScoreSummaryText());
+	container.appendChild(document.createElement('br'));
+	container.appendChild(document.createTextNode(tilesLeft + " tiles remaining."));
+	return container;
 };
 
 OvergrowthGameManager.prototype.getWinResultTypeCode = function() {

@@ -76,8 +76,11 @@ export class OnlinePlayEngine {
 			}
 		);
 	}
-	getVerificationCode(callback) {
-		$.get("backend/getVerificationCode.php",
+	verifyCode(code, callback) {
+		$.post("backend/verifyCode.php",
+			{
+				code: code
+			},
 			function(data, status) {
 				if (status === 'success') {
 					callback(data.trim());
@@ -99,10 +102,13 @@ export class OnlinePlayEngine {
 			}
 		);
 	}
-	updateUserPassword(userId, existingPassword, newPassword, callback) {
+	updateUserPassword(loginToken, existingPassword, newPassword, callback) {
 		$.post("backend/updateUserPassword.php",
 			{
-				userId: userId,
+				userId: loginToken.userId,
+				username: loginToken.username,
+				userEmail: loginToken.userEmail,
+				deviceId: loginToken.deviceId,
 				existingPassword: existingPassword,
 				newPassword: newPassword
 			},

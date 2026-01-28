@@ -167,7 +167,10 @@ SolitaireGameManager.prototype.getWinner = function() {
 };
 
 SolitaireGameManager.prototype.getWinReason = function() {
-	return "<br />" + this.board.harmonyManager.getSolitaireGameSummaryText();
+	var container = document.createElement('span');
+	container.appendChild(document.createElement('br'));
+	container.appendChild(this.board.harmonyManager.getSolitaireGameSummaryText());
+	return container;
 };
 
 SolitaireGameManager.prototype.getWinResultTypeCode = function() {

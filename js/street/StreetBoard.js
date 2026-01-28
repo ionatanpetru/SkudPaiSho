@@ -1,5 +1,14 @@
 /* Street Pai Sho Board */
 
+import { GUEST, HOST, RowAndColumn } from '../CommonNotationObjects';
+import { debug } from '../GameData';
+import { RELEASE_CAPTIVE_TILES, gameOptionEnabled } from '../GameOptions';
+import { showBadMoveModal } from '../PaiShoMain';
+import { GATE, NON_PLAYABLE, POSSIBLE_MOVE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import { newKnotweedRules } from '../skud-pai-sho/SkudPaiShoRules';
+import { StreetBoardPoint } from './StreetBoardPoint';
+import { StreetHarmony, StreetHarmonyManager } from './StreetHarmony';
+
 export function StreetBoard() {
 	this.size = new RowAndColumn(17, 17);
 	this.cells = this.brandNew();

@@ -31,9 +31,9 @@ export class YammaGameManager {
 	}
 
 	runNotationMove(move, withActuate) {
-		// if (this.winner) {
-		// 	return; // Game is over
-		// }
+		if (this.winner) {
+			return; // Game is over
+		}
 
 		const color = this.getPlayerColor(move.player);
 		const rotation = move.rotation || 0;
@@ -57,8 +57,7 @@ export class YammaGameManager {
 	}
 
 	getWinner() {
-		// return this.winner;
-		return null; // do not show winner - testing
+		return this.winner;
 	}
 
 	getWinReason() {
@@ -73,8 +72,7 @@ export class YammaGameManager {
 	}
 
 	hasEnded() {
-		// return this.winner !== null || this.board.isBoardFull();
-		return this.board.isBoardFull(); // no winner - testing
+		return this.winner !== null || this.board.isBoardFull();
 	}
 
 	getPossibleMoves() {

@@ -169,13 +169,13 @@ export class NickActuator {
 		}
 		if (clickable) {
 			if (this.mobile) {
-				theDiv.addEventListener('click', function() {
-					unplayedTileClicked(this);
-					showTileMessage(this);
+				theDiv.addEventListener('click', () => {
+					unplayedTileClicked(theDiv);
+					showTileMessage(theDiv);
 				});
 			} else {
-				theDiv.addEventListener('click', function() { unplayedTileClicked(this); });
-				theDiv.addEventListener('mouseover', function() { showTileMessage(this); });
+				theDiv.addEventListener('click', () => unplayedTileClicked(theDiv));
+				theDiv.addEventListener('mouseover', () => showTileMessage(theDiv));
 				theDiv.addEventListener('mouseout', clearMessage);
 			}
 		}
@@ -236,13 +236,13 @@ export class NickActuator {
 		theDiv.setAttribute("id", tile.id);
 
 		if (this.mobile) {
-			theDiv.addEventListener('click', function() {
-				unplayedTileClicked(this);
-				showTileMessage(this);
+			theDiv.addEventListener('click', () => {
+				unplayedTileClicked(theDiv);
+				showTileMessage(theDiv);
 			});
 		} else {
-			theDiv.addEventListener('click', function() { unplayedTileClicked(this); });
-			theDiv.addEventListener('mouseover', function() { showTileMessage(this); });
+			theDiv.addEventListener('click', () => unplayedTileClicked(theDiv));
+			theDiv.addEventListener('mouseover', () => showTileMessage(theDiv));
 			theDiv.addEventListener('mouseout', clearMessage);
 		}
 

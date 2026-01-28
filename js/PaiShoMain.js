@@ -4,78 +4,15 @@ import $ from 'jquery';
 import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
 
 import {
-	ADEVAR_LITE,
-	ADEVAR_ROTATE,
-	BONUS_MOVEMENT_5,
-	BONUS_MOVEMENT_BASED_ON_NUM_CAPTIVES,
-	BOTTOMLESS_RESERVES,
-	CHOOSE_NEUTRAL_STACK_SPACE,
-	CRUMBLEWEED,
-	DIAGONAL_BISON_ABILITY_TESTING,
 	DIAGONAL_MOVEMENT,
-	DYNAMIC_GROUP_LIMIT,
-	EDGES_12x12_GAME,
-	EDGES_DICE_FOR_MOVEMENT,
-	EDGES_MOVE_4_2,
-	EIGHT_SIDED_BOARD,
-	ETHEREAL_ACCENT_TILES,
 	EVERYTHING_CAPTURE,
-	FIVE_SIDED_BOARD,
-	FORMAL_WIN_CONDITION,
-	FOUR_SIDED_BOARD,
-	FULL_GRID,
-	FULL_POINTS_SCORING,
-	GINSENG_1_POINT_0,
-	GINSENG_ROTATE,
-	HEXHEX_10,
-	HEXHEX_11,
-	HEXHEX_6,
-	HIDE_RESERVE_TILES,
-	IGNORE_CLASHING,
-	KING_MOVES_LIKE_PAWNS,
-	LESS_TILES,
-	LION_TURTLE_ABILITY_ANYWHERE,
-	MIDLINE_OPENER,
-	MORE_ATTACKERS,
-	NO_ALT_WIN,
-	NO_EFFECT_TILES,
-	NO_HARMONY_VISUAL_AIDS,
-	NO_REINFORCEMENT,
-	NO_SETUP_PHASE,
-	NO_WHEELS,
-	OPTION_ANCIENT_OASIS_EXPANSION,
-	OPTION_ATTACKERS_MOVE_FIRST,
-	OPTION_DOUBLE_ACCENT_TILES,
-	OPTION_DOUBLE_TILES,
-	OPTION_FULL_TILES,
-	OPTION_INFORMAL_START,
-	OPTION_INSANE_TILES,
-	ORIGINAL_BENDER_EXPANSION,
-	ORIGINAL_BOARD_SETUP,
-	PLAY_IN_SPACES,
-	RELEASE_CAPTIVE_TILES,
-	RUMBLEWEED,
-	SHORTER_GAME,
-	SIX_SIDED_BOARD,
-	SPECIAL_FLOWERS_BOUNCE,
-	SPECTATORS_CAN_PLAY,
-	SQUARE_SPACES,
-	SWAP_BISON_AND_DRAGON,
-	SWAP_BISON_AND_DRAGON_ABILITIES,
-	SWAP_BISON_WITH_LEMUR,
-	TUMBLE_6,
-	TUMPLETORE,
-	UNDERGROWTH_SIMPLE,
-	VAGABOND_ROTATE,
-	VARIABLE_ACCENT_TILES,
-	GODAI_BOARD_ZONES,
-	GODAI_EMPTY_TILE,
+	V_DOUBLE_MOVE_DISTANCE,
 	gameOptionEnabled,
 	getGameOptionDescription,
-	V_DOUBLE_MOVE_DISTANCE,
-	GINSENG_GINSENG_5,
-	BISON_GRANTS_FLYING
 } from './GameOptions';
+import { GameType, getGameTypeEntryFromId, gameTypeIdSupported } from './GameType';
+// Re-export for backward compatibility
+export { GameType, getGameTypeEntryFromId, gameTypeIdSupported };
 import { AdevarController } from "./adevar/AdevarController";
 import { AdevarOptions } from './adevar/AdevarOptions';
 import { Ads } from "./Ads";
@@ -114,6 +51,8 @@ import { TumbleweedController } from './tumbleweed/TumbleweedController';
 import { UndergrowthController } from './undergrowth/UndergrowthController';
 import { YammaController } from './yamma/YammaController';
 import { TicTacToeController } from './tictactoe/TicTacToeController';
+import { HexController } from './hex/HexController';
+import { PaikoController } from './paiko/PaikoController';
 import { VagabondController } from "./vagabond/VagabondController";
 import * as WelcomeTutorial from './WelcomeTutorial';
 import * as TournamentManager from './TournamentManager';
@@ -148,6 +87,18 @@ import {
 	notifyMe,
 	notifyThisMessage
 } from './Notifications';
+import {
+	initWebPush,
+	isPushSupported,
+	isWebPushEnabled,
+	subscribeToPush,
+	unsubscribeFromPush,
+	saveWebPushSubscriptionIfNeeded,
+	isChatNotificationsEnabled,
+	enableChatNotifications,
+	disableChatNotifications
+} from './WebPush';
+import { PREF_IOS_DEVICE_TOKEN } from './preferenceTypes';
 import { addEventToElement, setupUiEvents } from './ui/UiSetup';
 import { setupHtmlEventHandlers } from './ui/HtmlEventHandlers';
 import { applyBoardOptionToBgSvg, mobileAndTabletcheck } from "./ActuatorHelp";
@@ -173,6 +124,7 @@ import { buildLoginModalContentElement } from './ui/LoginModal';
 import NickController from './nick/NickController';
 import { viewGameRankingsClicked } from './PaiShoMain';
 import * as GameStats from './GameStats';
+import { buildSignUpModalContentElement } from './ui/SignUpModal';
 
 
 export const QueryString = (() => {
@@ -252,7 +204,7 @@ export const tileDesignTypeValues = {
 	custom: "Use Custom Designs"
 };
 
-const paiShoBoardDesignTypeKey = "paiShoBoardDesignTypeKey";
+export const paiShoBoardDesignTypeKey = "paiShoBoardDesignTypeKey";
 export const customBoardUrlKey = "customBoardUrlKey";
 export const customBoardUrlArrayKey = "customBoardUrlArrayKey";
 const defaultBoardDesignKey = "tgg20211007";
@@ -305,7 +257,7 @@ const paiShoBoardDesignTypeValuesDefault = {
 	applycustomboard: "Add Custom Board from URL"
 };
 
-let paiShoBoardDesignTypeValues = {};
+export let paiShoBoardDesignTypeValues = {};
 
 export const svgBoardDesigns = [
 	"lightmode",
@@ -445,7 +397,6 @@ export let interval = 0;
 export let emailBeingVerified = "";
 export let usernameBeingVerified = "";
 export let passwordBeingVerified = "";
-export let codeToVerify = 0;
 export let tempUserId;
 export let myGamesList = [];
 export let gameSeekList = [];
@@ -603,7 +554,8 @@ window.requestAnimationFrame(function() {
 		url = "https://skudpaisho.com/";
 	}
 
-	if ((url.startsWith("file") || url.includes("localhost")) && !ios && !runningOnAndroid) {
+	// if ((url.startsWith("file") || url.includes("localhost")) && !ios && !runningOnAndroid) {
+	if ((url.startsWith("file")) && !ios && !runningOnAndroid) {
 		onlinePlayEnabled = false;
 	}
 
@@ -795,6 +747,8 @@ const initialVerifyLoginCallback = (response) => {
 		startWatchingNumberOfGamesWhereUserTurn();
 		appCaller.alertAppLoaded();
 		userIsSignedInOk = true;
+		// Subscribe to web push notifications if supported
+		saveWebPushSubscriptionIfNeeded(getLoginToken());
 	} else {
 		// Cannot verify user login, forget all current stuff.
 		if (getUsername()) {
@@ -1421,6 +1375,7 @@ export function showSignOutModal() {
 
 export function showChangePasswordModal() {
 	const msgContent = document.getElementById('changePasswordModalContentContainer').cloneNode(true);
+	msgContent.style.display = '';
 	showModalElem("Update Password", msgContent);
 }
 
@@ -1606,7 +1561,13 @@ export function getAdditionalMessage() {
 		// There is a winner!
 		container.appendChild(document.createElement("br"));
 		const winnerSpan = document.createElement("strong");
-		winnerSpan.textContent = getGameWinner() + getGameWinReason();
+		winnerSpan.appendChild(document.createTextNode(getGameWinner()));
+		const winReason = getGameWinReason();
+		if (typeof winReason === 'string') {
+			winnerSpan.appendChild(document.createTextNode(winReason));
+		} else {
+			winnerSpan.appendChild(winReason);
+		}
 		container.appendChild(winnerSpan);
 	} else if (gameController.gameHasEndedInDraw && gameController.gameHasEndedInDraw()) {
 		container.appendChild(document.createElement("br"));
@@ -1886,7 +1847,13 @@ export function linkShortenCallback(shortUrl, ignoreNoEmail, okToUpdateWinInfo) 
         // There is a winner!
         messageText.appendChild(document.createElement("br"));
         const winnerStrong = document.createElement("strong");
-        winnerStrong.innerText = getGameWinner() + getGameWinReason();
+        winnerStrong.appendChild(document.createTextNode(getGameWinner()));
+        const winReason = getGameWinReason();
+        if (typeof winReason === 'string') {
+            winnerStrong.appendChild(document.createTextNode(winReason));
+        } else {
+            winnerStrong.appendChild(winReason);
+        }
         messageText.appendChild(winnerStrong);
         // Save winner
         if (okToUpdateWinInfo && playingOnlineGame()) {
@@ -2304,7 +2271,11 @@ export function clearMessage() {
 	// }
 
 	const helpSpan = document.createElement("span");
-	helpSpan.innerHTML = defaultHelpMessageText;
+	if (defaultHelpMessageText instanceof HTMLElement) {
+		helpSpan.appendChild(defaultHelpMessageText);
+	} else {
+		helpSpan.innerHTML = defaultHelpMessageText;
+	}
 	helpTabContentDiv.appendChild(helpSpan);
 
 	const tournamentText = getTournamentText();
@@ -2348,19 +2319,19 @@ export function RmbUp(htmlPoint) {
 export function displayReturnedMessage(messageReturned) {
 	const heading = messageReturned.heading;
 	const message = messageReturned.message;
+	const container = document.createElement('div');
+
 	if (heading) {
-		if (message.length > 1) {
-			setMessage(toHeading(heading) + toBullets(message));
-		} else {
-			setMessage(toHeading(heading) + toMessage(message));
-		}
-	} else {
-		if (message.length > 1) {
-			setMessage(toBullets(message));
-		} else {
-			setMessage(toMessage(message));
-		}
+		container.appendChild(toHeading(heading));
 	}
+
+	if (message.length > 1) {
+		container.appendChild(toBullets(message));
+	} else {
+		container.appendChild(toMessage(message));
+	}
+
+	setMessage(container);
 }
 
 export function showTileMessage(tileDiv) {
@@ -2376,10 +2347,27 @@ export function showPointMessage(htmlPoint) {
 }
 
 export function setMessage(msg) {
-	if (msg === document.getElementById("helpTextContent").innerHTML) {
-		clearMessage();
+	const helpTextContent = document.getElementById("helpTextContent");
+
+	if (msg instanceof HTMLElement) {
+		// Clear existing content
+		while (helpTextContent.firstChild) {
+			helpTextContent.removeChild(helpTextContent.firstChild);
+		}
+		// Add tournament text if any
+		const tournamentText = getTournamentText();
+		if (tournamentText) {
+			const tourSpan = document.createElement('span');
+			tourSpan.innerHTML = tournamentText;
+			helpTextContent.appendChild(tourSpan);
+		}
+		helpTextContent.appendChild(msg);
 	} else {
-		document.getElementById("helpTextContent").innerHTML = getTournamentText() + msg;
+		if (msg === helpTextContent.innerHTML) {
+			clearMessage();
+		} else {
+			helpTextContent.innerHTML = getTournamentText() + msg;
+		}
 	}
 }
 
@@ -2399,33 +2387,54 @@ export function getTournamentText() {
 }
 
 export function toHeading(str) {
-	return "<h4>" + str + "</h4>";
+	const h4 = document.createElement('h4');
+	if (str instanceof HTMLElement) {
+		h4.appendChild(str);
+	} else {
+		h4.textContent = str;
+	}
+	return h4;
 }
 
 export function toMessage(paragraphs) {
-	let message = "";
+	const container = document.createElement('span');
 
 	if (paragraphs.length === 1) {
-		return paragraphs[0];
+		const item = paragraphs[0];
+		if (item instanceof HTMLElement) {
+			container.appendChild(item);
+		} else {
+			container.innerHTML = item;
+		}
 	} else if (paragraphs.length > 1) {
-		paragraphs.forEach((str) => {
-			message += "<p>" + str + "</p>";
+		paragraphs.forEach((item) => {
+			const p = document.createElement('p');
+			if (item instanceof HTMLElement) {
+				p.appendChild(item);
+			} else {
+				p.innerHTML = item;
+			}
+			container.appendChild(p);
 		});
 	}
 
-	return message;
+	return container;
 }
 
 export function toBullets(paragraphs) {
-	let message = "<ul>";
+	const ul = document.createElement('ul');
 
-	paragraphs.forEach((str) => {
-		message += "<li>" + str + "</li>";
+	paragraphs.forEach((item) => {
+		const li = document.createElement('li');
+		if (item instanceof HTMLElement) {
+			li.appendChild(item);
+		} else {
+			li.innerHTML = item;
+		}
+		ul.appendChild(li);
 	});
 
-	message += "</ul>";
-
-	return message;
+	return ul;
 }
 
 export function getNeutralPointMessage() {
@@ -2595,7 +2604,7 @@ export function showModalElem(headingText, modalMessageElement, onlyCloseByClick
 	const span = document.getElementsByClassName("myMainModalClose")[0];
 
 	const modalHeading = document.getElementById('modalHeading');
-	modalHeading.innerText = headingText;
+	modalHeading.innerHTML = headingText;
 
 	const modalMessage = document.getElementById('modalMessage');
 	modalMessage.innerHTML = '';
@@ -2894,9 +2903,9 @@ export function verifyCodeClicked() {
 	if (usernameBeingVerified && usernameBeingVerified.trim() != ""
 		&& emailBeingVerified && emailBeingVerified.trim() != "") {
 
-		codeToVerify = document.getElementById("verificationCodeInput").value;
+		const codeToVerify = document.getElementById("verificationCodeInput").value;
 		if (codeToVerify && codeToVerify.trim() != "") {
-			onlinePlayEngine.getVerificationCode(verifyCodeCallback);
+			onlinePlayEngine.verifyCode(codeToVerify, verifyCodeCallback);
 		}
 	}
 }
@@ -2937,7 +2946,6 @@ const createDeviceIdCallback = (generatedDeviceId) => {
 	emailBeingVerified = "";
 	usernameBeingVerified = "";
 	tempUserId = null;
-	codeToVerify = 0;
 
 	updateFooter();
 	clearMessage();
@@ -2996,16 +3004,15 @@ export function updatePasswordClicked() {
 		const newPassword = document.getElementById("userPasswordInput").value.trim();
 		const passwordCheck = document.getElementById("userPasswordCheckInput").value.trim();
 		if (passwordIsValid(newPassword, passwordCheck)) {
-			onlinePlayEngine.updateUserPassword(getUserId(), existingPassword, newPassword, updatePasswordCallback);
+			onlinePlayEngine.updateUserPassword(getLoginToken(), existingPassword, newPassword, updatePasswordCallback);
 		} else {
 			updatePasswordCallback("fail");
 		}
 	}
 }
 
-// TODO actualCode should be result...
-const verifyCodeCallback = (actualCode) => {
-	if (codeToVerify === actualCode) {
+const verifyCodeCallback = (result) => {
+	if (result === "verified") {
 		if (tempUserId && tempUserId > 0) {
 			createUserCallback(tempUserId);
 		} else {
@@ -3017,7 +3024,6 @@ const verifyCodeCallback = (actualCode) => {
 		emailBeingVerified = "";
 		usernameBeingVerified = "";
 		tempUserId = null;
-		codeToVerify = 0;
 		showModalElem("Validation Failed", document.createTextNode("Validation failed. Please try again."));
 	}
 };
@@ -3072,385 +3078,6 @@ export function forgetCurrentGameInfo() {
 
 	updateCurrentGameTitle();
 }
-
-export const GameType = {
-	SkudPaiSho: {
-		id: 1,
-		name: "Skud Pai Sho",
-		desc: "Skud Pai Sho",
-		description: "Arrange flowers into position while changing the landscape of the board to outpace your opponent.",
-		coverImg: "skud.png",
-		color: "var(--skudcolor)",
-		rulesUrl: "https://skudpaisho.com/site/games/skud-pai-sho/",
-		gameOptions: [
-			OPTION_INFORMAL_START,
-			OPTION_DOUBLE_ACCENT_TILES,
-			OPTION_ANCIENT_OASIS_EXPANSION,
-			NO_HARMONY_VISUAL_AIDS,
-			NO_WHEELS,
-			SPECIAL_FLOWERS_BOUNCE,
-			NO_ALT_WIN
-		],
-		secretGameOptions: [
-			DIAGONAL_MOVEMENT,
-			EVERYTHING_CAPTURE,
-			IGNORE_CLASHING,
-			VARIABLE_ACCENT_TILES	// In development
-		]
-	},
-	VagabondPaiSho: {
-		id: 2,
-		name: "Vagabond Pai Sho",
-		desc: "Vagabond Pai Sho",
-		color: "var(--vagabondcolor)",
-		description: "Construct a battlefield by deploying tiles across the board, then attack your opponent’s Lotus tile.",
-		coverImg: "vagabond.png",
-		rulesUrl: "https://skudpaisho.com/site/games/vagabond-pai-sho/",
-		gameOptions: [
-			OPTION_DOUBLE_TILES,
-			SWAP_BISON_WITH_LEMUR
-		],
-		secretGameOptions: [
-			V_DOUBLE_MOVE_DISTANCE
-		]
-	},
-	Adevar: {
-		id: 12,
-		name: "Adevăr Pai Sho",
-		desc: "Adevăr Pai Sho",
-		color: "var(--adevarcolor)",
-		description: "See through your opponent’s deception and skillfully craft your own disguise to further your hidden objective.",
-		coverImg: "adevar.png",
-		rulesUrl: "https://skudpaisho.com/site/games/adevar-pai-sho/",
-		gameOptions: [
-			ADEVAR_LITE
-		],
-		noRankedGames: true
-	},
-	Ginseng: {
-		id: 18,
-		name: "Ginseng Pai Sho",
-		desc: "Ginseng Pai Sho",
-		color: "var(--ginsengcolor)",
-		description: "Advance your Lotus into enemy territory with the power of the original benders and protective harmonies.",
-		coverImg: "ginseng.png",
-		rulesUrl: "https://skudpaisho.com/site/games/ginseng-pai-sho/",
-		gameOptions: [
-			GINSENG_GINSENG_5,
-			BISON_GRANTS_FLYING
-		],
-		secretGameOptions: [
-			LION_TURTLE_ABILITY_ANYWHERE,
-			SWAP_BISON_AND_DRAGON,
-			SWAP_BISON_AND_DRAGON_ABILITIES,
-			GINSENG_1_POINT_0,
-			DIAGONAL_BISON_ABILITY_TESTING
-		]
-	},
-	FirePaiSho: {
-		id: 15,
-		name: "Fire Pai Sho",
-		desc: "Fire Pai Sho",
-		color: "var(--firecolor)",
-		description: "Like Skud Pai Sho, but with a twist: tiles are chosen randomly.",
-		coverImg: "rose.png",
-		rulesUrl: "https://skudpaisho.com/site/games/fire-pai-sho/",
-		gameOptions: [
-			NO_HARMONY_VISUAL_AIDS,
-			OPTION_DOUBLE_ACCENT_TILES,
-			HIDE_RESERVE_TILES,
-			ETHEREAL_ACCENT_TILES
-		],
-		secretGameOptions: [
-			ORIGINAL_BENDER_EXPANSION,
-			MIDLINE_OPENER
-		]
-	},
-	KeyPaiSho: {
-		id: 19,
-		name: "Key Pai Sho",
-		desc: "Key Pai Sho",
-		color: "var(--keypaishocolor)",
-		description: "Built to replicate the Pai Sho board states seen in ATLA Book 1.",
-		coverImg: "lotus.png",
-		rulesUrl: "https://skudpaisho.com/site/games/key-pai-sho/",
-		gameOptions: [
-			NO_EFFECT_TILES
-		]
-	},
-	Nick: {
-		id: 21,
-		name: "Nick Pai Sho",
-		desc: "Nick Pai Sho",
-		color: "var(--nickcolor)",
-		description: "Advance your lotus to the center of the board and protect it using the four elements and the Avatar.",
-		coverImg: "nick.png",
-		rulesUrl: "https://skudpaisho.com/site/games/nick-pai-sho/",
-		gameOptions: [],
-		noRankedGames: true
-	},
-	SolitairePaiSho: {
-		id: 4,
-		name: "Nature's Grove: Respite",
-		desc: "Respite - Solitaire Pai Sho",
-		// color: "var(--solitairecolor)",
-		color: "var(--othercolor)",
-		description: "Arrange random flowers into position to achieve the highest score possible.",
-		coverImg: "rose.png",
-		rulesUrl: "https://skudpaisho.com/site/games/solitaire-pai-sho/",
-		gameOptions: [
-			OPTION_DOUBLE_TILES,
-			OPTION_INSANE_TILES
-		],
-		noRankedGames: true
-	},
-	CoopSolitaire: {
-		id: 6,
-		// desc: "Nature's Grove: Synergy",
-		desc: "Synergy - Co-op Pai Sho",
-		color: "var(--coopsolitairecolor)",
-		description: "Arrange random flowers into position with a partner to achieve the highest score possible.",
-		coverImg: "lotus.png",
-		rulesUrl: "https://skudpaisho.com/site/games/cooperative-solitaire-pai-sho/",
-		gameOptions: [
-			LESS_TILES,
-			OPTION_DOUBLE_TILES,
-			OPTION_INSANE_TILES
-		],
-		noRankedGames: true
-	},
-	OvergrowthPaiSho: {
-		id: 8,
-		name: "Overgrowth Pai Sho",
-		desc: "Overgrowth Pai Sho",
-		color: "var(--overgrowthcolor)",
-		description: "Arrange random flowers into position to get a higher score than your opponent.",
-		coverImg: "rose.png",
-		rulesUrl: "https://skudpaisho.com/site/games/overgrowth-pai-sho/",
-		gameOptions: [
-			LESS_TILES,
-			OPTION_FULL_TILES,
-			FULL_POINTS_SCORING
-		],
-		noRankedGames: true
-	},
-	Undergrowth: {
-		id: 16,
-		name: "Undergrowth Pai Sho",
-		desc: "Undergrowth Pai Sho",
-		color: "var(--undergrowthcolor)",
-		description: "Arrange random flowers into position to get a higher score than your opponent.",
-		coverImg: "lotus.png",
-		rulesUrl: "https://skudpaisho.com/site/games/undergrowth-pai-sho/",
-		noRankedGames: true,
-		gameOptions: [
-			UNDERGROWTH_SIMPLE
-		]
-	},
-	Trifle: {
-		id: 10,
-		name: "Pai and Sho's Trifle",
-		desc: "Pai and Sho's Trifle",
-		color: "var(--triflecolor)",
-		description: "Like Vagabond Pai Sho, but with new collectable tiles.",
-		coverImg: "lotus.png",
-		rulesUrl: "https://skudpaisho.com/site/games/pai-shos-trifle/",
-		gameOptions: [],
-		usersWithAccess: [
-			'SkudPaiSho',
-			'abacadaren',
-			'Korron',
-			'vescucci',
-			'geebung02',
-			'sirstotes',
-			'Cannoli',
-			'SpinxKreuz',
-			'TheRealMomo',
-			'MrsSkud',
-			'markdwagner',
-			'The_IceL0rd'
-		],
-		noRankedGames: true
-	},
-	CapturePaiSho: {
-		id: 3,
-		name: "Capture Pai Sho",
-		desc: "Capture Pai Sho",
-		color: "var(--capturecolor)",
-		description: "A capture battle between opponents.",
-		coverImg: "lotus.png",
-		rulesUrl: "https://skudpaisho.com/site/games/capture-pai-sho/",
-		gameOptions: []
-	},
-	SpiritPaiSho: {
-		id: 17,
-		name: "Spirit Pai Sho",
-		desc: "Spirit Pai Sho (Beta)",
-		color: "var(--spiritcolor)",
-		description: "A new ruleset based on Capture Pai Sho.",
-		coverImg: "lotus.png",
-		rulesUrl: "https://skudpaisho.com/",
-		gameOptions: []
-	},
-	StreetPaiSho: {
-		id: 5,
-		name: "Street Pai Sho",
-		desc: "Street Pai Sho",
-		color: "var(--streetcolor)",
-		description: "Based on the Pai Sho scene from The Legend of Korra.",
-		coverImg: "lotus.png",
-		rulesUrl: "https://skudpaisho.com/site/games/street-pai-sho/",
-		gameOptions: [
-			FORMAL_WIN_CONDITION,
-			ORIGINAL_BOARD_SETUP,
-			RELEASE_CAPTIVE_TILES,
-			BONUS_MOVEMENT_5,
-			BONUS_MOVEMENT_BASED_ON_NUM_CAPTIVES
-		],
-		noRankedGames: true
-	},
-	Playground: {
-		id: 7,
-		name: "Pai Sho Playground",
-		desc: "Pai Sho Playground",
-		color: "var(--playgroundcolor)",
-		description: "Move tiles freely and play around in this sandbox mode.",
-		coverImg: "lotus.png",
-		rulesUrl: "https://skudpaisho.com/site/games/pai-sho-playground/",
-		gameOptions: [
-			PLAY_IN_SPACES,
-			VAGABOND_ROTATE,
-			ADEVAR_ROTATE,
-			GINSENG_ROTATE,
-			SPECTATORS_CAN_PLAY,
-			FULL_GRID,
-			SQUARE_SPACES,
-			BOTTOMLESS_RESERVES
-		],
-		noRankedGames: true
-	},
-	BeyondTheMaps: {
-		id: 20,
-		name: "Beyond The Edges of The Maps",
-		desc: "Beyond The Edges of The Maps",
-		// color: "var(--edgescolor)",
-		color: "var(--othercolor)",
-		description: "Explore the land beyond the maps.",
-		coverImg: "boat.png",
-		rulesUrl: "https://skudpaisho.com/site/games/beyond-the-edges-of-the-maps/",
-		gameOptions: [
-			EDGES_12x12_GAME,
-			EDGES_MOVE_4_2,
-			EDGES_DICE_FOR_MOVEMENT
-		]
-	},
-	Blooms: {
-		id: 9,
-		name: "Blooms",
-		desc: "Blooms",
-		color: "var(--bloomscolor)",
-		description: "A territory battle on a hexagonal board.",
-		coverImg: "hexagon.png",
-		// // rulesUrl: "https://www.nickbentley.games/blooms-rules/",
-		rulesUrl: "https://boardgamegeek.com/boardgame/249095/blooms",
-		gameOptions: [
-			SHORTER_GAME,
-			FOUR_SIDED_BOARD,
-			SIX_SIDED_BOARD,
-			EIGHT_SIDED_BOARD,
-			HEXHEX_10
-		]
-	},
-	Meadow: {
-		id: 14,
-		name: "Medo",
-		desc: "Medo",
-		color: "var(--meadowcolor)",
-		description: "A territory battle on a hexagonal board.",
-		coverImg: "hexagon.png",
-		// rulesUrl: "https://www.nickbentley.games/medo-rules-and-tips/",
-		rulesUrl: "https://boardgamegeek.com/boardgame/353305/medo",
-		gameOptions: [
-			SHORTER_GAME,
-			FOUR_SIDED_BOARD,
-			SIX_SIDED_BOARD,
-			EIGHT_SIDED_BOARD,
-			DYNAMIC_GROUP_LIMIT
-		]
-	},
-	Hexentafl: {
-		id: 11,
-		name: "heXentafl",
-		desc: "heXentafl",
-		color: "var(--hexcolor)",
-		description: "An asymmetrical strategy game where one player must defend their king while the opponent attacks.",
-		coverImg: "hexagon.png",
-		rulesUrl: "https://nxsgame.wordpress.com/2019/09/26/hexentafl/",
-		gameOptions: [
-			OPTION_ATTACKERS_MOVE_FIRST,
-			FIVE_SIDED_BOARD,
-			KING_MOVES_LIKE_PAWNS
-		],
-		secretGameOptions: [
-			MORE_ATTACKERS
-		]
-	},
-	Tumbleweed: {
-		id: 13,
-		name: "Tumbleweed",
-		desc: "Tumbleweed",
-		color: "var(--tumbleweedcolor)",
-		description: "A hexagonal territory war where players stack tiles based on line-of-sight.",
-		coverImg: "hexagon.png",
-		rulesUrl: "https://www.youtube.com/watch?v=mjA_g3nwYW4",
-		gameOptions: [
-			HEXHEX_11,
-			HEXHEX_6,
-			CHOOSE_NEUTRAL_STACK_SPACE,
-			NO_REINFORCEMENT,
-			TUMBLE_6,
-			RUMBLEWEED,
-			TUMPLETORE,
-			NO_SETUP_PHASE
-		],
-		secretGameOptions: [
-			CRUMBLEWEED
-		]
-	},
-	GodaiPaiSho: {
-		id: 42069, // Funny random number hehe
-		name: "Godai Pai Sho",
-		desc: "Godai Pai Sho",
-		color: "var(--othercolor)",
-		description: "Capture your opponents elemental tiles while protecting your own",
-		coverImg: "lotus.png",
-		rulesUrl: "https://tinyurl.com/65frxu6h",
-		gameOptions: [
-			GODAI_BOARD_ZONES,
-			GODAI_EMPTY_TILE,
-		]
-	},
-	Yamma: {
-		id: 100,
-		name: "Yamma",
-		desc: "Yamma",
-		color: "var(--othercolor)",
-		description: "A 3D four-in-a-row game with cubes viewed from three perspectives.",
-		coverImg: "hexagon.png",
-		rulesUrl: "https://boardgamegeek.com/boardgame/388435/yamma",
-		gameOptions: []
-	},
-	TicTacToe: {
-		id: 101,
-		name: "Tic Tac Toe",
-		desc: "Tic Tac Toe",
-		color: "var(--othercolor)",
-		description: "The classic game of Xs and Os. Get three in a row to win!",
-		coverImg: "hexagon.png",
-		rulesUrl: "https://en.wikipedia.org/wiki/Tic-tac-toe",
-		gameOptions: []
-	}
-};
 
 export function getGameControllerForGameType(gameTypeId) {
 	let controller;
@@ -3533,6 +3160,12 @@ export function getGameControllerForGameType(gameTypeId) {
 			break;
 		case GameType.TicTacToe.id:
 			controller = new TicTacToeController(gameContainerDiv, isMobile);
+			break;
+		case GameType.Hex.id:
+			controller = new HexController(gameContainerDiv, isMobile);
+			break;
+		case GameType.Paiko.id:
+			controller = new PaikoController(gameContainerDiv, isMobile);
 			break;
 		default:
 			debug("Game Controller unavailable.");
@@ -4007,57 +3640,69 @@ function createGameOptionRowStotesTheme(myGame, even) {
 	return gameOptions;
 }
 
-function createGameEntryDefaultTheme(myGame) {
-	const container = document.createElement('div');
+function createGameEntryDefaultTheme(myGame, gameColor) {
 	const gId = parseInt(myGame.gameId);
 	const userIsHost = usernameEquals(myGame.hostUsername);
 	const userIsGuest = usernameEquals(myGame.guestUsername);
 
-	// Create clickable game title
-	const gameDiv = document.createElement('div');
-	gameDiv.className = 'clickableText';
-	gameDiv.onclick = () => {
+	// Create card container
+	const entryDiv = document.createElement('div');
+	entryDiv.classList.add('myGameEntry');
+	if (myGame.isUserTurn) {
+		entryDiv.classList.add('yourTurn');
+	}
+	entryDiv.style.setProperty('--game-color', gameColor);
+	entryDiv.onclick = () => {
 		jumpToGame(gId);
 		closeModal();
 	};
 
-	// Build game display title
+	// Content container
+	const contentDiv = document.createElement('div');
+	contentDiv.classList.add('myGameEntryContent');
+
+	// Players line
+	const playersDiv = document.createElement('div');
+	playersDiv.classList.add('myGamePlayers');
+
 	if (!userIsHost) {
 		if (myGame.hostOnline) {
-			gameDiv.appendChild(createUserOnlineIconElement());
+			playersDiv.appendChild(createUserOnlineIconElement());
 		} else {
-			gameDiv.appendChild(createUserOfflineIconElement());
+			playersDiv.appendChild(createUserOfflineIconElement());
 		}
 	}
-	gameDiv.appendChild(document.createTextNode(myGame.hostUsername));
-	gameDiv.appendChild(document.createTextNode(' vs. '));
+	playersDiv.appendChild(document.createTextNode(myGame.hostUsername));
+	playersDiv.appendChild(document.createTextNode(' vs. '));
 
 	if (!userIsGuest) {
 		if (myGame.guestOnline) {
-			gameDiv.appendChild(createUserOnlineIconElement());
+			playersDiv.appendChild(createUserOnlineIconElement());
 		} else {
-			gameDiv.appendChild(createUserOfflineIconElement());
+			playersDiv.appendChild(createUserOfflineIconElement());
 		}
 	}
-	gameDiv.appendChild(document.createTextNode(myGame.guestUsername));
+	playersDiv.appendChild(document.createTextNode(myGame.guestUsername));
 
 	if (myGame.isUserTurn) {
-		gameDiv.appendChild(document.createTextNode(' (Your turn)'));
+		const turnSpan = document.createElement('span');
+		turnSpan.classList.add('myGameTurnIndicator');
+		turnSpan.textContent = '(Your turn)';
+		playersDiv.appendChild(turnSpan);
 	}
 
-	container.appendChild(gameDiv);
+	contentDiv.appendChild(playersDiv);
 
 	// Add game options
 	for (let i = 0; i < myGame.gameOptions.length; i++) {
 		const optionDiv = document.createElement('div');
-		optionDiv.innerHTML = '&nbsp;&bull;&nbsp;';
-		const em = document.createElement('em');
-		em.textContent = 'Game Option: ' + getGameOptionDescription(myGame.gameOptions[i]);
-		optionDiv.appendChild(em);
-		container.appendChild(optionDiv);
+		optionDiv.classList.add('myGameOption');
+		optionDiv.textContent = '• ' + getGameOptionDescription(myGame.gameOptions[i]);
+		contentDiv.appendChild(optionDiv);
 	}
 
-	return container;
+	entryDiv.appendChild(contentDiv);
+	return entryDiv;
 }
 
 function createClickableDiv(text, onclickFn) {
@@ -4129,23 +3774,51 @@ const showMyGamesCallback = (results) => {
 		} else {
 			// Build divs for default theme
 			let gameTypeHeading = "";
+			let currentSection = null;
+
 			for (const index in myGamesList) {
 				const myGame = myGamesList[index];
+				const gameTypeEntry = getGameTypeEntryFromId(myGame.gameTypeId);
 
-				// Add game type heading if it changed
-				if (myGame.gameTypeDesc !== gameTypeHeading) {
-					if (gameTypeHeading !== "") {
-						container.appendChild(document.createElement('br'));
+				// Resolve the game color
+				let gameColor = gameTypeEntry?.color || 'var(--othercolor)';
+				if (gameColor && gameColor.startsWith('var(')) {
+					const varName = gameColor.match(/var\((--[\w-]+)\)/)?.[1];
+					if (varName) {
+						gameColor = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
 					}
+				}
+
+				// Create new section when game type changes
+				if (myGame.gameTypeDesc !== gameTypeHeading) {
 					gameTypeHeading = myGame.gameTypeDesc;
+
+					currentSection = document.createElement('div');
+					currentSection.classList.add('myGamesSection');
+
+					// Create heading with icon and colored border
 					const headingDiv = document.createElement('div');
-					headingDiv.className = 'modalContentHeading';
-					headingDiv.textContent = gameTypeHeading;
-					container.appendChild(headingDiv);
+					headingDiv.classList.add('joinGameHeading');
+					headingDiv.style.setProperty('--game-color', gameColor);
+
+					if (gameTypeEntry?.coverImg) {
+						const headingIcon = document.createElement('img');
+						headingIcon.classList.add('joinGameHeadingIcon');
+						headingIcon.src = 'style/game-icons/' + gameTypeEntry.coverImg;
+						headingIcon.alt = gameTypeHeading;
+						headingDiv.appendChild(headingIcon);
+					}
+
+					const headingText = document.createElement('span');
+					headingText.textContent = gameTypeHeading;
+					headingDiv.appendChild(headingText);
+
+					currentSection.appendChild(headingDiv);
+					container.appendChild(currentSection);
 				}
 
 				// Add game entry
-				container.appendChild(createGameEntryDefaultTheme(myGame));
+				currentSection.appendChild(createGameEntryDefaultTheme(myGame, gameColor));
 			}
 		}
 	}
@@ -4267,6 +3940,7 @@ export function accountHeaderClicked() {
 		loginClicked();
 	}
 	requestNotificationPermission();
+	initWebPush();
 }
 
 export function loginClicked() {
@@ -4283,7 +3957,7 @@ export function signUpClicked() {
 		msgContent.appendChild(document.createElement('br'));
 		msgContent.appendChild(document.createTextNode("You are currently signed in as " + getUsername()));
 	} else {
-		msgContent = document.getElementById('signUpModalContentContainer').cloneNode(true);
+		msgContent = buildSignUpModalContentElement();
 	}
 
 	showModalElem("Sign Up", msgContent);
@@ -4334,28 +4008,6 @@ const getCurrentGamesForUserNewCallback = (results) => {
 		completeJoinGameSeek(gameSeek);
 	}
 };
-
-export function getGameTypeEntryFromId(id) {
-	let gameTypeEntry = null;
-	Object.keys(GameType).forEach((key, index) => {
-		if (GameType[key].id === id) {
-			gameTypeEntry = GameType[key];
-			return GameType[key];
-		}
-	});
-	return gameTypeEntry;
-}
-
-export function gameTypeIdSupported(id) {
-	let gameTypeIdFound = false;
-	Object.keys(GameType).forEach((key, index) => {
-		if (GameType[key].id === id) {
-			gameTypeIdFound = true;
-			return true;
-		}
-	});
-	return gameTypeIdFound;
-}
 
 let selectedGameSeek;
 
@@ -4508,50 +4160,98 @@ const getGameSeeksCallback = (results) => {
 
 			container.appendChild(table);
 		} else {
+			let currentSection = null;
+
 			for (const index in gameSeekList) {
 				const gameSeek = gameSeekList[index];
+				const gameTypeEntry = getGameTypeEntryFromId(gameSeek.gameTypeId);
+
 				if (
 					gameDevOn
-					|| !getGameTypeEntryFromId(gameSeek.gameTypeId).usersWithAccess
-					|| usernameIsOneOf(getGameTypeEntryFromId(gameSeek.gameTypeId).usersWithAccess)
+					|| !gameTypeEntry.usersWithAccess
+					|| usernameIsOneOf(gameTypeEntry.usersWithAccess)
 				) {
+					// Create new section when game type changes
 					if (gameSeek.gameTypeDesc !== gameTypeHeading) {
-						if (gameTypeHeading !== "") {
-							container.appendChild(document.createElement('br'));
-						}
 						gameTypeHeading = gameSeek.gameTypeDesc;
+
+						// Resolve the game color
+						let gameColor = gameTypeEntry.color || 'var(--othercolor)';
+						if (gameColor && gameColor.startsWith('var(')) {
+							const varName = gameColor.match(/var\((--[\w-]+)\)/)?.[1];
+							if (varName) {
+								gameColor = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+							}
+						}
+
+						currentSection = document.createElement('div');
+						currentSection.classList.add('joinGameSection');
+
+						// Create heading with icon and colored border
 						const headingDiv = document.createElement('div');
-						headingDiv.classList.add('modalContentHeading');
-						headingDiv.textContent = gameTypeHeading;
-						container.appendChild(headingDiv);
+						headingDiv.classList.add('joinGameHeading');
+						headingDiv.style.setProperty('--game-color', gameColor);
+
+						if (gameTypeEntry.coverImg) {
+							const headingIcon = document.createElement('img');
+							headingIcon.classList.add('joinGameHeadingIcon');
+							headingIcon.src = 'style/game-icons/' + gameTypeEntry.coverImg;
+							headingIcon.alt = gameTypeHeading;
+							headingDiv.appendChild(headingIcon);
+						}
+
+						const headingText = document.createElement('span');
+						headingText.textContent = gameTypeHeading;
+						headingDiv.appendChild(headingText);
+
+						currentSection.appendChild(headingDiv);
+						container.appendChild(currentSection);
 					}
 
-					const entryContainer = document.createElement('div');
+					// Resolve the game color for entry hover
+					let entryColor = gameTypeEntry.color || 'var(--othercolor)';
+					if (entryColor && entryColor.startsWith('var(')) {
+						const varName = entryColor.match(/var\((--[\w-]+)\)/)?.[1];
+						if (varName) {
+							entryColor = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+						}
+					}
+
 					const gId = parseInt(gameSeek.gameId);
 
-					const clickableDiv = document.createElement('div');
-					clickableDiv.classList.add('clickableText', 'gameSeekEntry');
-					clickableDiv.onclick = () => acceptGameSeekClicked(gId);
-					clickableDiv.appendChild(document.createTextNode('Host: '));
+					// Create card-style entry
+					const entryDiv = document.createElement('div');
+					entryDiv.classList.add('gameSeekEntry');
+					entryDiv.style.setProperty('--game-color', entryColor);
+					entryDiv.onclick = () => acceptGameSeekClicked(gId);
+
+					// Content container
+					const contentDiv = document.createElement('div');
+					contentDiv.classList.add('gameSeekEntryContent');
+
+					// Host line
+					const hostDiv = document.createElement('div');
+					hostDiv.classList.add('gameSeekHost');
 					const iconSpan = document.createElement('span');
 					iconSpan.innerHTML = gameSeek.hostOnline ? getUserOnlineIcon() : getUserOfflineIcon();
-					clickableDiv.appendChild(iconSpan);
-					let hostText = gameSeek.hostUsername;
+					hostDiv.appendChild(iconSpan);
+					let hostText = ' ' + gameSeek.hostUsername;
 					if (gameSeek.rankedGame) {
 						hostText += ' (' + gameSeek.hostRating + ')';
 					}
-					clickableDiv.appendChild(document.createTextNode(hostText));
-					entryContainer.appendChild(clickableDiv);
+					hostDiv.appendChild(document.createTextNode(hostText));
+					contentDiv.appendChild(hostDiv);
 
+					// Game options
 					for (let i = 0; i < gameSeek.gameOptions.length; i++) {
 						const optionDiv = document.createElement('div');
-						optionDiv.appendChild(document.createTextNode('\u00A0\u2022\u00A0'));
-						const emElem = document.createElement('em');
-						emElem.textContent = 'Game Option: ' + getGameOptionDescription(gameSeek.gameOptions[i]);
-						optionDiv.appendChild(emElem);
-						entryContainer.appendChild(optionDiv);
+						optionDiv.classList.add('gameSeekOption');
+						optionDiv.textContent = '• ' + getGameOptionDescription(gameSeek.gameOptions[i]);
+						contentDiv.appendChild(optionDiv);
 					}
-					container.appendChild(entryContainer);
+
+					entryDiv.appendChild(contentDiv);
+					currentSection.appendChild(entryDiv);
 					gameSeeksDisplayed = true;
 				}
 			}
@@ -4638,8 +4338,9 @@ export function viewGameSeeksClicked() {
 
 const getActiveGamesCountCallback = (count) => {
 	const activeCountDiv = document.getElementById('activeGamesCountDisplay');
-	if (activeCountDiv && Number.isFinite(count)) {
-		activeCountDiv.innerText = count + " games active in the past 24 hours!";
+	const countNum = parseInt(count, 10);
+	if (activeCountDiv && Number.isFinite(countNum)) {
+		activeCountDiv.innerText = countNum + " games active in the past 24 hours!";
 	}
 };
 
@@ -4910,7 +4611,7 @@ export function setSidenavNewGameSection() {
 
 export function closeGame() {
 	if (gameDevOn) {
-		setGameController(GameType.Trifle.id);
+		setGameController(GameType.Paiko.id);
 		// setGameController(GameType.BeyondTheMaps.id);
 		// // REMOVE THIS
 		// addGameOption(EDGES_MOVE_4_2);
@@ -4960,39 +4661,100 @@ function getNewGameEntryForGameType(gameType) {
 			if (small) {
 				newGameElem.classList.add('small');
 			}
-			newGameElem.style.backgroundColor = gameType.color
-			// todo......
-		} else {
-			// return "<div class='newGameEntry'><span class='clickableText' onclick='setGameController(" + gameType.id + "); closeModal();'>" + gameType.desc + "</span><span>&nbsp;-&nbsp;<i class='fa fa-book' aria-hidden='true'></i>&nbsp;</span><a href='" + gameType.rulesUrl + "' target='_blank' class='newGameRulesLink'>Rules</a></div>";
-			// newGameElem.classList.add('newGameEntry');
-			// Create the div element
-			const div = document.createElement("div");
-			div.className = "newGameEntry";
+			newGameElem.style.backgroundColor = gameType.color;
 
-			// Create the span element for clickable text
-			const spanClickableText = document.createElement("span");
-			spanClickableText.className = "clickableText";
-			spanClickableText.textContent = gameType.desc;
-			spanClickableText.onclick = function() {
+			// Image
+			const img = document.createElement('img');
+			img.src = 'style/game-icons/' + gameType.coverImg;
+			img.ondblclick = function() {
 				setGameController(gameType.id);
 				closeModal();
 			};
+			newGameElem.appendChild(img);
 
-			// Create the span element for the icon
-			const spanIcon = document.createElement("span");
-			spanIcon.innerHTML = "&nbsp;-&nbsp;<i class='fa fa-book' aria-hidden='true'></i>&nbsp;";
+			// Title
+			const h3 = document.createElement('h3');
+			h3.textContent = gameType.desc;
+			h3.onclick = function() {
+				setGameController(gameType.id);
+				closeModal();
+			};
+			newGameElem.appendChild(h3);
+
+			// Hidden expandable section
+			const hiddenDiv = document.createElement('div');
+			hiddenDiv.className = 'gameDiv-hidden';
+
+			const rulesSpan = document.createElement('span');
+			rulesSpan.className = 'rulesSpan';
+			rulesSpan.innerHTML = '<i class="fa fa-book" aria-hidden="true"></i>&nbsp;';
+			const rulesLink = document.createElement('a');
+			rulesLink.href = gameType.rulesUrl;
+			rulesLink.target = '_blank';
+			rulesLink.textContent = 'Rules';
+			rulesSpan.appendChild(rulesLink);
+			hiddenDiv.appendChild(rulesSpan);
+
+			const descP = document.createElement('p');
+			descP.textContent = gameType.description;
+			hiddenDiv.appendChild(descP);
+
+			newGameElem.appendChild(hiddenDiv);
+
+			return newGameElem;
+		} else {
+			// Create the card div element
+			const div = document.createElement("div");
+			div.className = "newGameEntry";
+
+			// Resolve the actual color value from CSS variable reference (e.g., "var(--skudcolor)" -> "#c83737")
+			let gameColor = gameType.color;
+			if (gameColor && gameColor.startsWith('var(')) {
+				const varName = gameColor.match(/var\((--[\w-]+)\)/)?.[1];
+				if (varName) {
+					gameColor = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+				}
+			}
+			div.style.setProperty('--game-color', gameColor);
+
+			// Create thumbnail image
+			const thumbnail = document.createElement("img");
+			thumbnail.className = "newGameThumbnail";
+			thumbnail.src = 'style/game-icons/' + gameType.coverImg;
+			thumbnail.alt = gameType.desc;
+
+			// Create content container
+			const contentDiv = document.createElement("div");
+			contentDiv.className = "newGameEntryContent";
+
+			// Create the span element for clickable text
+			const spanClickableText = document.createElement("span");
+			spanClickableText.className = "newGameTitle";
+			spanClickableText.textContent = gameType.desc;
 
 			// Create the anchor element for rules link
 			const anchorRules = document.createElement("a");
 			anchorRules.href = gameType.rulesUrl;
 			anchorRules.target = "_blank";
 			anchorRules.className = "newGameRulesLink";
-			anchorRules.textContent = "Rules";
+			anchorRules.innerHTML = "<i class='fa fa-book' aria-hidden='true'></i> Rules";
+			anchorRules.onclick = function(e) {
+				e.stopPropagation();
+			};
 
-			// Append the elements to the div
-			div.appendChild(spanClickableText);
-			div.appendChild(spanIcon);
-			div.appendChild(anchorRules);
+			// Append text and rules to content
+			contentDiv.appendChild(spanClickableText);
+			contentDiv.appendChild(anchorRules);
+
+			// Append thumbnail and content to card
+			div.appendChild(thumbnail);
+			div.appendChild(contentDiv);
+
+			// Make entire card clickable
+			div.onclick = function() {
+				setGameController(gameType.id);
+				closeModal();
+			};
 
 			return div;
 		}
@@ -5640,7 +5402,7 @@ export function iOSShake() {
 export function saveDeviceTokenIfNeeded() {
 	const deviceToken = localStorage.getItem(deviceTokenKey);
 	if ((ios || QueryString.appType === 'ios') && deviceToken && userIsLoggedIn()) {
-		onlinePlayEngine.addUserPreferenceValue(getLoginToken(), 3, deviceToken, emptyCallback);
+		onlinePlayEngine.addUserPreferenceValue(getLoginToken(), PREF_IOS_DEVICE_TOKEN, deviceToken, emptyCallback);
 	}
 }
 
@@ -5989,6 +5751,17 @@ export {
 	notifyMe,
 	notifyThisMessage
 } from './Notifications';
+
+// Re-exported from WebPush module
+export {
+	isPushSupported,
+	isWebPushEnabled,
+	subscribeToPush,
+	unsubscribeFromPush,
+	isChatNotificationsEnabled,
+	enableChatNotifications,
+	disableChatNotifications
+} from './WebPush';
 
 /* Keyboard shortcuts */
 document.onkeyup = function(e) {

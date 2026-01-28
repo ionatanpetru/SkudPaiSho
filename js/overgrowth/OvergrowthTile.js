@@ -1,19 +1,19 @@
 // Tile
 
-import {
-  ACCENT_TILE,
-  BASIC_FLOWER,
-  BOAT,
-  KNOTWEED,
-  ORCHID,
-  ROCK,
-  SPECIAL_FLOWER,
-  WHEEL,
-  WHITE_LOTUS,
-  debug,
-  superHarmonies,
-} from '../GameData';
 import { GUEST, HOST } from '../CommonNotationObjects';
+import {
+	ACCENT_TILE,
+	BASIC_FLOWER,
+	BOAT,
+	KNOTWEED,
+	ORCHID,
+	ROCK,
+	SPECIAL_FLOWER,
+	WHEEL,
+	WHITE_LOTUS,
+	debug,
+} from '../GameData';
+import { superHarmonies } from '../skud-pai-sho/SkudPaiShoRules';
 import { RED, WHITE, tileIdIncrement } from '../skud-pai-sho/SkudPaiShoTile';
 
 export function OvergrowthTile(code, ownerCode) {

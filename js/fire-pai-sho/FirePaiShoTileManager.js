@@ -1,5 +1,12 @@
 /* Skud Pai Sho Tile Manager */
 
+import { getRandomizer } from '../../js_util/MersenneTwisterRandom';
+import { GUEST, HOST } from '../CommonNotationObjects';
+import { ACCENT_TILE, BASIC_FLOWER, copyArray, SPECIAL_FLOWER } from '../GameData';
+import { gameOptionEnabled, OPTION_ANCIENT_OASIS_EXPANSION, OPTION_DOUBLE_ACCENT_TILES, ORIGINAL_BENDER_EXPANSION } from '../GameOptions';
+import { guestPlayerCode, hostPlayerCode } from '../pai-sho-common/PaiShoPlayerHelp';
+import { FirePaiShoTile } from './FirePaiShoTile';
+
 export function FirePaiShoTileManager(forActuating) {
 	if (forActuating) {
 		this.hostTiles = this.loadOneOfEach('H');
@@ -208,7 +215,7 @@ FirePaiShoTileManager.prototype.grabTile = function(player, tileCode, bonus) {
 	var tile;
 	for (var i = 0; i < tilePile.length; i++) {
 		if (tilePile[i].code === tileCode) {
-			newTileArr = tilePile.splice(i, 1);
+			var newTileArr = tilePile.splice(i, 1);
 			tile = newTileArr[0];
 			break;
 		}

@@ -1,4 +1,12 @@
 // Street Pai Sho Game Manager
+import { ARRANGING, GUEST, HOST, INITIAL_SETUP, NotationPoint, PLANTING } from '../CommonNotationObjects';
+import { debug } from '../GameData';
+import { FORMAL_WIN_CONDITION, gameOptionEnabled } from '../GameOptions';
+import { PaiShoMarkingManager } from '../pai-sho-common/PaiShoMarkingManager';
+import { getCurrentPlayer } from '../PaiShoMain';
+import { lessBonus, limitedGatesRule, newGatesRule, newSpecialFlowerRules } from '../skud-pai-sho/SkudPaiShoRules';
+import { StreetBoard } from './StreetBoard';
+import { StreetTileManager } from './StreetTileManager';
 
 export function StreetGameManager(actuator, ignoreActuate, isCopy) {
 	this.isCopy = isCopy;
@@ -28,11 +36,11 @@ StreetGameManager.prototype.setup = function (ignoreActuate) {
 };
 
 // Sends the updated board to the actuator
-StreetGameManager.prototype.actuate = function () {
+StreetGameManager.prototype.actuate = function (moveToAnimate) {
 	if (this.isCopy) {
 		return;
 	}
-	this.actuator.actuate(this.board, this.tileManager, this.markingManager);
+	this.actuator.actuate(this.board, this.tileManager, this.markingManager, moveToAnimate);
 };
 
 StreetGameManager.prototype.runNotationMove = function(move, withActuate) {
@@ -125,7 +133,7 @@ StreetGameManager.prototype.runNotationMove = function(move, withActuate) {
 	}
 
 	if (withActuate) {
-		this.actuate();
+		this.actuate(move);
 	}
 
 	this.endGameWinners = [];

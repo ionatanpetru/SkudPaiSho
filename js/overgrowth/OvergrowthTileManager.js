@@ -1,5 +1,18 @@
 // Tile Manager
 
+import { GUEST, HOST } from '../CommonNotationObjects';
+import { copyArray, debug } from '../GameData';
+import {
+	gameOptionEnabled,
+	LESS_TILES,
+	OPTION_DOUBLE_TILES,
+	OPTION_FULL_TILES,
+	OPTION_INSANE_TILES,
+} from '../GameOptions';
+import { getPlayerCodeFromName, guestPlayerCode, hostPlayerCode } from '../pai-sho-common/PaiShoPlayerHelp';
+import { getRandomizer } from '../../js_util/MersenneTwisterRandom';
+import { OvergrowthTile } from './OvergrowthTile';
+
 export function OvergrowthTileManager(forActuating) {
 	if (forActuating) {
 		this.hostTiles = this.loadOneOfEach('H');
@@ -109,7 +122,7 @@ OvergrowthTileManager.prototype.grabTile = function(playerName, tileCode) {
 	var tile;
 	for (var i = 0; i < tilePile.length; i++) {
 		if (tilePile[i].code === tileCode) {
-			newTileArr = tilePile.splice(i, 1);
+			var newTileArr = tilePile.splice(i, 1);
 			tile = newTileArr[0];
 			break;
 		}

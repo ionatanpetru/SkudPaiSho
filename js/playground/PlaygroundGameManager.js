@@ -1,7 +1,13 @@
 // Skud Pai Sho Game Manager
 
+import { setBoardImage } from '../ActuatorHelp';
+import { DEPLOY, MOVE } from '../CommonNotationObjects';
 import { debug } from '../GameData';
+import { PaiShoMarkingManager } from '../pai-sho-common/PaiShoMarkingManager';
 import { lessBonus, limitedGatesRule, newGatesRule, newSpecialFlowerRules } from '../skud-pai-sho/SkudPaiShoRules';
+import { PlaygroundBoard } from './PlaygroundBoard';
+import { PlaygroundMoveType, PlaygroundNotationConstants } from './PlaygroundGameNotation';
+import { PlaygroundTileManager } from './PlaygroundTileManager';
 
 export function PlaygroundGameManager(actuator, ignoreActuate, isCopy) {
 	this.isCopy = isCopy;
@@ -60,8 +66,6 @@ PlaygroundGameManager.prototype.runNotationMove = function(move, withActuate) {
 		if (capturedTile) {
 			this.tileManager.pilesByName[PlaygroundNotationConstants.capturedPile].push(capturedTile);
 		}
-	} else if (move.moveType === PlaygroundMoveType.hideTileLibraries) {
-		this.actuateOptions.showTileLibrary = false;
 	} else if (move.moveType === PlaygroundMoveType.deployToTilePile) {
 		var tile = this.tileManager.grabTile(move.tileOwner, move.tileType, move.sourcePileName);
 		this.tileManager.pilesByName[move.endPileName].push(tile);

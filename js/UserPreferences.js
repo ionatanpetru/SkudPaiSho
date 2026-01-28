@@ -15,6 +15,15 @@ import {
 	submitMoveData,
 	confirmMoveToSubmit,
 	showModalElem,
+	userIsLoggedIn,
+	getLoginToken,
+	isPushSupported,
+	isWebPushEnabled,
+	subscribeToPush,
+	unsubscribeFromPush,
+	isChatNotificationsEnabled,
+	enableChatNotifications,
+	disableChatNotifications,
 } from './PaiShoMain';
 import { OnboardingFunctions } from './OnBoardingVars';
 import { GameClock } from './util/GameClock';
@@ -186,6 +195,72 @@ export function showPreferences() {
 	clockLabel.textContent = ' (Beta) Game Clock enabled?';
 	clockDiv.appendChild(clockLabel);
 	container.appendChild(clockDiv);
+
+	// Web Push notifications checkbox (only show if supported and logged in)
+	if (isPushSupported() && userIsLoggedIn()) {
+		const pushDiv = document.createElement('div');
+		const pushCheckbox = document.createElement('input');
+		pushCheckbox.id = 'webPushCheckBox';
+		pushCheckbox.type = 'checkbox';
+		pushCheckbox.checked = isWebPushEnabled();
+		pushCheckbox.onclick = async () => {
+			if (pushCheckbox.checked) {
+				// Request permission immediately on user gesture (before any await)
+				const permission = await Notification.requestPermission();
+				if (permission !== 'granted') {
+					pushCheckbox.checked = false;
+					return;
+				}
+				const subscription = await subscribeToPush(getLoginToken());
+				if (!subscription) {
+					pushCheckbox.checked = false;
+				}
+			} else {
+				await unsubscribeFromPush();
+			}
+		};
+		pushDiv.appendChild(pushCheckbox);
+		const pushLabel = document.createElement('label');
+		pushLabel.htmlFor = 'webPushCheckBox';
+		pushLabel.textContent = ' Push notifications for opponent moves?';
+		pushDiv.appendChild(pushLabel);
+		container.appendChild(pushDiv);
+
+		// Chat notifications checkbox (only show if push is enabled)
+		const chatDiv = document.createElement('div');
+		chatDiv.style.marginLeft = '20px';
+		const chatCheckbox = document.createElement('input');
+		chatCheckbox.id = 'chatNotificationsCheckBox';
+		chatCheckbox.type = 'checkbox';
+		chatCheckbox.checked = isChatNotificationsEnabled();
+		chatCheckbox.disabled = !isWebPushEnabled();
+		chatCheckbox.onclick = async () => {
+			if (chatCheckbox.checked) {
+				const success = await enableChatNotifications(getLoginToken());
+				if (!success) {
+					chatCheckbox.checked = false;
+				}
+			} else {
+				await disableChatNotifications(getLoginToken());
+			}
+		};
+		chatDiv.appendChild(chatCheckbox);
+		const chatLabel = document.createElement('label');
+		chatLabel.htmlFor = 'chatNotificationsCheckBox';
+		chatLabel.textContent = ' Also notify for chat messages?';
+		chatDiv.appendChild(chatLabel);
+		container.appendChild(chatDiv);
+
+		// Update chat checkbox state when push checkbox changes
+		const originalPushClick = pushCheckbox.onclick;
+		pushCheckbox.onclick = async () => {
+			await originalPushClick();
+			chatCheckbox.disabled = !pushCheckbox.checked;
+			if (!pushCheckbox.checked) {
+				chatCheckbox.checked = false;
+			}
+		};
+	}
 
 	// Minimal ads option
 	if (Ads.Options.showAds) {

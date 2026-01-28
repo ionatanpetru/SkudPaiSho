@@ -1,5 +1,12 @@
 /* Skud Pai Sho Tile Manager */
 
+import { GUEST, HOST } from '../CommonNotationObjects';
+import { ACCENT_TILE, BASIC_FLOWER, debug, SPECIAL_FLOWER } from '../GameData';
+import { BOTTOMLESS_RESERVES, gameOptionEnabled } from '../GameOptions';
+import { GameType } from '../PaiShoMain';
+import { PlaygroundNotationConstants } from './PlaygroundGameNotation';
+import { PlaygroundTile } from './PlaygroundTile';
+
 export function PlaygroundTileManager(forActuating) {
 	if (forActuating) {
 		this.hostTileLibrary = this.loadTileSet('H');
@@ -226,7 +233,7 @@ PlaygroundTileManager.prototype.grabTile = function(player, tileCode, sourcePile
 		var tile;
 		for (var i = 0; i < tilePile.length; i++) {
 			if (tilePile[i].code === tileCode && tilePile[i].ownerCode === player) {
-				newTileArr = tilePile.splice(i, 1);
+				let newTileArr = tilePile.splice(i, 1);
 				tile = newTileArr[0];
 				break;
 			}

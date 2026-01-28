@@ -130,7 +130,7 @@ CoopSolitaireController.prototype.getAdditionalMessage = function() {
 		container.appendChild(document.createTextNode('The ' + playerName + ' is not allowed to form ' + typeNotAllowed + '.'));
 		container.appendChild(document.createElement('br'));
 		const strong = document.createElement('strong');
-		strong.textContent = this.theGame.getWinReason();
+		strong.appendChild(this.theGame.getWinReason());
 		container.appendChild(strong);
 	}
 	return container;

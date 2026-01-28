@@ -116,10 +116,10 @@ KeyPaiShoActuator.prototype.htmlify = function(board, tileManager, markingManage
 
 	// Go through tile piles and display
 	tileManager.hostTiles.forEach(function(tile) {
-		self.addTile(tile, this.hostTilesContainer);
+		self.addTile(tile, self.hostTilesContainer);
 	});
 	tileManager.guestTiles.forEach(function(tile) {
-		self.addTile(tile, this.guestTilesContainer);
+		self.addTile(tile, self.guestTilesContainer);
 	});
 };
 
@@ -162,12 +162,12 @@ KeyPaiShoActuator.prototype.addTile = function(tile, mainContainer) {
 
 	if (this.mobile) {
 		theDiv.addEventListener('click', () => {
-				unplayedTileClicked(this);
-				showTileMessage(this);
+				unplayedTileClicked(theDiv);
+				showTileMessage(theDiv);
 			});
 	} else {
-		theDiv.addEventListener('click', () => unplayedTileClicked(this));
-		theDiv.addEventListener('mouseover', () => showTileMessage(this));
+		theDiv.addEventListener('click', () => unplayedTileClicked(theDiv));
+		theDiv.addEventListener('mouseover', () => showTileMessage(theDiv));
 		theDiv.addEventListener('mouseout', clearMessage);
 	}
 

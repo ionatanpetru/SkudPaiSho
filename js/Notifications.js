@@ -19,6 +19,12 @@ export function notifyMe() {
 }
 
 export function notifyThisMessage(message) {
+	// Skip browser notification if push notifications are enabled
+	// (push notifications will handle this instead)
+	if (localStorage.getItem('webPushEnabled') === 'true') {
+		return;
+	}
+
 	// Let's check if the browser supports notifications
 	// if (!("Notification" in window)) {
 	//   alert("This browser does not support desktop notification");

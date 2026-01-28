@@ -1,3 +1,8 @@
+import { GUEST, HOST } from "../CommonNotationObjects";
+import { debug } from "../GameData";
+import { getOpponentName } from "../pai-sho-common/PaiShoPlayerHelp";
+import { MeadowBoard } from "./MeadowBoard";
+import { MeadowBoardPoint } from "./MeadowBoardPoint";
 
 export function MeadowGameManager(actuator, ignoreActuate, isCopy) {
 	this.isCopy = isCopy;

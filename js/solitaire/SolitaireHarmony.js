@@ -228,28 +228,31 @@ SolitaireHarmonyManager.prototype.getSolitaireGameSummaryText = function() {
 	// Calculate Simple score (based on number of Harmonies and Disharmonies)
 	var harmonyPoints = this.numHarmoniesForPlayer(player);
 	var clashPoints = this.numClashesForPlayer(player);
-	
-	// var simpleScore = harmonyPoints - Math.abs(harmonyPoints - clashPoints);
+
 	var simpleScore = harmonyPoints > clashPoints ? clashPoints : harmonyPoints;
 	debug("Simple Score: " + simpleScore);
 
-	var message = harmonyPoints + " Harmonies <br />"
-					+ clashPoints + " Disharmonies <br />"
-					+ "Simple Score: " + simpleScore;
+	var container = document.createElement('span');
+	container.appendChild(document.createTextNode(harmonyPoints + " Harmonies"));
+	container.appendChild(document.createElement('br'));
+	container.appendChild(document.createTextNode(clashPoints + " Disharmonies"));
+	container.appendChild(document.createElement('br'));
+	container.appendChild(document.createTextNode("Simple Score: " + simpleScore));
 
-	/** Other score ideas: 
-		Each Harmony/Clash is worth the number of points equal to 
-			the number of spaces the Harmony touches on the board?
-	*/
+	// Full scoring based on harmony lengths
 	harmonyPoints = this.getHarmonyPointsForPlayer(player, this.harmonies);
 	clashPoints = this.getHarmonyPointsForPlayer(player, this.clashes);
 	var complexScore = harmonyPoints > clashPoints ? clashPoints : harmonyPoints;
 
-	return message + "<br /><br />" 
-			+ harmonyPoints + " Harmony Points <br />" 
-			+ clashPoints + " Disharmony Points <br />"
-			+ "Full Score: " + complexScore;
-	// return "Score: " + totalScore;
+	container.appendChild(document.createElement('br'));
+	container.appendChild(document.createElement('br'));
+	container.appendChild(document.createTextNode(harmonyPoints + " Harmony Points"));
+	container.appendChild(document.createElement('br'));
+	container.appendChild(document.createTextNode(clashPoints + " Disharmony Points"));
+	container.appendChild(document.createElement('br'));
+	container.appendChild(document.createTextNode("Full Score: " + complexScore));
+
+	return container;
 };
 
 SolitaireHarmonyManager.prototype.getHarmonyPointsForPlayer = function(player, harmonyList) {

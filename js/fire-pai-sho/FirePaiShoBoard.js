@@ -1,4 +1,15 @@
 /* Fire Pai Sho Board */
+import { GUEST, HOST, NotationPoint, RowAndColumn } from '../CommonNotationObjects';
+import { ACCENT_TILE, BASIC_FLOWER, BOAT, KNOTWEED, KOI, LION_TURTLE, ORIGINAL_BENDER, POND, ROCK, SPECIAL_FLOWER, WHEEL, WHITE_LOTUS } from '../GameData';
+import { ETHEREAL_ACCENT_TILES, gameOptionEnabled, ORIGINAL_BENDER_EXPANSION } from '../GameOptions';
+import { GATE, NEUTRAL, NON_PLAYABLE, POSSIBLE_MOVE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import { boatOnlyMoves, newKnotweedRules, newWheelRule, rocksUnwheelable, simplest, superRocks } from '../skud-pai-sho/SkudPaiShoRules';
+import { RED, WHITE } from '../skud-pai-sho/SkudPaiShoTile';
+import { FirePaiShoBoardPoint } from './FirePaiShoBoardPoint';
+import { FirePaiShoTile } from './FirePaiShoTile';
+import { debug } from '../GameData';
+import { FirePaiShoHarmony, FirePaiShoHarmonyManager } from './FirePaiShoHarmony';
+import { showBadMoveModal } from '../PaiShoMain';
 
 export function FirePaiShoBoard() {
 	this.size = new RowAndColumn(17, 17);
@@ -477,7 +488,7 @@ FirePaiShoBoard.prototype.canPlaceFlower = function(boardPoint, tile) {
 
 FirePaiShoBoard.prototype.canPlaceBender = function(boardPoint, aTile) {
 
-	nextToLionTurtle = false;
+	var nextToLionTurtle = false;
 
 	if (gameOptionEnabled(ORIGINAL_BENDER_EXPANSION)) {
 		//Any point that has the player´s lionturtle next to it is legit
@@ -945,7 +956,7 @@ FirePaiShoBoard.prototype.restoreTileIfNeeded = function(boardPoint){
 	//console.log("Assuming a restore unless I hear otherwise");
 	var restore = true;
 	var corporealize = true;
-	rowCols = this.getSurroundingRowAndCols(boardPoint);
+	var rowCols = this.getSurroundingRowAndCols(boardPoint);
 	for (var i = 0; i < rowCols.length; i++) {
 		var bp = this.cells[rowCols[i].row][rowCols[i].col];
 		if (bp.hasTile() && bp.tile.accentType === KNOTWEED) {
@@ -1025,7 +1036,7 @@ FirePaiShoBoard.prototype.canMoveTileToPoint = function(player, boardPointStart,
 
 	// But maybe they can get there if they move through lion turtle
 	if (!closeEnough && this.lionTurtleLocation(player) != false) {
-		lionTurtleStart = this.lionTurtleLocation(player);
+		var lionTurtleStart = this.lionTurtleLocation(player);
 		if (!(Math.abs(lionTurtleStart.row - boardPointEnd.row) + Math.abs(lionTurtleStart.col - boardPointEnd.col) > numMoves)) {
 			// Move may be possible. But there may be tiles in the way...
 			if (this.verifyAbleToReach(lionTurtleStart, boardPointEnd, numMoves)) {
@@ -1054,7 +1065,7 @@ FirePaiShoBoard.prototype.canClearPointWithDragon = function(boardPoint) {
 		return false;
 	}
 
-	tile = boardPoint.tile;
+	var tile = boardPoint.tile;
 
 	// If endpoint is a Gate, that's wrong.
 	if (boardPoint.isType(GATE)) {
@@ -1076,17 +1087,16 @@ FirePaiShoBoard.prototype.canClearPointWithDragon = function(boardPoint) {
 };
 
 FirePaiShoBoard.prototype.clearSurroundingTilesIfPossible = function(boardPoint) {
-	
 	//Check all tiles in clockwise order.
-	row = boardPoint.row;
-	col = boardPoint.col;
+	var row = boardPoint.row;
+	var col = boardPoint.col;
 
 	//No idea if this is getting the right points... maybe need to test it...
 	//No idea if this is getting the right points... maybe need to test it...
 	//No idea if this is getting the right points... maybe need to test it...
 	//No idea if this is getting the right points... maybe need to test it...
 	//N (+1, +1)
-	checkPoint = this.cells[row + 1][col + 1]; 
+	var checkPoint = this.cells[row + 1][col + 1]; 
 	if (this.canClearPointWithDragon(checkPoint)){checkPoint.removeTile();}
 	//NE (+1, 0)
 	checkPoint = this.cells[row + 1][col];
@@ -1468,7 +1478,7 @@ FirePaiShoBoard.prototype.getTileHarmonies = function(boardPoint) {
 FirePaiShoBoard.prototype.getHarmonyLeft = function(tile, endRowCol) {
 	var colToCheck = endRowCol.col - 1;
 
-	harmonies = [];
+	var harmonies = [];
 
 	while (colToCheck >= 0 && !this.cells[endRowCol.row][colToCheck].hasCorporealTile() 
 		&& !this.cells[endRowCol.row][colToCheck].isType(GATE)) {
@@ -1493,7 +1503,7 @@ FirePaiShoBoard.prototype.getHarmonyLeft = function(tile, endRowCol) {
 FirePaiShoBoard.prototype.getHarmonyRight = function(tile, endRowCol) {
 	var colToCheck = endRowCol.col + 1;
 	
-	harmonies = [];
+	var harmonies = [];
 
 	while (colToCheck  <= 16 && !this.cells[endRowCol.row][colToCheck].hasCorporealTile() 
 		&& !this.cells[endRowCol.row][colToCheck].isType(GATE)) {
@@ -1517,7 +1527,7 @@ FirePaiShoBoard.prototype.getHarmonyRight = function(tile, endRowCol) {
 FirePaiShoBoard.prototype.getHarmonyUp = function(tile, endRowCol) {
 	var rowToCheck = endRowCol.row - 1;
 
-	harmonies = [];
+	var harmonies = [];
 
 	while (rowToCheck >= 0 && !this.cells[rowToCheck][endRowCol.col].hasCorporealTile() 
 		&& !this.cells[rowToCheck][endRowCol.col].isType(GATE)) {
@@ -1542,7 +1552,7 @@ FirePaiShoBoard.prototype.getHarmonyUp = function(tile, endRowCol) {
 FirePaiShoBoard.prototype.getHarmonyDown = function(tile, endRowCol) {
 	var rowToCheck = endRowCol.row + 1;
 
-	harmonies = [];
+	var harmonies = [];
 
 	while (rowToCheck  <= 16 && !this.cells[rowToCheck][endRowCol.col].hasCorporealTile() 
 		&& !this.cells[rowToCheck][endRowCol.col].isType(GATE)) {

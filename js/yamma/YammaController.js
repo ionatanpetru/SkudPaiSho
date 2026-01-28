@@ -27,6 +27,7 @@ import {
 	YammaNotationBuilder
 } from './YammaGameNotation';
 import { YammaRandomAI } from './ai/YammaRandomAI';
+import { YammaStrategicAI } from './ai/YammaStrategicAI';
 
 export class YammaController {
 	constructor(gameContainer, isMobile) {
@@ -214,7 +215,7 @@ export class YammaController {
 	}
 
 	getAiList() {
-		return [new YammaRandomAI()];
+		return [new YammaStrategicAI(), new YammaRandomAI()];
 	}
 
 	getCurrentPlayer() {

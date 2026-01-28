@@ -169,18 +169,21 @@ UndergrowthGameManager.prototype.getWinner = function() {
 };
 
 UndergrowthGameManager.prototype.getWinReason = function() {
-	var msg = "";
+	var container = document.createElement('span');
 	if (this.getWinner()) {
-		msg += " won the game with more tiles touching the Central Gardens!";
+		container.appendChild(document.createTextNode(" won the game with more tiles touching the Central Gardens!"));
 	}
-	return msg + this.getScoreSummary();
+	container.appendChild(this.getScoreSummary());
+	return container;
 };
 
 UndergrowthGameManager.prototype.getScoreSummary = function() {
-	return "<br />"
-		+ "Host Central Tiles: " + this.board.getNumberOfTilesTouchingCentralGardensForPlayer(HOST)
-		+ "<br />"
-		+ "Guest Central Tiles: " + this.board.getNumberOfTilesTouchingCentralGardensForPlayer(GUEST);
+	var container = document.createElement('span');
+	container.appendChild(document.createElement('br'));
+	container.appendChild(document.createTextNode("Host Central Tiles: " + this.board.getNumberOfTilesTouchingCentralGardensForPlayer(HOST)));
+	container.appendChild(document.createElement('br'));
+	container.appendChild(document.createTextNode("Guest Central Tiles: " + this.board.getNumberOfTilesTouchingCentralGardensForPlayer(GUEST)));
+	return container;
 };
 
 UndergrowthGameManager.prototype.getWinResultTypeCode = function() {

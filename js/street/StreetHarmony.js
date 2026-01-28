@@ -1,5 +1,9 @@
 /* Skud Pai Sho Harmony */
 
+import { GUEST, HOST, NotationPoint, RowAndColumn } from '../CommonNotationObjects';
+import { debug } from '../GameData';
+import { completeHarmony } from '../skud-pai-sho/SkudPaiShoRules';
+
 export function StreetHarmony(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn) {
 	this.tile1 = tile1;
 	this.tile1Pos = new RowAndColumn(tile1RowAndColumn.row, tile1RowAndColumn.col);

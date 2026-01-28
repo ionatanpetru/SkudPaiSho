@@ -29,7 +29,9 @@ vi.mock('../js/PaiShoMain', () => {
 			SkudPaiSho: { id: 1, name: 'Skud Pai Sho' }
 		},
 		// Mock game options
-		ggOptions: []
+		ggOptions: [],
+		// Mock QueryString for GameData.js debug function
+		QueryString: { appType: '' }
 	};
 });
 

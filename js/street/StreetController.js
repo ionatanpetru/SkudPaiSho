@@ -31,6 +31,7 @@ import {
   getRedPointMessage,
   getRedWhitePointMessage,
   getWhitePointMessage,
+  isAnimationsOn,
   myTurn,
   onlinePlayEnabled,
   playingOnlineGame,
@@ -55,7 +56,7 @@ import {
 import { StreetTile } from './StreetTile';
 
 export function StreetController(gameContainer, isMobile) {
-	this.actuator = new StreetActuator(gameContainer, isMobile);
+	this.actuator = new StreetActuator(gameContainer, isMobile, isAnimationsOn());
 
 	/* Board setup code determines initial tile placement pattern on the board. */
 	this.initializeBoardSetupCodes();
@@ -520,6 +521,10 @@ StreetController.prototype.getCurrentPlayer = function() {
 
 StreetController.prototype.cleanup = function() {
 	// Nothing.
+};
+
+StreetController.prototype.setAnimationsOn = function(isOn) {
+	this.actuator.setAnimationOn(isOn);
 };
 
 StreetController.prototype.isSolitaire = function() {
