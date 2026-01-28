@@ -1,6 +1,7 @@
 /* Beyond The Edges of The Maps specific UI interaction logic */
 
 import {
+  activeAi,
   BRAND_NEW,
   GameType,
   WAITING_FOR_BONUS_ENDPOINT,
@@ -43,6 +44,7 @@ import { TrifleGameNotation } from '../trifle/TrifleGameNotation';
 import { debug } from '../GameData';
 import { getRandomizer } from '../../js_util/MersenneTwisterRandom';
 import BeyondTheMapsTile, { BeyondTheMapsTileType } from './BeyondTheMapsTile';
+import { BeyondTheMapsStrategicAI } from './ai/BeyondTheMapsStrategicAI';
 
 export class BeyondTheMapsController {
 	constructor(gameContainer, isMobile) {
@@ -504,16 +506,26 @@ export class BeyondTheMapsController {
 		}
 	}
 
-	playAiTurn(finalizeMove) {
-		// 
+	playAiTurn(finalizeCallback) {
+		var self = this;
+		var playerMoveNum = this.gameNotation.moves.length;
+
+		setTimeout(function() {
+			var move = activeAi.getMove(self.theGame.getCopy(), playerMoveNum);
+			if (!move) {
+				return;
+			}
+			self.gameNotation.addMove(move);
+			finalizeCallback();
+		}, 500);
 	}
 
 	startAiGame(finalizeMove) {
-		// 
+		this.playAiTurn(finalizeMove);
 	}
 
 	getAiList() {
-		return [];
+		return [new BeyondTheMapsStrategicAI()];
 	}
 
 	getCurrentPlayer() {
